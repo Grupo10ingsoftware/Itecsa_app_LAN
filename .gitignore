@@ -1,0 +1,49 @@
+# Variables de entorno locales
+deploy/production.env
+.env*
+!.env.example
+!**/.env.example
+!env.example
+!**/env.example
+!*.env.example
+!**/*.env.example
+!*.env.sample
+!**/*.env.sample
+!*.env.template
+!**/*.env.template
+
+# Certificados locales de base de datos
+capaServidor/certs/*.pem
+
+# Dependencias
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build / cobertura
+dist/
+capaVista/**/dist-ssr/
+capaServidor/**/build/
+capaServidor/**/coverage/
+data/backups/
+
+# Configuracion local frontend
+capaVista/**/*.local
+capaVista/**/lerna-debug.log*
+
+# Editor y sistema
+.DS_Store
+.idea/
+.vscode/
+capaVista/**/*.suo
+capaVista/**/*.ntvs*
+capaVista/**/*.njsproj
+capaVista/**/*.sln
+capaVista/**/*.sw?
+capaServidor/**/*.swp

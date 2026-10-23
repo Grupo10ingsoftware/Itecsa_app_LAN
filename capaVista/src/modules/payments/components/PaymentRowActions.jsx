@@ -1,0 +1,246 @@
+import { useAuth } from "../../../hooks/useAuth";
+import { PERMISSIONS } from "../../../config/permissions";
+import { useEffect, useId, useRef } from 'react'
+import { PAYMENT_STATUS } from '@/config/status'
+import styles from './PaymentRowActions.module.css'
+
+const ACTION_OPTIONS = [
+  {
+    status: PAYMENT_STATUS.PENDIENTE,
+    label: 'Pendiente',
+    icon: 'bi-clock',
+    className: styles.actionDropdownOptionPending,
+  },
+  {
+    status: PAYMENT_STATUS.CONFIRMADO,
+    label: 'Confirmar',
+    icon: 'bi-check-circle',
+    className: styles.actionDropdownOptionConfirm,
+  },
+  {
+    status: PAYMENT_STATUS.RECHAZADO,
+    label: 'Rechazar',
+    icon: 'bi-x-circle',
+    className: styles.actionDropdownOptionReject,
+  },
+]
+
+function PaymentActionOption({
+  className,
+  icon,
+  label,
+  onClose,
+  onSelect,
+  order,
+  status,
+}) {
+  if (order.paymentStatus === status) return null
+
+  return (
+    <button
+      className={`${styles.actionDropdownOption} ${className}`}
+      onClick={() => {
+        onSelect(order, status)
+        onClose?.()
+      }}
+      role="menuitem"
+      type="button"
+    >
+      <i className={`bi ${icon}`} />
+      <span>{label}</span>
+    </button>
+  )
+}
+
+function ManageButton({
+  disabled = false,
+  disabledTooltip,
+  isMobile,
+  isOpen,
+  onClose,
+  onPrefetch,
+  onSelect,
+  onToggle,
+  order,
+}) {
+  const dropdownRef = useRef(null)
+  const menuId = useId()
+  const actionRootSelector = `[data-payment-action-root="${order.id}"]`
+  const isResolved = order.paymentStatus !== PAYMENT_STATUS.PENDIENTE
+
+  useEffect(() => {
+    if (!isOpen) return undefined
+
+    const handlePointerDown = (event) => {
+      if (dropdownRef.current?.contains(event.target)) return
+
+      const actionRoot = event.target.closest?.(actionRootSelector)
+      if (actionRoot) return
+
+      onClose?.()
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key !== 'Escape') return
+
+      event.preventDefault()
+      onClose?.()
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [actionRootSelector, isOpen, onClose])
+
+  const handleMenuKeyDown = (event) => {
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return
+
+    const options = Array.from(
+      event.currentTarget.querySelectorAll('button:not([disabled])'),
+    )
+
+    if (options.length === 0) return
+
+    event.preventDefault()
+
+    const currentIndex = options.indexOf(document.activeElement)
+    let nextIndex = 0
+
+    if (event.key === 'ArrowDown') {
+      nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % options.length
+    }
+
+    if (event.key === 'ArrowUp') {
+      nextIndex =
+        currentIndex < 0
+          ? options.length - 1
+          : (currentIndex - 1 + options.length) % options.length
+    }
+
+    if (event.key === 'Home') nextIndex = 0
+    if (event.key === 'End') nextIndex = options.length - 1
+
+    options[nextIndex]?.focus()
+  }
+
+  const tooltip = disabled
+    ? disabledTooltip ?? 'No tienes permisos para interactuar con esta accion.'
+    : undefined
+
+  return (
+    <div
+      className={styles.actionDropdownWrap}
+      data-disabled={disabled ? 'true' : undefined}
+      data-payment-action-root={order.id}
+      data-tooltip={tooltip}
+      ref={dropdownRef}
+    >
+      <button
+        aria-controls={isOpen ? menuId : undefined}
+        aria-expanded={isOpen ? 'true' : 'false'}
+        aria-haspopup="menu"
+        className={`${styles.actionButton} ${styles.actionButtonManage} ${
+          isMobile ? 'w-100' : ''
+        }`}
+        disabled={disabled}
+        onFocus={() => onPrefetch?.(order)}
+        onMouseEnter={() => onPrefetch?.(order)}
+        onClick={() => {
+          if (disabled) return
+          onPrefetch?.(order)
+          onToggle(order.id)
+        }}
+        type="button"
+      >
+        Gestionar
+      </button>
+
+      {isOpen && !disabled && (
+        <div
+          aria-label="Acciones de pago"
+          className={styles.paymentActionSelect}
+          id={menuId}
+          onKeyDown={handleMenuKeyDown}
+          onPointerDown={(event) => event.stopPropagation()}
+          role="menu"
+        >
+          {ACTION_OPTIONS.filter(
+            (option) =>
+              !isResolved || option.status !== PAYMENT_STATUS.PENDIENTE,
+          ).map((option) => (
+            <PaymentActionOption
+              className={option.className}
+              icon={option.icon}
+              key={option.status}
+              label={option.label}
+              onClose={onClose}
+              onSelect={onSelect}
+              order={order}
+              status={option.status}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function PaymentRowActions({
+  canUpdatePaymentStatus = false,
+  editingStatus,
+  isMobile = false,
+  isUpdatingPaymentStatus = false,
+  onCloseEditor,
+  onPrefetchDetails,
+  onSelectStatus,
+  onToggleEditor,
+  onViewDetail,
+  order,
+}) {
+  const { hasPermission } = useAuth()
+  const canRevise = hasPermission(PERMISSIONS.REVISE_PAYMENT_STATUS)
+  const isResolved = order.paymentStatus !== PAYMENT_STATUS.PENDIENTE
+  const isManageDisabled =
+    !canUpdatePaymentStatus || isUpdatingPaymentStatus
+  const manageDisabledTooltip = isUpdatingPaymentStatus
+      ? 'Actualizando estado de pago.'
+      : undefined
+
+  return (
+    <div
+      className={`${styles.actionControlsGroup} ${
+        isMobile ? styles.actionControlsGroupMobile : ''
+      }`}
+    >
+      {canUpdatePaymentStatus && (!isResolved || canRevise) && <ManageButton
+        disabled={isManageDisabled}
+        disabledTooltip={manageDisabledTooltip}
+        isMobile={isMobile}
+        isOpen={Boolean(editingStatus[order.id])}
+        onClose={onCloseEditor}
+        onPrefetch={onPrefetchDetails}
+        onSelect={onSelectStatus}
+        onToggle={onToggleEditor}
+        order={order}
+      />}
+
+      {isResolved && typeof onViewDetail === 'function' && (
+        <button
+          className={`${styles.actionButton} ${styles.actionButtonDetail} ${
+            isMobile ? 'w-100' : ''
+          }`}
+          onClick={() => onViewDetail(order)}
+          onFocus={() => onPrefetchDetails?.(order)}
+          onMouseEnter={() => onPrefetchDetails?.(order)}
+          type="button"
+        >
+          Ver detalle
+        </button>
+      )}
+    </div>
+  )
+}

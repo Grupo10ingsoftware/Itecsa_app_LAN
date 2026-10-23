@@ -1,0 +1,42 @@
+{
+  "name": "capaservidor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --import ./test/setup.mjs --test",
+    "start": "node src/app/app.js",
+    "dev": "nodemon src/app/dev.js",
+    "prisma:pull": "node ../tooling/prisma/node_modules/prisma/build/index.js db pull",
+    "prisma:generate": "node ../tooling/prisma/node_modules/prisma/build/index.js generate",
+    "prisma:validate": "node ../tooling/prisma/node_modules/prisma/build/index.js validate",
+    "prisma:migrate:dev": "node ../tooling/prisma/node_modules/prisma/build/index.js migrate dev",
+    "prisma:migrate:status": "node ../tooling/prisma/node_modules/prisma/build/index.js migrate status",
+    "orders:preflight": "node scripts/ordersPreflight.mjs",
+    "pin:retention:preview": "node scripts/previewPinRecoveryRetention.mjs",
+    "retention:preview": "node scripts/previewBusinessRetention.mjs",
+    "prisma:studio": "node ../tooling/prisma/node_modules/prisma/build/index.js studio"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@prisma/adapter-mariadb": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-oauth2-jwt-bearer": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "overrides": {
+    "@hono/node-server": "1.19.14",
+    "mariadb": "3.5.4",
+    "mysql2": "3.24.4",
+    "qs": "6.16.0",
+    "fast-uri": "3.1.6"
+  }
+}
