@@ -1,0 +1,72 @@
+# Decisiones aprobadas y límites de implementación
+
+Fecha: **24-10-2026**. Fuente de aprobación: nuevo encargo «Plan maestro de migración modular de Auth0 a Keycloak». Base de código `34dfd7c09f876285c1ea84d9020a44a1414ba468`. Estas decisiones actualizan las alternativas de la auditoría [02](02_RBAC_ACTUAL_Y_PROPUESTO.md), sin modificar ese documento histórico.
+
+## Registro
+
+| ID | Decisión expresa / aplicación concreta | Estado |
+|---|---|---|
+| D01 | Nueve roles: siete funcionales actuales, Desarrollador y nuevo Soporte | Aprobada; política aislada implementada |
+| D02 | Antiguo Soporte técnico → Desarrollador con exactamente sus 24 capacidades restantes tras retirar `manage:users` | Aprobada; sin migrar personas o registros |
+| D03 | AP/AV/AC pierden únicamente `manage:users`; sus restantes permisos y los de los otros cuatro roles funcionales se conservan | Aprobada; aplicada en la nueva política aislada |
+| D04 | Nuevo Soporte gestiona cuentas, sin capacidades comerciales, incluidas lecturas de pedidos/capacidad | Aprobada; cinco capacidades concretas en la tabla siguiente |
+| D05 | Gerencia, Desarrollador y Soporte requieren política específica para creación/modificación/asignación | Camino ordinario cerrado; no se inventó aprobador |
+| D06 | No autoasignación ni elevación propia | Catálogo de destinos ordinarios excluye el rol Soporte; validación de sujetos e identidades pendiente de integración administrativa |
+| D07 | Conservar Auth0, SDK, servicios, adaptadores, templates, pruebas y documentación | Conservados; sin eliminación ni fallback nuevo |
+| D08 | Solo fases 00 y 01, con política aislada y sin identidades reales | Ejecutadas para revisión; fase 02 no iniciada |
+
+La selección concreta de Soporte utiliza la autorización expresa para conservar perfil y mensajes propios cuando sean necesarios. `manage:own-pin` mantiene el PIN propio independiente, requerido por los contratos de operaciones sensibles; no crea un permiso de administración del PIN ajeno ni un restablecimiento de contraseña. `manage:users` representa la capacidad administrativa existente; no acredita que estén implementadas las futuras credenciales temporales, recuperación o consulta de auditoría. No se añadieron capacidades ficticias para funciones que aún no existen.
+
+## Matriz aprobada para la política nueva
+
+AP/AV/AC = administradores Producción/Ventas/Cobranzas; OP/OV/OC = sus operarios; G = Gerencia; D = Desarrollador; S = **nuevo** Soporte. ✓ permite únicamente si el token también contiene la capacidad y se cumplen los controles de identidad/estado/operación; — deniega incluso con un JWT excesivo.
+
+| Capacidad | AP | AV | AC | OP | OV | OC | G | D | S |
+|---|---|---|---|---|---|---|---|---|---|
+| read:own-profile | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| manage:own-pin | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| read:orders | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| read:production-capacity | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| read:own-messages | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| update:own-messages | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| manage:users | — | — | — | — | — | — | — | — | ✓ |
+| read:sales-notes | — | ✓ | — | — | ✓ | — | — | ✓ | — |
+| create:orders | — | ✓ | — | — | ✓ | — | — | ✓ | — |
+| reevaluate:orders | — | ✓ | — | — | ✓ | — | — | ✓ | — |
+| read:payments | — | — | ✓ | — | — | ✓ | — | ✓ | — |
+| update:payment-status | — | — | ✓ | — | — | ✓ | — | ✓ | — |
+| revise:payment-status | — | — | ✓ | — | — | — | — | ✓ | — |
+| move:orders | ✓ | — | — | ✓ | — | — | — | ✓ | — |
+| start:production | ✓ | — | — | — | — | — | — | ✓ | — |
+| update:production-subprocesses | ✓ | — | — | ✓ | — | — | — | ✓ | — |
+| rollback:production-subprocesses | ✓ | — | — | — | — | — | — | ✓ | — |
+| manage:production-capacity | ✓ | — | — | — | — | — | — | ✓ | — |
+| manage:production-load | ✓ | — | — | — | — | — | — | ✓ | — |
+| manage:order-tags | ✓ | — | — | — | — | — | — | ✓ | — |
+| review:orders | ✓ | — | — | — | — | — | — | ✓ | — |
+| cancel:orders | ✓ | — | — | — | — | — | — | ✓ | — |
+| read:production-calendar | ✓ | ✓ | — | — | ✓ | — | — | ✓ | — |
+| update:order-delivery-date | ✓ | — | — | — | — | — | — | ✓ | — |
+| view:metrics | ✓ | — | — | — | — | — | ✓ | ✓ | — |
+| **Total** | **18** | **10** | **9** | **8** | **10** | **8** | **7** | **24** | **5** |
+
+La matriz se presentó al equipo antes de modificar el código. En pruebas, una expectativa literal e independiente verifica sus 225 celdas: 99 concesiones y 126 denegaciones. Las tablas documentales son evidencia revisable; la política ejecutable se obtiene únicamente de `shared/keycloakAuthorization.js`, derivada de `shared/authorization.js`. No hay un segundo catálogo manual de identificadores de capacidades ni algoritmos de negocio copiados.
+
+## Asignación ordinaria y sujetos
+
+Solo nuevo Soporte tiene `manage:users`. Los destinos ordinarios posibles son AP, AV, AC, OP, OV y OC. Gerencia, Desarrollador y Soporte no aparecen como destinos gestionables por ningún actor. Los otros ocho roles devuelven una lista vacía.
+
+`canManageUser(actorRole, targetRole)` comprueba **alcance por rol**, no la autorización completa de una operación. La integración administrativa futura debe validar sujeto del actor frente al destino, capacidad efectiva, rol previo y solicitado del destino, estado local, PIN y auditoría. Un cambio de rol de una cuenta Gerencia a un rol ordinario tampoco puede eludir el cierre verificando solo el nuevo valor. En esta fase no existen rutas nuevas que permitan tales operaciones.
+
+## Correspondencia pendiente y datos conservados
+
+| Superficie | Comprobación actual | Acción futura |
+|---|---|---|
+| Valor Soporte en catálogo antiguo, tokens, normalizador, configs y fixtures | Sigue significando el rol técnico antiguo en la ejecución activa | Resolver sujetos explícitamente antes de activar la nueva frontera |
+| Desarrollador | Nuevo valor solo en política y pruebas aisladas | Provisionar/migrar únicamente en laboratorio y con aprobación |
+| Usuarios locales (`rol_usuario`, `id_auth0`) | No se editaron ni consultaron filas reales | Inventario controlado, correspondencia issuer/sub y rol coherente en fase autorizada |
+| Históricos y actor (`id_usuario`, registros y relaciones) | Código/esquema preservados; sin escrituras | Mantener PK y referencias, ensayar preservación histórica |
+| Realm roles, defaults, composites y mappers | No se consultó ni modificó el realm real | Verificar roles efectivos; nunca convertir el nombre Soporte ambiguo de forma automática |
+| Mocks, fixtures, generador RBAC y documentos Auth0 | Se conservan los ocho roles originales | Mantenerlos como referencia; no regenerar artefactos Auth0 con la nueva matriz |
+
+Permanecen pendientes: autorización de cuentas privilegiadas y bootstrap, formato de username, política de datos históricos/base nueva, identidad externa estable, parámetros de infraestructura, entrega de credenciales, políticas de sesión/recuperación/retención y mínimos del futuro servicio administrativo. Ninguno se resolvió por defecto.

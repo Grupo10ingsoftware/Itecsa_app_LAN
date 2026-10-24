@@ -33,12 +33,14 @@ export const ROLE_PERMISSIONS = Object.freeze(Object.fromEntries(Object.entries(
   [ROLES.SOPORTE]: BUSINESS_PERMISSIONS,
 }).map(([role,permissions]) => [role,Object.freeze(permissions)])));
 export const ROLES_CLAIM = 'https://itecsa.local/roles';
-export function roleFromPayload(payload) {
+// Optional policy arguments are internal catalogs, never values taken from a JWT.
+// Existing callers retain the complete legacy policy until explicit integration.
+export function roleFromPayload(payload, recognizedRoles = RECOGNIZED_ROLES) {
   const roles = payload?.[ROLES_CLAIM];
-  return Array.isArray(roles) && roles.length === 1 && RECOGNIZED_ROLES.includes(roles[0]) ? roles[0] : null;
+  return Array.isArray(roles) && roles.length === 1 && recognizedRoles.includes(roles[0]) ? roles[0] : null;
 }
-export function can(role, permissions, permission) {
-  return ROLE_PERMISSIONS[role]?.includes(permission) === true && Array.isArray(permissions) && permissions.includes(permission);
+export function can(role, permissions, permission, rolePermissions = ROLE_PERMISSIONS) {
+  return rolePermissions[role]?.includes(permission) === true && Array.isArray(permissions) && permissions.includes(permission);
 }
 // Excepcion tecnica unica: alcance interdepartamental; no omite permisos, PIN ni reglas de estado.
 export function manageableRoles(role) {
