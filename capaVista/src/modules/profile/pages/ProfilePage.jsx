@@ -15,7 +15,7 @@ function getDisplayValue(value, fallback = 'No informado') {
 }
 
 export default function ProfilePage() {
-  const { auth0User, pinStatus, refreshSession, user } = useAuth()
+  const { identityUser, pinStatus, refreshSession, user } = useAuth()
   const authApi = useAuthApi()
   const [historyOpen, setHistoryOpen] = useState(false)
   const historyApi = useMemo(() => ({ getMovements: (_subject, query) => authApi.getProfileMovements(query) }), [authApi])
@@ -44,7 +44,7 @@ export default function ProfilePage() {
   const profile = useMemo(() => {
     const firstName = loadedProfile?.primerNombre ?? user?.primerNombre
     const lastName = loadedProfile?.apellidoPaterno ?? user?.apellidoPaterno
-    const email = loadedProfile?.email ?? user?.email
+    const email = loadedProfile ? loadedProfile.email : user?.email
     const role = loadedProfile?.rolUsuario ?? user?.rolUsuario
     const status = loadedProfile?.estadoUsuario ?? user?.estadoUsuario
 
@@ -55,9 +55,9 @@ export default function ProfilePage() {
       role,
       status,
       rut: loadedProfile?.rutUsuario ?? user?.rutUsuario,
-      picture: auth0User?.picture,
+      picture: identityUser?.picture,
     }
-  }, [auth0User, user, loadedProfile])
+  }, [identityUser, user, loadedProfile])
 
   useEffect(() => {
     if (pinStatus !== 'pending_acknowledgement' || visiblePin) return
@@ -299,7 +299,7 @@ export default function ProfilePage() {
                 <div className="modal-body">
                   {!recoveryRequested ? (
                     <p>
-                      Solicita un codigo de verificacion en tu correo para generar un nuevo PIN.
+                      {loadedProfile?.email ? 'Solicita un codigo de verificacion en tu correo para generar un nuevo PIN.' : 'La recuperacion de PIN por correo requiere un correo real registrado. Contacta al administrador.'}
                     </p>
                   ) : (
                     <label className="form-label w-100">
@@ -323,7 +323,7 @@ export default function ProfilePage() {
                   {!recoveryRequested ? (
                     <button
                       className="btn btn-dark"
-                      disabled={isPinBusy}
+                      disabled={isPinBusy || !loadedProfile?.email}
                       onClick={requestRecovery}
                       type="button"
                     >

@@ -76,7 +76,7 @@ export default function UserManagementTable({
                 <tr key={user.id}>
                   <td className={styles.nameCell}>{user.nombreListado}</td>
                   <td>{user.rutUsuario}</td>
-                  <td className={styles.emailCell}>{user.correoUsuario}</td>
+                  <td className={styles.emailCell}>{user.correoUsuario || 'Sin correo'}</td>
                   <td>{getRoleLabel(user.rolUsuario)}</td>
                   <td>
                     <UserStatusBadge status={user.estadoUsuario} />
@@ -86,6 +86,7 @@ export default function UserManagementTable({
                     <UserButton
                       className={styles.actionButton}
                       icon="bi-pencil-fill"
+                      disabled={!user.idUsuarioAutenticacionExterna}
                       onClick={() => onEditUser(user)}
                       variant="secondary"
                     >
@@ -94,6 +95,7 @@ export default function UserManagementTable({
                     <UserButton
                       className={styles.actionButton}
                       icon="bi-clock-history"
+                      disabled={!user.idUsuarioAutenticacionExterna}
                       onClick={() => onViewMovements(user)}
                       variant="secondary"
                     >

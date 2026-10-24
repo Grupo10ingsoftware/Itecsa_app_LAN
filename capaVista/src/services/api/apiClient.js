@@ -84,7 +84,7 @@ function isFormDataBody(body) {
   return typeof FormData !== 'undefined' && body instanceof FormData
 }
 
-export function createApiClient({ baseUrl = getDefaultBaseUrl(), getAccessToken } = {}) {
+export function createApiClient({ baseUrl = getDefaultBaseUrl(), getAccessToken, isSessionCurrent = () => true } = {}) {
   if (typeof getAccessToken !== 'function') {
     throw new ApiClientError('apiClient requiere una funcion getAccessToken.', {
       code: API_ERROR_CODES.CONFIGURATION_ERROR,
@@ -92,7 +92,9 @@ export function createApiClient({ baseUrl = getDefaultBaseUrl(), getAccessToken 
   }
 
   async function request(path, { method = 'GET', headers, body, responseType } = {}) {
+    if (!isSessionCurrent()) throw createSessionInvalidError()
     const token = await getBearerToken(getAccessToken)
+    if (!isSessionCurrent()) throw createSessionInvalidError()
     const requestHeaders = new Headers(headers)
     requestHeaders.set('Authorization', `Bearer ${token}`)
 
@@ -118,6 +120,7 @@ export function createApiClient({ baseUrl = getDefaultBaseUrl(), getAccessToken 
     }
 
     const payload = await readResponsePayload(response, responseType)
+    if (!isSessionCurrent()) throw createSessionInvalidError()
 
     if (response.status === 401) {
       throw new ApiClientError('La sesion no es valida o no esta autenticada.', {

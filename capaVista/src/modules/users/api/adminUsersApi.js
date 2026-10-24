@@ -43,6 +43,8 @@ export function createAdminUsersApi(apiClient) {
         })}`,
     ),
     getMovements,
+    setTemporaryPassword: ({ userId, pin, identityVerified }) => apiClient.post(
+      `/admin/users/${encodeURIComponent(userId)}/temporary-password`, { pin, identityVerified }),
     getSummary: () => apiClient.get('/admin/users/summary'),
     createUser: ({ nombreUsuario, apellidoUsuario, rutUsuario, correoUsuario, rolUsuario }) =>
       apiClient.post('/admin/users', {

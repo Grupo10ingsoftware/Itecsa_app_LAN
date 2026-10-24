@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { API_ERROR_CODES } from '../../../services/api/apiClient'
 import { useAuth } from '../../../hooks/useAuth'
 import { useAdminUsersApi } from '../hooks/useAdminUsersApi'
+import TemporaryPasswordModal from '../components/TemporaryPasswordModal.jsx'
 import UserButton from '../components/UserButton'
 import UserCreateModal from '../components/UserCreateModal'
 import UserEditModal from '../components/UserEditModal'
@@ -39,7 +40,7 @@ function mapApiUser(user) {
     `${firstWord(nombreUsuario)} ${firstWord(apellidoUsuario)}`.trim() || nombreCompleto
 
   return {
-    id: user.idUsuarioAutenticacionExterna ?? user.idAuth0 ?? user.idUsuario,
+    id: user.idUsuarioAutenticacionExterna ?? user.idUsuario,
     idUsuario: user.idUsuario,
     idUsuarioAutenticacionExterna: user.idUsuarioAutenticacionExterna ?? user.idAuth0,
     nombreUsuario,
@@ -54,6 +55,10 @@ function mapApiUser(user) {
 }
 
 function getErrorText(error) {
+  if (['USER_UPDATE_PENDING_RECONCILIATION', 'USER_STATUS_PENDING_RECONCILIATION', 'CREDENTIAL_SETUP_PENDING_RECONCILIATION'].includes(error?.payload?.code)) {
+    return 'La operacion quedo pendiente de conciliacion. Revisa el estado de la cuenta antes de continuar.'
+  }
+  if (error?.payload?.code === 'SECURE_TRANSPORT_REQUIRED') return 'Este procedimiento requiere una conexion HTTPS.'
   if (error?.code === API_ERROR_CODES.SESSION_INVALID || error?.status === 401) {
     return 'La sesion no es valida o expiro. Vuelve a iniciar sesion para gestionar usuarios.'
   }
@@ -90,7 +95,7 @@ function getErrorText(error) {
 }
 
 export default function UserManagementPage() {
-  const { auth0User, loginWithRedirect } = useAuth()
+  const { identityUser, loginWithRedirect } = useAuth()
   const adminUsersApi = useAdminUsersApi()
   const latestRequestRef = useRef(0)
   const latestSummaryRequestRef = useRef(createLatestRequestTracker())
@@ -112,9 +117,10 @@ export default function UserManagementPage() {
   const [actionMessage, setActionMessage] = useState(null)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [movementsUser, setMovementsUser] = useState(null)
+  const [credentialUser, setCredentialUser] = useState(null)
   const [editingUser, setEditingUser] = useState(null)
   const [unlinkingUser, setUnlinkingUser] = useState(null)
-  const currentAuth0UserId = auth0User?.sub ?? null
+  const currentExternalUserId = identityUser?.sub ?? null
 
   useEffect(() => {
     const debounceTimer = window.setTimeout(() => {
@@ -155,8 +161,8 @@ export default function UserManagementPage() {
             return {
               ...mappedUser,
               isCurrentUser: Boolean(
-                currentAuth0UserId &&
-                  mappedUser.idUsuarioAutenticacionExterna === currentAuth0UserId,
+                currentExternalUserId &&
+                  mappedUser.idUsuarioAutenticacionExterna === currentExternalUserId,
               ),
             }
           }),
@@ -176,7 +182,7 @@ export default function UserManagementPage() {
         }
       }
     },
-    [activeRole, activeStatus, adminUsersApi, currentAuth0UserId, debouncedSearchTerm, page],
+    [activeRole, activeStatus, adminUsersApi, currentExternalUserId, debouncedSearchTerm, page],
   )
 
   const loadSummary = useCallback(async () => {
@@ -280,11 +286,13 @@ export default function UserManagementPage() {
 
   async function handleCreatedUser(user) {
     const completed = isCompletedUserCreation(user)
-    if (completed) setIsCreateModalOpen(false)
+    if (completed || user.outcome === 'pending_credentials') setIsCreateModalOpen(false)
     setPage(1)
     await refreshAfterMutation({
       type: completed ? 'success' : 'warning',
-      text: completed
+      text: user.outcome === 'pending_credentials'
+        ? 'Cuenta registrada. Usa Editar usuario para establecer credenciales por HTTPS; no se envio correo.'
+        : completed
         ? 'Usuario creado correctamente.'
         : 'El alta quedo incompleta y requiere conciliacion. Revisa el detalle antes de cerrar.',
     })
@@ -367,11 +375,13 @@ export default function UserManagementPage() {
         onClose={() => setIsCreateModalOpen(false)}
         onCreated={handleCreatedUser}
       />
+      {credentialUser && <TemporaryPasswordModal key={credentialUser.id} user={credentialUser} onClose={() => setCredentialUser(null)} />}
       <UserEditModal
         key={editingUser?.id ?? 'user-edit-modal'}
         isOpen={Boolean(editingUser)}
         onClose={() => setEditingUser(null)}
         onSave={handleSaveUser}
+        onCredentials={user => { setEditingUser(null); setCredentialUser(user) }}
         onUnlink={(user) => {
           setEditingUser(null)
           setUnlinkingUser(user)

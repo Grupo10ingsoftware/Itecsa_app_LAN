@@ -44,17 +44,18 @@ function isBlockedAccountError(error) {
 }
 
 function getLoginErrorMessage(error) {
+  if (error?.code === 'AUTH_CONFIGURATION_ERROR') return error.message
   return isBlockedAccountError(error) ? BLOCKED_ACCOUNT_MESSAGE : GENERIC_LOGIN_ERROR_MESSAGE
 }
 
 export default function LoginPage() {
-  const { auth0User, error, isAuthenticated, isLoading, loginWithRedirect } = useAuth()
+  const { identityUser, error, isAuthenticated, isLoading, loginWithRedirect } = useAuth()
   const [shouldStartLogin, setShouldStartLogin] = useState(false)
   const location = useLocation()
   const returnTo = getSafeRedirectPath(location.state, location.search)
 
   useEffect(() => {
-    if (error || isAuthenticated || auth0User || shouldStartLogin) {
+    if (error || isAuthenticated || identityUser || shouldStartLogin) {
       return undefined
     }
 
@@ -66,7 +67,7 @@ export default function LoginPage() {
     return () => {
       window.clearTimeout(timeoutId)
     }
-  }, [auth0User, error, isAuthenticated, isLoading, shouldStartLogin])
+  }, [identityUser, error, isAuthenticated, isLoading, shouldStartLogin])
 
   useEffect(() => {
     if (error || !shouldStartLogin || isAuthenticated) {
@@ -102,7 +103,7 @@ export default function LoginPage() {
               Inicio de sesion
             </h1>
             <p className="text-secondary mb-0">
-              Ingresa mediante el acceso seguro de Auth0.
+              Ingresa mediante el acceso seguro de ITECSA.
             </p>
           </div>
 
@@ -119,7 +120,7 @@ export default function LoginPage() {
     )
   }
 
-  if (isLoading || auth0User || shouldStartLogin) {
+  if (isLoading || identityUser || shouldStartLogin) {
     return (
       <main className={`container-fluid ${styles.loginPage}`}>
         <section className={`shadow-sm ${styles.loginPanel}`} aria-live="polite">
@@ -138,7 +139,7 @@ export default function LoginPage() {
             Inicio de sesion
           </h1>
           <p className="text-secondary mb-0">
-            Ingresa mediante el acceso seguro de Auth0.
+            Ingresa mediante el acceso seguro de ITECSA.
           </p>
         </div>
 

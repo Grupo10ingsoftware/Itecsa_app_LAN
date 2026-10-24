@@ -17,9 +17,9 @@ function createFormState(user) {
   }
 }
 
-export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, onSave, onUnlink, user }) {
+export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, onSave, onUnlink, onCredentials, user }) {
   const [values, setValues] = useState(() => (user ? createFormState(user) : null))
-  const { user: actor } = useAuth()
+  const { user: actor, provider } = useAuth()
   const [pin, setPin] = useState('')
   const [pinError, setPinError] = useState('')
   const [saveError, setSaveError] = useState('')
@@ -54,11 +54,11 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
     const currentRole = user?.rolUsuario ?? ''
 
     return (
-      Object.values(values).every((value) => String(value).trim().length > 0) &&
+      Object.entries(values).every(([key, value]) => (key === 'correoUsuario' && provider === 'keycloak') || String(value).trim().length > 0) &&
       /^\d{6}$/.test(pin.trim()) &&
       !(isCurrentUser && values.rolUsuario !== currentRole)
     )
-  }, [isCurrentUser, pin, user?.rolUsuario, values])
+  }, [isCurrentUser, pin, provider, user?.rolUsuario, values])
 
   if (!isOpen || !user || !values) {
     return null
@@ -100,7 +100,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
         ...user,
         nombreUsuario: values.nombreUsuario.trim(),
         apellidoUsuario: values.apellidoUsuario.trim(),
-        correoUsuario: values.correoUsuario.trim().toLowerCase(),
+        correoUsuario: values.correoUsuario.trim().toLowerCase() || (provider === 'keycloak' ? null : ''),
         rolUsuario: values.rolUsuario,
         pin: trimmedPin,
       })
@@ -195,7 +195,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
                   id="edit-user-email"
                   name="correoUsuario"
                   onChange={handleChange}
-                  required
+                  required={provider !== 'keycloak'}
                   type="email"
                   value={values.correoUsuario}
                 />
@@ -257,6 +257,8 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
           </div>
         )}
         <footer className={editStyles.actions}>
+          {provider === 'keycloak' && onCredentials && <UserButton disabled={isSubmitting || isCurrentUser || !['Activo', 'Vinculado', 'Pendiente'].includes(user.estadoUsuario)}
+            onClick={() => onCredentials(user)} variant="secondary">Establecer credenciales</UserButton>}
           <UserButton
             className={`${editStyles.actionButton} ${editStyles.unlinkButton}`}
             disabled={isSubmitting || isCurrentUser || user.estadoUsuario === 'Desvinculado'}

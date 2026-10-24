@@ -47,6 +47,10 @@ function FieldErrors({ errors, id }) {
 }
 
 function getErrorMessage(error) {
+  if (error?.payload?.code === 'USER_CREATE_OUTCOME_UNKNOWN' || error?.payload?.retryCreate === false) return {
+    type: MESSAGE_TYPES.WARNING,
+    text: `No se pudo confirmar el resultado del alta. No la repitas: solicita conciliacion administrativa. Referencia: ${error.payload.username ?? 'no disponible'}.`,
+  }
   if (error?.code === API_ERROR_CODES.SESSION_INVALID || error?.status === 401) {
     return {
       type: MESSAGE_TYPES.WARNING,
@@ -83,6 +87,9 @@ function getErrorMessage(error) {
 }
 
 function buildCreatedUserMessage(user) {
+  if (user.outcome === 'pending_credentials') return { type: MESSAGE_TYPES.INFO,
+    text: 'Cuenta registrada. Falta establecer credenciales mediante el procedimiento administrativo HTTPS. No se envio correo.' }
+
   if (user.outcome === 'completed') {
     return {
       type: MESSAGE_TYPES.SUCCESS,
@@ -93,7 +100,7 @@ function buildCreatedUserMessage(user) {
   if (user.internalUserPersisted === false) {
     return {
       type: MESSAGE_TYPES.WARNING,
-      text: 'La identidad fue creada en Auth0, pero falta registrarla en el sistema interno. No repitas el alta: requiere conciliacion administrativa.',
+      text: 'La identidad externa fue creada, pero falta registrarla en el sistema interno. No repitas el alta: requiere conciliacion administrativa.',
     }
   }
 
@@ -118,7 +125,7 @@ function buildCreatedUserMessage(user) {
 }
 
 export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, onCreated } = {}) {
-  const { loginWithRedirect, user: actor } = useAuth()
+  const { loginWithRedirect, user: actor, provider } = useAuth()
   const adminUsersApi = useAdminUsersApi()
   const [values, setValues] = useState(INITIAL_VALUES)
   const [fieldErrors, setFieldErrors] = useState(INITIAL_ERRORS)
@@ -145,7 +152,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
   async function handleSubmit(event) {
     event.preventDefault()
 
-    const nextErrors = validateUserCreateForm(values)
+    const nextErrors = validateUserCreateForm(values, { optionalEmail: provider === 'keycloak' })
     setFieldErrors(nextErrors)
     clearResultState()
 
@@ -157,7 +164,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
       nombreUsuario: values.nombreUsuario.trim(),
       apellidoUsuario: values.apellidoUsuario.trim(),
       rutUsuario: values.rutUsuario.trim().toUpperCase(),
-      correoUsuario: values.correoUsuario.trim().toLowerCase(),
+      correoUsuario: values.correoUsuario.trim().toLowerCase() || (provider === 'keycloak' ? null : ''),
       rolUsuario: values.rolUsuario,
     }
 
@@ -218,7 +225,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
     }
   }
 
-  const canRequestPasswordEmail = canRequestPasswordSetupEmail(createdUser)
+  const canRequestPasswordEmail = provider !== 'keycloak' && canRequestPasswordSetupEmail(createdUser)
   const isSessionInvalid = message?.requiresLogin === true
   const nombreUsuarioErrors = fieldErrors.nombreUsuario ?? []
   const apellidoUsuarioErrors = fieldErrors.apellidoUsuario ?? []
@@ -284,7 +291,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
 
         <div className={`${styles.fieldCard} ${correoUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
           <div className={styles.fieldContent}>
-            <label htmlFor="user-email">Correo electronico <span>*</span></label>
+            <label htmlFor="user-email">Correo electronico {provider !== 'keycloak' && <span>*</span>}</label>
             <input
               aria-describedby="user-email-errors"
               aria-invalid={correoUsuarioErrors.length > 0}
@@ -348,11 +355,13 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
               disabled
               id="user-password"
               name="password"
-              placeholder="Gestionada por Auth0"
+              placeholder="Gestionada por el proveedor de identidad"
               type="password"
             />
             <p className={styles.fieldHelp} id="user-password-help">
-              El usuario establecera su contraseña mediante un correo enviado por Auth0.
+              {provider === 'keycloak'
+                ? 'La cuenta quedara pendiente de credenciales. Establecelas desde Editar usuario mediante HTTPS.'
+                : 'El usuario establecera su contraseña mediante el procedimiento de correo de Auth0.'}
             </p>
           </div>
         </div>
@@ -361,13 +370,14 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
           <section className={styles.creationResult}>
             <h2>Resultado de creacion</h2>
             <dl>
+              <div><dt>Identificador externo</dt><dd>{createdUser.idUsuarioAutenticacionExterna}</dd></div>
               <div><dt>Nombre</dt><dd>{createdUser.nombreUsuario} {createdUser.apellidoUsuario}</dd></div>
               <div><dt>RUT</dt><dd>{createdUser.rutUsuario}</dd></div>
-              <div><dt>Correo electronico</dt><dd>{createdUser.correoUsuario}</dd></div>
+              <div><dt>Correo electronico</dt><dd>{createdUser.correoUsuario || 'Sin correo'}</dd></div>
               <div><dt>Rol</dt><dd>{getRoleLabel(createdUser.rolUsuario)}</dd></div>
               <div>
                 <dt>Correo de contraseña</dt>
-                <dd>{createdUser.passwordSetupEmailRequested ? 'Solicitado' : 'Pendiente'}</dd>
+                <dd>{createdUser.passwordSetupEmailRequested ? 'Solicitado' : provider === 'keycloak' ? 'No solicitado' : 'Pendiente'}</dd>
               </div>
             </dl>
           </section>

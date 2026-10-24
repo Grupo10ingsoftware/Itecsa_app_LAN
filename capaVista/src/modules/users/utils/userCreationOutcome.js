@@ -10,6 +10,7 @@ export function isCompletedUserCreation(user) {
 
 export function canRequestPasswordSetupEmail(user) {
   return (
+    user?.outcome !== 'pending_credentials' &&
     user?.passwordSetupEmailRequested === false &&
     user?.internalUserPersisted === true &&
     user?.roleAssignmentCompleted === true &&

@@ -33,6 +33,17 @@ export default function ProtectedRoute({ children, fallback }) {
     )
   }
 
+  if (authStatus === 'access-denied') return <Navigate replace to={APP_ROUTES.ACCESS_DENIED} />
+
+  if (authStatus === 'error') {
+    return (
+      <div className="alert alert-danger m-4" role="alert">
+        No fue posible verificar la sesion con el backend.
+        {error?.message ? ` ${error.message}` : ''}
+      </div>
+    )
+  }
+
   if (!isAuthenticated || authStatus === 'session-invalid') {
     // Control visual de frontend: la autorizacion definitiva se valida en backend.
     return (
@@ -45,17 +56,6 @@ export default function ProtectedRoute({ children, fallback }) {
           to={`/login?from=${encodeURIComponent(fromPath)}`}
         />
       )
-    )
-  }
-
-  if (authStatus === 'access-denied') return <Navigate replace to={APP_ROUTES.ACCESS_DENIED} />
-
-  if (authStatus === 'error') {
-    return (
-      <div className="alert alert-danger m-4" role="alert">
-        No fue posible verificar la sesion con el backend.
-        {error?.message ? ` ${error.message}` : ''}
-      </div>
     )
   }
 

@@ -35,7 +35,7 @@ export default function UserManagementMobileList({ isLoading, onEditUser, onView
             </div>
             <div>
               <dt>Correo</dt>
-              <dd>{user.correoUsuario}</dd>
+              <dd>{user.correoUsuario || 'Sin correo'}</dd>
             </div>
             <div>
               <dt>Rol</dt>
@@ -43,12 +43,14 @@ export default function UserManagementMobileList({ isLoading, onEditUser, onView
             </div>
           </dl>
           <footer className={styles.userActions}>
-            <UserButton icon="bi-pencil-fill" onClick={() => onEditUser(user)} variant="secondary">
+            <UserButton icon="bi-pencil-fill" disabled={!user.idUsuarioAutenticacionExterna}
+                      onClick={() => onEditUser(user)} variant="secondary">
               Editar
             </UserButton>
             <UserButton
               icon="bi-clock-history"
-              onClick={() => onViewMovements(user)}
+              disabled={!user.idUsuarioAutenticacionExterna}
+                      onClick={() => onViewMovements(user)}
               variant="secondary"
             >
               Movimientos

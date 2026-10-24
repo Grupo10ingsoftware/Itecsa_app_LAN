@@ -1,27 +1,29 @@
-import { runtimeConfig } from '../../config/runtimeConfig.js'
+import { runtimeConfig, validateBrowserIdentityConfig } from '../../config/runtimeConfig.js'
+import { Auth0IdentityProvider, KeycloakIdentityProvider } from './IdentityProviders.jsx'
+import { safeReturnPath } from './keycloakSession.js'
 import { Auth0Provider } from '@auth0/auth0-react'
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthProvider } from './AuthProvider'
 
-function getSafeReturnPath(returnTo) {
-  // Conserva la navegacion interna del callback sin aceptar destinos externos.
-  if (typeof returnTo === 'string' && returnTo.startsWith('/') && !returnTo.startsWith('//')) {
-    return returnTo
-  }
-
-  return '/kanban'
-}
 
 export default function AppProviders({ children }) {
   const navigate = useNavigate()
   const handleRedirectCallback = useCallback(
     (appState) => {
-      navigate(getSafeReturnPath(appState?.returnTo), { replace: true })
+      navigate(safeReturnPath(appState?.returnTo), { replace: true })
     },
     [navigate],
   )
 
+  try { validateBrowserIdentityConfig(runtimeConfig, window) } catch (error) {
+    return <div role="alert" className="alert alert-danger m-4">{error.message}</div>
+  }
+  if (runtimeConfig.authProvider === 'keycloak') return (
+    <KeycloakIdentityProvider onRedirect={path => navigate(path, { replace: true })}>
+      <AuthProvider>{children}</AuthProvider>
+    </KeycloakIdentityProvider>
+  )
   return (
     <Auth0Provider
       domain={runtimeConfig.auth0Domain}
@@ -32,8 +34,9 @@ export default function AppProviders({ children }) {
         redirect_uri: window.location.origin,
       }}
       onRedirectCallback={handleRedirectCallback}
+      cacheLocation="memory"
     >
-      <AuthProvider>{children}</AuthProvider>
+      <Auth0IdentityProvider><AuthProvider>{children}</AuthProvider></Auth0IdentityProvider>
     </Auth0Provider>
   )
 }

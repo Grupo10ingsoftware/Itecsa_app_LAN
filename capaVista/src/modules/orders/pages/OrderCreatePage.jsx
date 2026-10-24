@@ -10,7 +10,7 @@ import styles from './OrderCreatePage.module.css'
 
 export default function OrderCreatePage() {
   const navigate = useNavigate()
-  const { auth0User, user } = useAuth()
+  const { identityUser, user } = useAuth()
   const flow = useOrderCreateFlow({ navigate })
   const { actions } = flow
   const responsibleUserName = [
@@ -19,8 +19,8 @@ export default function OrderCreatePage() {
   ].filter(Boolean).join(' ')
     || user?.correoUsuario
     || user?.email
-    || auth0User?.name
-    || auth0User?.email
+    || identityUser?.name
+    || identityUser?.email
     || 'Usuario no identificado'
 
   if (flow.viewMode === ORDER_CREATE_VIEW_MODE.SUCCESS && flow.registeredOrder) {

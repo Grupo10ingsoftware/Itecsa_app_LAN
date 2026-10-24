@@ -63,12 +63,12 @@ export function validateRut(value) {
   return errors
 }
 
-export function validateUserCreateForm(values) {
+export function validateUserCreateForm(values, { optionalEmail = false } = {}) {
   return {
     nombreUsuario: validatePersonName(values.nombreUsuario, 'El nombre'),
     apellidoUsuario: validatePersonName(values.apellidoUsuario, 'El apellido'),
     rutUsuario: validateRut(values.rutUsuario),
-    correoUsuario: validateEmail(values.correoUsuario),
+    correoUsuario: optionalEmail && !values.correoUsuario.trim() ? [] : validateEmail(values.correoUsuario),
     rolUsuario: validateRole(values.rolUsuario),
   }
 }

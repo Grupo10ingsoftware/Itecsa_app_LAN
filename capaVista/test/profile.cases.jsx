@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { AuthContext } from '../src/app/providers/authContext'
+import { IdentityContext } from '../src/app/providers/identityContext.js'
 import ProfilePage from '../src/modules/profile/pages/ProfilePage'
 import { ROLES } from '../src/config/roles'
 import assert from 'node:assert/strict'
@@ -9,9 +10,10 @@ export function run() {
   for (const role of Object.values(ROLES)) {
     for (const pinStatus of ['active', 'pending_acknowledgement']) {
       const html = renderToStaticMarkup(
+        <IdentityContext.Provider value={{ sessionKey: 'test', getSessionKey: () => 'test', getAccessToken: async () => 'synthetic' }}>
         <AuthContext.Provider value={{ user: { rolUsuario: role, sub: 'test' }, pinStatus }}>
           <ProfilePage />
-        </AuthContext.Provider>,
+        </AuthContext.Provider></IdentityContext.Provider>,
       )
       assert.equal(html.includes('Generar nuevo PIN (debug)'), import.meta.env.DEV && import.meta.env.VITE_ENABLE_DEMO_ROUTES === 'true' && role === ROLES.SOPORTE && pinStatus === 'active')
     }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { APP_ROUTES } from '../../../config/routes'
+import { runtimeConfig } from '../../../config/runtimeConfig.js'
 import {
   PasswordResetApiError,
   requestPasswordResetEmail,
@@ -55,6 +56,13 @@ export default function PasswordResetPage() {
     }
   }
 
+  if (runtimeConfig.authProvider === 'keycloak') return (
+    <main className={styles.page}><section className={styles.panel}>
+      <h1 className={styles.title}>Recuperar contraseña</h1>
+      <p>Solicita al administrador el procedimiento de verificacion de identidad y entrega segura de credenciales temporales. No requiere correo electronico.</p>
+      <Link to={APP_ROUTES.LOGIN}>Volver al inicio de sesion</Link>
+    </section></main>
+  )
   return (
     <main className={styles.page}>
       <section className={styles.panel} aria-labelledby="password-reset-title">

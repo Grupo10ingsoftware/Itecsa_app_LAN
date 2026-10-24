@@ -1,5 +1,6 @@
 import { can } from "../../../../shared/authorization.js";
-import { useAuth0 } from '@auth0/auth0-react'
+import { useIdentity } from './identityContext.js'
+import { RECOGNIZED_ROLES } from '../../../../shared/authorization.js'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuthApi } from '../../modules/auth/hooks/useAuthApi'
 import { API_ERROR_CODES } from '../../services/api/apiClient'
@@ -15,6 +16,7 @@ const AUTH_STATUS = Object.freeze({
 })
 
 const VERIFY_SESSION_TIMEOUT_MS = 10000
+const defaultVerificationKey = () => 0
 
 function withTimeout(promise, timeoutMs) {
   return new Promise((resolve, reject) => {
@@ -38,36 +40,56 @@ function withTimeout(promise, timeoutMs) {
 export function AuthProvider({ children }) {
   const {
     error,
+    provider, sessionKey, getSessionKey, verificationKey = 0,
+    getVerificationKey = defaultVerificationKey,
     isAuthenticated,
     isLoading,
     loginWithRedirect,
-    logout: auth0Logout,
+    logout: identityLogout,
     user,
-  } = useAuth0()
+  } = useIdentity()
+  const subject = user?.sub
   const authApi = useAuthApi()
   const [verifiedSession, setVerifiedSession] = useState({
     status: null,
     subject: null,
+    sessionKey: null,
     user: null,
     error: null,
   })
 
   const verifySession = useCallback(
-    () => withTimeout(authApi.verify(), VERIFY_SESSION_TIMEOUT_MS),
-    [authApi],
+    async () => {
+      const verified = await withTimeout(authApi.verify(), VERIFY_SESSION_TIMEOUT_MS)
+      if (getSessionKey() !== sessionKey || getVerificationKey() !== verificationKey || !subject || verified?.sub !== subject
+        || !RECOGNIZED_ROLES.includes(verified.rolUsuario) || !Array.isArray(verified.permissions)
+        || verified.permissions.some(p => typeof p !== 'string')) {
+        throw Object.assign(Error('La identidad verificada no coincide con la sesion.'), { status: 401 })
+      }
+      return verified
+    },
+    [authApi, getSessionKey, sessionKey, subject, getVerificationKey, verificationKey],
   )
 
   const refreshSession = useCallback(async () => {
-    const verifiedUser = await verifySession()
-    setVerifiedSession({
-      status: AUTH_STATUS.AUTHENTICATED,
-      subject: user?.sub ?? verifiedUser.sub ?? null,
-      user: verifiedUser,
-      error: null,
-    })
-
-    return verifiedUser
-  }, [user?.sub, verifySession])
+    try {
+      const verifiedUser = await verifySession()
+      setVerifiedSession({
+        status: AUTH_STATUS.AUTHENTICATED,
+        subject,
+        sessionKey,
+        verificationKey,
+        user: verifiedUser,
+        error: null,
+      })
+      return verifiedUser
+    } catch (verifyError) {
+      if (getSessionKey() === sessionKey && getVerificationKey() === verificationKey) setVerifiedSession({ subject, sessionKey, verificationKey,
+        user: null, error: verifyError, status: verifyError?.status === 401 ? AUTH_STATUS.SESSION_INVALID
+          : verifyError?.status === 403 ? AUTH_STATUS.ACCESS_DENIED : AUTH_STATUS.ERROR })
+      throw verifyError
+    }
+  }, [subject, sessionKey, getSessionKey, getVerificationKey, verificationKey, verifySession])
 
   useEffect(() => {
     let isCurrent = true
@@ -86,7 +108,9 @@ export function AuthProvider({ children }) {
 
         setVerifiedSession({
           status: AUTH_STATUS.AUTHENTICATED,
-          subject: user?.sub ?? verifiedUser.sub ?? null,
+          subject,
+          sessionKey,
+          verificationKey,
           user: verifiedUser,
           error: null,
         })
@@ -105,7 +129,9 @@ export function AuthProvider({ children }) {
 
         setVerifiedSession({
           status,
-          subject: user?.sub ?? null,
+          subject: subject ?? null,
+          sessionKey,
+          verificationKey,
           user: null,
           error: verifyError,
         })
@@ -114,17 +140,18 @@ export function AuthProvider({ children }) {
     return () => {
       isCurrent = false
     }
-  }, [isAuthenticated, isLoading, user?.sub, verifySession])
+  }, [isAuthenticated, isLoading, subject, sessionKey, verificationKey, verifySession])
 
   const logout = useCallback(() => {
-    auth0Logout({
+    identityLogout({
       logoutParams: {
         returnTo: window.location.origin,
       },
     })
-  }, [auth0Logout])
+  }, [identityLogout])
 
-  const hasCurrentVerification = verifiedSession.subject === (user?.sub ?? null)
+  const hasCurrentVerification = verifiedSession.subject === (subject ?? null) && verifiedSession.sessionKey === sessionKey
+    && verifiedSession.verificationKey === verificationKey
   const verifiedUser = isAuthenticated && hasCurrentVerification ? verifiedSession.user : null
   const verificationError =
     isAuthenticated && hasCurrentVerification ? verifiedSession.error : null
@@ -147,7 +174,7 @@ export function AuthProvider({ children }) {
   )
 
   const authStatus = error
-    ? AUTH_STATUS.ERROR
+    ? error?.status === 401 ? AUTH_STATUS.SESSION_INVALID : AUTH_STATUS.ERROR
     : isLoading
       ? AUTH_STATUS.LOADING
       : !isAuthenticated
@@ -161,8 +188,10 @@ export function AuthProvider({ children }) {
   const value = useMemo(
     () => ({
       user: verifiedUser,
-      auth0User: user,
-      isAuthenticated: isAuthenticated && authStatus !== AUTH_STATUS.SESSION_INVALID,
+      identityUser: user,
+      auth0User: user, // Transitional alias; consumers use identityUser.
+      provider,
+      isAuthenticated: isAuthenticated && authStatus === AUTH_STATUS.AUTHENTICATED,
       isLoading: isLoading || isVerifyingSession,
       isVerifyingSession,
       authStatus,
@@ -176,6 +205,7 @@ export function AuthProvider({ children }) {
     }),
     [
       verifiedUser,
+      provider,
       user,
       isAuthenticated,
       authStatus,
