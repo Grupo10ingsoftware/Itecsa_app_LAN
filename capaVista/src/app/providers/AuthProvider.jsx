@@ -1,6 +1,6 @@
-import { can } from "../../../../shared/authorization.js";
+import { authorizationForProvider } from '../../../../shared/identityAuthorization.js'
 import { useIdentity } from './identityContext.js'
-import { RECOGNIZED_ROLES } from '../../../../shared/authorization.js'
+import { isValidVerifiedIdentity, isCurrentVerification } from './verifiedIdentity.js'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuthApi } from '../../modules/auth/hooks/useAuthApi'
 import { API_ERROR_CODES } from '../../services/api/apiClient'
@@ -49,10 +49,12 @@ export function AuthProvider({ children }) {
     user,
   } = useIdentity()
   const subject = user?.sub
+  const policy = authorizationForProvider(provider)
   const authApi = useAuthApi()
   const [verifiedSession, setVerifiedSession] = useState({
     status: null,
     subject: null,
+    provider: null,
     sessionKey: null,
     user: null,
     error: null,
@@ -61,14 +63,13 @@ export function AuthProvider({ children }) {
   const verifySession = useCallback(
     async () => {
       const verified = await withTimeout(authApi.verify(), VERIFY_SESSION_TIMEOUT_MS)
-      if (getSessionKey() !== sessionKey || getVerificationKey() !== verificationKey || !subject || verified?.sub !== subject
-        || !RECOGNIZED_ROLES.includes(verified.rolUsuario) || !Array.isArray(verified.permissions)
-        || verified.permissions.some(p => typeof p !== 'string')) {
+      if (getSessionKey() !== sessionKey || getVerificationKey() !== verificationKey ||
+        !isValidVerifiedIdentity(verified, { provider, subject })) {
         throw Object.assign(Error('La identidad verificada no coincide con la sesion.'), { status: 401 })
       }
       return verified
     },
-    [authApi, getSessionKey, sessionKey, subject, getVerificationKey, verificationKey],
+    [authApi, getSessionKey, sessionKey, subject, getVerificationKey, verificationKey, provider],
   )
 
   const refreshSession = useCallback(async () => {
@@ -77,6 +78,7 @@ export function AuthProvider({ children }) {
       setVerifiedSession({
         status: AUTH_STATUS.AUTHENTICATED,
         subject,
+        provider,
         sessionKey,
         verificationKey,
         user: verifiedUser,
@@ -84,12 +86,12 @@ export function AuthProvider({ children }) {
       })
       return verifiedUser
     } catch (verifyError) {
-      if (getSessionKey() === sessionKey && getVerificationKey() === verificationKey) setVerifiedSession({ subject, sessionKey, verificationKey,
+      if (getSessionKey() === sessionKey && getVerificationKey() === verificationKey) setVerifiedSession({ subject, provider, sessionKey, verificationKey,
         user: null, error: verifyError, status: verifyError?.status === 401 ? AUTH_STATUS.SESSION_INVALID
           : verifyError?.status === 403 ? AUTH_STATUS.ACCESS_DENIED : AUTH_STATUS.ERROR })
       throw verifyError
     }
-  }, [subject, sessionKey, getSessionKey, getVerificationKey, verificationKey, verifySession])
+  }, [subject, provider, sessionKey, getSessionKey, getVerificationKey, verificationKey, verifySession])
 
   useEffect(() => {
     let isCurrent = true
@@ -109,6 +111,7 @@ export function AuthProvider({ children }) {
         setVerifiedSession({
           status: AUTH_STATUS.AUTHENTICATED,
           subject,
+          provider,
           sessionKey,
           verificationKey,
           user: verifiedUser,
@@ -130,6 +133,7 @@ export function AuthProvider({ children }) {
         setVerifiedSession({
           status,
           subject: subject ?? null,
+          provider,
           sessionKey,
           verificationKey,
           user: null,
@@ -140,7 +144,7 @@ export function AuthProvider({ children }) {
     return () => {
       isCurrent = false
     }
-  }, [isAuthenticated, isLoading, subject, sessionKey, verificationKey, verifySession])
+  }, [isAuthenticated, isLoading, subject, provider, sessionKey, verificationKey, verifySession])
 
   const logout = useCallback(() => {
     identityLogout({
@@ -150,8 +154,7 @@ export function AuthProvider({ children }) {
     })
   }, [identityLogout])
 
-  const hasCurrentVerification = verifiedSession.subject === (subject ?? null) && verifiedSession.sessionKey === sessionKey
-    && verifiedSession.verificationKey === verificationKey
+  const hasCurrentVerification = isCurrentVerification(verifiedSession, { subject, provider, sessionKey, verificationKey })
   const verifiedUser = isAuthenticated && hasCurrentVerification ? verifiedSession.user : null
   const verificationError =
     isAuthenticated && hasCurrentVerification ? verifiedSession.error : null
@@ -168,9 +171,9 @@ export function AuthProvider({ children }) {
       // Control visual de experiencia: la autorizacion efectiva siempre la valida el backend.
       const permissions = verifiedUser?.permissions
 
-      return can(verifiedUser?.rolUsuario, permissions, permission)
+      return policy?.can(verifiedUser?.rolUsuario, permissions, permission) === true
     },
-    [verifiedUser],
+    [verifiedUser, policy],
   )
 
   const authStatus = error

@@ -1,6 +1,7 @@
 import { AppError } from '../../../errors/AppError.js';
 import { PAYMENT_STATUS } from '../../../config/status.js';
-import { can, PERMISSIONS as P } from '../../../../../shared/authorization.js';
+import { PERMISSIONS as P } from '../../../../../shared/authorization.js';
+import { authorizationForProvider } from '../../../../../shared/identityAuthorization.js';
 
 export const RESOLVED_PAYMENT_PENDING_LOCKED_MESSAGE =
   "Un pago confirmado o rechazado no puede volver al estado Pendiente.";
@@ -68,7 +69,7 @@ export async function updPaymentStateOperation(service, orderId, newPaymentStatu
 
     const currentPaymentStatus = currentOrder.estado_pago;
     if (currentPaymentStatus !== PAYMENT_STATUS.PENDIENTE) {
-      if (!can(data.role, data.permissions, P.REVISE_PAYMENT_STATUS)) {
+      if (authorizationForProvider(data.identityProvider)?.can(data.role, data.permissions, P.REVISE_PAYMENT_STATUS) !== true) {
         const error = new AppError(403,
           "Solo Administrador Cobranzas o Soporte puede modificar una decision de pago.",
         );

@@ -1,6 +1,6 @@
 import users from '../modules/users/repo/users.repo.js';
 import { getAuth0UserRole } from '../modules/users/service/auth0Management.service.js';
-import { roleFromPayload } from '../../../shared/authorization.js';
+import { authorizationForProvider } from '../../../shared/identityAuthorization.js';
 import { isActiveUserStatus, USER_STATUS } from '../config/userLifecycle.js';
 
 const ACCESS_DENIED = 'Usuario desvinculado o rol desactualizado. Renueva tu sesion.';
@@ -10,13 +10,16 @@ export function createRequireActiveIdentity({ repository = users, resolveAuth0Ro
     const payload = req.auth?.payload;
     if (!payload?.sub) return res.status(401).json({ message: 'Sesion no valida.' });
 
-    const role = roleFromPayload(payload);
+    const role = authorizationForProvider(req.identityProvider)?.roleFromPayload(payload);
     if (!role || !Array.isArray(payload.permissions) || payload.permissions.some(p => typeof p !== 'string')) {
       return res.status(403).json({ message: 'La sesion no tiene un rol o permisos validos.' });
     }
 
     try {
       let user = await repository.findByAuth0Id(payload.sub);
+      if (req.identityProvider === 'keycloak' && user?.idAuth0 !== payload.sub) {
+        return res.status(403).json({ message: ACCESS_DENIED });
+      }
       if (!user || (!isActiveUserStatus(user.estadoUsuario) && user.estadoUsuario !== USER_STATUS.PENDING_FIRST_LOGIN)) {
         return res.status(403).json({ message: ACCESS_DENIED });
       }
@@ -25,7 +28,8 @@ export function createRequireActiveIdentity({ repository = users, resolveAuth0Ro
         // Una sesion valida demuestra el primer acceso. El rol debe coincidir antes de activarla.
         if (user.rolUsuario !== role) return res.status(403).json({ message: ACCESS_DENIED });
         user = await repository.activateOnFirstAccess(payload.sub, role);
-        if (!user || !isActiveUserStatus(user.estadoUsuario) || user.rolUsuario !== role) {
+        if (!user || !isActiveUserStatus(user.estadoUsuario) || user.rolUsuario !== role ||
+            (req.identityProvider === 'keycloak' && user.idAuth0 !== payload.sub)) {
           return res.status(403).json({ message: ACCESS_DENIED });
         }
       }

@@ -7,6 +7,7 @@ import { resolveEnvironmentConfig } from "../config/environment.js";
 import { currentAppEnvironment } from "../config/environment.js";
 import { safeLogger } from "../shared/safeLogger.js";
 import { startTemporaryDataCleanup } from "../modules/security/service/temporaryDataCleanup.service.js";
+import { resolveIdentityConfiguration } from '../config/identity.js';
 
 const requiredEnvironmentVariables = [
     "FRONTEND_ORIGIN",
@@ -20,12 +21,8 @@ function validateEnvironment() {
     resolveEnvironmentConfig(process.env);
 
     const appEnvironment = currentAppEnvironment({ required: true });
-    const provider = process.env.AUTH_PROVIDER || 'auth0';
-    if (!['auth0', 'keycloak'].includes(provider)) throw new Error('AUTH_PROVIDER invalido.');
-    const identityVariables = provider === 'keycloak'
-        ? ['KEYCLOAK_ISSUER', 'KEYCLOAK_AUDIENCE', 'KEYCLOAK_CLIENT_ID', 'KEYCLOAK_JWKS_URI']
-        : ['AUTH0_DOMAIN', 'AUTH0_AUDIENCE'];
-    const missingVariables = [...requiredEnvironmentVariables, ...identityVariables].filter(
+    resolveIdentityConfiguration(process.env);
+    const missingVariables = requiredEnvironmentVariables.filter(
         (variable) => !process.env[variable]?.trim(),
     );
 
@@ -34,15 +31,6 @@ function validateEnvironment() {
             `Faltan variables de entorno obligatorias: ${missingVariables.join(", ")}`,
         );
     }
-    if (provider === 'keycloak') {
-        const issuer = new URL(process.env.KEYCLOAK_ISSUER);
-        const jwks = new URL(process.env.KEYCLOAK_JWKS_URI);
-        if ((issuer.protocol !== 'https:' || jwks.protocol !== 'https:') &&
-            (appEnvironment === 'production' || process.env.KEYCLOAK_ALLOW_HTTP !== 'true')) {
-            throw new Error('Keycloak requiere HTTPS fuera del piloto local.');
-        }
-    }
-
     if (appEnvironment === "production" && process.env.ENABLE_INTERNAL_READINESS === "true" && !process.env.INTERNAL_HEALTH_TOKEN?.trim()) {
         throw new Error("INTERNAL_HEALTH_TOKEN es obligatorio al habilitar readiness.");
     }

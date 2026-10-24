@@ -15,7 +15,7 @@ test('access token Keycloak exige firma, issuer, audience, cliente, rol y permis
   const app = express();
   app.get('/verify', auth({ issuer, audience: 'https://api.itecsa.local',
     jwksUri: `http://127.0.0.1:${keyServer.address().port}/certs` }), (req, res) => {
-    const claims = normalizeKeycloakClaims(req.auth.payload, 'itecsa-web');
+    const claims = normalizeKeycloakClaims(req.auth.payload, 'itecsa-web', 'itecsa-api-v1');
     res.status(claims ? 200 : 403).end();
   });
   app.use((error, _req, res, _next) => res.status(error.status || 401).end());
@@ -23,7 +23,7 @@ test('access token Keycloak exige firma, issuer, audience, cliente, rol y permis
   await new Promise(resolve => server.once('listening', resolve));
   const base = `http://127.0.0.1:${server.address().port}/verify`;
   const claims = { iss: issuer, aud: ['https://api.itecsa.local'], sub: 'pilot-id', azp: 'itecsa-web', typ: 'Bearer',
-    realm_access: { roles: ['Soporte'] }, permissions: ['read:own-profile'], iat: Math.floor(Date.now() / 1000),
+    resource_access: { 'itecsa-api-v1': { roles: ['Soporte'] } }, permissions: ['read:own-profile'], iat: Math.floor(Date.now() / 1000),
     exp: Math.floor(Date.now() / 1000) + 300 };
   function sign(payload, signingKey = privateKey) {
     const encoded = value => Buffer.from(JSON.stringify(value)).toString('base64url');
@@ -39,7 +39,7 @@ test('access token Keycloak exige firma, issuer, audience, cliente, rol y permis
     assert.equal(await status({ ...claims, iss: 'http://other/realms/itecsa' }), 401);
     assert.equal(await status({ ...claims, aud: ['other-api'] }), 401);
     assert.equal(await status({ ...claims, azp: 'other-client' }), 403);
-    assert.equal(await status({ ...claims, realm_access: { roles: ['Soporte', 'Gerencia'] } }), 403);
+    assert.equal(await status({ ...claims, resource_access: { 'itecsa-api-v1': { roles: ['Soporte', 'Gerencia'] } } }), 403);
     assert.equal(await status({ ...claims, permissions: undefined }), 403);
   } finally {
     server.close();

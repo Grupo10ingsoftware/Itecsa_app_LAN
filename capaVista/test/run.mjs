@@ -14,6 +14,7 @@ try {
   const metrics = await server.ssrLoadModule('/test/metrics.cases.jsx')
   metrics.run()
   const authorization = await server.ssrLoadModule('/test/authorization.cases.jsx')
+  const verifiedIdentity = await server.ssrLoadModule('/test/verifiedIdentity.cases.js')
   const payments = await server.ssrLoadModule('/test/payment.cases.jsx')
 
   const profile = await server.ssrLoadModule('/test/profile.cases.jsx')
@@ -30,6 +31,7 @@ try {
 
   profile.run()
   authorization.run()
+  verifiedIdentity.run()
   payments.run()
   orders.run()
   kanbanDetail.run()

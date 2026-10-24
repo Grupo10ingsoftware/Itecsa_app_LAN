@@ -1,10 +1,12 @@
-import { RECOGNIZED_ROLES, ROLES_CLAIM } from '../../../shared/authorization.js';
+import { RECOGNIZED_ROLES, ROLES_CLAIM, ROLE_PERMISSIONS } from '../../../shared/keycloakAuthorization.js';
 
-export function normalizeKeycloakClaims(payload, clientId) {
-  if (payload?.typ !== 'Bearer' || payload?.azp !== clientId || typeof payload?.sub !== 'string' || !payload.sub) return null;
-  const roles = payload.realm_access?.roles;
-  const selected = Array.isArray(roles) ? roles.filter(role => RECOGNIZED_ROLES.includes(role)) : [];
-  if (selected.length !== 1 || !Array.isArray(payload.permissions) ||
+export function normalizeKeycloakClaims(payload, clientId, roleClientId) {
+  if (typeof clientId !== 'string' || !clientId || typeof roleClientId !== 'string' || !roleClientId || roleClientId === clientId ||
+      payload?.typ !== 'Bearer' || payload?.azp !== clientId || typeof payload?.sub !== 'string' || !payload.sub.trim()) return null;
+  // A new, explicit namespace prevents legacy realm Soporte from becoming new Soporte.
+  const roles = payload.resource_access?.[roleClientId]?.roles;
+  if (!Array.isArray(roles) || roles.length !== 1 || !RECOGNIZED_ROLES.includes(roles[0]) || !Array.isArray(payload.permissions) ||
       payload.permissions.some(permission => typeof permission !== 'string' || !permission.trim())) return null;
-  return { ...payload, [ROLES_CLAIM]: selected, permissions: payload.permissions };
+  const permissions = ROLE_PERMISSIONS[roles[0]].filter(permission => payload.permissions.includes(permission));
+  return { ...payload, [ROLES_CLAIM]: [...roles], permissions };
 }

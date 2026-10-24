@@ -6,7 +6,8 @@ import {
   PAYMENT_STATUS,
   PAYMENT_CONFIRMATION_REQUIRED_MESSAGE,
 } from '../../../config/status.js';
-import { can, PERMISSIONS as P } from '../../../../../shared/authorization.js';
+import { PERMISSIONS as P } from '../../../../../shared/authorization.js';
+import { authorizationForProvider } from '../../../../../shared/identityAuthorization.js';
 
 export function toPrismaDate(value) {
   if (!value) return null;
@@ -74,7 +75,7 @@ export async function updGeneralStepOperation(service, orderId, stepId, options 
 
   if (
     isMoveToProduction &&
-    !can(options.role, permissions, P.START_PRODUCTION)
+    authorizationForProvider(options.identityProvider)?.can(options.role, permissions, P.START_PRODUCTION) !== true
   ) {
     const error = new AppError(403, KANBAN_MOVE_TO_PRODUCTION_PERMISSION_MESSAGE);
     throw error;

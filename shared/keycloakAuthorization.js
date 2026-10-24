@@ -1,4 +1,4 @@
-// Phase 01 policy only. No runtime provider, route or identity migration imports it.
+// Approved LAN policy. Runtime integration requires an explicit client-role namespace.
 // Derive the approved changes from the existing catalog; do not copy business rules.
 import {
   ROLES as LEGACY_ROLES, FUNCTIONAL_ROLES, ROLE_PERMISSIONS as LEGACY_ROLE_PERMISSIONS,
@@ -6,6 +6,7 @@ import {
 } from './authorization.js';
 
 export { PERMISSIONS, BUSINESS_PERMISSIONS, ROLES_CLAIM, FUNCTIONAL_ROLES } from './authorization.js';
+export const POLICY_ID = 'itecsa-keycloak-v1';
 
 export const ROLES = Object.freeze({
   ...Object.fromEntries(Object.entries(LEGACY_ROLES).filter(([key]) => key !== 'SOPORTE')),

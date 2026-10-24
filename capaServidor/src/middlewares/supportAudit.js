@@ -1,11 +1,13 @@
 import { ROLES } from "../../../shared/authorization.js";
+import { ROLES as KEYCLOAK_ROLES } from '../../../shared/keycloakAuthorization.js';
 import SecurityAuditRepository from "../modules/security/repo/securityAudit.repo.js";
 import { safeLogger } from "../shared/safeLogger.js";
 
 export function createSupportAudit({ repository = new SecurityAuditRepository(), logger = safeLogger } = {}) {
     return function supportAudit(req, res, next) {
         res.on("finish", () => {
-            const isSupport = req.currentUser?.rolUsuario === ROLES.SOPORTE;
+            const isSupport = req.currentUser?.rolUsuario === ROLES.SOPORTE ||
+                (req.identityProvider === 'keycloak' && req.currentUser?.rolUsuario === KEYCLOAK_ROLES.DESARROLLADOR);
             const isUserAdministration = req.method !== "GET" && req.originalUrl?.startsWith("/api/admin/users");
             if (!isSupport && !isUserAdministration) return;
             const actorUserId = req.currentUser?.idUsuario ?? null;

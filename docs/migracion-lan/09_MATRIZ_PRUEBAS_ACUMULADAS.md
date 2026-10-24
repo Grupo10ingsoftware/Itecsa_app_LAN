@@ -1,6 +1,6 @@
 # Matriz de pruebas acumuladas
 
-Fecha: **24-10-2026**. Base: `34dfd7c09f876285c1ea84d9020a44a1414ba468`. Alcance autorizado: 00–01. Comandos reproducibles y aislamiento: [08](08_EVIDENCIA_FASES_00_01.md). Política y matriz: [07](07_DECISIONES_APROBADAS.md).
+Fecha: **24-10-2026**. Las secciones iniciales conservan la evidencia histórica 00–01 sobre `34dfd7c09f876285c1ea84d9020a44a1414ba468`. La actualización 02 al final parte de `66a75c07e70004f4f83fa015ffe7ab828aa9e9f6` y actualiza los pendientes que sí fueron ensayados. Reproducción: [08](08_EVIDENCIA_FASES_00_01.md), [10](10_EVIDENCIA_Y_CONFIGURACION_FASE_02.md). Matriz: [07](07_DECISIONES_APROBADAS.md).
 
 ## Ejecuciones conservadas
 
@@ -77,3 +77,27 @@ K01–K14 agrupan aserciones: no se presentan como 14 pruebas adicionales indepe
 | R10 | T01–T34 de la auditoría original | Siguen siendo especificaciones de aceptación; ver documento 03; no se declaran 34 pruebas reales aprobadas |
 
 No se habilitaron flags de integración contra infraestructura real ni se desactivaron controles para superar resultados. No hay una migración de esquema que ensayar en 00–01. La revisión humana sigue pendiente; no se continuará a fase 02 sin autorización.
++
+## Actualización de fase 02 sobre 66a75c0
+
+El equipo autorizó avanzar a 02. Las tablas anteriores conservan los resultados históricos; esta sección registra la ejecución nueva. Evidencia y procedimientos: [10](10_EVIDENCIA_Y_CONFIGURACION_FASE_02.md).
+
+| ID | Comprobación ejecutada | Resultado final |
+|---|---|---|
+| P02-CORE | JWT/JWKS locales, configuración estricta, normalización y política HTTP | 12 pruebas padre nuevas aprobadas; incluyen 225 decisiones, firmas/algoritmos/expiración/issuer/audience/cliente/tipo, JWKS caído y errores de DB |
+| P02-LOCAL | Estado, rol y sujeto local, sin conciliación Auth0 | Aprobado con dobles y con MySQL real de laboratorio; token anterior denegado tras cambio/desactivación/desvinculación |
+| P02-SERVICES | Producción, corrección de pagos e histórico con política seleccionada | Aprobado; Desarrollador conserva acceso, Soporte no gana negocio y se conserva actor PIN/local |
+| P02-AUDIT | Técnico renombrado mantiene auditoría reforzada | Aprobado para Desarrollador/Soporte Keycloak y Soporte Auth0 |
+| P02-API | Suite completa backend sin conexiones externas | 1113 contabilizadas: 1109 aprobadas, 4 omitidas, 0 fallos |
+| P02-WEB | Script frontend completo | 51 node:test aprobadas, SSR previo aprobado y 251 verificaciones nuevas de contrato/proveedor/sesión |
+| P02-QUALITY | Lint/build producción y sintaxis | Exit 0; 562 módulos Vite; 145 fuentes backend/shared/scripts sin error |
+| P02-SCRIPTS | Scripts originales y generador de realm derivado | 25 aprobadas, 0 fallos |
+| P02-REAL | Keycloak 26.8.1 y MySQL 8.4.13 en red interna efímera | 16 aprobadas: padre + 15 subtests; nueve roles, 225 decisiones, PKCE, ID token, roles antiguos/múltiples, permisos excesivos, sujetos concurrentes, estado local, refresh y code replay |
+| P02-RESTART | Reinicio del Keycloak efímero e ingreso Code+PKCE nuevo | 2 aprobadas, 0 fallos |
+| P02-IMAGE | Suite normal en imagen sin fixtures de laboratorio | La integración opt-in se omite correctamente sin importar herramientas ausentes |
+
+Las 12 pruebas nuevas forman parte de las 1109 aprobadas; no se vuelven a sumar. Una de ellas comprueba que Keycloak no hereda por nombre la excepción técnica de PIN. La integración real se omite en la suite sin red y se ejecuta explícitamente por separado. Las 16+2 contabilizaciones reales incluyen padres, no equivalen a 18 escenarios de negocio independientes. El ensayo HTTP del login real no es una prueba de navegador Brave o de todo el frontend.
+
+Fallos anteriores conservados: primer laboratorio sin basic/sub y refresh después de code replay; segundo fixture con id_auth0=NULL incompatible con el schema; tests de servicios con propiedad de error equivocada. Se corrigieron configuración/fixtures/secuencia y se repitieron los casos y la regresión. No se relajó el control de sujeto, el esquema ni las denegaciones.
+
+Estado actualizado de pendientes: R04 probado para los roles/composites/mappers del laboratorio 26.8.1, pendiente realm empresarial; R05 cubierto con JWT locales y tokens reales para contrato/ID token/estado/sujetos, pendiente despliegue corporativo completo; R07 conserva el incidente refresh_token=undefined en Brave. R01–R03, R06, R08–R10 mantienen sus límites originales. Ningún éxito de laboratorio acredita migración de personas ni operación integral offline.

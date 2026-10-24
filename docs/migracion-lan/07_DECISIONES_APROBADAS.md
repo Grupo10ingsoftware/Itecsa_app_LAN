@@ -1,6 +1,6 @@
 # Decisiones aprobadas y límites de implementación
 
-Fecha: **24-10-2026**. Fuente de aprobación: nuevo encargo «Plan maestro de migración modular de Auth0 a Keycloak». Base de código `34dfd7c09f876285c1ea84d9020a44a1414ba468`. Estas decisiones actualizan las alternativas de la auditoría [02](02_RBAC_ACTUAL_Y_PROPUESTO.md), sin modificar ese documento histórico.
+Fecha: **24-10-2026**. Fuente de aprobación: nuevo encargo «Plan maestro de migración modular de Auth0 a Keycloak» y autorización posterior de avance. Base de auditoría `34dfd7c09f876285c1ea84d9020a44a1414ba468`; fase 02 sobre `66a75c07e70004f4f83fa015ffe7ab828aa9e9f6`. Estas decisiones actualizan las alternativas de la auditoría [02](02_RBAC_ACTUAL_Y_PROPUESTO.md), sin modificar ese documento histórico.
 
 ## Registro
 
@@ -13,7 +13,8 @@ Fecha: **24-10-2026**. Fuente de aprobación: nuevo encargo «Plan maestro de mi
 | D05 | Gerencia, Desarrollador y Soporte requieren política específica para creación/modificación/asignación | Camino ordinario cerrado; no se inventó aprobador |
 | D06 | No autoasignación ni elevación propia | Catálogo de destinos ordinarios excluye el rol Soporte; validación de sujetos e identidades pendiente de integración administrativa |
 | D07 | Conservar Auth0, SDK, servicios, adaptadores, templates, pruebas y documentación | Conservados; sin eliminación ni fallback nuevo |
-| D08 | Solo fases 00 y 01, con política aislada y sin identidades reales | Ejecutadas para revisión; fase 02 no iniciada |
+| D08 | Alcance inicial: fases 00 y 01, política aislada y sin identidades reales | Entregadas; commit local 66a75c0 solicitado por el equipo |
+| D09 | El equipo indicó «pasamos a la siguiente fase» después del commit | Fase 02 autorizada; 03 y posteriores siguen sin autorización |
 
 La selección concreta de Soporte utiliza la autorización expresa para conservar perfil y mensajes propios cuando sean necesarios. `manage:own-pin` mantiene el PIN propio independiente, requerido por los contratos de operaciones sensibles; no crea un permiso de administración del PIN ajeno ni un restablecimiento de contraseña. `manage:users` representa la capacidad administrativa existente; no acredita que estén implementadas las futuras credenciales temporales, recuperación o consulta de auditoría. No se añadieron capacidades ficticias para funciones que aún no existen.
 
@@ -70,3 +71,9 @@ Solo nuevo Soporte tiene `manage:users`. Los destinos ordinarios posibles son AP
 | Mocks, fixtures, generador RBAC y documentos Auth0 | Se conservan los ocho roles originales | Mantenerlos como referencia; no regenerar artefactos Auth0 con la nueva matriz |
 
 Permanecen pendientes: autorización de cuentas privilegiadas y bootstrap, formato de username, política de datos históricos/base nueva, identidad externa estable, parámetros de infraestructura, entrega de credenciales, políticas de sesión/recuperación/retención y mínimos del futuro servicio administrativo. Ninguno se resolvió por defecto.
+
+## Aplicación técnica en fase 02
+
+La matriz funcional anterior no cambia. La implementación selecciona su política desde el proveedor autenticado; los roles Keycloak nuevos se leen exclusivamente de un cliente de roles explícito (`KEYCLOAK_ROLE_CLIENT_ID`), distinto de la SPA. Un rol de realm llamado Soporte no establece esa asignación. La configuración empresarial y la correspondencia por sujeto siguen pendientes: esta es una decisión técnica de integración, no una aprobación para migrar personas ni conceder roles privilegiados.
+
+En laboratorio se utilizó `itecsa-api-v1` para los nueve roles y `itecsa-capabilities-v1` para las 25 capacidades. Los composites y mappers se generan de la matriz canónica y la API vuelve a intersectar los permisos emitidos con el rol local. No se hizo un hardcoded grant universal, un mapper de atributos editables por trabajadores ni una sustitución global de nombres. Los detalles, límites y reversión están en [10](10_EVIDENCIA_Y_CONFIGURACION_FASE_02.md).

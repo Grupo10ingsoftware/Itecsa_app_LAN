@@ -179,6 +179,7 @@ test('isolation: importing the new policy preserves the active legacy matrix and
   const raw = { typ: 'Bearer', azp: 'itecsa-web', sub: 'synthetic-subject',
     realm_access: { roles: ['Desarrollador'] }, permissions: ['read:orders'] };
   assert.equal(normalizeKeycloakClaims(raw, 'itecsa-web'), null, 'do not activate phase 02 claims');
-  assert.deepEqual(normalizeKeycloakClaims({ ...raw, realm_access: { roles: ['Soporte'] } }, 'itecsa-web')
-    [legacy.ROLES_CLAIM], ['Soporte']);
+  // Phase 02 integrates a separate client-role namespace. Realm-only pilot tokens
+  // are now rejected, while the Auth0 matrix and unmarked legacy middleware above remain intact.
+  assert.equal(normalizeKeycloakClaims({ ...raw, realm_access: { roles: ['Soporte'] } }, 'itecsa-web'), null);
 });

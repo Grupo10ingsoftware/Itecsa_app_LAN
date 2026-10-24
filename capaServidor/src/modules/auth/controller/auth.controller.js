@@ -5,11 +5,12 @@ import {
     requestPasswordSetupEmail,
 } from "../../users/service/auth0Management.service.js";
 import userRepository from "../../users/repo/users.repo.js";
-import { OFFICIAL_ROLES, ROLES } from "../../../config/roles.js";
+import { ROLES } from "../../../config/roles.js";
 import pinService from "../service/pin.service.js";
 import { safeLogger } from "../../../shared/safeLogger.js";
 import { isActiveUserStatus, USER_STATUS } from "../../../config/userLifecycle.js";
 import { validateUserMovementsQuery } from "../../users/validators/adminUsers.validator.js";
+import { authorizationForProvider } from '../../../../../shared/identityAuthorization.js';
 
 const EMAIL_CLAIM = "https://itecsa.local/email";
 const ROLES_CLAIM = "https://itecsa.local/roles";
@@ -71,6 +72,7 @@ export function createVerifyAuthSessionHandler({
         const email = payload?.[EMAIL_CLAIM];
         const roles = payload?.[ROLES_CLAIM];
         const permissionsClaim = payload?.[PERMISSIONS_CLAIM];
+        const policy = authorizationForProvider(req.identityProvider);
 
         const hasValidIdentity =
             typeof payload?.sub === "string" &&
@@ -80,7 +82,7 @@ export function createVerifyAuthSessionHandler({
         const hasSingleOfficialRole =
             Array.isArray(roles) &&
             roles.length === 1 &&
-            OFFICIAL_ROLES.has(roles[0]);
+            policy?.RECOGNIZED_ROLES.includes(roles[0]);
         const hasValidPermissions =
             permissionsClaim === undefined || Array.isArray(permissionsClaim);
 
@@ -102,6 +104,9 @@ export function createVerifyAuthSessionHandler({
 
             return res.status(200).json({
                 sub: payload.sub,
+                ...(req.identityProvider === 'keycloak' ? {
+                    identityProvider: 'keycloak', authorizationPolicy: policy.POLICY_ID,
+                } : {}),
                 ...(req.currentUser ? {
                     primerNombre: req.currentUser.nombreUsuario,
                     apellidoPaterno: req.currentUser.apellidoUsuario,
@@ -136,6 +141,10 @@ export function createRevealPinHandler({ pins = pinService } = {}) {
 export function createDebugResetPinHandler({ pins = pinService } = {}) {
     return async function debugResetPinHandler(req, res) {
         res.set("Cache-Control", "no-store");
+        // The old technical Soporte exception must not transfer to the new account role.
+        if (req.identityProvider === 'keycloak') {
+            return res.status(403).json({ code: 'PIN_DEBUG_FORBIDDEN', message: 'La accion tecnica no esta habilitada para esta identidad.' });
+        }
         try {
             return res.status(200).json({ pinStatus: await pins.debugReset(req.auth?.payload) });
         } catch (error) {
