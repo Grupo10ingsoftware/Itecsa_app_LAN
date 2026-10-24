@@ -62,6 +62,9 @@ export function createAuthRouter({
     );
     router.post(
         "/password-reset/request",
+        (req, res, next) => process.env.AUTH_PROVIDER === 'keycloak'
+            ? res.status(503).json({ code: 'IDENTITY_PROVIDER_NOT_IMPLEMENTED', message: 'Recuperacion de credenciales no disponible en el piloto Keycloak.' })
+            : next(),
         passwordResetRateLimit,
         createPasswordResetRequestHandler({
             users,

@@ -11,7 +11,9 @@
 .agents
 .codex
 .github
-docs
+docs/**
+!docs/auth0/
+!docs/auth0/rbac.expected.json
 data
 mockups-muestras
 *.md

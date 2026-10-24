@@ -53,9 +53,10 @@ export default function LoginPage() {
   const [shouldStartLogin, setShouldStartLogin] = useState(false)
   const location = useLocation()
   const returnTo = getSafeRedirectPath(location.state, location.search)
+  const loggedOut = new URLSearchParams(location.search).get('logged_out') === '1'
 
   useEffect(() => {
-    if (error || isAuthenticated || identityUser || shouldStartLogin) {
+    if (loggedOut || error || isAuthenticated || identityUser || shouldStartLogin) {
       return undefined
     }
 
@@ -67,10 +68,10 @@ export default function LoginPage() {
     return () => {
       window.clearTimeout(timeoutId)
     }
-  }, [identityUser, error, isAuthenticated, isLoading, shouldStartLogin])
+  }, [identityUser, error, isAuthenticated, isLoading, loggedOut, shouldStartLogin])
 
   useEffect(() => {
-    if (error || !shouldStartLogin || isAuthenticated) {
+    if (loggedOut || error || !shouldStartLogin || isAuthenticated) {
       return
     }
 
@@ -79,7 +80,7 @@ export default function LoginPage() {
         returnTo,
       },
     })
-  }, [error, isAuthenticated, loginWithRedirect, returnTo, shouldStartLogin])
+  }, [error, isAuthenticated, loggedOut, loginWithRedirect, returnTo, shouldStartLogin])
 
   const handleLoginRetry = () => {
     loginWithRedirect({
@@ -138,6 +139,7 @@ export default function LoginPage() {
           <h1 className="h3 mt-3 mb-2" id="login-title">
             Inicio de sesion
           </h1>
+          {loggedOut && <p className="mb-2">Sesión cerrada.</p>}
           <p className="text-secondary mb-0">
             Ingresa mediante el acceso seguro de ITECSA.
           </p>

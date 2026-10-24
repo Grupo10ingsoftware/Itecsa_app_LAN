@@ -40,6 +40,8 @@ test('login conserva solo destino interno y logout limpia memoria antes de naveg
   assert.deepEqual(f.calls.find(c => c[0] === 'login')[1], { redirectUri: 'https://app.test' })
   await f.session.logout()
   assert.equal(f.sdk.token, undefined); assert.equal(f.session.getSnapshot().isAuthenticated, false)
+  assert.equal(f.session.getSnapshot().isLoading, true)
+  assert.deepEqual(f.calls.find(c => c[0] === 'logout')[1], { redirectUri: 'https://app.test/login?logged_out=1' })
   assert.equal(f.storage.size, 0); assert.equal(f.calls.at(-1)[0], 'navigate')
 })
 

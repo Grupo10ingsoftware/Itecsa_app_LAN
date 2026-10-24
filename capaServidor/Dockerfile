@@ -15,6 +15,8 @@ COPY --chown=node:node capaServidor/src ./src
 COPY --chown=node:node capaServidor/data ./data
 COPY --chown=node:node capaServidor/test ./test
 COPY --chown=node:node shared /app/shared
+COPY --chown=node:node scripts/rbac.mjs /app/scripts/rbac.mjs
+COPY --chown=node:node docs/auth0/rbac.expected.json /app/docs/auth0/rbac.expected.json
 RUN chown -R node:node /app
 USER node
 ENV APP_ENV=development NODE_ENV=development PORT=3000

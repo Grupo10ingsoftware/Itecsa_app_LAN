@@ -15,6 +15,7 @@ npm run dev --prefix capaVista
 
 SPA: `http://localhost:5173`. API: `http://localhost:3000/api`.
 Para trabajar con contenedores, seguir la [guía Docker y despliegue](docs/operacion/DOCKER_DESPLIEGUE.md).
+Para el acceso piloto por Keycloak, seguir la [guía del túnel y arranque LAN](docs/operacion/PILOTO_KEYCLOAK_LAN.md).
 
 ## Documentación
 

@@ -7,6 +7,7 @@ RUN npm ci
 FROM dependencies AS development
 COPY --chown=node:node capaVista/ ./
 COPY --chown=node:node shared /app/shared
+COPY --chown=node:node deploy/40-runtime-config.sh /app/deploy/40-runtime-config.sh
 RUN chown -R node:node /app
 USER node
 EXPOSE 5173

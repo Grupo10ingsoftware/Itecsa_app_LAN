@@ -31,6 +31,7 @@ export function createRequireActiveIdentity({ repository = users, resolveAuth0Ro
       }
 
       if (user.rolUsuario !== role) {
+        if (req.identityProvider === 'keycloak') return res.status(403).json({ message: ACCESS_DENIED });
         // El token puede ser anterior a otro cambio: confirmar el rol actual antes de escribir.
         const currentAuth0Role = await resolveAuth0Role(payload.sub);
         if (currentAuth0Role !== role) {

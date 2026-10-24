@@ -11,6 +11,7 @@ import ProtectedRoute from '../shared/components/navigation/ProtectedRoute'
 import RoleGuard from '../shared/components/navigation/RoleGuard'
 import ModuleLoadingState from '../shared/components/navigation/ModuleLoadingState'
 import { informationPageLoaders } from './informationPageLoaders'
+import { runtimeConfig } from '../config/runtimeConfig.js'
 
 const KanbanBoardPage = lazy(() => import('../modules/kanban/pages/KanbanBoardPage'))
 const ProfilePage = lazy(informationPageLoaders[APP_ROUTES.PROFILE])
@@ -90,7 +91,7 @@ export default function AppRouter() {
             <Route
               path="admin/usuarios"
               element={
-                <RoleGuard
+                runtimeConfig.authProvider === 'keycloak' ? <Navigate replace to={APP_ROUTES.KANBAN} /> : <RoleGuard
                   requiredPermission={PERMISSIONS.MANAGE_USERS_VISUALLY}
                   requiredRoles={ADMINISTRATIVE_ROLES}
                 >

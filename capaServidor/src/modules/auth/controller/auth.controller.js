@@ -74,8 +74,8 @@ export function createVerifyAuthSessionHandler({
 
         const hasValidIdentity =
             typeof payload?.sub === "string" &&
-            typeof email === "string" &&
-            email.trim().length > 0;
+            payload.sub.length > 0 &&
+            (req.identityProvider === 'keycloak' || (typeof email === "string" && email.trim().length > 0));
         // Un rol singular evita escoger arbitrariamente entre asignaciones RBAC incompatibles.
         const hasSingleOfficialRole =
             Array.isArray(roles) &&
@@ -108,7 +108,7 @@ export function createVerifyAuthSessionHandler({
                     rutUsuario: req.currentUser.rutUsuario,
                     estadoUsuario: req.currentUser.estadoUsuario,
                 } : {}),
-                email,
+                email: typeof email === 'string' && email.trim() ? email : null,
                 rolUsuario,
                 isAdministrador: rolUsuario === ROLES.ADMINISTRADOR,
                 permissions,

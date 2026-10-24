@@ -77,10 +77,15 @@ export function createKeycloakSession(keycloak, browser, onRedirect = () => {}) 
     },
     async logout() {
       try {
-        const url = keycloak.createLogoutUrl({ redirectUri: browser.location.origin })
-        invalid(null)
+        const url = keycloak.createLogoutUrl({ redirectUri: `${browser.location.origin}/login?logged_out=1` })
+        // Mantener la ruta protegida en carga hasta que el navegador salga hacia Keycloak.
+        // Un estado "no autenticado" visible aqui redirige a /login e inicia otro login.
+        generation++
+        snapshot = { ...snapshot, isAuthenticated: false, user: null, sessionKey: generation }
+        keycloak.clearToken()
         browser.sessionStorage.removeItem('itecsa.returnTo')
-        browser.location.assign(await url)
+        notify({ isLoading: true, error: null })
+        browser.location.assign(url)
       } catch (error) { invalid(error) }
     },
     getAccessToken,

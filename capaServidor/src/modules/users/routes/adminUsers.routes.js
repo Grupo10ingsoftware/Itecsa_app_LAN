@@ -25,6 +25,9 @@ export function createAdminUsersRouter({
     validatePin = requirePin,
 } = {}) {
     const router = Router();
+    router.use((req, res, next) => process.env.AUTH_PROVIDER === 'keycloak'
+        ? res.status(503).json({ code: 'IDENTITY_PROVIDER_NOT_IMPLEMENTED', message: 'Gestion de usuarios no disponible en el piloto Keycloak.' })
+        : next());
     router.get(
         "/users",
         authenticate,

@@ -3,6 +3,7 @@ import { APP_ROUTES, MAIN_NAVIGATION_ROUTES } from '../../../config/routes'
 import { useAuth } from '../../../hooks/useAuth'
 import styles from '../layout/Layout.module.css'
 import { preloadInformationPage } from '../../../app/informationPageLoaders'
+import { runtimeConfig } from '../../../config/runtimeConfig.js'
 
 const ROUTE_ICONS_BY_PATH = Object.freeze({
   [APP_ROUTES.KANBAN]: 'bi-kanban',
@@ -18,6 +19,7 @@ export default function NavigationMenu({ onNavigate }) {
   const { hasPermission, hasRole } = useAuth()
 
   function canNavigate(route) {
+    if (runtimeConfig.authProvider === 'keycloak' && route.path === APP_ROUTES.ADMIN_USERS) return false
     const matchesPermission = !route.permission || hasPermission(route.permission)
     const requiredRoles = route.requiredRoles ?? []
     const matchesRole = requiredRoles.length === 0 || requiredRoles.some((role) => hasRole(role))
