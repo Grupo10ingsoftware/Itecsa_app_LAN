@@ -4,263 +4,83 @@ import { API_ERROR_CODES } from '../../../services/api/apiClient'
 import { useAuth } from '../../../hooks/useAuth'
 import { useAdminUsersApi } from '../hooks/useAdminUsersApi'
 import { hasValidationErrors, validateUserCreateForm } from '../utils/userValidation'
-import { canRequestPasswordSetupEmail } from '../utils/userCreationOutcome'
-import { authorizationForProvider } from '../../../../../shared/identityAuthorization.js'
 import styles from './UserCreateForm.module.css'
 
-const INITIAL_VALUES = Object.freeze({
-  nombreUsuario: '',
-  apellidoUsuario: '',
-  rutUsuario: '',
-  correoUsuario: '',
-  rolUsuario: '',
-  username: '',
-  pin: '',
-})
-
-const INITIAL_ERRORS = Object.freeze({
-  nombreUsuario: [],
-  apellidoUsuario: [],
-  rutUsuario: [],
-  correoUsuario: [],
-  rolUsuario: [],
-  username: [],
-  pin: [],
-})
-
-const MESSAGE_TYPES = Object.freeze({
-  SUCCESS: 'success',
-  WARNING: 'warning',
-  DANGER: 'danger',
-  INFO: 'info',
-})
+const INITIAL_VALUES = Object.freeze({ nombreUsuario: '', apellidoUsuario: '', rutUsuario: '', correoUsuario: '', rolUsuario: '', username: '', pin: '' })
+const INITIAL_ERRORS = Object.freeze({ nombreUsuario: [], apellidoUsuario: [], rutUsuario: [], correoUsuario: [], rolUsuario: [], username: [], pin: [] })
+const MESSAGE_TYPES = Object.freeze({ WARNING: 'warning', DANGER: 'danger', INFO: 'info' })
 
 function FieldErrors({ errors, id }) {
-  if (errors.length === 0) {
-    return null
-  }
-
-  return (
-    <div className={styles.fieldErrors} id={id}>
-      {errors.map((error) => (
-        <p key={error}>
-          {error}
-        </p>
-      ))}
-    </div>
-  )
+  return errors.length ? <div className={styles.fieldErrors} id={id}>{errors.map(error => <p key={error}>{error}</p>)}</div> : null
 }
-
 function getErrorMessage(error) {
-  if (error?.payload?.code === 'USER_CREATE_OUTCOME_UNKNOWN' || error?.payload?.retryCreate === false) return {
-    type: MESSAGE_TYPES.WARNING,
-    text: `No se pudo confirmar el resultado del alta. No la repitas: solicita conciliacion administrativa. Referencia: ${error.payload.username ?? 'no disponible'}.`,
-  }
   if (error?.code === API_ERROR_CODES.SESSION_INVALID || error?.status === 401) {
-    return {
-      type: MESSAGE_TYPES.WARNING,
-      text: 'La sesion no es valida o expiro. Vuelve a iniciar sesion para crear usuarios.',
-      requiresLogin: true,
-    }
+    return { type: MESSAGE_TYPES.WARNING, text: 'La sesion no es valida o expiro. Vuelve a iniciar sesion.', requiresLogin: true }
   }
-
-  if (error?.status === 403) {
-    return {
-      type: MESSAGE_TYPES.DANGER,
-      text: 'Acceso denegado. Tu usuario no tiene permisos para crear usuarios.',
-    }
-  }
-
-  if (error?.status === 409) {
-    return {
-      type: MESSAGE_TYPES.WARNING,
-      text: 'Ya existe un usuario con ese correo.',
-    }
-  }
-
-  if (error?.code === API_ERROR_CODES.NETWORK_ERROR) {
-    return {
-      type: MESSAGE_TYPES.DANGER,
-      text: 'No fue posible contactar la API. Revisa la conexion e intenta nuevamente.',
-    }
-  }
-
-  return {
-    type: MESSAGE_TYPES.DANGER,
-    text: 'No fue posible crear el usuario. Intenta nuevamente.',
-  }
+  if (error?.status === 403) return { type: MESSAGE_TYPES.DANGER, text: 'Acceso denegado. No tienes permisos para preparar esta cuenta.' }
+  if (error?.status === 409) return { type: MESSAGE_TYPES.WARNING, text: 'La cuenta o la operacion tiene un conflicto. Revisa su estado antes de repetir el alta.' }
+  return { type: MESSAGE_TYPES.DANGER, text: error?.payload?.message || 'No se pudo confirmar la preparacion. Revisa el estado antes de repetirla.' }
 }
-
-function buildCreatedUserMessage(user) {
-  if (user.outcome === 'pending_credentials') return { type: MESSAGE_TYPES.INFO,
-    text: 'Cuenta registrada. Falta establecer credenciales mediante el procedimiento administrativo HTTPS. No se envio correo.' }
-
-  if (user.outcome === 'completed') {
-    return {
-      type: MESSAGE_TYPES.SUCCESS,
-      text: 'Usuario creado correctamente. Auth0 solicitara el correo para establecer contraseña.',
-    }
-  }
-
-  if (user.internalUserPersisted === false) {
-    return {
-      type: MESSAGE_TYPES.WARNING,
-      text: 'La identidad externa fue creada, pero falta registrarla en el sistema interno. No repitas el alta: requiere conciliacion administrativa.',
-    }
-  }
-
-  if (user.roleAssignmentCompleted === false) {
-    return {
-      type: MESSAGE_TYPES.WARNING,
-      text: 'La cuenta fue creada, pero no se pudo asignar el rol de acceso. Requiere gestion manual antes de solicitar el correo de contraseña.',
-    }
-  }
-
-  if (user.pinProvisioned === false) {
-    return {
-      type: MESSAGE_TYPES.WARNING,
-      text: 'La cuenta y el rol fueron creados, pero falta aprovisionar el PIN. No se solicito el correo de contraseña.',
-    }
-  }
-
-  return {
-    type: MESSAGE_TYPES.WARNING,
-    text: 'La cuenta fue creada, pero no se pudo solicitar el correo de establecimiento de contrasena.',
-  }
+function preparationMessage(result) {
+  return { type: result.outcome === 'identity_prepared' ? MESSAGE_TYPES.INFO : MESSAGE_TYPES.WARNING,
+    text: result.outcome === 'identity_prepared'
+      ? 'Cuenta preparada, pendiente y deshabilitada. La entrega de credenciales aun no esta habilitada.'
+      : 'Preparacion incompleta. No repitas el alta. Referencia: ' + result.operationId + '.' }
 }
-
 export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, onCreated } = {}) {
-  const { loginWithRedirect, user: actor, provider } = useAuth()
-  const keycloak = provider === 'keycloak'
+  const { loginWithRedirect, user: actor } = useAuth()
   const adminUsersApi = useAdminUsersApi()
   const [values, setValues] = useState(INITIAL_VALUES)
   const [fieldErrors, setFieldErrors] = useState(INITIAL_ERRORS)
   const [message, setMessage] = useState(null)
   const [createdUser, setCreatedUser] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isRequestingPasswordEmail, setIsRequestingPasswordEmail] = useState(false)
-
-  function clearResultState() {
-    setMessage(null)
-    setCreatedUser(null)
+  function handleFieldChange({ target: { name, value } }) {
+    if (createdUser && name !== 'pin') return
+    setValues(current => ({ ...current, [name]: value }))
+    if (!createdUser) setMessage(null)
   }
-
-  function handleFieldChange(event) {
-    const { name, value } = event.target
-    if (keycloak && createdUser && name !== 'pin') return
-
-    setValues((currentValues) => ({
-      ...currentValues,
-      [name]: value,
-    }))
-    if (!keycloak || !createdUser) clearResultState()
-  }
-
   async function handleSubmit(event) {
     event.preventDefault()
-    if (isSubmitting || (keycloak && createdUser)) return
-
-    const nextErrors = validateUserCreateForm(values, { optionalEmail: keycloak, requireRut: !keycloak })
-    if (keycloak) {
-      nextErrors.username = values.username && values.username === values.username.trim().toLowerCase()
-        && values.username.length <= 255 && !/\s/u.test(values.username)
-        && [...values.username].every(char => char.codePointAt(0) > 32) ? [] : ['Ingresa un nombre de acceso en minusculas, sin espacios.']
-      nextErrors.pin = /^\d{6}$/.test(values.pin) ? [] : ['Ingresa tu PIN de 6 digitos.']
-      if (!authorizationForProvider(provider).manageableRoles(actor?.rolUsuario).includes(values.rolUsuario)) {
-        nextErrors.rolUsuario = ['No puedes asignar ese rol.']
-      }
-    }
+    if (isSubmitting || createdUser) return
+    const nextErrors = validateUserCreateForm(values, { optionalEmail: true, requireRut: false })
+    nextErrors.username = values.username && values.username === values.username.trim().toLowerCase()
+      && values.username.length <= 255 && !/\s/u.test(values.username)
+      && [...values.username].every(char => char.codePointAt(0) > 32) ? [] : ['Ingresa un nombre de acceso en minusculas, sin espacios.']
+    nextErrors.pin = /^\d{6}$/.test(values.pin) ? [] : ['Ingresa tu PIN de 6 digitos.']
+    if (!manageableRoles(actor?.rolUsuario).includes(values.rolUsuario)) nextErrors.rolUsuario = ['No puedes asignar ese rol.']
     setFieldErrors(nextErrors)
-    clearResultState()
-
-    if (hasValidationErrors(nextErrors)) {
-      return
-    }
-
-    const payload = {
-      nombreUsuario: values.nombreUsuario.trim(),
-      apellidoUsuario: values.apellidoUsuario.trim(),
-      rutUsuario: values.rutUsuario.trim().toUpperCase(),
-      correoUsuario: values.correoUsuario.trim().toLowerCase() || (provider === 'keycloak' ? null : ''),
-      rolUsuario: values.rolUsuario,
-      ...(keycloak ? { username: values.username, pin: values.pin } : {}),
-    }
-
+    setMessage(null)
+    if (hasValidationErrors(nextErrors)) return
     setIsSubmitting(true)
     onBusyChange?.(true)
-
     try {
-      const user = await adminUsersApi.createUser(payload)
-      setCreatedUser(user)
-      setMessage(keycloak ? { type: user.outcome === 'identity_prepared' ? MESSAGE_TYPES.INFO : MESSAGE_TYPES.WARNING,
-        text: user.outcome === 'identity_prepared'
-          ? 'Cuenta preparada, pendiente y deshabilitada. La entrega de credenciales aun no esta habilitada.'
-          : `Preparacion incompleta. No repitas el alta. Referencia: ${user.operationId}.` } : buildCreatedUserMessage(user))
-      if (!keycloak || user.outcome === 'identity_prepared') setValues(INITIAL_VALUES)
-      setFieldErrors(INITIAL_ERRORS)
-      onCreated?.(user)
-    } catch (error) {
-      setMessage(getErrorMessage(error))
-    } finally {
-      if (keycloak) setValues(current => ({ ...current, pin: '' }))
-      setIsSubmitting(false)
-      onBusyChange?.(false)
-    }
-  }
-  async function handleReconcile() {
-    if (!/^\d{6}$/.test(values.pin)) { setFieldErrors(current => ({ ...current, pin: ['Ingresa tu PIN de 6 digitos.'] })); return }
-    setIsSubmitting(true); onBusyChange?.(true)
-    try {
-      const result = await adminUsersApi.reconcile({ operationId: createdUser.operationId, pin: values.pin })
+      const result = await adminUsersApi.createUser({ nombreUsuario: values.nombreUsuario.trim(),
+        apellidoUsuario: values.apellidoUsuario.trim(), correoUsuario: values.correoUsuario.trim().toLowerCase() || null,
+        rolUsuario: values.rolUsuario, username: values.username, pin: values.pin })
       setCreatedUser(result)
-      setMessage({ type: result.outcome === 'identity_prepared' ? MESSAGE_TYPES.INFO : MESSAGE_TYPES.WARNING,
-        text: result.outcome === 'identity_prepared' ? 'Cuenta preparada. Permanece pendiente y deshabilitada.'
-          : `La operacion sigue pendiente de revision. Referencia: ${result.operationId}.` })
+      setMessage(preparationMessage(result))
+      if (result.outcome === 'identity_prepared') setValues(INITIAL_VALUES)
+      setFieldErrors(INITIAL_ERRORS)
       onCreated?.(result)
     } catch (error) { setMessage(getErrorMessage(error)) }
     finally { setValues(current => ({ ...current, pin: '' })); setIsSubmitting(false); onBusyChange?.(false) }
   }
-
-  async function handlePasswordSetupEmailRequest() {
-    if (!createdUser?.correoUsuario || createdUser.roleAssignmentCompleted === false) {
+  async function handleReconcile() {
+    if (!/^\d{6}$/.test(values.pin)) {
+      setFieldErrors(current => ({ ...current, pin: ['Ingresa tu PIN de 6 digitos.'] }))
       return
     }
-
-    setIsRequestingPasswordEmail(true)
+    setIsSubmitting(true)
     onBusyChange?.(true)
-
     try {
-      const response = await adminUsersApi.requestPasswordSetupEmail({
-        correoUsuario: createdUser.correoUsuario,
-      })
-      setCreatedUser((currentUser) => ({
-        ...currentUser,
-        passwordSetupEmailRequested: response.passwordSetupEmailRequested,
-      }))
-      setMessage({
-        type: MESSAGE_TYPES.SUCCESS,
-        text: 'Correo de establecimiento de contraseña solicitado correctamente.',
-      })
-    } catch (error) {
-      const nextMessage = getErrorMessage(error)
-      const shouldKeepMappedMessage =
-        error?.code === API_ERROR_CODES.SESSION_INVALID ||
-        error?.status === 401 ||
-        error?.status === 403
-
-      setMessage({
-        ...nextMessage,
-        text: shouldKeepMappedMessage
-          ? nextMessage.text
-          : 'No fue posible solicitar el correo de establecimiento de contraseña. Intenta nuevamente.',
-      })
-    } finally {
-      setIsRequestingPasswordEmail(false)
-      onBusyChange?.(false)
-    }
+      const result = await adminUsersApi.reconcile({ operationId: createdUser.operationId, pin: values.pin })
+      setCreatedUser(result)
+      setMessage(preparationMessage(result))
+      onCreated?.(result)
+    } catch (error) { setMessage(getErrorMessage(error)) }
+    finally { setValues(current => ({ ...current, pin: '' })); setIsSubmitting(false); onBusyChange?.(false) }
   }
-
-  const canRequestPasswordEmail = provider !== 'keycloak' && canRequestPasswordSetupEmail(createdUser)
   const isSessionInvalid = message?.requiresLogin === true
   const nombreUsuarioErrors = fieldErrors.nombreUsuario ?? []
   const apellidoUsuarioErrors = fieldErrors.apellidoUsuario ?? []
@@ -268,7 +88,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
   const correoUsuarioErrors = fieldErrors.correoUsuario ?? []
   const rolUsuarioErrors = fieldErrors.rolUsuario ?? []
   const isModalMode = mode === 'modal'
-  const isBusy = isSubmitting || isRequestingPasswordEmail
+  const isBusy = isSubmitting
 
   return (
     <form
@@ -287,14 +107,14 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
             )}
           </div>
         )}
-        {keycloak && <div className={styles.fieldCard}>
+        <div className={styles.fieldCard}>
           <div className={styles.fieldContent}>
             <label htmlFor="user-username">Nombre de acceso <span>*</span></label>
             <input id="user-username" name="username" value={values.username} onChange={handleFieldChange}
               autoComplete="off" maxLength={255} disabled={Boolean(createdUser)} aria-invalid={Boolean(fieldErrors.username?.length)} aria-describedby="user-username-errors" />
             <FieldErrors errors={fieldErrors.username ?? []} id="user-username-errors" />
           </div>
-        </div>}
+        </div>
 
         <div className={`${styles.fieldCard} ${nombreUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
           <div className={styles.fieldContent}>
@@ -334,7 +154,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
 
         <div className={`${styles.fieldCard} ${correoUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
           <div className={styles.fieldContent}>
-            <label htmlFor="user-email">Correo electronico {provider !== 'keycloak' && <span>*</span>}</label>
+            <label htmlFor="user-email">Correo electronico </label>
             <input
               aria-describedby="user-email-errors"
               aria-invalid={correoUsuarioErrors.length > 0}
@@ -352,7 +172,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
 
         <div className={`${styles.fieldCard} ${rutUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
           <div className={styles.fieldContent}>
-            <label htmlFor="user-rut">RUT {!keycloak && <span>*</span>}</label>
+            <label htmlFor="user-rut">RUT </label>
             <input
               aria-describedby="user-rut-errors"
               aria-invalid={rutUsuarioErrors.length > 0}
@@ -363,9 +183,9 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
               placeholder="Ej: 12.345.678-9"
               type="text"
               value={values.rutUsuario}
-              disabled={keycloak}
+              disabled
             />
-            {keycloak && <p className={styles.fieldHelp}>La preparacion actual no registra RUT.</p>}
+            <p className={styles.fieldHelp}>La preparacion actual no registra RUT.</p>
             <FieldErrors errors={rutUsuarioErrors} id="user-rut-errors" />
           </div>
         </div>
@@ -382,7 +202,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
               value={values.rolUsuario}
             >
               <option value="">Selecciona un rol</option>
-              {(keycloak ? authorizationForProvider(provider).manageableRoles(actor?.rolUsuario) : manageableRoles(actor?.rolUsuario)).map((role) => (
+              {manageableRoles(actor?.rolUsuario).map((role) => (
                 <option key={role} value={role}>
                   {getRoleLabel(role)}
                 </option>
@@ -404,37 +224,19 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
               type="password"
             />
             <p className={styles.fieldHelp} id="user-password-help">
-              {provider === 'keycloak'
-                ? 'La cuenta quedara deshabilitada y pendiente. La activacion y entrega de credenciales aun no estan habilitadas.'
-                : 'El usuario establecera su contraseña mediante el procedimiento de correo de Auth0.'}
+              La cuenta quedara deshabilitada y pendiente. La activacion y entrega de credenciales aun no estan habilitadas.
             </p>
           </div>
         </div>
-        {keycloak && <div className={styles.fieldCard}>
+        <div className={styles.fieldCard}>
           <div className={styles.fieldContent}>
             <label htmlFor="user-prepare-pin">Tu PIN de autorizacion <span>*</span></label>
             <input id="user-prepare-pin" name="pin" type="password" inputMode="numeric" maxLength={6} autoComplete="off"
               value={values.pin} onChange={handleFieldChange} aria-invalid={Boolean(fieldErrors.pin?.length)} aria-describedby="user-prepare-pin-errors" />
             <FieldErrors errors={fieldErrors.pin ?? []} id="user-prepare-pin-errors" />
           </div>
-        </div>}
+        </div>
 
-        {createdUser && !keycloak && (
-          <section className={styles.creationResult}>
-            <h2>Resultado de creacion</h2>
-            <dl>
-              <div><dt>Identificador externo</dt><dd>{createdUser.idUsuarioAutenticacionExterna}</dd></div>
-              <div><dt>Nombre</dt><dd>{createdUser.nombreUsuario} {createdUser.apellidoUsuario}</dd></div>
-              <div><dt>RUT</dt><dd>{createdUser.rutUsuario}</dd></div>
-              <div><dt>Correo electronico</dt><dd>{createdUser.correoUsuario || 'Sin correo'}</dd></div>
-              <div><dt>Rol</dt><dd>{getRoleLabel(createdUser.rolUsuario)}</dd></div>
-              <div>
-                <dt>Correo de contraseña</dt>
-                <dd>{createdUser.passwordSetupEmailRequested ? 'Solicitado' : provider === 'keycloak' ? 'No solicitado' : 'Pendiente'}</dd>
-              </div>
-            </dl>
-          </section>
-        )}
       </div>
 
       <footer className={styles.actions}>
@@ -444,17 +246,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
           </button>
         )}
 
-        {canRequestPasswordEmail && (
-          <button
-            className={styles.secondaryButton}
-            disabled={isRequestingPasswordEmail}
-            onClick={handlePasswordSetupEmailRequest}
-            type="button"
-          >
-            {isRequestingPasswordEmail ? 'Solicitando correo...' : 'Solicitar correo'}
-          </button>
-        )}
-        {keycloak && createdUser?.outcome === 'needs_reconciliation' && <button className={styles.secondaryButton}
+        {createdUser?.outcome === 'needs_reconciliation' && <button className={styles.secondaryButton}
           type="button" disabled={isBusy} onClick={handleReconcile}>Conciliar preparacion</button>}
 
         <button
@@ -463,7 +255,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
           type="submit"
         >
           <i className="bi bi-plus-circle" aria-hidden="true" />
-          {isSubmitting ? (keycloak ? 'Preparando cuenta...' : 'Creando usuario...') : (keycloak ? 'Preparar cuenta pendiente' : 'Crear usuario')}
+          {isSubmitting ? 'Preparando cuenta...' : 'Preparar cuenta pendiente'}
         </button>
       </footer>
     </form>

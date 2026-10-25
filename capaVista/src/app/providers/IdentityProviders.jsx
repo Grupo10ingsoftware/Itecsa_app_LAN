@@ -1,24 +1,8 @@
-import { useAuth0 } from '@auth0/auth0-react'
 import Keycloak from 'keycloak-js'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useSyncExternalStore } from 'react'
 import { runtimeConfig } from '../../config/runtimeConfig.js'
 import { IdentityContext } from './identityContext.js'
 import { createKeycloakSession } from './keycloakSession.js'
-
-export function Auth0IdentityProvider({ children }) {
-  const auth = useAuth0()
-  const sessionKey = useMemo(() => ({ authenticated: auth.isAuthenticated, subject: auth.user?.sub }), [auth.isAuthenticated, auth.user?.sub])
-  const current = useRef(sessionKey)
-  useLayoutEffect(() => { current.current = sessionKey }, [sessionKey])
-  const getSessionKey = useCallback(() => current.current, [])
-  const { getAccessTokenSilently } = auth
-  const getAccessToken = useCallback(() => getAccessTokenSilently({
-    authorizationParams: { audience: runtimeConfig.auth0Audience },
-  }), [getAccessTokenSilently])
-  const value = useMemo(() => ({ ...auth, provider: 'auth0', sessionKey, getSessionKey, getAccessToken }),
-    [auth, sessionKey, getSessionKey, getAccessToken])
-  return <IdentityContext.Provider value={value}>{children}</IdentityContext.Provider>
-}
 
 let keycloakSession
 export function KeycloakIdentityProvider({ children, onRedirect }) {

@@ -121,10 +121,9 @@ class Server {
     this.app.use(
       this.paths.auth,
       createAuthRouter({
-        includeDebugRoutes: this.environment.demoFeaturesEnabled && this.appEnvironment !== "production",
       }),
     )
-    if (this.env.AUTH_PROVIDER === 'keycloak' && this.env.IDENTITY_PREPARATION_ENABLED === 'true') {
+    if ((this.env.AUTH_PROVIDER ?? 'keycloak') === 'keycloak' && this.env.IDENTITY_PREPARATION_ENABLED === 'true') {
       this.app.use('/api/admin/identity', createKeycloakIdentityPreparationRouter({
         service: new KeycloakIdentityAdministrationService(),
       }));

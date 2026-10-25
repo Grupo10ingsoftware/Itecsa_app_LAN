@@ -1,7 +1,7 @@
 // Server-only configuration. Resolving it performs no network or database work.
 export function resolveKeycloakAdministration(env = process.env) {
   const fail = () => { throw Error('Configuracion administrativa Keycloak invalida.'); };
-  if (env.AUTH_PROVIDER !== 'keycloak') fail();
+  if ((env.AUTH_PROVIDER ?? 'keycloak') !== 'keycloak') fail();
   const required = ['KEYCLOAK_ISSUER', 'KEYCLOAK_ROLE_CLIENT_ID', 'KEYCLOAK_ADMIN_CLIENT_ID', 'KEYCLOAK_ADMIN_CLIENT_SECRET'];
   if (required.some(key => typeof env[key] !== 'string' || !env[key].trim())) fail();
   let issuer;

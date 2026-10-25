@@ -192,7 +192,6 @@ export function AuthProvider({ children }) {
     () => ({
       user: verifiedUser,
       identityUser: user,
-      auth0User: user, // Transitional alias; consumers use identityUser.
       provider,
       isAuthenticated: isAuthenticated && authStatus === AUTH_STATUS.AUTHENTICATED,
       isLoading: isLoading || isVerifyingSession,

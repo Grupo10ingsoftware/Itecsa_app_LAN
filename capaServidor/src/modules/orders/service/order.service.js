@@ -232,7 +232,7 @@ class OrderService {
     return toSalesNotePreview(salesNote);
   }
 
-  async reevaluateOrder(orderId, { auth0UserId } = {}) {
+  async reevaluateOrder(orderId, { identitySubject } = {}) {
     const order = await this.repo.get(orderId);
     if (!order) {
       const error = new AppError(404, "Pedido no encontrado.", "ORDER_NOT_FOUND"); throw error;
@@ -245,19 +245,19 @@ class OrderService {
     }
     const [salesNote, userId] = await Promise.all([
       this.salesNoteSourceService.getByNumber(order.numero_nota_venta),
-      this.resolveInternalUserId({ auth0UserId }),
+      this.resolveInternalUserId({ identitySubject }),
     ]);
     return this.runInTransaction(({ repo }) => repo.reevaluateFromSalesNote({
       orderId, salesNote, userId,
     }));
   }
 
-  async setOrderLabel(orderId, { label, active }, { auth0UserId } = {}) {
+  async setOrderLabel(orderId, { label, active }, { identitySubject } = {}) {
     const allowed = new Set(["Urgencia", "Prioridad por contrato", "PRODUCIÉNDOSE"]);
     if (!allowed.has(label) || typeof active !== "boolean") {
       const error = new AppError(400, "Etiqueta o estado no valido."); throw error;
     }
-    const userId = await this.resolveInternalUserId({ auth0UserId });
+    const userId = await this.resolveInternalUserId({ identitySubject });
     return this.runInTransaction(async ({ repo }) => {
       const result = await repo.setOrderLabel({ orderId, label, active, userId });
       if (!result) { const error = new AppError(404, "Pedido no encontrado.", "ORDER_NOT_FOUND"); throw error; }
@@ -265,9 +265,9 @@ class OrderService {
     });
   }
 
-  async resolveInternalUserId({ auth0UserId, id_usuario } = {}) {
-    if (auth0UserId) {
-      const user = await this.userRepo.findByAuth0Id(auth0UserId);
+  async resolveInternalUserId({ identitySubject, id_usuario } = {}) {
+    if (identitySubject) {
+      const user = await this.userRepo.findBySubject(identitySubject);
 
       if (!user?.idUsuario) {
         const error = new AppError(403, "No existe un usuario interno vinculado a la sesion.");

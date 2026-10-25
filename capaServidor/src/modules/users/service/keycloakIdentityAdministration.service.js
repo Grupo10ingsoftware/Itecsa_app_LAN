@@ -64,7 +64,7 @@ export class KeycloakIdentityAdministrationService {
     if (!binding || !ASSIGNABLE_ROLES.includes(binding.Usuario.rol_usuario)) reject('IDENTITY_TARGET_FORBIDDEN', 403);
     const external = await this.management.getUser(subject);
     const roles = await this.management.roles(subject);
-    if (binding.Usuario.id_auth0 !== subject || binding.username !== external.username || roles.length !== 1
+    if (binding.subject !== subject || binding.Usuario.id_usuario !== binding.user_id || binding.username !== external.username || roles.length !== 1
       || roles[0].name !== binding.Usuario.rol_usuario) reject('IDENTITY_BINDING_CONFLICT');
     return { localUserId: binding.user_id, subject, username: external.username, email: binding.Usuario.correo_usuario,
       externalEmail: external.email ?? null, issuer: binding.issuer, role: binding.Usuario.rol_usuario,

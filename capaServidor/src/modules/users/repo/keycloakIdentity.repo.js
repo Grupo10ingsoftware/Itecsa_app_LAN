@@ -1,10 +1,11 @@
+import { identityUserWhere } from '../../../database/identityBinding.js';
 import { randomUUID } from 'node:crypto';
 import getPrismaClient from '../../../database/prisma.js';
 import { isActiveUserStatus, ACTIVE_USER_STATUSES, USER_STATUS } from '../../../config/userLifecycle.js';
 import { ADMIN_ROLES, ASSIGNABLE_ROLES } from '../../../../../shared/keycloakAuthorization.js';
 import { USER_RESPONSE_SELECT, UserRepository } from './users.repo.js';
 
-// New-provider persistence is independent of the legacy Auth0 repository.
+// Explicit external bindings preserve local keys and actor ownership.
 export class KeycloakIdentityRepository {
   constructor({ prisma } = {}) { this.prisma = prisma; }
   get client() { return this.prisma ?? getPrismaClient(); }
@@ -25,7 +26,7 @@ export class KeycloakIdentityRepository {
       this.client.usuario.count({ where }),
     ]);
     return { usuarios: rows.map(row => {
-      const identityBindingConflict = row.id_auth0 !== row.ExternalIdentity.subject;
+      const identityBindingConflict = typeof row.ExternalIdentity?.subject !== 'string' || !row.ExternalIdentity.subject;
       return { idUsuario: row.id_usuario, idUsuarioAutenticacionExterna: identityBindingConflict ? null : row.ExternalIdentity.subject,
         identityBindingConflict,
         username: row.ExternalIdentity.username, nombreUsuario: row.nombre_usuario, apellidoUsuario: row.apellido_usuario,
@@ -42,7 +43,7 @@ export class KeycloakIdentityRepository {
   }
   movements(userId, filters) { return new UserRepository({ prisma: this.client }).listMovements(userId, filters); }
   actor(subject) {
-    return this.client.usuario.findUnique({ where: { id_auth0: subject },
+    return this.client.usuario.findFirst({ where: identityUserWhere(subject),
       select: { id_usuario: true, rol_usuario: true, estado_usuario: true } });
   }
   async claim({ issuer, input, digest, actorId }) {
@@ -85,13 +86,13 @@ export class KeycloakIdentityRepository {
   }
   async complete(operation, subject, actorId, actorSubject, actorRole) {
     return this.client.$transaction(async tx => {
-      const actors = await tx.$queryRaw`SELECT id_auth0, rol_usuario, estado_usuario FROM Usuario WHERE id_usuario=${actorId} FOR UPDATE`;
-      if (actors[0]?.id_auth0 !== actorSubject || actors[0]?.rol_usuario !== actorRole
+      const actors = await tx.$queryRaw`SELECT u.rol_usuario, u.estado_usuario, e.subject, e.issuer, e.provider FROM Usuario u JOIN ExternalIdentity e ON e.user_id = u.id_usuario WHERE u.id_usuario=${actorId} FOR UPDATE`;
+      if (actors[0]?.subject !== actorSubject || actors[0]?.provider !== 'keycloak' || actors[0]?.issuer !== operation.issuer || actors[0]?.rol_usuario !== actorRole
         || !ADMIN_ROLES.includes(actorRole) || !isActiveUserStatus(actors[0]?.estado_usuario)) {
         throw Object.assign(Error('El actor cambio durante la preparacion.'), { code: 'IDENTITY_ACTOR_CHANGED' });
       }
       const input = operation.input;
-      const user = await tx.usuario.create({ data: { id_auth0: subject, correo_usuario: input.email,
+      const user = await tx.usuario.create({ data: { correo_usuario: input.email,
         nombre_usuario: input.firstName, apellido_usuario: input.lastName, rol_usuario: input.role, estado_usuario: 'Pendiente' } });
       await tx.externalIdentity.create({ data: { provider: 'keycloak', issuer: operation.issuer, subject,
         username: input.username, user_id: user.id_usuario } });
@@ -109,6 +110,6 @@ export class KeycloakIdentityRepository {
   operationUsing(client, id) { return client.identityProvisionOperation.findUnique({ where: { id } }); }
   binding(issuer, subject) {
     return this.client.externalIdentity.findUnique({ where: { provider_issuer_subject: { provider: 'keycloak', issuer, subject } },
-      include: { Usuario: { select: { id_auth0: true, rol_usuario: true, estado_usuario: true, correo_usuario: true } } } });
+      include: { Usuario: { select: { id_usuario: true, rol_usuario: true, estado_usuario: true, correo_usuario: true } } } });
   }
 }

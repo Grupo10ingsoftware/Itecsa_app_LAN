@@ -86,7 +86,7 @@ class OrderController {
   createOrder = async (req = request, res = response) => {
     try {
       const order = await this.service.createOrder(req.body ?? {}, {
-        auth0UserId: req.auth?.payload?.sub, actorId: req.currentUser?.idUsuario, requestId: req.requestId,
+        identitySubject: req.auth?.payload?.sub, actorId: req.currentUser?.idUsuario, requestId: req.requestId,
       });
       return res.status(201).json(toOrderCreatedDTO(order));
     } catch (error) { return respondError(error, req, res); }
@@ -97,7 +97,7 @@ class OrderController {
       const { orderId } = req.params;
       if (!orderId) return res.status(400).json({ msg: "Missing ID" });
       const result = await this.service.updPaymentState(orderId, req.body?.paymentStatusId ?? req.body?.paymentStatus, {
-        auth0UserId: req.auth?.payload?.sub, actor: req.pinActor, observacion: req.body?.observacion,
+        identitySubject: req.auth?.payload?.sub, actor: req.pinActor, observacion: req.body?.observacion,
         role: authorizationForProvider(req.identityProvider)?.roleFromPayload(req.auth?.payload), permissions: req.auth?.payload?.permissions,
         ...(req.identityProvider ? { identityProvider: req.identityProvider } : {}),
       });
@@ -121,7 +121,7 @@ class OrderController {
 
   sendToReview = async (req = request, res = response) => {
     try {
-      await this.service.sendToReview(req.params.orderId, req.body?.comment, { auth0UserId: req.auth?.payload?.sub });
+      await this.service.sendToReview(req.params.orderId, req.body?.comment, { identitySubject: req.auth?.payload?.sub });
       return res.status(200).json(toKanbanOrderDetailDTO(await this.service.getOrderViewById(req.params.orderId, "kanban")));
     }
     catch (error) { return respondError(error, req, res); }
@@ -137,14 +137,14 @@ class OrderController {
 
   reevaluate = async (req = request, res = response) => {
     try {
-      await this.service.reevaluateOrder(req.params.orderId, { auth0UserId: req.auth?.payload?.sub });
+      await this.service.reevaluateOrder(req.params.orderId, { identitySubject: req.auth?.payload?.sub });
       return res.status(200).json(toKanbanOrderDetailDTO(await this.service.getOrderViewById(req.params.orderId, "kanban")));
     }
     catch (error) { return respondError(error, req, res); }
   };
 
   setLabel = async (req = request, res = response) => {
-    try { return res.status(200).json(toOrderLabelsPatchDTO(await this.service.setOrderLabel(req.params.orderId, req.body, { auth0UserId: req.auth?.payload?.sub }))); }
+    try { return res.status(200).json(toOrderLabelsPatchDTO(await this.service.setOrderLabel(req.params.orderId, req.body, { identitySubject: req.auth?.payload?.sub }))); }
     catch (error) { return respondError(error, req, res); }
   };
 

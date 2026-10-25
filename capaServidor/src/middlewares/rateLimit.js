@@ -40,21 +40,6 @@ export const authenticatedRateLimit = createThrottleMiddleware({
     },
 });
 
-export function createPasswordResetRateLimit({ throttle = securityThrottle } = {}) {
-    return createThrottleMiddleware({
-        throttle,
-        rules(req) {
-            const email = typeof req.body?.email === "string"
-                ? req.body.email.trim().toLowerCase()
-                : "invalid";
-            return [
-                { scope: "password-reset-ip", subject: clientAddress(req), limit: 10, windowMs: 15 * 60_000 },
-                { scope: "password-reset-account", subject: email, limit: 3, windowMs: 15 * 60_000 },
-            ];
-        },
-    });
-}
-
 export function createPinRecoveryRateLimit({ event, throttle = securityThrottle } = {}) {
     if (event !== "request" && event !== "confirm") {
         throw new TypeError("Evento de recuperacion PIN desconocido.");

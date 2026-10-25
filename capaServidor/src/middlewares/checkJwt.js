@@ -15,10 +15,8 @@ export function createCheckJwt({ environment = process.env,
             configuration = resolveIdentityConfiguration(environment);
             const key = JSON.stringify(configuration);
             if (!jwtValidator || validatorConfiguration !== key) {
-                jwtValidator = configuration.provider === 'keycloak'
-                    ? auth({ audience: configuration.audience, issuer: configuration.issuer,
-                        jwksUri: configuration.jwksUri, tokenSigningAlg: 'RS256' })
-                    : auth({ audience: configuration.audience, issuerBaseURL: configuration.issuerBaseURL });
+                jwtValidator = auth({ audience: configuration.audience, issuer: configuration.issuer,
+                    jwksUri: configuration.jwksUri, tokenSigningAlg: 'RS256' });
                 validatorConfiguration = key;
             }
         } catch {

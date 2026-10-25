@@ -3,7 +3,7 @@ import { ROLES, FUNCTIONAL_ROLES } from '../../../shared/authorization.js';
 import { authorizationForProvider } from '../../../shared/identityAuthorization.js';
 // Opciones funcionales: nunca ofrecer Soporte en formularios.
 export const OFFICIAL_ROLES = FUNCTIONAL_ROLES;
-export function isOfficialRole(role, provider = 'auth0') { return authorizationForProvider(provider)?.RECOGNIZED_ROLES.includes(role) === true; }
+export function isOfficialRole(role, provider = 'keycloak') { return authorizationForProvider(provider)?.RECOGNIZED_ROLES.includes(role) === true; }
 export function getRoleLabel(role) {
   if (role === ROLES.ADMINISTRADOR) return 'Administrador Producción';
   if (role === ROLES.PRODUCCION) return 'Operario Producción';

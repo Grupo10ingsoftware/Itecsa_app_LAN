@@ -16,7 +16,7 @@ const segment = value => {
 const ordinary = role => { if (!ASSIGNABLE_ROLES.includes(role)) throw new KeycloakServiceError('KEYCLOAK_ROLE_FORBIDDEN', { category: 'authorization', status: 403 }); };
 const validText = (value, max) => typeof value === 'string' && value.trim() && value.length <= max && !/[\u0000-\u001f]/u.test(value);
 
-// No Auth0 imports, SDK, retries of mutations or credentials in errors.
+// Mutations are not retried; credentials never appear in errors.
 export class KeycloakManagementService {
   constructor({ env = process.env, fetcher = fetch, clock = Date.now } = {}) {
     this.config = resolveKeycloakAdministration(env);
