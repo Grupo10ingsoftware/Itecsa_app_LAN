@@ -1,5 +1,7 @@
 # Variables de entorno locales
 deploy/production.env
+deploy/mysql-lab.env
+deploy/mysql-lab/certs/
 .env*
 !.env.example
 !**/.env.example
