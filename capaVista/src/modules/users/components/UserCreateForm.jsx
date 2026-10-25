@@ -5,6 +5,7 @@ import { useAuth } from '../../../hooks/useAuth'
 import { useAdminUsersApi } from '../hooks/useAdminUsersApi'
 import { hasValidationErrors, validateUserCreateForm } from '../utils/userValidation'
 import styles from './UserCreateForm.module.css'
+import { generateUsername } from '../utils/generateUsername.js'
 
 const INITIAL_VALUES = Object.freeze({ nombreUsuario: '', apellidoUsuario: '', rutUsuario: '', correoUsuario: '', rolUsuario: '', username: '', pin: '' })
 const INITIAL_ERRORS = Object.freeze({ nombreUsuario: [], apellidoUsuario: [], rutUsuario: [], correoUsuario: [], rolUsuario: [], username: [], pin: [] })
@@ -37,13 +38,19 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
   const [isSubmitting, setIsSubmitting] = useState(false)
   function handleFieldChange({ target: { name, value } }) {
     if (createdUser && name !== 'pin') return
-    setValues(current => ({ ...current, [name]: value }))
+    setValues(current => {
+      const next = { ...current, [name]: value }
+      if (name === 'nombreUsuario' || name === 'apellidoUsuario') {
+        next.username = generateUsername(next.nombreUsuario, next.apellidoUsuario)
+      }
+      return next
+    })
     if (!createdUser) setMessage(null)
   }
   async function handleSubmit(event) {
     event.preventDefault()
     if (isSubmitting || createdUser) return
-    const nextErrors = validateUserCreateForm(values, { optionalEmail: true, requireRut: false })
+    const nextErrors = validateUserCreateForm(values)
     nextErrors.username = values.username && values.username === values.username.trim().toLowerCase()
       && values.username.length <= 255 && !/\s/u.test(values.username)
       && [...values.username].every(char => char.codePointAt(0) > 32) ? [] : ['Ingresa un nombre de acceso en minusculas, sin espacios.']
@@ -56,7 +63,8 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
     onBusyChange?.(true)
     try {
       const result = await adminUsersApi.createUser({ nombreUsuario: values.nombreUsuario.trim(),
-        apellidoUsuario: values.apellidoUsuario.trim(), correoUsuario: values.correoUsuario.trim().toLowerCase() || null,
+        apellidoUsuario: values.apellidoUsuario.trim(), correoUsuario: values.correoUsuario.trim().toLowerCase(),
+        rutUsuario: values.rutUsuario.trim(),
         rolUsuario: values.rolUsuario, username: values.username, pin: values.pin })
       setCreatedUser(result)
       setMessage(preparationMessage(result))
@@ -107,58 +115,67 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
             )}
           </div>
         )}
-        <div className={styles.fieldCard}>
+        <div className={styles.nameRow}>
+          <div className={`${styles.fieldCard} ${nombreUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
+            <div className={styles.fieldContent}>
+              <label htmlFor="user-first-name">Nombre <span>*</span></label>
+              <input
+                aria-describedby="user-first-name-errors"
+                aria-invalid={nombreUsuarioErrors.length > 0}
+                autoComplete="given-name"
+                required
+                maxLength={100}
+                id="user-first-name"
+                name="nombreUsuario"
+                onChange={handleFieldChange}
+                placeholder="Ingresa el nombre"
+                type="text"
+                value={values.nombreUsuario}
+              />
+              <FieldErrors errors={nombreUsuarioErrors} id="user-first-name-errors" />
+            </div>
+          </div>
+
+          <div className={`${styles.fieldCard} ${apellidoUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
+            <div className={styles.fieldContent}>
+              <label htmlFor="user-last-name">Apellido <span>*</span></label>
+              <input
+                aria-describedby="user-last-name-errors"
+                aria-invalid={apellidoUsuarioErrors.length > 0}
+                autoComplete="family-name"
+                required
+                maxLength={100}
+                id="user-last-name"
+                name="apellidoUsuario"
+                onChange={handleFieldChange}
+                placeholder="Ingresa el apellido"
+                type="text"
+                value={values.apellidoUsuario}
+              />
+              <FieldErrors errors={apellidoUsuarioErrors} id="user-last-name-errors" />
+            </div>
+          </div>
+
+        </div>
+
+        <div className={`${styles.fieldCard} ${styles.fieldCardWide}`}>
           <div className={styles.fieldContent}>
             <label htmlFor="user-username">Nombre de acceso <span>*</span></label>
-            <input id="user-username" name="username" value={values.username} onChange={handleFieldChange}
+            <input id="user-username" name="username" value={values.username} readOnly required
               autoComplete="off" maxLength={255} disabled={Boolean(createdUser)} aria-invalid={Boolean(fieldErrors.username?.length)} aria-describedby="user-username-errors" />
             <FieldErrors errors={fieldErrors.username ?? []} id="user-username-errors" />
           </div>
         </div>
 
-        <div className={`${styles.fieldCard} ${nombreUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
-          <div className={styles.fieldContent}>
-            <label htmlFor="user-first-name">Nombres <span>*</span></label>
-            <input
-              aria-describedby="user-first-name-errors"
-              aria-invalid={nombreUsuarioErrors.length > 0}
-              autoComplete="given-name"
-              id="user-first-name"
-              name="nombreUsuario"
-              onChange={handleFieldChange}
-              placeholder="Ingresa los nombres"
-              type="text"
-              value={values.nombreUsuario}
-            />
-            <FieldErrors errors={nombreUsuarioErrors} id="user-first-name-errors" />
-          </div>
-        </div>
-
-        <div className={`${styles.fieldCard} ${apellidoUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
-          <div className={styles.fieldContent}>
-            <label htmlFor="user-last-name">Apellidos <span>*</span></label>
-            <input
-              aria-describedby="user-last-name-errors"
-              aria-invalid={apellidoUsuarioErrors.length > 0}
-              autoComplete="family-name"
-              id="user-last-name"
-              name="apellidoUsuario"
-              onChange={handleFieldChange}
-              placeholder="Ingresa los apellidos"
-              type="text"
-              value={values.apellidoUsuario}
-            />
-            <FieldErrors errors={apellidoUsuarioErrors} id="user-last-name-errors" />
-          </div>
-        </div>
-
         <div className={`${styles.fieldCard} ${correoUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
           <div className={styles.fieldContent}>
-            <label htmlFor="user-email">Correo electronico </label>
+            <label htmlFor="user-email">Correo electronico <span>*</span></label>
             <input
               aria-describedby="user-email-errors"
               aria-invalid={correoUsuarioErrors.length > 0}
               autoComplete="email"
+              required
+              maxLength={255}
               id="user-email"
               name="correoUsuario"
               onChange={handleFieldChange}
@@ -172,7 +189,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
 
         <div className={`${styles.fieldCard} ${rutUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
           <div className={styles.fieldContent}>
-            <label htmlFor="user-rut">RUT </label>
+            <label htmlFor="user-rut">RUT <span>*</span></label>
             <input
               aria-describedby="user-rut-errors"
               aria-invalid={rutUsuarioErrors.length > 0}
@@ -183,9 +200,9 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
               placeholder="Ej: 12.345.678-9"
               type="text"
               value={values.rutUsuario}
-              disabled
+              required
+              maxLength={12}
             />
-            <p className={styles.fieldHelp}>La preparacion actual no registra RUT.</p>
             <FieldErrors errors={rutUsuarioErrors} id="user-rut-errors" />
           </div>
         </div>

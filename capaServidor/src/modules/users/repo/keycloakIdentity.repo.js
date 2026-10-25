@@ -92,7 +92,7 @@ export class KeycloakIdentityRepository {
         throw Object.assign(Error('El actor cambio durante la preparacion.'), { code: 'IDENTITY_ACTOR_CHANGED' });
       }
       const input = operation.input;
-      const user = await tx.usuario.create({ data: { correo_usuario: input.email,
+      const user = await tx.usuario.create({ data: { correo_usuario: input.email, rut_usuario: input.rut ?? null,
         nombre_usuario: input.firstName, apellido_usuario: input.lastName, rol_usuario: input.role, estado_usuario: 'Pendiente' } });
       await tx.externalIdentity.create({ data: { provider: 'keycloak', issuer: operation.issuer, subject,
         username: input.username, user_id: user.id_usuario } });

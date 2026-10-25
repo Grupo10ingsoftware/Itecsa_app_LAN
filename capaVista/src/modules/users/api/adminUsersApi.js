@@ -30,9 +30,9 @@ export function createAdminUsersApi(apiClient) {
     getSummary: () => apiClient.get(base + '/summary'),
     inspectUser: subject => apiClient.get('/admin/identity/identities/' + encodeURIComponent(subject)),
     reconcile: ({ operationId, pin }) => apiClient.post('/admin/identity/operations/' + encodeURIComponent(operationId) + '/reconcile', { pin }),
-    createUser: ({ username, nombreUsuario, apellidoUsuario, correoUsuario, rolUsuario, pin }) =>
+    createUser: ({ username, nombreUsuario, apellidoUsuario, correoUsuario, rutUsuario, rolUsuario, pin }) =>
       apiClient.post('/admin/identity/identities/prepare', { pin, identity: {
-        username, firstName: nombreUsuario, lastName: apellidoUsuario, email: correoUsuario || null, role: rolUsuario,
+        username, firstName: nombreUsuario, lastName: apellidoUsuario, email: correoUsuario, rut: rutUsuario, role: rolUsuario,
       } }),
     setTemporaryPassword: unavailable,
     updateUser: unavailable,

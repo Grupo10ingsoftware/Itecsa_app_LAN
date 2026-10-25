@@ -14,15 +14,18 @@ export class IdentityAdministrationError extends Error {
 }
 const reject = (code, status) => { throw new IdentityAdministrationError(code, status); };
 function normalize(input) {
-  if (!input || Object.keys(input).some(key => !['username', 'email', 'firstName', 'lastName', 'role'].includes(key))) reject('IDENTITY_INPUT_INVALID', 400);
+  if (!input || Object.keys(input).some(key => !['username', 'email', 'firstName', 'lastName', 'role', 'rut'].includes(key))) reject('IDENTITY_INPUT_INVALID', 400);
   if (!ASSIGNABLE_ROLES.includes(input.role)) reject('IDENTITY_ROLE_FORBIDDEN', 403);
   const text = (value, max) => typeof value === 'string' && value.trim() && value.length <= max && !/[\u0000-\u001f]/u.test(value);
   if (!text(input.username, 255) || input.username !== input.username.trim().toLowerCase()
     || !text(input.firstName, 100) || !text(input.lastName, 100)) reject('IDENTITY_INPUT_INVALID', 400);
-  if (input.email !== undefined && input.email !== null && typeof input.email !== 'string') reject('IDENTITY_INPUT_INVALID', 400);
-  const email = input.email === undefined || input.email === null || input.email === '' ? null : input.email.trim().toLowerCase();
-  if (email !== null && (!text(email, 255) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) reject('IDENTITY_INPUT_INVALID', 400);
-  return { username: input.username, email, firstName: input.firstName.trim(), lastName: input.lastName.trim(), role: input.role };
+  if (!text(input.email, 255) || !text(input.rut, 12)) reject('IDENTITY_INPUT_INVALID', 400);
+  const email = input.email.trim().toLowerCase();
+  const rut = input.rut.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    || !/^(\d{1,2}\.?\d{3}\.?\d{3}-[\dkK])$/.test(rut)) reject('IDENTITY_INPUT_INVALID', 400);
+  return { username: input.username, email, rut: rut.replaceAll('.', '').toUpperCase(),
+    firstName: input.firstName.trim(), lastName: input.lastName.trim(), role: input.role };
 }
 const result = operation => ({
   operationId: operation.id, outcome: operation.state === 'prepared' ? 'identity_prepared' : operation.state,
