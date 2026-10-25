@@ -92,18 +92,33 @@ export class KeycloakIdentityRepository {
         throw Object.assign(Error('El actor cambio durante la preparacion.'), { code: 'IDENTITY_ACTOR_CHANGED' });
       }
       const input = operation.input;
-      const user = await tx.usuario.create({ data: { correo_usuario: input.email, rut_usuario: input.rut ?? null,
+      const user = operation.local_user_id
+        ? await tx.usuario.findFirst({ where: { id_usuario: operation.local_user_id, id_keycloak: subject,
+          ExternalIdentity: { is: { provider: 'keycloak', issuer: operation.issuer, subject } } } })
+        : await tx.usuario.create({ data: { id_keycloak: subject, correo_usuario: input.email, rut_usuario: input.rut ?? null,
         nombre_usuario: input.firstName, apellido_usuario: input.lastName, rol_usuario: input.role, estado_usuario: 'Pendiente' } });
-      await tx.externalIdentity.create({ data: { provider: 'keycloak', issuer: operation.issuer, subject,
+      if (!user) throw Error('IDENTITY_BINDING_CONFLICT');
+      if (!operation.local_user_id) await tx.externalIdentity.create({ data: { provider: 'keycloak', issuer: operation.issuer, subject,
         username: input.username, user_id: user.id_usuario } });
       await tx.securityAuditEvent.create({ data: { event_type: 'identity.preparation', actor_user_id: actorId,
         action: 'prepare', resource_type: 'identity_operation', resource_id: operation.id, request_id: operation.id,
         outcome: 'prepared' } });
       const result = await tx.identityProvisionOperation.updateMany({
         where: { id: operation.id, revision: operation.revision, state: 'running' },
-        data: { state: 'prepared', external_subject: subject, local_user_id: user.id_usuario },
+        data: { external_subject: subject, local_user_id: user.id_usuario },
       });
       if (result.count !== 1) throw Error('IDENTITY_OPERATION_CONFLICT');
+      return this.operationUsing(tx, operation.id);
+    });
+  }
+  async finish(operation) {
+    return this.client.$transaction(async tx => {
+      const updated = await tx.identityProvisionOperation.updateMany({
+        where: { id: operation.id, state: 'running', revision: operation.revision,
+          external_subject: operation.external_subject, local_user_id: operation.local_user_id },
+        data: { state: 'created' },
+      });
+      if (updated.count !== 1) throw Error('IDENTITY_OPERATION_CONFLICT');
       return this.operationUsing(tx, operation.id);
     });
   }

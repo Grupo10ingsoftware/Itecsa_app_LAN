@@ -1,3 +1,4 @@
+import { generarContrasena } from './generarContrasena.js';
 import { createHash } from 'node:crypto';
 import { can, PERMISSIONS, ASSIGNABLE_ROLES } from '../../../../../shared/keycloakAuthorization.js';
 import { isActiveUserStatus } from '../../../config/userLifecycle.js';
@@ -28,17 +29,17 @@ function normalize(input) {
     firstName: input.firstName.trim(), lastName: input.lastName.trim(), role: input.role };
 }
 const result = operation => ({
-  operationId: operation.id, outcome: operation.state === 'prepared' ? 'identity_prepared' : operation.state,
+  operationId: operation.id, outcome: operation.state === 'created' ? 'user_created'
+    : operation.state === 'prepared' ? 'identity_prepared' : operation.state,
   externalSubject: operation.external_subject, localUserId: operation.local_user_id,
   recoverable: ['needs_reconciliation', 'running', 'pending'].includes(operation.state),
-  credentialsConfigured: false, fullyProvisioned: false,
+  credentialsConfigured: operation.state === 'created', fullyProvisioned: operation.state === 'created',
 });
 const matchesPreparation = (external, operation) => !external.enabled && external.username === operation.username
   && external.attributes?.itecsa_provision_id?.length === 1 && external.attributes.itecsa_provision_id[0] === operation.id
   && (external.email ?? null) === operation.input.email
   && external.firstName === operation.input.firstName && external.lastName === operation.input.lastName;
 
-// Preparation only: enabling an account and delivering credentials are separate operations.
 export class KeycloakIdentityAdministrationService {
   constructor({ management, repository = new KeycloakIdentityRepository(), pins = pinService } = {}) {
     this.management = management ?? new KeycloakManagementService();
@@ -99,6 +100,7 @@ export class KeycloakIdentityAdministrationService {
     try { operation = await this.repository.claim({ issuer: this.management.config.issuer, input, digest, actorId }); }
     catch { throw new IdentityAdministrationError('IDENTITY_JOURNAL_UNAVAILABLE', 503); }
     if (operation.payload_digest !== digest) reject('IDENTITY_OPERATION_PAYLOAD_CONFLICT');
+    if (operation.state === 'created') return result(operation);
     if (operation.state === 'prepared') {
       const user = await this.inspect(context, operation.external_subject);
       if (user.enabled || user.localState !== 'Pendiente'
@@ -120,6 +122,7 @@ export class KeycloakIdentityAdministrationService {
     return acquired ? this.execute(context, acquired, actorId, true) : reject('IDENTITY_OPERATION_BUSY');
   }
   async execute(context, operation, actorId, reconcile) {
+    let ownedSubject;
     try {
       let external = await this.management.findByUsername(operation.username);
       if (external && (!reconcile || external.attributes?.itecsa_provision_id?.[0] !== operation.id)) {
@@ -131,6 +134,13 @@ export class KeycloakIdentityAdministrationService {
         await this.repository.checkpoint(operation, subject);
         external = await this.management.getUser(subject);
       }
+      if (external?.attributes?.itecsa_provision_id?.[0] === operation.id) {
+        ownedSubject = external.id;
+        if (reconcile && external.enabled) {
+          await this.management.setEnabled(ownedSubject, false);
+          external = await this.management.getUser(ownedSubject);
+        }
+      }
       if (!matchesPreparation(external, operation)
         || (operation.external_subject && operation.external_subject !== external.id)) reject('IDENTITY_EXTERNAL_OUTCOME_UNKNOWN');
       await this.repository.checkpoint(operation, external.id);
@@ -138,9 +148,24 @@ export class KeycloakIdentityAdministrationService {
       const verified = await this.management.getUser(external.id);
       if (!matchesPreparation(verified, operation)) reject('IDENTITY_EXTERNAL_OUTCOME_UNKNOWN');
       if (await this.authorize(context) !== actorId) reject('IDENTITY_ADMIN_FORBIDDEN', 403);
-      return result(await this.repository.complete(operation, external.id, actorId, context.subject, context.role));
+      let temporaryPassword;
+      if (!reconcile) {
+        temporaryPassword = generarContrasena();
+        await this.management.setTemporaryPassword(external.id, temporaryPassword);
+      }
+      if (!await this.management.hasTemporaryPassword(external.id)) reject('IDENTITY_CREDENTIAL_NOT_CONFIRMED');
+      const stored = await this.repository.complete(operation, external.id, actorId, context.subject, context.role);
+      await this.management.setEnabled(external.id, true);
+      if (!(await this.management.getUser(external.id)).enabled) reject('IDENTITY_ACTIVATION_NOT_CONFIRMED');
+      const completed = await this.repository.finish(stored);
+      return { ...result(completed), ...(temporaryPassword ? { temporaryPassword, mustChangePassword: true } : {}) };
     } catch (error) {
-      const code = error instanceof IdentityAdministrationError || error instanceof KeycloakServiceError ? error.code
+      let disableFailed = false;
+      if (ownedSubject) {
+        try { await this.management.setEnabled(ownedSubject, false); }
+        catch { disableFailed = true; }
+      }
+      const code = disableFailed ? 'IDENTITY_DISABLE_UNCONFIRMED' : error instanceof IdentityAdministrationError || error instanceof KeycloakServiceError ? error.code
         : error?.code === 'IDENTITY_ACTOR_CHANGED' ? 'IDENTITY_ADMIN_FORBIDDEN' : 'IDENTITY_STORAGE_UNAVAILABLE';
       try { await this.repository.fail(operation, code, { terminal: code === 'IDENTITY_USERNAME_EXISTS', actorId }); }
       catch { throw new IdentityAdministrationError('IDENTITY_JOURNAL_UNAVAILABLE', 503); }

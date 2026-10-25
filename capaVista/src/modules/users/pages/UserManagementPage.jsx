@@ -275,11 +275,11 @@ export default function UserManagementPage() {
   }
 
   async function handleCreatedUser(user) {
-    if (user.outcome === 'identity_prepared') setIsCreateModalOpen(false)
+    if (user.outcome === 'user_created') setIsCreateModalOpen(false)
     setPage(1)
-    await refreshAfterMutation({ type: user.outcome === 'identity_prepared' ? 'info' : 'warning',
-      text: user.outcome === 'identity_prepared'
-        ? 'Cuenta preparada. Permanece pendiente y deshabilitada; aun no tiene credenciales.'
+    await refreshAfterMutation({ type: user.outcome === 'user_created' ? 'info' : 'warning',
+      text: user.outcome === 'user_created'
+        ? 'Usuario creado. Deberá cambiar su contraseña temporal al iniciar sesión.'
         : 'Preparacion incompleta. No repitas el alta con otro nombre. Referencia: ' + user.operationId + '.' })
   }
   async function handleInspectUser(user) {

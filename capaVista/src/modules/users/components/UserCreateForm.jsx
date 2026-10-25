@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import PaymentCredentialsModal from '../../payments/components/PaymentCredentialsModal.jsx'
+import TemporaryPasswordModal from './TemporaryPasswordModal.jsx'
 import { getRoleLabel, manageableRoles } from '../../../config/roles'
 import { API_ERROR_CODES } from '../../../services/api/apiClient'
 import { useAuth } from '../../../hooks/useAuth'
@@ -7,14 +10,15 @@ import { hasValidationErrors, validateUserCreateForm } from '../utils/userValida
 import styles from './UserCreateForm.module.css'
 import { generateUsername } from '../utils/generateUsername.js'
 
-const INITIAL_VALUES = Object.freeze({ nombreUsuario: '', apellidoUsuario: '', rutUsuario: '', correoUsuario: '', rolUsuario: '', username: '', pin: '' })
-const INITIAL_ERRORS = Object.freeze({ nombreUsuario: [], apellidoUsuario: [], rutUsuario: [], correoUsuario: [], rolUsuario: [], username: [], pin: [] })
+const INITIAL_VALUES = Object.freeze({ nombreUsuario: '', apellidoUsuario: '', rutUsuario: '', correoUsuario: '', rolUsuario: '', username: '' })
+const INITIAL_ERRORS = Object.freeze({ nombreUsuario: [], apellidoUsuario: [], rutUsuario: [], correoUsuario: [], rolUsuario: [], username: [] })
 const MESSAGE_TYPES = Object.freeze({ WARNING: 'warning', DANGER: 'danger', INFO: 'info' })
 
 function FieldErrors({ errors, id }) {
   return errors.length ? <div className={styles.fieldErrors} id={id}>{errors.map(error => <p key={error}>{error}</p>)}</div> : null
 }
 function getErrorMessage(error) {
+  if (error?.payload?.code?.startsWith('PIN_')) return { type: MESSAGE_TYPES.DANGER, text: error.payload.message }
   if (error?.code === API_ERROR_CODES.SESSION_INVALID || error?.status === 401) {
     return { type: MESSAGE_TYPES.WARNING, text: 'La sesion no es valida o expiro. Vuelve a iniciar sesion.', requiresLogin: true }
   }
@@ -23,10 +27,10 @@ function getErrorMessage(error) {
   return { type: MESSAGE_TYPES.DANGER, text: error?.payload?.message || 'No se pudo confirmar la preparacion. Revisa el estado antes de repetirla.' }
 }
 function preparationMessage(result) {
-  return { type: result.outcome === 'identity_prepared' ? MESSAGE_TYPES.INFO : MESSAGE_TYPES.WARNING,
-    text: result.outcome === 'identity_prepared'
-      ? 'Cuenta preparada, pendiente y deshabilitada. La entrega de credenciales aun no esta habilitada.'
-      : 'Preparacion incompleta. No repitas el alta. Referencia: ' + result.operationId + '.' }
+  return { type: result.outcome === 'user_created' ? MESSAGE_TYPES.INFO : MESSAGE_TYPES.WARNING,
+    text: result.outcome === 'user_created'
+      ? 'Usuario creado. Si no registraste la contraseña inicial, crea una nueva credencial temporal a través de Keycloak.'
+      : 'Creación incompleta. No repitas el alta. Referencia: ' + result.operationId + '.' }
 }
 export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, onCreated } = {}) {
   const { loginWithRedirect, user: actor } = useAuth()
@@ -36,8 +40,12 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
   const [message, setMessage] = useState(null)
   const [createdUser, setCreatedUser] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [pinAction, setPinAction] = useState(null)
+  const [pinError, setPinError] = useState('')
+  const [credential, setCredential] = useState(null)
+  const submitting = useRef(false)
   function handleFieldChange({ target: { name, value } }) {
-    if (createdUser && name !== 'pin') return
+    if (createdUser || pinAction || isSubmitting) return
     setValues(current => {
       const next = { ...current, [name]: value }
       if (name === 'nombreUsuario' || name === 'apellidoUsuario') {
@@ -49,45 +57,62 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
   }
   async function handleSubmit(event) {
     event.preventDefault()
-    if (isSubmitting || createdUser) return
+    if (isSubmitting || createdUser || pinAction || credential) return
     const nextErrors = validateUserCreateForm(values)
     nextErrors.username = values.username && values.username === values.username.trim().toLowerCase()
       && values.username.length <= 255 && !/\s/u.test(values.username)
       && [...values.username].every(char => char.codePointAt(0) > 32) ? [] : ['Ingresa un nombre de acceso en minusculas, sin espacios.']
-    nextErrors.pin = /^\d{6}$/.test(values.pin) ? [] : ['Ingresa tu PIN de 6 digitos.']
     if (!manageableRoles(actor?.rolUsuario).includes(values.rolUsuario)) nextErrors.rolUsuario = ['No puedes asignar ese rol.']
     setFieldErrors(nextErrors)
     setMessage(null)
     if (hasValidationErrors(nextErrors)) return
-    setIsSubmitting(true)
-    onBusyChange?.(true)
-    try {
-      const result = await adminUsersApi.createUser({ nombreUsuario: values.nombreUsuario.trim(),
-        apellidoUsuario: values.apellidoUsuario.trim(), correoUsuario: values.correoUsuario.trim().toLowerCase(),
-        rutUsuario: values.rutUsuario.trim(),
-        rolUsuario: values.rolUsuario, username: values.username, pin: values.pin })
-      setCreatedUser(result)
-      setMessage(preparationMessage(result))
-      if (result.outcome === 'identity_prepared') setValues(INITIAL_VALUES)
-      setFieldErrors(INITIAL_ERRORS)
-      onCreated?.(result)
-    } catch (error) { setMessage(getErrorMessage(error)) }
-    finally { setValues(current => ({ ...current, pin: '' })); setIsSubmitting(false); onBusyChange?.(false) }
+    openPin('create')
   }
-  async function handleReconcile() {
-    if (!/^\d{6}$/.test(values.pin)) {
-      setFieldErrors(current => ({ ...current, pin: ['Ingresa tu PIN de 6 digitos.'] }))
-      return
-    }
-    setIsSubmitting(true)
+  function openPin(action) {
+    setPinError('')
+    setPinAction(action)
     onBusyChange?.(true)
+  }
+  function cancelPin() {
+    if (submitting.current) return
+    setPinAction(null)
+    setPinError('')
+    onBusyChange?.(false)
+  }
+  async function confirmPin({ pin }) {
+    if (submitting.current) return
+    submitting.current = true
+    setIsSubmitting(true)
+    setPinError('')
     try {
-      const result = await adminUsersApi.reconcile({ operationId: createdUser.operationId, pin: values.pin })
+      const response = pinAction === 'reconcile'
+        ? await adminUsersApi.reconcile({ operationId: createdUser.operationId, pin })
+        : await adminUsersApi.createUser({ nombreUsuario: values.nombreUsuario.trim(),
+          apellidoUsuario: values.apellidoUsuario.trim(), correoUsuario: values.correoUsuario.trim().toLowerCase(),
+          rutUsuario: values.rutUsuario.trim(), rolUsuario: values.rolUsuario, username: values.username, pin })
+      const { temporaryPassword, ...result } = response
       setCreatedUser(result)
+      setFieldErrors(INITIAL_ERRORS)
+      setPinAction(null)
       setMessage(preparationMessage(result))
-      onCreated?.(result)
-    } catch (error) { setMessage(getErrorMessage(error)) }
-    finally { setValues(current => ({ ...current, pin: '' })); setIsSubmitting(false); onBusyChange?.(false) }
+      if (result.outcome === 'user_created' && result.mustChangePassword && typeof temporaryPassword === 'string' && temporaryPassword) {
+        setCredential({ username: values.username, temporaryPassword })
+      } else {
+        onBusyChange?.(false)
+        onCreated?.(result)
+      }
+    } catch (error) {
+      setPinError(getErrorMessage(error).text)
+    } finally {
+      submitting.current = false
+      setIsSubmitting(false)
+    }
+  }
+  function acceptCredential() {
+    setCredential(null)
+    setValues(INITIAL_VALUES)
+    onBusyChange?.(false)
+    onCreated?.(createdUser)
   }
   const isSessionInvalid = message?.requiresLogin === true
   const nombreUsuarioErrors = fieldErrors.nombreUsuario ?? []
@@ -96,9 +121,10 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
   const correoUsuarioErrors = fieldErrors.correoUsuario ?? []
   const rolUsuarioErrors = fieldErrors.rolUsuario ?? []
   const isModalMode = mode === 'modal'
-  const isBusy = isSubmitting
+  const isBusy = isSubmitting || Boolean(pinAction) || Boolean(credential)
 
   return (
+    <>
     <form
       className={`${styles.form} ${isModalMode ? styles.modalForm : ''}`}
       noValidate
@@ -237,20 +263,12 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
               disabled
               id="user-password"
               name="password"
-              placeholder="Gestionada por el proveedor de identidad"
+              placeholder="Generada automáticamente al crear el usuario"
               type="password"
             />
             <p className={styles.fieldHelp} id="user-password-help">
-              La cuenta quedara deshabilitada y pendiente. La activacion y entrega de credenciales aun no estan habilitadas.
+              Se generará una contraseña temporal. El usuario deberá cambiarla al iniciar sesión.
             </p>
-          </div>
-        </div>
-        <div className={styles.fieldCard}>
-          <div className={styles.fieldContent}>
-            <label htmlFor="user-prepare-pin">Tu PIN de autorizacion <span>*</span></label>
-            <input id="user-prepare-pin" name="pin" type="password" inputMode="numeric" maxLength={6} autoComplete="off"
-              value={values.pin} onChange={handleFieldChange} aria-invalid={Boolean(fieldErrors.pin?.length)} aria-describedby="user-prepare-pin-errors" />
-            <FieldErrors errors={fieldErrors.pin ?? []} id="user-prepare-pin-errors" />
           </div>
         </div>
 
@@ -264,17 +282,24 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
         )}
 
         {createdUser?.outcome === 'needs_reconciliation' && <button className={styles.secondaryButton}
-          type="button" disabled={isBusy} onClick={handleReconcile}>Conciliar preparacion</button>}
+          type="button" disabled={isBusy} onClick={() => openPin('reconcile')}>Conciliar preparacion</button>}
 
         <button
           className={styles.submitButton}
-          disabled={isSubmitting || Boolean(createdUser)}
+          disabled={isBusy || Boolean(createdUser)}
           type="submit"
         >
           <i className="bi bi-plus-circle" aria-hidden="true" />
-          {isSubmitting ? 'Preparando cuenta...' : 'Preparar cuenta pendiente'}
+          {isSubmitting ? 'Creando usuario...' : 'Crear usuario'}
         </button>
       </footer>
     </form>
+    {pinAction && createPortal(<PaymentCredentialsModal
+      description="Ingrese su PIN personal para autorizar la creación del usuario."
+      kicker="Creación de usuario" manageFocus layerClassName={styles.credentialLayer}
+      isSubmitting={isSubmitting} onCancel={cancelPin} onConfirm={confirmPin} errorMessage={pinError}
+    />, document.body)}
+    {credential && createPortal(<TemporaryPasswordModal initialCredential={credential} onClose={acceptCredential} />, document.body)}
+    </>
   )
 }

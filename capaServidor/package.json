@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test:users": "node --test src/modules/users/service/userCreation.test.js",
     "start": "node src/app/app.js",
     "predev": "npm run prisma:generate",
     "dev": "nodemon src/app/dev.js",

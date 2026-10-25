@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { PAYMENT_STATUS } from '@/config/status'
 import styles from './PaymentActionConfirmModal.module.css'
+import { useModalDialog } from '../../users/hooks/useModalDialog.js'
 
 export default function PaymentCredentialsModal({
   isSubmitting = false,
@@ -8,11 +9,18 @@ export default function PaymentCredentialsModal({
   onConfirm,
   order,
   targetStatus,
+  description,
+  kicker = 'Validación de pago',
+  errorMessage = '',
+  manageFocus = false,
+  layerClassName = '',
 }) {
   const [pin, setPin] = useState('')
   const [comment, setComment] = useState('')
   const [error, setError] = useState('')
   const submittingRef = useRef(false)
+  const modalRef = useRef(null)
+  useModalDialog({ containerRef: modalRef, isOpen: manageFocus, canClose: !isSubmitting, onClose: onCancel })
 
   const requiresComment =
     order?.paymentStatus !== undefined &&
@@ -20,7 +28,7 @@ export default function PaymentCredentialsModal({
   const canSubmit =
     /^\d{6}$/.test(pin) && (!requiresComment || comment.trim().length > 0)
 
-  if (!order || !targetStatus) return null
+  if (!description && (!order || !targetStatus)) return null
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -46,7 +54,7 @@ export default function PaymentCredentialsModal({
   }
 
   return (
-    <div className={styles.credentialsModalLayer} role="presentation">
+    <div className={`${styles.credentialsModalLayer} ${layerClassName}`} data-modal-layer="true" role="presentation">
       <form
         aria-labelledby="payment-credentials-modal-title"
         aria-modal="true"
@@ -54,11 +62,12 @@ export default function PaymentCredentialsModal({
         noValidate
         onSubmit={handleSubmit}
         role="dialog"
+        ref={modalRef}
       >
         <header className={styles.credentialsModalHeader}>
           <div>
             <span className={styles.credentialsModalKicker}>
-              Validación de pago
+              {kicker}
             </span>
             <h3 id="payment-credentials-modal-title">Ingrese su PIN</h3>
           </div>
@@ -75,8 +84,7 @@ export default function PaymentCredentialsModal({
 
         <div className={styles.credentialsModalBody}>
           <p className={styles.credentialsIntro}>
-            Ingrese su PIN personal para hacer efectivo el cambio de pago
-            de {order.nvNumber} a {targetStatus}.
+            {description ?? `Ingrese su PIN personal para hacer efectivo el cambio de pago de ${order.nvNumber} a ${targetStatus}.`}
           </p>
 
           <label className={styles.credentialsField}>
@@ -117,6 +125,7 @@ export default function PaymentCredentialsModal({
           )}
 
           {error && <p className={styles.credentialsError}>{error}</p>}
+          {errorMessage && <p className={styles.credentialsError} role="alert">{errorMessage}</p>}
         </div>
 
         <footer className={styles.credentialsModalFooter}>

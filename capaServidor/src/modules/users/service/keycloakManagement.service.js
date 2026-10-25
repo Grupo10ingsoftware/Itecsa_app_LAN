@@ -134,6 +134,20 @@ export class KeycloakManagementService {
     await this.request('/users/' + segment(subject), { method: 'PUT', body: { enabled }, expected: [204] });
   }
 
+  async setTemporaryPassword(subject, password) {
+    if (!validText(password, 255)) invalid();
+    await this.request('/users/' + segment(subject) + '/reset-password', {
+      method: 'PUT', expected: [204], body: { type: 'password', value: password, temporary: true },
+    });
+  }
+
+  async hasTemporaryPassword(subject) {
+    const user = await this.getUser(subject);
+    const { data } = await this.request('/users/' + segment(subject) + '/credentials');
+    return Array.isArray(data) && data.some(credential => credential.type === 'password')
+      && user.requiredActions?.includes('UPDATE_PASSWORD') === true;
+  }
+
   async logout(subject) {
     await this.request('/users/' + segment(subject) + '/logout', { method: 'POST', expected: [204] });
   }
