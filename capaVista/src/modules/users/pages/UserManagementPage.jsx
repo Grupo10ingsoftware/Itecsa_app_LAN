@@ -285,7 +285,9 @@ export default function UserManagementPage() {
   async function handleInspectUser(user) {
     try {
       const detail = await adminUsersApi.inspectUser(user.idUsuarioAutenticacionExterna)
-      setEditingUser({ ...user, username: detail.username, enabled: detail.enabled })
+      setEditingUser({ ...user, username: detail.username, enabled: detail.enabled,
+        nombreUsuario: detail.firstName, apellidoUsuario: detail.lastName, correoUsuario: detail.email,
+        rolUsuario: detail.role, estadoUsuario: detail.localState })
     } catch (error) { setActionMessage({ type: 'danger', text: getErrorText(error) }) }
   }
 
@@ -298,7 +300,7 @@ export default function UserManagementPage() {
             Gestion de usuarios
           </h1>
           <p className={styles.pageSubtitle}>Administra usuarios, roles y estado de vinculacion del sistema.</p>
-          <p role="status">Puedes consultar cuentas y movimientos, y preparar cuentas pendientes. La edicion, los cambios de rol, la activacion, la desactivacion y la entrega de credenciales aun no estan habilitados.</p>
+          <p role="status">Puedes crear usuarios y editar sus datos, rol y estado con tu PIN de autorizacion.</p>
         </header>
 
         <UserSummaryCards
@@ -345,7 +347,6 @@ export default function UserManagementPage() {
             currentPage={page}
             isLoading={isLoading}
             onEditUser={handleInspectUser}
-            readOnly
             onViewMovements={setMovementsUser}
             onPageChange={setPage}
             totalPages={totalPages}
@@ -374,14 +375,8 @@ export default function UserManagementPage() {
         isOpen={Boolean(editingUser)}
         onClose={() => setEditingUser(null)}
         onSave={handleSaveUser}
-        onCredentials={user => { setEditingUser(null); setCredentialUser(user) }}
-        onUnlink={(user) => {
-          setEditingUser(null)
-          setUnlinkingUser(user)
-        }}
         isCurrentUser={Boolean(editingUser?.isCurrentUser)}
         user={editingUser}
-        readOnly
       />
       <UserUnlinkConfirmModal
         isOpen={Boolean(unlinkingUser)}

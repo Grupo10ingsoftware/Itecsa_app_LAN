@@ -14,6 +14,19 @@ export class IdentityAdministrationError extends Error {
   }
 }
 const reject = (code, status) => { throw new IdentityAdministrationError(code, status); };
+function normalizeUpdate(input) {
+  const fields = ['firstName', 'lastName', 'email', 'role', 'state'];
+  if (!input || Object.keys(input).some(key => !fields.includes(key))
+    || fields.some(key => typeof input[key] !== 'string' || !input[key].trim())) reject('IDENTITY_INPUT_INVALID', 400);
+  const value = Object.fromEntries(fields.map(key => [key, input[key].trim()]));
+  if ([value.firstName, value.lastName].some(name => name.length > 100 || !/^[\p{L} ]+$/u.test(name))
+    || value.email.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.email)) reject('IDENTITY_INPUT_INVALID', 400);
+  if (!ASSIGNABLE_ROLES.includes(value.role)) reject('IDENTITY_ROLE_FORBIDDEN', 403);
+  if (!['Activo', 'Desvinculado', 'Pendiente', 'Pendiente rol'].includes(value.state)) reject('IDENTITY_INPUT_INVALID', 400);
+  return { ...value, email: value.email.toLowerCase() };
+}
+const localUpdate = input => ({ nombre_usuario: input.firstName, apellido_usuario: input.lastName,
+  correo_usuario: input.email, rol_usuario: input.role, estado_usuario: input.state });
 function normalize(input) {
   if (!input || Object.keys(input).some(key => !['username', 'email', 'firstName', 'lastName', 'role', 'rut'].includes(key))) reject('IDENTITY_INPUT_INVALID', 400);
   if (!ASSIGNABLE_ROLES.includes(input.role)) reject('IDENTITY_ROLE_FORBIDDEN', 403);
@@ -66,11 +79,13 @@ export class KeycloakIdentityAdministrationService {
     if (subject === context.subject) reject('IDENTITY_SELF_TARGET_FORBIDDEN', 403);
     const binding = await this.repository.binding(this.management.config.issuer, subject);
     if (!binding || !ASSIGNABLE_ROLES.includes(binding.Usuario.rol_usuario)) reject('IDENTITY_TARGET_FORBIDDEN', 403);
+    if (binding.Usuario.estado_usuario?.startsWith('Actualizando:')) reject('IDENTITY_UPDATE_BUSY');
     const external = await this.management.getUser(subject);
     const roles = await this.management.roles(subject);
     if (binding.subject !== subject || binding.Usuario.id_usuario !== binding.user_id || binding.username !== external.username || roles.length !== 1
       || roles[0].name !== binding.Usuario.rol_usuario) reject('IDENTITY_BINDING_CONFLICT');
     return { localUserId: binding.user_id, subject, username: external.username, email: binding.Usuario.correo_usuario,
+      firstName: binding.Usuario.nombre_usuario, lastName: binding.Usuario.apellido_usuario,
       externalEmail: external.email ?? null, issuer: binding.issuer, role: binding.Usuario.rol_usuario,
       localState: binding.Usuario.estado_usuario, enabled: external.enabled };
   }
@@ -78,6 +93,74 @@ export class KeycloakIdentityAdministrationService {
     await this.authorize(context);
     if (filters.rolUsuario && !ASSIGNABLE_ROLES.includes(filters.rolUsuario)) reject('IDENTITY_TARGET_FORBIDDEN', 403);
     return this.repository.list(this.management.config.issuer, filters);
+  }
+  async update(context, subject, rawInput) {
+    const actorId = await this.authorize(context, { mutation: true });
+    if (subject === context.subject) reject('IDENTITY_SELF_TARGET_FORBIDDEN', 403);
+    const input = normalizeUpdate(rawInput);
+    let binding;
+    try { binding = await this.repository.beginUpdate(this.management.config.issuer, subject, actorId, context.role); }
+    catch (error) {
+      if (error.code === 'IDENTITY_TARGET_FORBIDDEN' || error.code === 'IDENTITY_ACTOR_CHANGED') reject(error.code, 403);
+      if (error.code === 'IDENTITY_UPDATE_BUSY') reject(error.code, 409);
+      reject('IDENTITY_STORAGE_UNAVAILABLE', 503);
+    }
+    const original = { role: binding.Usuario.rol_usuario, localState: binding.Usuario.estado_usuario };
+    let external, remoteStarted = false, finishAttempted = false;
+    try {
+      if (input.state.startsWith('Pendiente') && input.state !== original.localState) reject('IDENTITY_INPUT_INVALID', 400);
+      external = await this.management.getUser(subject);
+      const roles = await this.management.roles(subject);
+      if (external.username !== binding.username || roles.length !== 1 || roles[0].name !== original.role) reject('IDENTITY_BINDING_CONFLICT');
+      const enabled = input.state === 'Activo' || (input.state.startsWith('Pendiente') && external.enabled);
+      remoteStarted = true;
+      await this.management.setEnabled(subject, false);
+      await this.management.logout(subject);
+      await this.management.updateAttributes(subject, { firstName: input.firstName, lastName: input.lastName,
+        ...(input.email !== external.email ? { email: input.email } : {}) });
+      if (input.role !== original.role) await this.management.replaceRole(subject, input.role);
+      const verified = await this.management.getUser(subject);
+      if (verified.firstName !== input.firstName || verified.lastName !== input.lastName || verified.email !== input.email) {
+        reject('IDENTITY_UPDATE_NOT_CONFIRMED');
+      }
+      if (await this.authorize(context) !== actorId) reject('IDENTITY_ADMIN_FORBIDDEN', 403);
+      await this.management.setEnabled(subject, enabled);
+      if ((await this.management.getUser(subject)).enabled !== enabled) reject('IDENTITY_UPDATE_NOT_CONFIRMED');
+      finishAttempted = true;
+      await this.repository.finishUpdate(binding, localUpdate(input), actorId);
+      return { outcome: 'user_updated', subject };
+    } catch (error) {
+      let current;
+      try { current = await this.repository.binding(this.management.config.issuer, subject); }
+      catch { reject('IDENTITY_UPDATE_REQUIRES_REVIEW', 503); }
+      if (finishAttempted && current && Object.entries(localUpdate(input)).every(([key, value]) => current.Usuario[key] === value)) {
+        return { outcome: 'user_updated', subject };
+      }
+      if (current?.Usuario.estado_usuario === binding.updateState) {
+        await this.restoreUpdate(binding, remoteStarted ? external : null, original, actorId);
+      }
+      if (error instanceof KeycloakServiceError || error instanceof IdentityAdministrationError) throw error;
+      reject('IDENTITY_STORAGE_UNAVAILABLE', 503);
+    }
+  }
+  async restoreUpdate(binding, external, original, actorId) {
+    const subject = binding.subject;
+    const previous = binding.Usuario;
+    try {
+      if (external) {
+        await this.management.setEnabled(subject, false);
+        const current = await this.management.getUser(subject);
+        await this.management.updateAttributes(subject, { firstName: external.firstName, lastName: external.lastName,
+          ...(current.email !== external.email ? { email: external.email ?? null } : {}) });
+        await this.management.replaceRole(subject, original.role);
+        await this.management.setEnabled(subject, external.enabled);
+      }
+      await this.repository.finishUpdate(binding, { nombre_usuario: previous.nombre_usuario, apellido_usuario: previous.apellido_usuario,
+        correo_usuario: previous.correo_usuario, rol_usuario: previous.rol_usuario, estado_usuario: previous.estado_usuario }, actorId, 'reverted');
+    } catch {
+      try { await this.management.setEnabled(subject, false); } catch { /* Local access remains blocked. */ }
+      reject('IDENTITY_UPDATE_REQUIRES_REVIEW', 503);
+    }
   }
   async summary(context) {
     await this.authorize(context);

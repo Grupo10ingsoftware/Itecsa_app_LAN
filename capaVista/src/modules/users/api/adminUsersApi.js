@@ -35,7 +35,10 @@ export function createAdminUsersApi(apiClient) {
         username, firstName: nombreUsuario, lastName: apellidoUsuario, email: correoUsuario, rut: rutUsuario, role: rolUsuario,
       } }),
     setTemporaryPassword: unavailable,
-    updateUser: unavailable,
+    updateUser: ({ idUsuarioAutenticacionExterna, nombreUsuario, apellidoUsuario, correoUsuario, rolUsuario, estadoUsuario, pin }) =>
+      apiClient.patch('/admin/identity/identities/' + encodeURIComponent(idUsuarioAutenticacionExterna), { pin, identity: {
+        firstName: nombreUsuario, lastName: apellidoUsuario, email: correoUsuario, role: rolUsuario, state: estadoUsuario,
+      } }),
     unlinkUser: unavailable,
   }
 }

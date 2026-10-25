@@ -19,7 +19,12 @@ export function createKeycloakIdentityPreparationRouter({ authenticate = checkJw
     try { await action(req, res); }
     catch (error) {
       if (error instanceof IdentityAdministrationError || error instanceof KeycloakServiceError) {
-        return res.status(error.status).json({ code: error.code, message: 'La operacion administrativa no pudo completarse.' });
+        const messages = {
+          IDENTITY_UPDATE_BUSY: 'Otro cambio de este usuario esta en curso. Actualiza e intenta nuevamente.',
+          IDENTITY_UPDATE_REQUIRES_REVIEW: 'La actualizacion quedo incompleta y el acceso permanece bloqueado. Requiere revision administrativa.',
+          IDENTITY_INPUT_INVALID: 'Revisa el nombre, apellido, correo, rol y estado ingresados.',
+        };
+        return res.status(error.status).json({ code: error.code, message: messages[error.code] ?? 'La operacion administrativa no pudo completarse.' });
       }
       return respondError(error, req, res);
     }
@@ -40,6 +45,12 @@ export function createKeycloakIdentityPreparationRouter({ authenticate = checkJw
     return res.status(user ? 200 : 404).json(user ?? { code: 'IDENTITY_NOT_FOUND' });
   }));
   router.get('/identities/:subject', run(async (req, res) => res.json(await service.inspect(context(req), req.params.subject))));
+  router.patch('/identities/:subject', run(async (req, res) => {
+    if (!req.body || Object.keys(req.body).some(key => !['identity', 'pin'].includes(key))) {
+      throw new IdentityAdministrationError('IDENTITY_INPUT_INVALID', 400);
+    }
+    return res.json(await service.update(context(req), req.params.subject, req.body.identity));
+  }));
   router.post('/identities/prepare', run(async (req, res) => {
     if (!req.body || Object.keys(req.body).some(key => !['identity', 'pin'].includes(key))) {
       throw new IdentityAdministrationError('IDENTITY_INPUT_INVALID', 400);
