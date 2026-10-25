@@ -8,6 +8,11 @@ import { createCheckJwt } from '../src/middlewares/checkJwt.js';
 import requireCapability from '../src/middlewares/requireCapability.js';
 import { createRequireActiveIdentity } from '../src/middlewares/requireActiveIdentity.js';
 import { createVerifyAuthSessionHandler } from '../src/modules/auth/controller/auth.controller.js';
+import { createAdminUsersRouter } from '../src/modules/users/routes/adminUsers.routes.js';
+import { createMetricsRouter } from '../src/modules/metrics/routes/metrics.routes.js';
+import { createOrderRouter } from '../src/modules/orders/routes/order.routes.js';
+import { createOrderHistoryRouter } from '../src/modules/history/routes/orderHistory.routes.js';
+import { createMessageRouter } from '../src/modules/messages/routes/message.routes.js';
 import { UserRepository } from '../src/modules/users/repo/users.repo.js';
 import getPrismaClient, { disconnectPrismaClient } from '../src/database/prisma.js';
 
@@ -123,6 +128,11 @@ test('phase 02: Keycloak 26.8.1 + MySQL real, synthetic Code/PKCE and identity a
   const authenticate = createCheckJwt({ requireIdentity, rateLimit: (_req, _res, next) => next() });
   const app = express();
   app.get('/verify', authenticate, requireCapability('read:own-profile'), createVerifyAuthSessionHandler());
+  app.use('/admin', createAdminUsersRouter({ authenticate }));
+  // Exercise actual route authorization without business SQL; identity resolution still uses real MySQL.
+  const viewController = new Proxy({}, { get: () => (_req, res) => res.sendStatus(204) });
+  for (const [path, factory] of [['/orders', createOrderRouter], ['/metrics', createMetricsRouter],
+    ['/history', createOrderHistoryRouter], ['/messages', createMessageRouter]]) app.use(path, factory({ authenticate, controller: viewController }));
   app.get('/cap/:permission', authenticate, (req, res, next) => requireCapability(req.params.permission)(req, res, next), (_req, res) => res.sendStatus(204));
   app.use((error, _req, res, _next) => res.status(error.status || 503).end());
   const server = app.listen(0, '127.0.0.1');
@@ -156,7 +166,7 @@ test('phase 02: Keycloak 26.8.1 + MySQL real, synthetic Code/PKCE and identity a
     const decoded = decode(tokens.access_token);
     assert.deepEqual(decoded.resource_access[LAB.roleClientId].roles, [role]);
     assert.deepEqual([...decoded.permissions].sort(), [...policy.ROLE_PERMISSIONS[role]].sort());
-    await bind(tokens, username, role);
+    const local = await bind(tokens, username, role);
     for (const permission of policy.BUSINESS_PERMISSIONS) {
       assert.equal((await request(tokens.access_token, '/cap/' + encodeURIComponent(permission))).status,
         policy.ROLE_PERMISSIONS[role].includes(permission) ? 204 : 403, `${role}: ${permission}`);
@@ -167,6 +177,24 @@ test('phase 02: Keycloak 26.8.1 + MySQL real, synthetic Code/PKCE and identity a
     assert.equal(verified.authorizationPolicy, policy.POLICY_ID);
     assert.deepEqual([...verified.permissions].sort(), [...policy.ROLE_PERMISSIONS[role]].sort());
     assert.equal((await request(tokens.id_token)).status, 401, 'ID token is not an API access token');
+    try {
+      await db.usuario.update({ where: { id_usuario: local.id_usuario }, data: { rol_usuario: role === 'Soporte' ? 'Desarrollador' : 'Soporte' } });
+      assert.equal((await request(tokens.access_token)).status, 403, `${role}: old token after a local role change`);
+    } finally {
+      await db.usuario.update({ where: { id_usuario: local.id_usuario }, data: { rol_usuario: role } });
+    }
+    for (const [path, permission] of [['/orders/kanban', 'read:orders'], ['/orders/calendar-summary', 'read:production-calendar'],
+      ['/orders/payments', 'read:payments'], ['/orders/sales-notes/NV1', 'read:sales-notes'], ['/history/orders', 'read:orders'],
+      ['/history/orders/17', 'read:orders'], ['/metrics/summary', 'view:metrics'], ['/metrics/production-performance', 'view:metrics'],
+      ['/messages', 'read:own-messages'], ['/messages/42', 'read:own-messages']]) {
+      assert.equal((await request(tokens.access_token, path)).status, policy.ROLE_PERMISSIONS[role].includes(permission) ? 204 : 403, `${role} ${path}`);
+    }
+    // Actual administrative router: navigation grants cannot open Auth0 operations.
+    for (const [method, path] of [['GET', '/users'], ['GET', '/users/summary'], ['GET', '/users/17/movements'],
+      ['POST', '/users'], ['POST', '/users/password-setup-email'], ['PATCH', '/users/17'], ['PATCH', '/users/17/status']]) {
+      const response = await fetch(base + '/admin' + path, { method, headers: { authorization: `Bearer ${tokens.access_token}` } });
+      assert.equal(response.status, role === 'Soporte' ? 503 : 403, `${role} ${method} ${path}`);
+    }
   });
   await t.test('old realm Soporte and two effective application roles cannot log into ITECSA', async () => {
     for (const username of ['phase02-legacy-support', 'phase02-multiple']) {

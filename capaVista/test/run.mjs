@@ -31,6 +31,8 @@ try {
 
   profile.run()
   authorization.run()
+  const navigation = await server.ssrLoadModule('/test/navigation.cases.jsx')
+  navigation.run()
   verifiedIdentity.run()
   payments.run()
   orders.run()

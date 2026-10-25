@@ -15,7 +15,7 @@ function getDisplayValue(value, fallback = 'No informado') {
 }
 
 export default function ProfilePage() {
-  const { identityUser, pinStatus, refreshSession, user } = useAuth()
+  const { identityUser, pinStatus, refreshSession, user, provider } = useAuth()
   const authApi = useAuthApi()
   const [historyOpen, setHistoryOpen] = useState(false)
   const historyApi = useMemo(() => ({ getMovements: (_subject, query) => authApi.getProfileMovements(query) }), [authApi])
@@ -185,7 +185,7 @@ export default function ProfilePage() {
             <div className={styles.roleBlock}>
               <div className={styles.roleContent}>
               <span className={styles.cardIcon}><i className="bi bi-briefcase" aria-hidden="true" /></span>
-              <div><h3>Rol del usuario</h3><RoleBadge role={profile.role} /></div>
+              <div><h3>Rol del usuario</h3><RoleBadge role={profile.role} provider={provider} /></div>
               </div>
             </div>
           </aside>
@@ -220,7 +220,7 @@ export default function ProfilePage() {
             </div>
             {pinStatus === 'active' && <button className={styles.outlineButton} disabled={isPinBusy} type="button"
               onClick={() => { resetRecovery(); setRecoveryOpen(true) }}><i className="bi bi-arrow-clockwise" aria-hidden="true" />Recuperar PIN</button>}
-            {import.meta.env.DEV && import.meta.env.VITE_ENABLE_DEMO_ROUTES === 'true' && profile.role === ROLES.SOPORTE && pinStatus === 'active' && <div>
+            {provider !== 'keycloak' && import.meta.env.DEV && import.meta.env.VITE_ENABLE_DEMO_ROUTES === 'true' && profile.role === ROLES.SOPORTE && pinStatus === 'active' && <div>
               <button className={styles.outlineButton} type="button" disabled={isPinBusy} onClick={debugResetPin}>
                 {isPinBusy ? 'Generando...' : 'Generar nuevo PIN (debug)'}
               </button><p className={styles.debugHint}>El PIN anterior dejará de funcionar.</p>

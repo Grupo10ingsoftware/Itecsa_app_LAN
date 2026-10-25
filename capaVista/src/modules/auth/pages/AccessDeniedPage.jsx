@@ -2,12 +2,13 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../hooks/useAuth'
 import styles from './AccessDeniedPage.module.css'
+import { homeForIdentity } from '../../../config/navigationAccess'
 
 export default function AccessDeniedPage() {
-  const { logout, refreshSession } = useAuth()
+  const { logout, refreshSession, provider, user, isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const automaticRetryStarted = useRef(false)
-  const [isRetrying, setIsRetrying] = useState(true)
+  const [isRetrying, setIsRetrying] = useState(!isAuthenticated)
   const [retryFailed, setRetryFailed] = useState(false)
 
   const retryAccess = useCallback(async () => {
@@ -15,19 +16,24 @@ export default function AccessDeniedPage() {
     setRetryFailed(false)
 
     try {
-      await refreshSession()
-      navigate('/kanban', { replace: true })
+      const verifiedUser = await refreshSession()
+      const destination = homeForIdentity(provider, verifiedUser)
+      if (destination !== '/access-denied') navigate(destination, { replace: true })
     } catch {
       setRetryFailed(true)
+    } finally {
       setIsRetrying(false)
     }
-  }, [navigate, refreshSession])
+  }, [navigate, refreshSession, provider])
 
   useEffect(() => {
     if (automaticRetryStarted.current) return
     automaticRetryStarted.current = true
-    retryAccess()
-  }, [retryAccess])
+    if (!isAuthenticated) {
+      const timer = window.setTimeout(retryAccess, 0)
+      return () => { window.clearTimeout(timer); automaticRetryStarted.current = false }
+    }
+  }, [retryAccess, isAuthenticated])
 
   return (
     <main className={styles.page}>
@@ -47,6 +53,9 @@ export default function AccessDeniedPage() {
                 : 'No tienes permisos para acceder a este recurso.'}
           </p>
           <div className={styles.actions}>
+            {isAuthenticated && homeForIdentity(provider, user) !== '/access-denied' && (
+              <button className={styles.button} onClick={() => navigate(homeForIdentity(provider, user), { replace: true })} type="button">Ir a mi inicio</button>
+            )}
             <button className={styles.button} disabled={isRetrying} onClick={retryAccess} type="button">
               <i className="bi bi-arrow-clockwise" />
               {isRetrying ? 'Verificando…' : 'Reintentar acceso'}

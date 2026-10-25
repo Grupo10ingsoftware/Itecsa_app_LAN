@@ -24,6 +24,7 @@ function AppLayout() {
   return (
     <div className={styles.appShell}>
       <aside
+        id="main-sidebar"
         className={`
           ${styles.sidebar}
           ${isSidebarCollapsed ? styles.sidebarCollapsed : ''}
@@ -52,7 +53,7 @@ function AppLayout() {
           ${isSidebarCollapsed ? styles.contentAreaSidebarCollapsed : ''}
         `}
       >
-        <Topbar onOpenMobileSidebar={handleOpenMobileSidebar} />
+        <Topbar onOpenMobileSidebar={handleOpenMobileSidebar} isMobileSidebarOpen={isMobileSidebarOpen} />
         <main className={styles.mainContent}>
           <Suspense fallback={<ModuleLoadingState />}>
             <Outlet />

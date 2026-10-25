@@ -3,7 +3,7 @@ import RoleBadge from '../../../shared/components/data/RoleBadge'
 import styles from './ProfileSummary.module.css'
 
 export default function ProfileSummary() {
-  const { user } = useAuth()
+  const { user, provider } = useAuth()
 
   if (!user) {
     return (
@@ -27,7 +27,7 @@ export default function ProfileSummary() {
             {firstName} {lastName}
           </p>
           <p className={styles.email} title={email}>{email}</p>
-          <div className={styles.role}><RoleBadge role={role} /></div>
+          <div className={styles.role}><RoleBadge role={role} provider={provider} /></div>
         </div>
     </section>
   )

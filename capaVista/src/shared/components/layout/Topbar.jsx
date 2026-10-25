@@ -8,12 +8,14 @@ import ProfileSummary from '../../../modules/profile/components/ProfileSummary'
 import NotificationBell from '../../../modules/messages/components/NotificationBell'
 import styles from './Layout.module.css'
 
-export default function Topbar({ onOpenMobileSidebar }) {
+export default function Topbar({ onOpenMobileSidebar, isMobileSidebarOpen = false }) {
   const { hasPermission } = useAuth()
   const [popupContainer, setPopupContainer] = useState(null)
   return (
     <header className={styles.topbar}>
       <button
+        aria-controls="main-sidebar"
+        aria-expanded={isMobileSidebarOpen}
         aria-label="Abrir menú lateral"
         className={styles.mobileMenuButton}
         onClick={onOpenMobileSidebar}

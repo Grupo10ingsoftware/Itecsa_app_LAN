@@ -101,3 +101,24 @@ Las 12 pruebas nuevas forman parte de las 1109 aprobadas; no se vuelven a sumar.
 Fallos anteriores conservados: primer laboratorio sin basic/sub y refresh después de code replay; segundo fixture con id_auth0=NULL incompatible con el schema; tests de servicios con propiedad de error equivocada. Se corrigieron configuración/fixtures/secuencia y se repitieron los casos y la regresión. No se relajó el control de sujeto, el esquema ni las denegaciones.
 
 Estado actualizado de pendientes: R04 probado para los roles/composites/mappers del laboratorio 26.8.1, pendiente realm empresarial; R05 cubierto con JWT locales y tokens reales para contrato/ID token/estado/sujetos, pendiente despliegue corporativo completo; R07 conserva el incidente refresh_token=undefined en Brave. R01–R03, R06, R08–R10 mantienen sus límites originales. Ningún éxito de laboratorio acredita migración de personas ni operación integral offline.
+
+## Actualización de fase 03 sobre 9bb41e9
+
+El equipo pidió commit de 02 y avance a 03. Las secciones anteriores se conservan como evidencia histórica; este apartado registra los resultados nuevos. Procedimiento completo y matriz esperado/observado: [11](11_EVIDENCIA_Y_VERIFICACION_FASE_03.md).
+
+| ID | Comprobación ejecutada | Resultado final |
+|---|---|---|
+| P03-NAV | Menús, guards SSR, inicio, retornos internos y etiquetas de nueve roles | 411 verificaciones nuevas aprobadas, incluidos ocho menús Auth0 de referencia; fixture de aceptación independiente de la política ejecutable |
+| P03-BROWSER | Router, componentes y CSS reales en Brave/Chromium 156 | 243 comprobaciones a 1440×1000 y 243 a 390×844; 144 decisiones de URL directa por tamaño; cero errores de navegador |
+| P03-SESSION | Expiración y cambio de rol en cada uno de los nueve roles, en ambos tamaños | Aprobado; retira vistas y enlaces anteriores y ofrece inicio propio. Contextos/API sintéticos en navegador |
+| P03-HTTP | Routers de diez endpoints de vistas y siete administrativos | 90 decisiones de vistas + 63 administrativas; 180 rechazos adicionales por expiración/ausencia de permisos en vistas; 11 rechazos administrativos adicionales. Sin ejecutar controladores denegados |
+| P03-REAL | Regresión con Keycloak 26.8.1, MySQL 8.4.13 y PKCE reales | 16 aprobadas iniciales, 2 tras reinicio; se añaden 90 decisiones en routers de vistas, 63 administrativas y nueve cambios de rol local que rechazan el token previo |
+| P03-API | Suite backend completa sin red | 1115 contabilizadas: 1111 aprobadas, 4 omitidas, 0 fallos |
+| P03-WEB | Suite frontend completa | 51 node:test y SSR previos aprobados, incluidas 251 verificaciones de identidad de 02 y 411 de navegación |
+| P03-BROWSER-REG | Fixtures de sesión/SDK, métricas y PIN | Tres aprobados en navegador real. SDK contra servidor de tokens sintético; no acredita resolución del incidente empresarial |
+| P03-QUALITY | ESLint y build producción | Exit 0; 564 módulos, chunk principal 499,03 kB; 146 fuentes/scripts y dos tests backend sin errores de sintaxis; sin cambios de paquetes/lockfiles |
+| P03-SCRIPTS | Scripts originales y realm fixture | 25 aprobadas; sin llamadas a servicios externos |
+
+Los dos tests padre HTTP nuevos están incluidos en las 1111 aprobadas. Las 90+63 decisiones reales se agregaron dentro de los nueve subtests de roles existentes del laboratorio, por lo que no aumentan artificialmente el total 16. No se suman verificaciones SSR, comprobaciones DOM y tests node como si fueran la misma unidad.
+
+R06 tiene ahora evidencia browser de laboratorio en escritorio/móvil y los tres fixtures originales; permanece pendiente la aceptación en puestos LAN con frontend, API y realm empresariales configurados conjuntamente. R07 continúa abierto. R01–R03, R08–R10 mantienen sus límites. No se modificaron las pruebas Auth0 de referencia ni los algoritmos de PIN para obtener estos resultados.

@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import { INCIDENT_LIMITS, INCIDENT_MODULES } from '../../../../../shared/incidentReports'
-import { APP_ROUTES } from '../../../config/routes'
 import TextInput from '../../../shared/components/forms/TextInput'
 import SelectInput from '../../../shared/components/forms/SelectInput'
 import { useIncidentReportForm } from '../hooks/useIncidentReportForm'
@@ -41,7 +40,7 @@ export default function IncidentReportForm({ email, sendReport, enabled, checkin
     <TextInput id="incident-email" name="email" type="email" label={<>Correo de contacto <span className={common.required}>*</span></>} value={email} placeholder={checking ? 'Comprobando correo de contacto…' : undefined} readOnly required error={errors.email} autoComplete="email" describedBy="incident-email-hint" />
     <small id="incident-email-hint">Te contactaremos si necesitamos más información sobre este reporte.</small>
     <div className={common.formActions}>
-      <button className={common.cancelButton} type="button" disabled={busy} onClick={() => navigate(APP_ROUTES.KANBAN)}>Cancelar</button>
+      <button className={common.cancelButton} type="button" disabled={busy} onClick={() => navigate('/')}>Cancelar</button>
       <button className={`${common.sendButton} ${styles.sendButton}`} type="submit" disabled={busy || !enabled}>
         {busy ? <span className="spinner-border spinner-border-sm" aria-hidden="true" /> : <i className="bi bi-shield-fill" aria-hidden="true" />}
         {busy ? 'Enviando…' : 'Enviar reporte'}

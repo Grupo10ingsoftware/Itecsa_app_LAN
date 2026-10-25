@@ -11,7 +11,7 @@ export default function AppProviders({ children }) {
   const navigate = useNavigate()
   const handleRedirectCallback = useCallback(
     (appState) => {
-      navigate(safeReturnPath(appState?.returnTo), { replace: true })
+      navigate('/', { replace: true, state: { returnTo: safeReturnPath(appState?.returnTo) } })
     },
     [navigate],
   )
@@ -20,7 +20,7 @@ export default function AppProviders({ children }) {
     return <div role="alert" className="alert alert-danger m-4">{error.message}</div>
   }
   if (runtimeConfig.authProvider === 'keycloak') return (
-    <KeycloakIdentityProvider onRedirect={path => navigate(path, { replace: true })}>
+    <KeycloakIdentityProvider onRedirect={path => handleRedirectCallback({ returnTo: path })}>
       <AuthProvider>{children}</AuthProvider>
     </KeycloakIdentityProvider>
   )

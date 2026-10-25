@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../../hooks/useAuth'
 import styles from './LoginPage.module.css'
+import { resolvePostLoginPath } from '../../../config/navigationAccess'
 
 const LOGIN_REDIRECT_TIMEOUT_MS = 10000
 const BLOCKED_ACCOUNT_MESSAGE = 'Tu cuenta se encuentra desactivada. Comunicate con el administrador.'
@@ -49,7 +50,7 @@ function getLoginErrorMessage(error) {
 }
 
 export default function LoginPage() {
-  const { identityUser, error, isAuthenticated, isLoading, loginWithRedirect } = useAuth()
+  const { identityUser, error, isAuthenticated, isLoading, loginWithRedirect, provider, user } = useAuth()
   const [shouldStartLogin, setShouldStartLogin] = useState(false)
   const location = useLocation()
   const returnTo = getSafeRedirectPath(location.state, location.search)
@@ -91,7 +92,7 @@ export default function LoginPage() {
   }
 
   if (isAuthenticated) {
-    return <Navigate replace to={returnTo} />
+    return <Navigate replace to={resolvePostLoginPath(returnTo, provider, user)} />
   }
 
   if (error) {

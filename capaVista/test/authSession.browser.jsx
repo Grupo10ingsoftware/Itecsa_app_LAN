@@ -5,7 +5,7 @@ import Keycloak from 'keycloak-js'
 import { AuthProvider } from '../src/app/providers/AuthProvider.jsx'
 import { IdentityContext } from '../src/app/providers/identityContext.js'
 import { useAuth } from '../src/hooks/useAuth.js'
-import { ROLES, RECOGNIZED_ROLES, PERMISSIONS as P } from '../../shared/authorization.js'
+import { ROLES, RECOGNIZED_ROLES, PERMISSIONS as P, POLICY_ID } from '../../shared/keycloakAuthorization.js'
 import TemporaryPasswordModal from '../src/modules/users/components/TemporaryPasswordModal.jsx'
 
 const assert = (condition, message) => { if (!condition) throw Error(message) }
@@ -58,7 +58,10 @@ async function run() {
   const subscribers = new Set()
   const subscribe = listener => { subscribers.add(listener); return () => subscribers.delete(listener) }
   const change = patch => { current = { ...current, ...patch }; flushSync(() => subscribers.forEach(listener => listener())) }
-  let reply = () => json({ sub: current.user.sub, rolUsuario: ROLES.VENTAS, permissions: [P.READ_PROFILE], pinStatus: 'active' })
+  // The phase 02 backend proof is mandatory for Keycloak; keep Auth0's reference contract.
+  const verified = value => json({ ...value, estadoUsuario: 'Activo',
+    ...(current.provider === 'keycloak' ? { identityProvider: 'keycloak', authorizationPolicy: POLICY_ID } : {}) })
+  let reply = () => verified({ sub: current.user.sub, rolUsuario: ROLES.VENTAS, permissions: [P.READ_PROFILE], pinStatus: 'active' })
   const pending = []
   window.fetch = async (url, request) => {
     assert(String(url).endsWith('/auth/verify'), 'Verificacion backend obligatoria')
@@ -75,29 +78,29 @@ async function run() {
   flushSync(() => root.render(<StrictMode><Harness /></StrictMode>))
   assert(auth.isAuthenticated === false && !auth.user, 'Credenciales solas no autorizan')
   await waitFor(() => pending.length > 0)
-  reply = () => json({ sub: 'b', rolUsuario: ROLES.VENTAS, permissions: [], pinStatus: 'active' })
+  reply = () => verified({ sub: 'b', rolUsuario: ROLES.VENTAS, permissions: [], pinStatus: 'active' })
   change({ sessionKey: 2, user: { sub: 'b' }, getAccessToken: async () => 'access-b' })
   await waitFor(() => auth.authStatus === 'authenticated')
-  pending.forEach(resolve => resolve(json({ sub: 'a', rolUsuario: ROLES.SOPORTE, permissions: [P.MANAGE_USERS] })))
+  pending.forEach(resolve => resolve(verified({ sub: 'a', rolUsuario: ROLES.SOPORTE, permissions: [P.MANAGE_USERS] })))
   await pause()
   assert(auth.user.sub === 'b' && !auth.hasPermission(P.MANAGE_USERS), 'Respuesta tardia no contamina nueva identidad')
   assert(auth.identityUser.email === undefined, 'Identidad sin correo admitida')
   for (const role of RECOGNIZED_ROLES) {
-    reply = () => json({ sub: 'b', rolUsuario: role, permissions: [] })
+    reply = () => verified({ sub: 'b', rolUsuario: role, permissions: [] })
     await auth.refreshSession(); await waitFor(() => auth.user?.rolUsuario === role)
     assert(auth.hasRole(role) && !auth.hasPermission(P.MANAGE_USERS), 'Roles sin permisos no elevan acceso')
   }
-  reply = () => json({ sub: 'b', rolUsuario: ROLES.VENTAS, permissions: [P.MANAGE_USERS] })
+  reply = () => verified({ sub: 'b', rolUsuario: ROLES.VENTAS, permissions: [P.MANAGE_USERS] })
   await auth.refreshSession(); await waitFor(() => auth.user?.rolUsuario === ROLES.VENTAS)
   assert(!auth.hasPermission(P.MANAGE_USERS), 'Catalogo limita permiso explicito excesivo')
   let finishOldVerification
   reply = () => new Promise(resolve => { finishOldVerification = resolve })
   const oldVerification = auth.refreshSession().catch(() => {})
   await waitFor(() => Boolean(finishOldVerification))
-  reply = () => json({ sub: 'b', rolUsuario: ROLES.ADMIN_VENTAS, permissions: [P.MANAGE_USERS] })
+  reply = () => verified({ sub: 'b', rolUsuario: ROLES.ADMIN_VENTAS, permissions: [P.MANAGE_USERS] })
   change({ verificationKey: 1 })
   await waitFor(() => auth.user?.rolUsuario === ROLES.ADMIN_VENTAS)
-  finishOldVerification(json({ sub: 'b', rolUsuario: ROLES.VENTAS, permissions: [] }))
+  finishOldVerification(verified({ sub: 'b', rolUsuario: ROLES.VENTAS, permissions: [] }))
   await oldVerification; await pause()
   assert(auth.isAuthenticated && auth.user.rolUsuario === ROLES.ADMIN_VENTAS, 'Verificacion anterior a renovacion no sobrescribe resultado actual')
   for (const status of [401, 403, 503]) {
@@ -106,7 +109,7 @@ async function run() {
     await waitFor(() => !auth.user)
     assert(!auth.isAuthenticated, 'Sesion rechazada no autoriza')
   }
-  reply = () => json({ sub: 'other', rolUsuario: ROLES.VENTAS, permissions: [] })
+  reply = () => verified({ sub: 'other', rolUsuario: ROLES.VENTAS, permissions: [] })
   try { await auth.refreshSession() } catch { /* expected */ }
   await waitFor(() => auth.authStatus === 'session-invalid')
   change({ sessionKey: 3, isAuthenticated: false, user: null })

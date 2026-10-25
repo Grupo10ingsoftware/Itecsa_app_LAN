@@ -15,6 +15,7 @@ Fecha: **24-10-2026**. Fuente de aprobación: nuevo encargo «Plan maestro de mi
 | D07 | Conservar Auth0, SDK, servicios, adaptadores, templates, pruebas y documentación | Conservados; sin eliminación ni fallback nuevo |
 | D08 | Alcance inicial: fases 00 y 01, política aislada y sin identidades reales | Entregadas; commit local 66a75c0 solicitado por el equipo |
 | D09 | El equipo indicó «pasamos a la siguiente fase» después del commit | Fase 02 autorizada; 03 y posteriores siguen sin autorización |
+| D10 | El equipo pidió «hace un commit y sigue con la siguiente fase» tras 02 | Commit local 9bb41e9 creado; fase 03 autorizada e implementada. Fase 04 y posteriores pendientes de autorización |
 
 La selección concreta de Soporte utiliza la autorización expresa para conservar perfil y mensajes propios cuando sean necesarios. `manage:own-pin` mantiene el PIN propio independiente, requerido por los contratos de operaciones sensibles; no crea un permiso de administración del PIN ajeno ni un restablecimiento de contraseña. `manage:users` representa la capacidad administrativa existente; no acredita que estén implementadas las futuras credenciales temporales, recuperación o consulta de auditoría. No se añadieron capacidades ficticias para funciones que aún no existen.
 
@@ -77,3 +78,9 @@ Permanecen pendientes: autorización de cuentas privilegiadas y bootstrap, forma
 La matriz funcional anterior no cambia. La implementación selecciona su política desde el proveedor autenticado; los roles Keycloak nuevos se leen exclusivamente de un cliente de roles explícito (`KEYCLOAK_ROLE_CLIENT_ID`), distinto de la SPA. Un rol de realm llamado Soporte no establece esa asignación. La configuración empresarial y la correspondencia por sujeto siguen pendientes: esta es una decisión técnica de integración, no una aprobación para migrar personas ni conceder roles privilegiados.
 
 En laboratorio se utilizó `itecsa-api-v1` para los nueve roles y `itecsa-capabilities-v1` para las 25 capacidades. Los composites y mappers se generan de la matriz canónica y la API vuelve a intersectar los permisos emitidos con el rol local. No se hizo un hardcoded grant universal, un mapper de atributos editables por trabajadores ni una sustitución global de nombres. Los detalles, límites y reversión están en [10](10_EVIDENCIA_Y_CONFIGURACION_FASE_02.md).
+
+## Aplicación técnica en fase 03
+
+D09 conserva el alcance de su momento; D10 registra la autorización posterior. La matriz de 25 capacidades permanece intacta. Menús y guards utilizan los permisos efectivos de la política seleccionada. Soporte inicia en `/admin/usuarios`, con acceso a sus mensajes y perfil; los otros ocho roles inician en Kanban cuando poseen `read:orders`. La pantalla de Soporte anuncia que la administración aún no está disponible. Su entrada no habilita servicios, credenciales ni operaciones de 06–07.
+
+El gate administrativo ahora se evalúa **después** de autenticar y autorizar: sin sesión válida, 401; sin `manage:users`, 403; nuevo Soporte autorizado, 503 mientras el servicio no esté implementado. No se modificaron destinos asignables, excepciones privilegiadas ni reglas/PIN de negocio. Evidencia y comprobación por los nueve roles: [11](11_EVIDENCIA_Y_VERIFICACION_FASE_03.md).
