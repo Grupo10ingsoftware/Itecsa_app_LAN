@@ -116,7 +116,14 @@ export async function sendToReviewOperation(repository, id, audit = {}) {
     now: audit.now,
   });
 
-  const responsibleUserId = Number(updatedOrder?.id_usuario);
+  if (!updatedOrder) return updatedOrder;
+  // Read the persisted owner inside the current transaction. Public order DTOs
+  // intentionally omit internal user IDs and cannot identify the recipient.
+  const responsibleOrder = await repository.client.pedidos.findUnique({
+    where: { id_pedido: Number(id) },
+    select: { id_usuario: true },
+  });
+  const responsibleUserId = Number(responsibleOrder?.id_usuario);
   if (!updatedOrder || !Number.isInteger(responsibleUserId) || responsibleUserId <= 0) {
     return updatedOrder;
   }

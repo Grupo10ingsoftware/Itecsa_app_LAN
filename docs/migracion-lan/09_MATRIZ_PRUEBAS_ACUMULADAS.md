@@ -122,3 +122,27 @@ El equipo pidió commit de 02 y avance a 03. Las secciones anteriores se conserv
 Los dos tests padre HTTP nuevos están incluidos en las 1111 aprobadas. Las 90+63 decisiones reales se agregaron dentro de los nueve subtests de roles existentes del laboratorio, por lo que no aumentan artificialmente el total 16. No se suman verificaciones SSR, comprobaciones DOM y tests node como si fueran la misma unidad.
 
 R06 tiene ahora evidencia browser de laboratorio en escritorio/móvil y los tres fixtures originales; permanece pendiente la aceptación en puestos LAN con frontend, API y realm empresariales configurados conjuntamente. R07 continúa abierto. R01–R03, R08–R10 mantienen sus límites. No se modificaron las pruebas Auth0 de referencia ni los algoritmos de PIN para obtener estos resultados.
+
+## Actualización de fase 04 sobre 5941404
+
+El equipo pidió commit de 03 y avance a 04. Las evidencias anteriores permanecen históricas; la reproducción completa está en [12](12_EVIDENCIA_Y_VERIFICACION_FASE_04.md).
+
+| ID | Verificación nueva / acumulada | Resultado |
+|---|---|---|
+| P04-IDENTITY | Destinatario de revisión tomado del responsable persistido, separado del actor | Tres tests nuevos aprobados; el test original conserva su expectativa y adapta únicamente el doble de lectura |
+| P04-REAL | 18 operaciones × nueve roles, controllers/services/repositories reales | 162 decisiones: 73 permitidas y 89 denegadas; persistencia, actor, dueño, etiquetas, fechas y mensajes comprobados |
+| P04-NEGATIVE | PIN ausente/ajeno, pago pendiente, salto de etapa, subproceso incorrecto, retroceso sin anterior y fecha inhábil | Rechazos sin cambios productivos ni registros de negocio; el PIN incorrecto sí conserva su contador de seguridad |
+| P04-CONCURRENCY | Dos actores completan/retroceden o mueven a entrega simultáneamente | Una transición y un registro; una notificación de entrega; perdedor 409 o respuesta idempotente según operación |
+| P04-LANYARD | Repetición antes de 100%, carga del día, concurrencia y cantidad excesiva | Un avance por detalle/día; actor local; no suma dos veces ni acepta superar la cantidad |
+| P04-TRANSACTION | Error insertando notificación en revisión y en listo para entrega | SQL revierte etapa, registros y mensajes en ambos casos |
+| P04-PHYSICAL | R03 original y R01/R02 originales sin modificar | 1 + 2 aprobadas en un segundo MySQL efímero; sin publicar 33307 en el host |
+| P04-BROWSER | Kanban real y calendario, permisos/acciones/PIN/drop/paginación | 70 checks a 1440×1000 y 70 a 390×844; nueve roles; cero errores JS |
+| P04-REG-BROWSER | Navegación 03 y fixtures originales de sesión/métricas/PIN | 243 + 243 checks y tres fixtures PASS |
+| P04-API | Suite backend sin red | 1119 contabilizadas: 1115 aprobadas, 4 omitidas por aislamiento, 0 fallos |
+| P04-WEB | Suite frontend completa | 51 node:test y SSR anteriores, incluidos 411 checks de navegación y 251 de identidad: aprobados |
+| P04-REAL-TAP | Integración real acumulada | 40 aprobadas iniciales, 2 tras reinicio; los 40 incluyen padres y los 23 subtests productivos |
+| P04-QUALITY | Scripts, lint, build y sintaxis | 25 tests de scripts; lint/build exit 0; 564 módulos y chunk 499,03 kB; 147 fuentes/scripts y cuatro tests/helpers sin error de sintaxis |
+
+Las cuatro integraciones omitidas del script general tienen ahora ejecución separada aprobada: identidad Keycloak y las tres físicas MySQL. No se activan simultáneamente sobre una base compartida. R01–R03 quedan cubiertas en laboratorio, pendiente validación del entorno de destino; no se reescriben sus resultados históricos de 00–03. R07, R08–R10 y aceptación empresarial mantienen sus límites.
+
+El primer laboratorio productivo detectó realmente la pérdida del destinatario de revisión (0 mensajes frente a 1 esperado). El test unitario nuevo reprodujo el defecto antes de corregirlo. Otra pasada general encontró el doble antiguo de repositorio incompleto; se adaptó a la lectura real conservando la misma expectativa. El primer arranque físico falló por negociación RSA de MySQL, corregido únicamente en la preparación del laboratorio. Estos fallos no se presentan como éxitos retrospectivos.

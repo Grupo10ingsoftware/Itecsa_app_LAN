@@ -291,6 +291,11 @@ test("enviar a revision notifica al usuario de Ventas responsable", async () => 
     const repo = new OrderRepository({
         prisma: {
             async $queryRaw() { return []; },
+            pedidos: { async findUnique({ where, select }) {
+                assert.deepEqual(where, { id_pedido: 6 });
+                assert.deepEqual(select, { id_usuario: true });
+                return { id_usuario: 21 };
+            } },
             mensaje: {
                 async create({ data }) {
                     assert.equal(data.id_pedido, 6);
@@ -306,7 +311,6 @@ test("enviar a revision notifica al usuario de Ventas responsable", async () => 
     });
     repo.transitionGeneralStage = async () => ({
         id_pedido: 6,
-        id_usuario: 21,
         numero_nota_venta: "NV-100",
     });
 

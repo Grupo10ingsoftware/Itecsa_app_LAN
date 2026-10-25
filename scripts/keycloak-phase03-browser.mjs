@@ -13,7 +13,9 @@ const docker = (...args) => execFileSync('docker', args, { encoding: 'utf8', tim
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function main() {
-  assert.deepEqual(process.argv.slice(2), ['--run'], 'Uso: node scripts/keycloak-phase03-browser.mjs --run');
+  const production = process.argv.slice(2).includes('--production');
+  assert.deepEqual(process.argv.slice(2), production ? ['--run', '--production'] : ['--run'],
+    'Uso: node scripts/keycloak-phase03-browser.mjs --run [--production]');
   const candidates = [process.env.ITECSA_BROWSER_BIN,
     join(process.env.LOCALAPPDATA || '', 'BraveSoftware/Brave-Browser/Application/brave.exe'),
     'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
@@ -57,8 +59,10 @@ async function main() {
     await new Promise((resolveOpen, reject) => { socket.onopen = resolveOpen; socket.onerror = reject; });
     let id = 0;
     const pending = new Map();
+    const exceptions = [];
     socket.onmessage = event => {
       const message = JSON.parse(event.data);
+      if (message.method === 'Runtime.exceptionThrown') exceptions.push(message.params.exceptionDetails.exception?.description || message.params.exceptionDetails.text);
       const request = pending.get(message.id);
       if (!request) return;
       pending.delete(message.id); clearTimeout(request.timer);
@@ -73,6 +77,7 @@ async function main() {
     await command('Page.enable'); await command('Runtime.enable');
     console.log('Browser:', (await command('Browser.getVersion')).product);
     const fixtures = [
+      ...(production ? [['production', 'PRODUCTION_TEST_RESULT', 1440, 1000], ['production', 'PRODUCTION_TEST_RESULT', 390, 844]] : []),
       ['navigation', 'NAVIGATION_TEST_RESULT', 1440, 1000],
       ['navigation', 'NAVIGATION_TEST_RESULT', 390, 844],
       ['authSession', 'AUTH_TEST_RESULT', 1440, 1000],
@@ -80,17 +85,19 @@ async function main() {
       ['paymentPin', 'PIN_TEST_RESULT', 1440, 1000],
     ];
     for (const [fixture, marker, width, height] of fixtures) {
+      exceptions.length = 0;
       await command('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 992 });
       await command('Page.navigate', { url: `${origin}/test/${fixture}.browser.html?lab=${randomUUID()}` });
       let result;
       for (let i = 0; i < 450; i++) {
+        assert.equal(exceptions.length, 0, exceptions.join('\n'));
         const response = await command('Runtime.evaluate', { expression: '(document.getElementById("result") || document.getElementById("results"))?.textContent', returnByValue: true });
         result = response.result?.value;
         if (result?.includes(`${marker}:PASS`) || result?.includes('FAIL:')) break;
         await pause(100);
       }
       assert.equal(result, `${marker}:PASS`, `${fixture} ${width}x${height}: ${result}`);
-      const report = await command('Runtime.evaluate', { expression: 'JSON.stringify(window.__NAVIGATION_REPORT__ || {})', returnByValue: true });
+      const report = await command('Runtime.evaluate', { expression: 'JSON.stringify(window.__PRODUCTION_REPORT__ || window.__NAVIGATION_REPORT__ || {})', returnByValue: true });
       console.log(`${fixture} ${width}x${height}: PASS ${report.result?.value}`);
     }
   } finally {

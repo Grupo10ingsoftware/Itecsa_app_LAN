@@ -18,7 +18,9 @@ const images = {
 const docker = (...args) => execFileSync('docker', args, { encoding: 'utf8', timeout: 60000, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 
 async function main() {
-  assert.deepEqual(process.argv.slice(2), ['--run'], 'Uso: node scripts/keycloak-phase02-lab.mjs --run');
+  const production = process.argv.slice(2).includes('--production');
+  assert.deepEqual(process.argv.slice(2), production ? ['--run', '--production'] : ['--run'],
+    'Uso: node scripts/keycloak-phase02-lab.mjs --run [--production]');
   for (const image of Object.values(images)) docker('image', 'inspect', image);
   const suffix = randomUUID().slice(0, 8);
   const label = `itecsa.phase02.lab=${suffix}`;
@@ -58,6 +60,8 @@ async function main() {
       KEYCLOAK_ISSUER: LAB.issuer, KEYCLOAK_CLIENT_ID: LAB.clientId, KEYCLOAK_ROLE_CLIENT_ID: LAB.roleClientId,
       KEYCLOAK_AUDIENCE: LAB.audience, KEYCLOAK_JWKS_URI: LAB.issuer + '/protocol/openid-connect/certs',
       RUN_KEYCLOAK_REAL_INTEGRATION: 'true', DB_HOST: 'phase02-mysql', DB_PORT: '3306',
+      RUN_KEYCLOAK_PRODUCTION_INTEGRATION: String(production),
+      CURSOR_SECRET: 'Synthetic-Cursor-Phase04-Only-Not-Corporate',
       DB_USER: 'phase02_test', DB_PASSWORD: 'Synthetic-DB-Phase02-Only', DB_NAME: 'itecsa_identity_phase02_test',
       DB_SSL_MODE: 'disabled', DATABASE_URL: 'mysql://phase02_test:Synthetic-DB-Phase02-Only@phase02-mysql:3306/itecsa_identity_phase02_test',
     };
@@ -76,7 +80,32 @@ async function main() {
       if (result.error) throw result.error;
       assert.equal(result.status, 0, 'La prueba real debe finalizar sin fallos.');
     }
-    console.log('Laboratorio completo: inicial + reinicio aprobados.');
+    if (production) {
+      // Preserve the strict original 127.0.0.1:33307 guards without publishing a host port.
+      const physicalMysql = `${network}-physical-mysql`;
+      containers.push(physicalMysql);
+      docker('run', '-d', '--name', physicalMysql, '--label', label, '--network', network,
+        '--mount', 'type=tmpfs,target=/var/lib/mysql', '--env', 'MYSQL_ROOT_PASSWORD=Synthetic-Physical-Root-Only',
+        '--env', 'MYSQL_DATABASE=itecsa_physical_test', '--env', 'MYSQL_USER=itecsa_test',
+        '--env', 'MYSQL_PASSWORD=Synthetic-Physical-Phase04-Only', images.mysql, '--port=33307');
+      const physical = {
+        APP_ENV: 'test', NODE_ENV: 'test', AUTH_PROVIDER: 'auth0', SALES_NOTE_SOURCE: 'fixture',
+        RUN_PHYSICAL_REGRESSIONS: 'true', RUN_MYSQL_INTEGRATION: 'true', LAB_STAGE: 'phase04-physical',
+        DB_HOST: '127.0.0.1', DB_PORT: '33307', DB_NAME: 'itecsa_physical_test', DB_USER: 'itecsa_test',
+        DB_PASSWORD: 'Synthetic-Physical-Phase04-Only', DB_SSL_MODE: 'disabled',
+        DATABASE_URL: 'mysql://itecsa_test:Synthetic-Physical-Phase04-Only@127.0.0.1:33307/itecsa_physical_test',
+      };
+      const runner = `${network}-physical-runner`;
+      containers.push(runner);
+      console.log('Regresiones físicas originales: MySQL separado, sin puertos del host...');
+      const result = spawnSync('docker', ['run', '--rm', '--name', runner, '--label', label,
+        '--network', `container:${physicalMysql}`, '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--pids-limit', '256',
+        ...Object.entries(physical).flatMap(([key, value]) => ['--env', `${key}=${value}`]),
+        ...mounts, images.api, 'node', '/app/scripts/keycloak-phase04-physical.mjs'], { stdio: 'inherit', timeout: 180000 });
+      if (result.error) throw result.error;
+      assert.equal(result.status, 0, 'Las regresiones físicas originales deben finalizar sin fallos.');
+    }
+    console.log('Laboratorio completo: inicial + reinicio aprobados.' + (production ? ' Producción y regresiones físicas aprobadas.' : ''));
   } finally {
     for (const name of containers.reverse()) {
       try { removeOwnedContainer(name); } catch { console.error(`Revisar limpieza del recurso propio ${name}`); }

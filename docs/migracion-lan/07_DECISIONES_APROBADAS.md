@@ -16,6 +16,7 @@ Fecha: **24-10-2026**. Fuente de aprobación: nuevo encargo «Plan maestro de mi
 | D08 | Alcance inicial: fases 00 y 01, política aislada y sin identidades reales | Entregadas; commit local 66a75c0 solicitado por el equipo |
 | D09 | El equipo indicó «pasamos a la siguiente fase» después del commit | Fase 02 autorizada; 03 y posteriores siguen sin autorización |
 | D10 | El equipo pidió «hace un commit y sigue con la siguiente fase» tras 02 | Commit local 9bb41e9 creado; fase 03 autorizada e implementada. Fase 04 y posteriores pendientes de autorización |
+| D11 | El equipo pidió «commit y siguiente fase» tras 03 | Commit local 5941404 creado; fase 04 autorizada. Fase 05 y posteriores pendientes de autorización |
 
 La selección concreta de Soporte utiliza la autorización expresa para conservar perfil y mensajes propios cuando sean necesarios. `manage:own-pin` mantiene el PIN propio independiente, requerido por los contratos de operaciones sensibles; no crea un permiso de administración del PIN ajeno ni un restablecimiento de contraseña. `manage:users` representa la capacidad administrativa existente; no acredita que estén implementadas las futuras credenciales temporales, recuperación o consulta de auditoría. No se añadieron capacidades ficticias para funciones que aún no existen.
 
@@ -84,3 +85,9 @@ En laboratorio se utilizó `itecsa-api-v1` para los nueve roles y `itecsa-capabi
 D09 conserva el alcance de su momento; D10 registra la autorización posterior. La matriz de 25 capacidades permanece intacta. Menús y guards utilizan los permisos efectivos de la política seleccionada. Soporte inicia en `/admin/usuarios`, con acceso a sus mensajes y perfil; los otros ocho roles inician en Kanban cuando poseen `read:orders`. La pantalla de Soporte anuncia que la administración aún no está disponible. Su entrada no habilita servicios, credenciales ni operaciones de 06–07.
 
 El gate administrativo ahora se evalúa **después** de autenticar y autorizar: sin sesión válida, 401; sin `manage:users`, 403; nuevo Soporte autorizado, 503 mientras el servicio no esté implementado. No se modificaron destinos asignables, excepciones privilegiadas ni reglas/PIN de negocio. Evidencia y comprobación por los nueve roles: [11](11_EVIDENCIA_Y_VERIFICACION_FASE_03.md).
+
+## Aplicación técnica en fase 04
+
+D11 actualiza la autorización después de D10; la matriz de 25 capacidades no cambia. Se verificaron 18 operaciones productivas para los nueve roles con tokens Keycloak, PIN y persistencia reales de laboratorio. Los siete roles funcionales conservan su acceso productivo; Desarrollador conserva el acceso del técnico antiguo y nuevo Soporte queda fuera del negocio.
+
+La única corrección de código productivo resuelve el destinatario de la notificación de revisión desde `Pedidos.id_usuario` dentro de la transacción existente. El DTO público lo omitía y el mensaje no se creaba. Se conserva el actor autenticado, el responsable original, la matriz, las transiciones y el PIN. Es una corrección compartida por Auth0 y Keycloak, no una concesión nueva de permisos. Evidencia, fallos previos y límites: [12](12_EVIDENCIA_Y_VERIFICACION_FASE_04.md).
