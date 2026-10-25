@@ -174,3 +174,29 @@ Las cuatro integraciones omitidas en la suite sin red se ejecutaron separadament
 Fallos previos: revelación de PIN ya acusado rechazada correctamente; se reutilizó el PIN legítimo en memoria sin resetearlo. Se corrigieron expectativas de destinatarios adicionales válidos y del 400 por PIN ausente. Se completó una prop del fixture y se retiró un import sin uso. El navegador reprodujo mensajes del sujeto anterior antes del arreglo del encabezado. La carrera real de cliente devolvió 500 por P2002 del índice RUT; se corrigió a 409. La documentación distingue estos errores de preparación de los defectos de producto.
 
 R01–R03 conservan cobertura física de laboratorio; R04–R06 conservan límites del destino real. R07 sigue abierto; R08–R10 y aceptación offline/empresarial siguen pendientes. En privacidad/incidentes se dobla exclusivamente la entrega externa: no se acredita Resend operativo sin Internet. La fase 06 no se inicia automáticamente.
+
+## Actualización de fase 06 sobre 9e44010
+
+El usuario pidió commit de 05 y avance a 06. Se creó 9e44010 desde el árbol revisado y se ejecutó exclusivamente la base administrativa, conservando las evidencias anteriores. Procedimiento, contratos y limitaciones: [14](14_EVIDENCIA_Y_VERIFICACION_FASE_06.md).
+
+| ID | Verificación | Resultado |
+|---|---|---|
+| P06-ADAPTER | Configuración separada, token de servicio concurrente/expiración, exact search, límites, traversal, errores y mutaciones sin replay | Ocho pruebas focales aprobadas; incluye deadline HTTP real sobre cuerpo bloqueado y errores sanitizados |
+| P06-MIGRATION | Schema de 9e44010 con actor histórico/PIN/registro, seguido de migración SQL real | PK/FK, sub, correo, hash y salt preservados; correo nullable conserva unicidad y vínculo nuevo compara issuer/sub/username binarios |
+| P06-ROLES | Nueve actores, seis destinos ordinarios y privilegios | Solo Soporte prepara con capacidad efectiva/PIN/estado local; G/D/S no asignables; proveedor ajeno, falta de capacidad, PIN ajeno y autoobjetivo denegados |
+| P06-HTTP | Fábrica futura con JWT/PIN/servicios y SQL reales | Lectura y preparación idempotente por nueve roles: solo S autorizado; sin token/malformado 401, actor inyectado 400. La fábrica no se monta en la aplicación |
+| P06-PERSISTENCE | Preparación, username repetido, concurrencia entre servicios y payload cambiado | Un POST/un vínculo, digest/CAS persistidos; no adopta cuentas existentes. Pendiente + disabled; fullyProvisioned=false |
+| P06-PARTIAL | Respuesta perdida después de 201 real y error SQL después de insertar Usuario | Diario needs_reconciliation; IdP deshabilitado. Nuevo servicio concilia marcador/sub y completa sin repetir creación; SQL revierte usuario si falla vínculo |
+| P06-UNKNOWN | POST sin resultado, proceso interrumpido, diario caído, actor revocado o sujeto vinculado a otra fila durante saga | Sin creación repetida ni robo de running; sin diario no escribe IdP; revocación/cambio de PK impide completar. La confirmación SQL bloquea/comprueba actor. Interrupciones sin propietario confirmado requieren revisión operativa |
+| P06-PROVIDER | Token administrativo insuficiente, usuario inexistente, rol inválido, destino privilegiado, atributos/estado/roles y logout | Denegaciones reales; cambio/retirada de roles solo deshabilitado; refresh real rechazado después de logout; sin realm-admin ni credencial administrativa en JWT Soporte |
+| P06-API | Suite backend completa sin red externa | 1133 contabilizadas: **1129 aprobadas, 4 omitidas, 0 fallos** |
+| P06-REAL | Integración acumulada + reinicio + físicas | **72 aprobadas iniciales**, incluidos padres y 13 subtests de 06; **2 tras reinicio, 1 + 2 físicas** |
+| P06-WEB | Frontend completo y calidad | 51 node:test, SSR previo y checks 411/251 aprobados; lint/build exit 0, 564 módulos, chunk 499,08 kB |
+| P06-BROWSER | Negocio/producción/navegación y fixtures previos | 29 + 29, 70 + 70, 243 + 243; authSession/metrics/paymentPin PASS; cero errores JS |
+| P06-SCRIPTS | Generadores y scripts acumulados; sintaxis | 26 pruebas aprobadas; 156 fuentes/scripts y tres tests/helpers nuevos/modificados sin errores |
+
+Las cuatro integraciones omitidas por aislamiento se ejecutaron por separado satisfactoriamente. Los ocho tests focales están incluidos en las 1129 aprobadas; Node cuenta el nuevo fixture como entrada TAP adicional. Los conteos de decisiones HTTP, DOM/SSR y padres TAP mantienen unidades diferentes.
+
+Fallos anteriores: dos arranques agotaron readiness porque el JSON de User Profile incluía un enum DISABLED no aceptado en 26.8.1; se omitió para mantener atributos no declarados deshabilitados. La primera pasada con DDL aplicado cargó el cliente Prisma anterior mediante imports previos; se movió la generación a bootstrap separado. Un fixture de interrupción tenía digest no canónico y se corrigió sin relajar la comparación. Se sustituyó Full Scope Allowed por mappings explícitos del cliente de servicio. La pasada final vuelve a ejecutar todo sin fallos.
+
+Las primitivas administrativas del adaptador son backend privilegiado; sus permisos realm-management no se conceden a Soporte humano. La saga de 06 no establece contraseñas, habilita cuentas ni publica la gestión como completa. R07, infraestructura/offline, aceptación empresarial, retención y recuperación operativa de running interrumpido siguen pendientes. 07 exige autorización expresa; no se reactiva la integración Ubuntu cancelada.

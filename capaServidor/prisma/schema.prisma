@@ -193,7 +193,7 @@ model Tipo_Producto {
 model Usuario {
   id_usuario             Int                     @id @default(autoincrement())
   id_auth0               String                  @unique @db.VarChar(128)
-  correo_usuario         String                  @unique @db.VarChar(255)
+  correo_usuario         String?                 @unique @db.VarChar(255)
   rut_usuario            String?                 @db.VarChar(12)
   nombre_usuario         String?                 @db.VarChar(100)
   apellido_usuario       String?                 @db.VarChar(100)
@@ -216,6 +216,40 @@ model Usuario {
   PinRecoveryChallenge   PinRecoveryChallenge[]
   Registros              Registros[]
   SecurityAuditEvent     SecurityAuditEvent[]
+  ExternalIdentity       ExternalIdentity?
+}
+
+// Additive identity binding; the historical Usuario PK and id_auth0 remain intact.
+model ExternalIdentity {
+  id_external_identity Int     @id @default(autoincrement())
+  provider             String  @db.VarChar(20)
+  issuer               String  @db.VarChar(255)
+  subject              String  @db.VarChar(128)
+  username             String  @db.VarChar(255)
+  user_id              Int     @unique(map: "external_identity_user")
+  Usuario              Usuario @relation(fields: [user_id], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([provider, issuer, subject], map: "external_identity_subject")
+  @@unique([provider, issuer, username], map: "external_identity_username")
+}
+
+// Durable preparation journal. No passwords, PINs, service tokens or secrets.
+model IdentityProvisionOperation {
+  id               String   @id @db.Char(36)
+  issuer           String   @db.VarChar(255)
+  username         String   @db.VarChar(255)
+  payload_digest   String   @db.Char(64)
+  input            Json
+  external_subject String?  @db.VarChar(128)
+  local_user_id    Int?
+  state            String   @db.VarChar(30)
+  revision         Int      @default(0)
+  actor_user_id    Int
+  last_error       String?  @db.VarChar(80)
+  created_at       DateTime @default(now()) @db.DateTime(3)
+  updated_at       DateTime @updatedAt @db.DateTime(3)
+
+  @@unique([issuer, username], map: "identity_provision_username")
 }
 
 model etiqueta {

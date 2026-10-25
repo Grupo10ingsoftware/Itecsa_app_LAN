@@ -110,7 +110,9 @@ test('phase 02: Keycloak 26.8.1 + MySQL real, synthetic Code/PKCE and identity a
   assertIsolatedTarget();
   await ready();
   console.log('Keycloak real disponible; preparando solo la base efimera...');
-  if (process.env.LAB_STAGE !== 'restart') {
+  if (process.env.RUN_KEYCLOAK_ADMIN_INTEGRATION === 'true') {
+    assert.equal(process.env.PHASE06_SCHEMA_PREPARED, 'true', 'Run the isolated phase06 bootstrap before loading Prisma');
+  } else if (process.env.LAB_STAGE !== 'restart') {
     const cli = '/app/tooling/prisma/node_modules/prisma/build/index.js';
     const config = '/app/capaServidor/prisma.config.ts';
     const sql = execFileSync(process.execPath, [cli, 'migrate', 'diff', '--config', config,
@@ -264,6 +266,11 @@ test('phase 02: Keycloak 26.8.1 + MySQL real, synthetic Code/PKCE and identity a
     const { runBusinessRegression } = await import('./fixtures/keycloakBusiness.mjs');
     await t.test('phase 05: business modules with real identity, PIN and SQL',
       async business => runBusinessRegression(business, { db, authenticate, users: LAB_USERS, ...productionContext }));
+  }
+  if (process.env.RUN_KEYCLOAK_ADMIN_INTEGRATION === 'true') {
+    const { runAdministrationRegression } = await import('./fixtures/keycloakAdministration.mjs');
+    await t.test('phase 06: real Keycloak administration and durable preparation',
+      async administration => runAdministrationRegression(administration, { db, authenticate, login, bind, users: LAB_USERS, ...productionContext }));
   }
   assert.equal(auth0Calls, 0);
 });
