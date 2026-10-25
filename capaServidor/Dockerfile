@@ -8,6 +8,7 @@ COPY capaServidor/package*.json ./
 RUN npm ci
 COPY capaServidor/prisma ./prisma
 COPY capaServidor/prisma.config.ts ./
+COPY capaServidor/src/database/connectionConfig.js ./src/database/connectionConfig.js
 RUN npm run prisma:generate
 
 FROM dependencies AS development

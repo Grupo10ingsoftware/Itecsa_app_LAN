@@ -43,6 +43,13 @@ SPA: `http://localhost:5173`; API: `http://localhost:3000/api`. Auth0 debe permi
 | API: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSL_CA_PATH` | Adaptador MariaDB/MySQL con CA y TLS |
 | Prisma CLI: `DATABASE_URL` | Conexión definida en `prisma.config.ts`; debe corresponder a la misma base del runtime |
 
+La API y Prisma CLI validan que `DB_*` y `DATABASE_URL` indiquen el mismo host,
+puerto y nombre de base cuando se configura la URL; pueden usar cuentas
+distintas. Con TLS, ambas configuraciones deben usar la misma CA y la URL debe
+incluir `sslaccept=strict`. Para el laboratorio MySQL con perfiles host y Docker,
+consultar [MySQL de laboratorio](../operacion/MYSQL_LAB_DOCKER.md). El `.env`
+actual de Aiven no requiere cambios.
+
 Guardar la CA local, por ejemplo, en `capaServidor/certs/aiven-ca.pem`. El runtime resuelve rutas relativas de `DB_SSL_CA_PATH` respecto de `capaServidor`; usar una ruta válida para el entorno.
 
 La CLI de Prisma vive en `tooling/prisma`; `npm ci --prefix tooling/prisma` debe ejecutarse antes de `prisma:generate` o `prisma:validate`. La generación no conecta a la base ni aplica migraciones.

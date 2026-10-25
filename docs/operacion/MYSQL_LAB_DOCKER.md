@@ -14,8 +14,8 @@ No iniciar este servicio como parte de los Compose existentes.
    Restringir la lectura del archivo local a sus custodios. No agregarlo a Git.
 2. Crear `deploy/mysql-lab/certs/` fuera de Git con `ca.pem`,
    `server-cert.pem` y `server-key.pem`. El certificado del servidor debe estar
-   firmado por esa CA y tener un SAN DNS para `mysql`, nombre que usara un
-   contenedor conectado a la red. Mantener la clave privada legible solo por
+   firmado por esa CA y tener SAN DNS para `mysql` y SAN IP para `127.0.0.1`.
+   Ambos nombres se usaran en perfiles distintos de la API. Mantener la clave privada legible solo por
    el usuario de MySQL dentro del contenedor y sus custodios en el host. No
    reutilizar la CA ni las credenciales de Aiven.
 3. Confirmar la arquitectura de la maquina y que la imagen fijada esta
@@ -68,10 +68,55 @@ estatica no comprueba disponibilidad de la imagen ni permisos de certificados.
 
 ## Conexion futura de la aplicacion
 
-Una tarea posterior podra unir el servicio API a la red Docker externa
-`itecsa-mysql-lab-private` y configurar su `DB_HOST=mysql`, `DB_PORT=3306`,
-`DB_SSL_MODE=required`, `DB_SSL_CA_PATH` con la CA de este laboratorio,
-`DB_NAME` y credenciales propias. La CLI Prisma usa `DATABASE_URL` por separado:
-antes de cualquier inicializacion habra que verificar que ambas configuraciones
-apuntan a la misma instancia. Este Compose no une la API, no cambia Aiven, no
-crea tablas ni catalogos y no ejecuta migraciones.
+La API y Prisma CLI comparten una validacion estatica del destino. Los perfiles
+del laboratorio son completos e independientes de `capaServidor/.env`:
+
+| Ejecucion | Plantilla para copiar | Direccion MySQL | CA de la API |
+| --- | --- | --- | --- |
+| Computador | `capaServidor/env.mysql-lab.host.example` a `capaServidor/.env.mysql-lab.host` | `127.0.0.1:33307` | Ruta absoluta al `ca.pem` del laboratorio |
+| Contenedor API | `capaServidor/env.mysql-lab.docker.example` a `capaServidor/.env.mysql-lab.docker` | `mysql:3306` | `/run/secrets/mysql-lab-ca.pem` |
+
+Sustituir todos los marcadores, incluidos los secretos no relacionados con MySQL.
+El archivo Docker recibe la CA mediante `compose.api.mysql.lab.yaml`; no copiar
+la clave privada del servidor a la API. La cuenta de Prisma CLI puede diferir
+de la cuenta de la API, pero su URL debe señalar el mismo host, puerto y base.
+Ambas rutas TLS deben usar la misma CA y `sslaccept=strict`. En el computador,
+codificar usuario, clave y ruta absoluta de la CA al escribir `DATABASE_URL`,
+especialmente si la ruta contiene espacios.
+
+La configuracion base de MySQL sigue sin publicar puertos. Solo para pruebas
+desde el computador, el override `compose.mysql.lab.host.yaml` publicara 3306
+en `127.0.0.1:33307` cuando se incluya expresamente como segundo archivo:
+
+```bash
+docker compose --env-file deploy/mysql-lab.env -f compose.mysql.lab.yaml -f compose.mysql.lab.host.yaml config --quiet
+```
+
+El puerto puede ajustarse con `MYSQL_HOST_PORT`; entonces cambiar tambien
+`DB_PORT` y `DATABASE_URL` del perfil host. Para seleccionar ese perfil desde
+`capaServidor`, usar
+`DB_TARGET=mysql-lab-host DOTENV_PATH=.env.mysql-lab.host npm run dev` o
+anteponer ambas variables a un comando Prisma CLI. `DB_TARGET` obliga a usar
+la direccion local incluso si el shell contiene variables antiguas. Si el
+archivo seleccionado falta o no se puede leer, la API y la CLI fallan antes
+de utilizar una conexion. El `.env` actual de Aiven permanece como perfil
+predeterminado cuando no se selecciona otro archivo.
+
+Para ejecutar despues la API en Docker, `compose.api.mysql.lab.yaml` usa el
+perfil Docker indicado por `LAB_API_ENV_FILE=./capaServidor/.env.mysql-lab.docker`,
+monta la CA y se conecta a la red externa `itecsa-mysql-lab-private`. Su red
+Compose predeterminada permite acceder a las demas dependencias de la API.
+Validar ese Compose con `config --quiet` antes de usarlo. No ejecutar la CLI
+Prisma del computador con el perfil Docker: el host `mysql` y su ruta de CA
+solo existen dentro de la red y del contenedor.
+
+```bash
+LAB_API_ENV_FILE=./capaServidor/env.mysql-lab.docker.example docker compose -f compose.api.mysql.lab.yaml config --quiet
+```
+
+La plantilla permite esta comprobacion estatica; para un arranque posterior,
+seleccionar el archivo local `.env.mysql-lab.docker` ya completado.
+
+Estos archivos no crean tablas ni catalogos y no ejecutan migraciones. La
+conexion fisica, los certificados reales y los permisos de una eventual cuenta
+CLI distinta se validaran en la siguiente tarea.

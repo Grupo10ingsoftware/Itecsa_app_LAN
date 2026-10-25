@@ -3,6 +3,9 @@
 import "dotenv/config";
 // La CLI vive fuera del runtime; instalar primero tooling/prisma.
 import { defineConfig } from "../tooling/prisma/node_modules/prisma/config.js";
+import { resolveDatabaseConnection } from "./src/database/connectionConfig.js";
+
+resolveDatabaseConnection(process.env, { allowUnconfigured: true, requireUrl: true });
 
 export default defineConfig({
   schema: "prisma/schema.prisma",

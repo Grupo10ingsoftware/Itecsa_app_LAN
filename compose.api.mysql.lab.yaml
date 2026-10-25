@@ -1,0 +1,30 @@
+name: itecsa-api-mysql-lab
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: capaServidor/Dockerfile
+      target: development
+    env_file: ${LAB_API_ENV_FILE:?Definir LAB_API_ENV_FILE con el perfil Docker local}
+    environment:
+      DB_TARGET: mysql-lab-docker
+    secrets:
+      - source: mysql_lab_ca
+        target: mysql-lab-ca.pem
+    ports:
+      - "127.0.0.1:${LAB_API_PORT:-3001}:3000"
+    networks:
+      - default
+      - mysql_private
+    init: true
+    stop_grace_period: 15s
+
+networks:
+  mysql_private:
+    name: itecsa-mysql-lab-private
+    external: true
+
+secrets:
+  mysql_lab_ca:
+    file: ./deploy/mysql-lab/certs/ca.pem

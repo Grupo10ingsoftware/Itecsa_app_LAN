@@ -5,6 +5,7 @@ import { registerShutdown } from './shutdown.js';
 import pinService from "../modules/auth/service/pin.service.js";
 import { resolveEnvironmentConfig } from "../config/environment.js";
 import { currentAppEnvironment } from "../config/environment.js";
+import { resolveDatabaseConnection } from "../database/connectionConfig.js";
 import { safeLogger } from "../shared/safeLogger.js";
 import { startTemporaryDataCleanup } from "../modules/security/service/temporaryDataCleanup.service.js";
 import { resolveIdentityConfiguration } from '../config/identity.js';
@@ -19,6 +20,7 @@ const requiredEnvironmentVariables = [
 
 function validateEnvironment() {
     resolveEnvironmentConfig(process.env);
+    resolveDatabaseConnection(process.env, { allowUnconfigured: true });
 
     const appEnvironment = currentAppEnvironment({ required: true });
     resolveIdentityConfiguration(process.env);
