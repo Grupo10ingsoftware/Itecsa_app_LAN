@@ -8,7 +8,11 @@ COPY capaServidor/package*.json ./
 RUN npm ci
 COPY capaServidor/prisma ./prisma
 COPY capaServidor/prisma.config.ts ./
-RUN npm run prisma:generate
+# The CLI detects its TLS platform during generation and the development predev hook.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && npm run prisma:generate
 
 FROM dependencies AS development
 COPY --chown=node:node capaServidor/src ./src
@@ -19,7 +23,7 @@ RUN chown -R node:node /app
 USER node
 ENV APP_ENV=development NODE_ENV=development PORT=3000
 EXPOSE 3000
-CMD ["npm", "run", "dev", "--", "--signal", "SIGTERM", "--watch", "src", "--watch", "../shared", "--watch", "data/demo", "--ext", "js,json"]
+CMD ["npm", "run", "dev"]
 
 FROM dependencies AS production-dependencies
 RUN npm prune --omit=dev

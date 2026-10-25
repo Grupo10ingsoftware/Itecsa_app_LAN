@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/app/app.js",
+    "predev": "npm run prisma:generate",
     "dev": "nodemon src/app/dev.js",
     "prisma:pull": "node ../tooling/prisma/node_modules/prisma/build/index.js db pull",
     "prisma:generate": "node ../tooling/prisma/node_modules/prisma/build/index.js generate",
@@ -15,6 +16,11 @@
     "pin:retention:preview": "node scripts/previewPinRecoveryRetention.mjs",
     "retention:preview": "node scripts/previewBusinessRetention.mjs",
     "prisma:studio": "node ../tooling/prisma/node_modules/prisma/build/index.js studio"
+  },
+  "nodemonConfig": {
+    "watch": ["src", "../shared", "data/demo", ".env"],
+    "ext": "js,mjs,cjs,json,env",
+    "signal": "SIGTERM"
   },
   "keywords": [],
   "author": "",

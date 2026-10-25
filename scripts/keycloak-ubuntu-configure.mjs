@@ -162,8 +162,8 @@ async function main() {
   patchEnv('capaServidor/.env', { AUTH_PROVIDER: 'keycloak', KEYCLOAK_ALLOW_HTTP: 'true',
     KEYCLOAK_ISSUER: contract.issuer, KEYCLOAK_AUDIENCE: contract.audience,
     KEYCLOAK_CLIENT_ID: contract.clientId, KEYCLOAK_ROLE_CLIENT_ID: contract.roleClientId,
-    KEYCLOAK_JWKS_URI: 'http://host.docker.internal:18080/realms/itecsa/protocol/openid-connect/certs',
-    KEYCLOAK_ADMIN_TRANSPORT_ORIGIN: 'http://host.docker.internal:18080',
+    KEYCLOAK_JWKS_URI: contract.issuer + '/protocol/openid-connect/certs',
+    KEYCLOAK_ADMIN_TRANSPORT_ORIGIN: new URL(contract.issuer).origin,
     KEYCLOAK_ADMIN_CLIENT_ID: contract.adminClientId, KEYCLOAK_ADMIN_CLIENT_SECRET: secret.value,
     IDENTITY_PREPARATION_ENABLED: 'true', FRONTEND_ORIGIN: contract.origin });
   patchEnv('capaVista/.env', { VITE_AUTH_PROVIDER: 'keycloak', VITE_KEYCLOAK_URL: base,

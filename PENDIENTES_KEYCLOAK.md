@@ -2,6 +2,60 @@
 
 Estado del código al 25-10-2026. La aplicación admite únicamente Keycloak. Este documento distingue lo conectado de los flujos que faltan; no habilita operaciones administrativas adicionales.
 
+## Arranque reproducible de desarrollo
+
+El acceso del navegador es **http://127.0.0.1:5173/kanban**, tanto con Node local como con Docker Desktop. Vite anuncia ese enlace, mantiene el puerto 5173 y redirige `localhost:5173` antes de cargar la aplicación. No se usan las IP internas de contenedores como enlaces de acceso. Si el puerto está ocupado, Vite termina con error en lugar de pasar a 5174 y romper los redirects registrados.
+
+Cada desarrollador necesita sus dependencias locales, los `.env` privados autorizados, el certificado CA indicado por `DB_SSL_CA_PATH` y acceso al mismo Keycloak mediante el túnel local 127.0.0.1:18080. No se incluyen secretos en Git ni se copian cuentas o bases de datos. El cliente `itecsa-web` debe conservar redirects y logout `http://127.0.0.1:5173/*`, web origin `http://127.0.0.1:5173` y PKCE S256. El contrato reproducible está en `scripts/keycloak-ubuntu-contract.mjs`; no ejecutar el configurador para un simple arranque.
+
+Con acceso de red y SSH autorizado al pivote, mantener esta terminal abierta (autenticarse por el mecanismo privado asignado, sin guardar contraseñas en comandos):
+
+```powershell
+ssh -N -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 127.0.0.1:18080:10.20.30.10:8080 pivotadmin@100.105.202.35
+```
+
+No abrir otro túnel si 18080 ya está ocupado por el correcto. Comprobar `http://127.0.0.1:18080/realms/itecsa/.well-known/openid-configuration`: debe responder y declarar ese mismo origen y realm en issuer. El comando no crea usuarios ni modifica el servidor Ubuntu.
+
+Preparación inicial para Node, desde la raíz (Node 22.12+ o 24 LTS y npm, según los requisitos de las herramientas instaladas):
+
+```powershell
+npm ci --prefix tooling/prisma
+npm ci --prefix capaServidor
+npm ci --prefix capaVista
+```
+
+Si faltan los `.env`, partir de `capaServidor/env.example` y `capaVista/env.example` y completar los datos privados con el responsable. No sobrescribir archivos existentes ni generar un PIN_SECRET nuevo al usar la misma base. Mantener issuer y JWKS locales en 127.0.0.1; no colocar `host.docker.internal` en las URLs del navegador ni en la configuración local de Node. Compose selecciona ese transporte únicamente dentro de la API Docker.
+
+Con el túnel accesible, abrir dos terminales desde la raíz:
+
+```powershell
+# Terminal 1
+cd capaServidor
+npm run dev
+```
+
+```powershell
+# Terminal 2
+cd capaVista
+npm run dev
+```
+
+`npm run dev` del servidor genera Prisma Client antes de iniciar nodemon; no aplica migraciones ni consulta MySQL. Nodemon vigila las mismas fuentes, shared, fixtures y .env en ambos modos. Reiniciar Vite si cambia su .env. La API solo informa arranque después del evento listening; si 3000 está ocupado informa `EADDRINUSE`, sin anunciar un inicio correcto. La configuración privada de DB, PIN y cliente técnico sigue siendo necesaria para las funciones correspondientes.
+
+Alternativa con Docker Desktop, desde la raíz y con los procesos Node locales detenidos:
+
+```powershell
+docker compose up --build --watch
+```
+
+Compose publica web y API solo en loopback. Vite escucha 0.0.0.0 dentro del contenedor para que la publicación funcione; esa dirección no es la URL que se abre. No ejecutar ambos modos simultáneamente: comparten 5173 y 3000. Para pasar de Docker a Node, detener los servicios con `docker compose stop api web`; no borrar volúmenes ni la base. Al cambiar schema o dependencias, reconstruir la imagen.
+
+Comprobación manual: ambos modos deben anunciar el mismo enlace; abrir `http://localhost:5173/kanban` debe terminar en `http://127.0.0.1:5173/kanban` antes del login; `http://127.0.0.1:3000/api/health/live` debe responder 200. Después comprobar ingreso, recarga y logout con la cuenta propia. La salud pública no consulta MySQL ni acredita el funcionamiento de los flujos administrativos pendientes.
+
+Verificado en este ajuste: lint y build, generación e importación del cliente Prisma local, schema válido, arranque Node y Docker, preview, puerto ocupado, redirección con ruta y query, rechazo de IP interna como enlace de acceso, CORS limitado al origen acordado, rutas protegidas sin token y conexión WebSocket de HMR en ambos modos. Se contrastaron los `.env` privados sin imprimir secretos y el contrato reproducible. Desde la API Docker se comprobó salud y descarga de claves públicas por host.docker.internal, conservando el issuer 127.0.0.1. Se comprobó conexión TLS a MySQL con SELECT 1 y presencia de vínculos Keycloak mediante un conteo, sin devolver datos personales. Esto no revisa individualmente todos los vínculos. No se inició sesión con una cuenta real ni se ejecutaron escrituras de negocio en esta comprobación. La imagen de desarrollo incluye OpenSSL y certificados del sistema para la detección de plataforma de Prisma CLI.
+
+Este esquema permite a cada desarrollador ejecutar su copia en su propio equipo con el mismo origen local. Para que varios equipos abran una única instancia por LAN hace falta un origen HTTPS/DNS compartido y registrarlo coherentemente en SPA, API y Keycloak. No basta con exponer Vite por HTTP en una IP LAN; no se desactivan PKCE ni el iframe de sesión.
+
 ## Alcance conectado
 
 - SPA pública con Authorization Code, PKCE S256, tokens en memoria, iframe de sesión, renovación, recarga y logout.
@@ -48,7 +102,7 @@ Se retiraron excepciones del scanner ligadas a rutas eliminadas. El escaneo de h
 
 La compilación y las comprobaciones con dobles no sustituyen aceptación de usuarios vinculados, PIN bajo concurrencia MySQL, preparación y revocación en el entorno autorizado. No se recrean laboratorios ni se modifica Aiven o el realm para comprobar este retiro.
 
-Comprobaciones del retiro: lint y build de la SPA; validación del schema y generación de un cliente Prisma en salida temporal; comparación exacta de nueve roles y 225 decisiones de permisos; JWT firmados localmente con casos de firma, expiración, issuer, audience, cliente y roles incorrectos; resolución por vínculo, bloqueo de PIN y revalidación del actor; contratos de sesión, preparación y consultas de movimientos de la SPA. Son verificaciones locales con dobles y endpoints locales temporales, sin usuarios ni base de datos adicionales. No se añadieron suites al repositorio ni se sustituyeron las fuentes del servicio activo.
+Comprobaciones del retiro: lint y build de la SPA; validación del schema y generación de un cliente Prisma en salida temporal; comparación exacta de nueve roles y 225 decisiones de permisos; JWT firmados localmente con casos de firma, expiración, issuer, audience, cliente y roles incorrectos; resolución por vínculo, bloqueo de PIN y revalidación del actor; contratos de sesión, preparación y consultas de movimientos de la SPA. Fueron verificaciones locales con dobles y endpoints locales temporales, sin usuarios ni base de datos adicionales. En esa comprobación inicial no se añadieron suites ni se sustituyeron las fuentes activas. La posterior unificación del arranque utiliza los mismos servicios de desarrollo existentes, con sus imágenes reconstruidas; no crea un laboratorio de datos.
 
 Mantener el origen local 127 y el iframe elegidos. Faltan aceptación prolongada en varios navegadores/pestañas, tratamiento de refresh concurrente y logout remoto, HTTPS/DNS/CA/NTP compartidos y operación productiva. H2/start-dev y el túnel siguen siendo condiciones de desarrollo; no una recomendación de producción.
 
