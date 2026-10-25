@@ -135,7 +135,7 @@ export class KeycloakIdentityAdministrationService {
       const verified = await this.management.getUser(external.id);
       if (!matchesPreparation(verified, operation)) reject('IDENTITY_EXTERNAL_OUTCOME_UNKNOWN');
       if (await this.authorize(context) !== actorId) reject('IDENTITY_ADMIN_FORBIDDEN', 403);
-      return result(await this.repository.complete(operation, external.id, actorId, context.subject));
+      return result(await this.repository.complete(operation, external.id, actorId, context.subject, context.role));
     } catch (error) {
       const code = error instanceof IdentityAdministrationError || error instanceof KeycloakServiceError ? error.code
         : error?.code === 'IDENTITY_ACTOR_CHANGED' ? 'IDENTITY_ADMIN_FORBIDDEN' : 'IDENTITY_STORAGE_UNAVAILABLE';

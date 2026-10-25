@@ -14,14 +14,14 @@ export const ROLES = Object.freeze({
   SOPORTE: 'Soporte',
 });
 export const RECOGNIZED_ROLES = Object.freeze(Object.values(ROLES));
-export const ADMIN_ROLES = Object.freeze([ROLES.SOPORTE]);
+export const ADMIN_ROLES = Object.freeze([ROLES.SOPORTE, ROLES.DESARROLLADOR]);
 export const PRIVILEGED_ROLES = Object.freeze([ROLES.GERENCIA, ROLES.DESARROLLADOR, ROLES.SOPORTE]);
 export const ASSIGNABLE_ROLES = Object.freeze(FUNCTIONAL_ROLES.filter(role => !PRIVILEGED_ROLES.includes(role)));
 
 const withoutUserManagement = permissions => Object.freeze(permissions.filter(p => p !== PERMISSIONS.MANAGE_USERS));
 export const ROLE_PERMISSIONS = Object.freeze({
   ...Object.fromEntries(FUNCTIONAL_ROLES.map(role => [role, withoutUserManagement(LEGACY_ROLE_PERMISSIONS[role])])),
-  [ROLES.DESARROLLADOR]: withoutUserManagement(LEGACY_ROLE_PERMISSIONS[LEGACY_ROLES.SOPORTE]),
+  [ROLES.DESARROLLADOR]: Object.freeze([...LEGACY_ROLE_PERMISSIONS[LEGACY_ROLES.SOPORTE]]),
   [ROLES.SOPORTE]: Object.freeze([
     PERMISSIONS.READ_PROFILE, PERMISSIONS.MANAGE_PIN,
     PERMISSIONS.READ_MESSAGES, PERMISSIONS.UPDATE_MESSAGES, PERMISSIONS.MANAGE_USERS,
@@ -46,7 +46,7 @@ export function can(role, permissions, permission) {
 
 const NO_ROLES = Object.freeze([]);
 export function manageableRoles(role) {
-  return role === ROLES.SOPORTE ? ASSIGNABLE_ROLES : NO_ROLES;
+  return ADMIN_ROLES.includes(role) ? ASSIGNABLE_ROLES : NO_ROLES;
 }
 
 // Role scope only. A future administrative endpoint must ALSO validate actor/target

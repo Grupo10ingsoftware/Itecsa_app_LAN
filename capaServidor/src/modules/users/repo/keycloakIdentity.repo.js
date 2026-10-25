@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import getPrismaClient from '../../../database/prisma.js';
 import { isActiveUserStatus, ACTIVE_USER_STATUSES, USER_STATUS } from '../../../config/userLifecycle.js';
-import { ROLES, ASSIGNABLE_ROLES } from '../../../../../shared/keycloakAuthorization.js';
+import { ADMIN_ROLES, ASSIGNABLE_ROLES } from '../../../../../shared/keycloakAuthorization.js';
 import { USER_RESPONSE_SELECT, UserRepository } from './users.repo.js';
 
 // New-provider persistence is independent of the legacy Auth0 repository.
@@ -83,10 +83,11 @@ export class KeycloakIdentityRepository {
         outcome: terminal ? 'rejected' : 'pending', reason_code: code } });
     });
   }
-  async complete(operation, subject, actorId, actorSubject) {
+  async complete(operation, subject, actorId, actorSubject, actorRole) {
     return this.client.$transaction(async tx => {
       const actors = await tx.$queryRaw`SELECT id_auth0, rol_usuario, estado_usuario FROM Usuario WHERE id_usuario=${actorId} FOR UPDATE`;
-      if (actors[0]?.id_auth0 !== actorSubject || actors[0]?.rol_usuario !== ROLES.SOPORTE || !isActiveUserStatus(actors[0]?.estado_usuario)) {
+      if (actors[0]?.id_auth0 !== actorSubject || actors[0]?.rol_usuario !== actorRole
+        || !ADMIN_ROLES.includes(actorRole) || !isActiveUserStatus(actors[0]?.estado_usuario)) {
         throw Object.assign(Error('El actor cambio durante la preparacion.'), { code: 'IDENTITY_ACTOR_CHANGED' });
       }
       const input = operation.input;

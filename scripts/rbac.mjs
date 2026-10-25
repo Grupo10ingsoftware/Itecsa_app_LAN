@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { BUSINESS_PERMISSIONS, ROLE_PERMISSIONS, ROLES, RECOGNIZED_ROLES, ROLES_CLAIM } from '../shared/authorization.js';
+import { BUSINESS_PERMISSIONS, ROLE_PERMISSIONS, RECOGNIZED_ROLES, ROLES_CLAIM } from '../shared/authorization.js';
 export const audience = 'https://api.itecsa.local';
 export const requirements = {
  'read:own-profile':'RF04, RF10', 'manage:own-pin':'RF06–07', 'read:orders':'RF17–18, RF20, RF23, RF32, RF64–68',
@@ -44,19 +44,6 @@ if(process.argv[1] === fileURLToPath(import.meta.url)) {
  if(command==='--generate') {
   writeFileSync(new URL('../docs/auth0/rbac.expected.json',import.meta.url),JSON.stringify(expected,null,2)+'\n');
   writeFileSync(new URL('../docs/auth0/itecsa-post-login.cjs',import.meta.url),actionCode);
-  const lines=['# Asignación manual de permisos ITECSA','', 'Generado desde `shared/authorization.js` con `node scripts/rbac.mjs --generate`. No editar las listas a mano en este archivo.','',
-  '**API:** ITECSA API · **Identifier:** `https://api.itecsa.local`.', '',
-  'En Auth0: User Management → Roles → elegir rol → Permissions → Add Permissions → ITECSA API. Asignar exactamente la lista del rol. Los nombres técnicos usan `Produccion` sin tilde.', '',
-  'No seleccionar Auth0 Management API. No conceder permisos directos adicionales a usuarios. Cada usuario debe tener exactamente un rol ITECSA y coincidir con su registro interno. Soporte se asigna únicamente por el equipo técnico.', '',
-  'Esta matriz describe la configuración esperada del código. La evidencia del tenant se registra por separado con fecha y commit en [la auditoría histórica](../archivo/auditorias/AUDITORIA-2026-09-25.md); consultar [la guía vigente](README.md). Generar este archivo no verifica Auth0.', '',
-  `El catálogo contiene ${BUSINESS_PERMISSIONS.length} permisos funcionales. Soporte recibe los ${BUSINESS_PERMISSIONS.length}; nunca scopes de Management API. Renovar las sesiones después de cambiar asignaciones.`, '',
-  'Kanban usa read:orders y Pagos usa read:payments. view:kanban-module y view:payments-module son permisos retirados. Guardar carga operativa acepta manage:production-load o manage:production-capacity.', '',
-  'En Applications → APIs → ITECSA API, verificar RS256, Enable RBAC y Add Permissions in the Access Token. Verificar la Action vinculada a Post Login y el claim https://itecsa.local/roles.', ''];
-  for(const [role,permissions] of Object.entries(ROLE_PERMISSIONS)) {
-   lines.push('## '+role,'',role===ROLES.SOPORTE?`Rol técnico de desarrollo/testing. Todos los **${BUSINESS_PERMISSIONS.length} permisos funcionales**; conserva PIN y reglas de estado. No se ofrece en formularios.`:'Rol funcional. Mínimo privilegio según requisitos vigentes.','',...permissions.map(p=>'- `'+p+'`'),'');
-  }
-  lines.push('## Trazabilidad del catálogo','','| Permission | Justificación / condición |','| --- | --- |',...BUSINESS_PERMISSIONS.map(p=>'| `'+p+'` | '+requirements[p]+' |'),'');
-  writeFileSync(new URL('../docs/auth0/RBAC-PERMISOS-POR-ROL.md',import.meta.url),lines.join('\n'));
  } else if(command==='--check') {
   const differences=compare(JSON.parse(readFileSync(process.argv[3],'utf8')));
   console.log(differences.length?differences.join('\n'):'API, roles y Action coinciden con el modelo esperado.');process.exitCode=differences.length?1:0;

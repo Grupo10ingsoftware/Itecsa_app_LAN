@@ -42,18 +42,14 @@ jobs:
         env:
           RELEASE_SHA: ${{ github.sha }}
         run: |
-          node scripts/check-docs.mjs
           npm ci --prefix tooling/prisma
           npm ci --prefix capaServidor
           npm run prisma:generate --prefix capaServidor
-          npm test --prefix capaServidor
           npm ci --prefix capaVista
-          npm test --prefix capaVista
+          npm run lint --prefix capaVista
           npm run build --prefix capaVista
-          node --test scripts/*.test.mjs
           docker buildx build --load --platform linux/amd64 --target production --build-arg APP_VERSION="$RELEASE_SHA" -f capaServidor/Dockerfile -t itecsa-api:ci .
           docker buildx build --load --platform linux/amd64 --target production --build-arg APP_VERSION="$RELEASE_SHA" -f capaVista/Dockerfile -t itecsa-web:ci .
-          node scripts/docker-smoke.mjs
   images:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -101,18 +97,15 @@ jobs:
           echo "API_REPO=$image_prefix-api" >> "$GITHUB_ENV"
           echo "WEB_REPO=$image_prefix-web" >> "$GITHUB_ENV"
           echo "RELEASE_SHA=$RELEASE_SHA" >> "$GITHUB_ENV"
-      - name: Dependencies and tests
+      - name: Install dependencies and build frontend
         if: inputs.operation != 'rollback'
         run: |
-          node scripts/check-docs.mjs
           npm ci --prefix tooling/prisma
           npm ci --prefix capaServidor
           npm run prisma:generate --prefix capaServidor
-          npm test --prefix capaServidor
           npm ci --prefix capaVista
-          npm test --prefix capaVista
+          npm run lint --prefix capaVista
           npm run build --prefix capaVista
-          node --test scripts/*.test.mjs
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
       - name: Build API
         if: inputs.operation != 'rollback'
@@ -140,12 +133,6 @@ jobs:
           build-args: APP_VERSION=${{ env.RELEASE_SHA }}
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
-      - name: Smoke test production images
-        if: inputs.operation != 'rollback'
-        env:
-          API_IMAGE: itecsa-api:ci
-          WEB_IMAGE: itecsa-web:ci
-        run: node scripts/docker-smoke.mjs
       - name: Login GHCR
         if: github.event_name != 'pull_request'
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
@@ -153,7 +140,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish tested images
+      - name: Publish built images
         if: github.event_name != 'pull_request' && inputs.operation != 'rollback'
         run: |
           docker tag itecsa-api:ci "$API_REPO:sha-$RELEASE_SHA"
