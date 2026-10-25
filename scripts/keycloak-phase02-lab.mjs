@@ -19,8 +19,9 @@ const docker = (...args) => execFileSync('docker', args, { encoding: 'utf8', tim
 
 async function main() {
   const production = process.argv.slice(2).includes('--production');
-  assert.deepEqual(process.argv.slice(2), production ? ['--run', '--production'] : ['--run'],
-    'Uso: node scripts/keycloak-phase02-lab.mjs --run [--production]');
+  const business = process.argv.slice(2).includes('--business');
+  assert.deepEqual(process.argv.slice(2), business ? ['--run', '--production', '--business'] : production ? ['--run', '--production'] : ['--run'],
+    'Uso: node scripts/keycloak-phase02-lab.mjs --run [--production [--business]]');
   for (const image of Object.values(images)) docker('image', 'inspect', image);
   const suffix = randomUUID().slice(0, 8);
   const label = `itecsa.phase02.lab=${suffix}`;
@@ -61,6 +62,7 @@ async function main() {
       KEYCLOAK_AUDIENCE: LAB.audience, KEYCLOAK_JWKS_URI: LAB.issuer + '/protocol/openid-connect/certs',
       RUN_KEYCLOAK_REAL_INTEGRATION: 'true', DB_HOST: 'phase02-mysql', DB_PORT: '3306',
       RUN_KEYCLOAK_PRODUCTION_INTEGRATION: String(production),
+      RUN_KEYCLOAK_BUSINESS_INTEGRATION: String(business),
       CURSOR_SECRET: 'Synthetic-Cursor-Phase04-Only-Not-Corporate',
       DB_USER: 'phase02_test', DB_PASSWORD: 'Synthetic-DB-Phase02-Only', DB_NAME: 'itecsa_identity_phase02_test',
       DB_SSL_MODE: 'disabled', DATABASE_URL: 'mysql://phase02_test:Synthetic-DB-Phase02-Only@phase02-mysql:3306/itecsa_identity_phase02_test',

@@ -254,10 +254,16 @@ test('phase 02: Keycloak 26.8.1 + MySQL real, synthetic Code/PKCE and identity a
       code: authorization.code, code_verifier: randomBytes(32).toString('base64url') });
     assert.equal(response.status, 400);
   });
+  let productionContext;
   if (process.env.RUN_KEYCLOAK_PRODUCTION_INTEGRATION === 'true') {
     const { runProductionRegression } = await import('./fixtures/keycloakProduction.mjs');
     await t.test('phase 04: productive flows with real identity, PIN, repositories and transactions',
-      async production => runProductionRegression(production, { db, authenticate, login, bind, users: LAB_USERS }));
+      async production => { productionContext = await runProductionRegression(production, { db, authenticate, login, bind, users: LAB_USERS }); });
+  }
+  if (process.env.RUN_KEYCLOAK_BUSINESS_INTEGRATION === 'true') {
+    const { runBusinessRegression } = await import('./fixtures/keycloakBusiness.mjs');
+    await t.test('phase 05: business modules with real identity, PIN and SQL',
+      async business => runBusinessRegression(business, { db, authenticate, users: LAB_USERS, ...productionContext }));
   }
   assert.equal(auth0Calls, 0);
 });

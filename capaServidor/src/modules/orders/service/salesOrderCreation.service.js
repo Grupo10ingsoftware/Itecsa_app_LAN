@@ -1,6 +1,7 @@
 import { createLineSnapshots } from "./salesOrder.snapshot.js";
 import { SalesOrderError } from "./salesOrder.errors.js";
 import { validateCreateSalesOrder, validateSalesNoteSource } from "./salesOrder.validator.js";
+import { isUniqueConstraint } from '../../../database/uniqueConstraint.js';
 
 export const DUPLICATE_SALES_NOTE_MESSAGE =
   "Esta Nota de Venta ya fue registrada en el sistema y no puede volver a ingresarse.";
@@ -176,10 +177,7 @@ export default class SalesOrderCreationService {
         itemsSinSeguimientoProductivo: createdUntrackedItems,
       };
     }).catch((error) => {
-      const target = error?.meta?.target;
-      if (error?.code === "P2002" && (target === "Pedidos_numero_nota_venta_UNIQUE"
-        || target === "numero_nota_venta"
-        || (Array.isArray(target) && target.length === 1 && target[0] === "numero_nota_venta"))) {
+      if (isUniqueConstraint(error, { model: 'Pedidos', index: 'Pedidos_numero_nota_venta_UNIQUE', field: 'numero_nota_venta' })) {
         throw new SalesOrderError(DUPLICATE_SALES_NOTE_MESSAGE, 409);
       }
       throw error;

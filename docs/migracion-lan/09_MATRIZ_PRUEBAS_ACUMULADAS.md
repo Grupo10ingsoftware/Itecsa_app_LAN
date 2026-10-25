@@ -1,6 +1,6 @@
 # Matriz de pruebas acumuladas
 
-Fecha: **24-10-2026**. Las secciones iniciales conservan la evidencia histórica 00–01 sobre `34dfd7c09f876285c1ea84d9020a44a1414ba468`. La actualización 02 al final parte de `66a75c07e70004f4f83fa015ffe7ab828aa9e9f6` y actualiza los pendientes que sí fueron ensayados. Reproducción: [08](08_EVIDENCIA_FASES_00_01.md), [10](10_EVIDENCIA_Y_CONFIGURACION_FASE_02.md). Matriz: [07](07_DECISIONES_APROBADAS.md).
+Fecha de actualización: **25-10-2026**. Las secciones iniciales conservan la evidencia histórica 00–01 sobre `34dfd7c09f876285c1ea84d9020a44a1414ba468`. Las actualizaciones posteriores registran lo ensayado en cada fase; 05 parte de `e74a9142a8fc4dda00bf8c14bce07bf4f1557ad3`. Reproducción: [08](08_EVIDENCIA_FASES_00_01.md), [10](10_EVIDENCIA_Y_CONFIGURACION_FASE_02.md), [13](13_EVIDENCIA_Y_VERIFICACION_FASE_05.md). Matriz: [07](07_DECISIONES_APROBADAS.md).
 
 ## Ejecuciones conservadas
 
@@ -146,3 +146,31 @@ El equipo pidió commit de 03 y avance a 04. Las evidencias anteriores permanece
 Las cuatro integraciones omitidas del script general tienen ahora ejecución separada aprobada: identidad Keycloak y las tres físicas MySQL. No se activan simultáneamente sobre una base compartida. R01–R03 quedan cubiertas en laboratorio, pendiente validación del entorno de destino; no se reescriben sus resultados históricos de 00–03. R07, R08–R10 y aceptación empresarial mantienen sus límites.
 
 El primer laboratorio productivo detectó realmente la pérdida del destinatario de revisión (0 mensajes frente a 1 esperado). El test unitario nuevo reprodujo el defecto antes de corregirlo. Otra pasada general encontró el doble antiguo de repositorio incompleto; se adaptó a la lectura real conservando la misma expectativa. El primer arranque físico falló por negociación RSA de MySQL, corregido únicamente en la preparación del laboratorio. Estos fallos no se presentan como éxitos retrospectivos.
+
+## Actualización de fase 05 sobre e74a914
+
+La instrucción «ya ahora seguimos con la fase 5» autoriza esta ejecución. Procedimiento, archivos, fallos previos y límites: [13](13_EVIDENCIA_Y_VERIFICACION_FASE_05.md). Las cifras previas conservan su contexto histórico.
+
+| ID | Verificación nueva / acumulada | Resultado |
+|---|---|---|
+| P05-ROLES | 15 operaciones × nueve roles con JWT, PIN y SQL reales | 135 decisiones: 69 permitidas, 66 denegadas; incluye ventas, pagos, historial, métricas, mensajes, verify y debug PIN denegado |
+| P05-SALES | Fuente sintética aislada, actor, destinatarios, reevaluación, duplicados y concurrencia | Actor autenticado, responsable original; carrera con cliente nuevo y existente devuelve 201/409 y un pedido; fallo de mensaje revierte creación |
+| P05-PAYMENTS | Pago ordinario y revisión por capacidad, PIN y concurrencia | AC/OC/D operan pendiente; solo AC/D revisan resuelto; PIN ausente 400/ajeno 403; un registro concurrente; rollback de pago/auditoría ante fallo de mensaje |
+| P05-HISTORY | Restricciones financieras, actor, dos páginas y cursor inválido | Solo Cobranzas/D recibe observaciones financieras; original no se reasigna; cursor siguiente sin repetir evento; inválido 400 |
+| P05-METRICS | Agregado SQL conocido y validación de fechas | AP/G/D: 17 unidades en rango aislado; fecha imposible 400; otros roles 403 |
+| P05-MESSAGES | Propiedad, lectura, ocultación de notificación ajena y limpieza de propias | Operaciones ajenas 404; Soporte conserva sus mensajes; destinatarios automáticos AP/AC comprobados contra filas locales |
+| P05-CONTACT | Verify local, privacidad e incidentes | Correo local validado KC; Auth0 conserva claim. Canal apagado 503 y contacto ajeno 400. Con entrega externa doblada: SQL real, deduplicación y actor local |
+| P05-NEGATIVE | Ausencia/token inválido y fuente indisponible | 401/401; Ventas 503 y Soporte 403 sin nuevos pedidos |
+| P05-UNIT | Conflictos por índice/modelo, error desconocido y correo por proveedor | Cuatro pruebas focales nuevas aprobadas; las dos de conflicto fallaron antes de corregir producción |
+| P05-API | Suite completa backend sin red | 1124 contabilizadas: 1120 aprobadas, 4 omitidas, 0 fallos |
+| P05-REAL | Integración inicial acumulada + reinicio + físicas originales | 58 aprobadas iniciales, 2 tras reinicio y 1 + 2 físicas. Los 58 incluyen padres y 17 subtests de negocio de 05 |
+| P05-WEB | Suite frontend y SSR | 51 node:test; 411 checks de navegación y 251 de identidad, junto al SSR previo: aprobados |
+| P05-BROWSER | Pagos por nueve roles, cambio de sujeto y contacto del formulario | 29 checks a 1440×1000 y 29 a 390×844; respuesta pendiente de sujeto anterior no contamina el nuevo; cero errores JS |
+| P05-REG-BROWSER | Producción, navegación y tres fixtures originales | 70 + 70 y 243 + 243 checks; authSession, metrics y paymentPin PASS |
+| P05-QUALITY | Scripts, lint, build y sintaxis | 25 pruebas de scripts; lint/build exit 0; 564 módulos, chunk 499,08 kB; 148 fuentes/scripts y cuatro tests/helpers sin errores |
+
+Las cuatro integraciones omitidas en la suite sin red se ejecutaron separadamente y pasaron. No se suman TAP, decisiones HTTP y checks DOM/SSR como una unidad única. El backend cuenta además el nuevo módulo fixture como entrada TAP sin assertions propias: el cambio de 1119 a 1124 no significa cinco pruebas focales nuevas.
+
+Fallos previos: revelación de PIN ya acusado rechazada correctamente; se reutilizó el PIN legítimo en memoria sin resetearlo. Se corrigieron expectativas de destinatarios adicionales válidos y del 400 por PIN ausente. Se completó una prop del fixture y se retiró un import sin uso. El navegador reprodujo mensajes del sujeto anterior antes del arreglo del encabezado. La carrera real de cliente devolvió 500 por P2002 del índice RUT; se corrigió a 409. La documentación distingue estos errores de preparación de los defectos de producto.
+
+R01–R03 conservan cobertura física de laboratorio; R04–R06 conservan límites del destino real. R07 sigue abierto; R08–R10 y aceptación offline/empresarial siguen pendientes. En privacidad/incidentes se dobla exclusivamente la entrega externa: no se acredita Resend operativo sin Internet. La fase 06 no se inicia automáticamente.

@@ -113,7 +113,9 @@ export function createVerifyAuthSessionHandler({
                     rutUsuario: req.currentUser.rutUsuario,
                     estadoUsuario: req.currentUser.estadoUsuario,
                 } : {}),
-                email: typeof email === 'string' && email.trim() ? email : null,
+                email: req.identityProvider === 'keycloak'
+                    ? req.currentUser?.correoUsuario?.trim() || null
+                    : typeof email === 'string' && email.trim() ? email : null,
                 rolUsuario,
                 isAdministrador: rolUsuario === ROLES.ADMINISTRADOR,
                 permissions,

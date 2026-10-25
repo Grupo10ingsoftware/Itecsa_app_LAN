@@ -205,4 +205,5 @@ export async function runProductionRegression(t, { db, authenticate, login, bind
     }
   });
   console.log('PHASE04_PRODUCTION:EXECUTED roles=9 operations=18 decisions=162 realPIN=true businessSQL=true; check TAP result');
+  return { actors, pins };
 }

@@ -9,7 +9,7 @@ import NotificationBell from '../../../modules/messages/components/NotificationB
 import styles from './Layout.module.css'
 
 export default function Topbar({ onOpenMobileSidebar, isMobileSidebarOpen = false }) {
-  const { hasPermission } = useAuth()
+  const { hasPermission, provider, user } = useAuth()
   const [popupContainer, setPopupContainer] = useState(null)
   return (
     <header className={styles.topbar}>
@@ -28,7 +28,7 @@ export default function Topbar({ onOpenMobileSidebar, isMobileSidebarOpen = fals
         <ProfileSummary />
       </div>
       <nav className={styles.topbarActions} aria-label="Acciones del usuario">
-        {hasPermission(PERMISSIONS.READ_MESSAGES) && <NotificationBell popupContainer={popupContainer} buttonClassName={styles.headerAction} />}
+        {hasPermission(PERMISSIONS.READ_MESSAGES) && <NotificationBell key={[provider, user?.sub ?? ''].join(':')} popupContainer={popupContainer} buttonClassName={styles.headerAction} />}
         {HEADER_NAVIGATION_ROUTES.filter(route => hasPermission(route.permission)).map(route => (
           <NavLink key={route.path} to={route.path} aria-label={route.label} title={route.label}
             className={styles.headerAction} onPointerEnter={() => preloadInformationPage(route.path)}

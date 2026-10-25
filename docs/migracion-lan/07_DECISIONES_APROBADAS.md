@@ -1,6 +1,6 @@
 # Decisiones aprobadas y límites de implementación
 
-Fecha: **24-10-2026**. Fuente de aprobación: nuevo encargo «Plan maestro de migración modular de Auth0 a Keycloak» y autorización posterior de avance. Base de auditoría `34dfd7c09f876285c1ea84d9020a44a1414ba468`; fase 02 sobre `66a75c07e70004f4f83fa015ffe7ab828aa9e9f6`. Estas decisiones actualizan las alternativas de la auditoría [02](02_RBAC_ACTUAL_Y_PROPUESTO.md), sin modificar ese documento histórico.
+Fecha de actualización: **25-10-2026**. Fuente de aprobación: nuevo encargo «Plan maestro de migración modular de Auth0 a Keycloak» y autorizaciones posteriores de avance. Base de auditoría `34dfd7c09f876285c1ea84d9020a44a1414ba468`; fase 02 sobre `66a75c07e70004f4f83fa015ffe7ab828aa9e9f6`; fase 05 sobre `e74a9142a8fc4dda00bf8c14bce07bf4f1557ad3`. Estas decisiones actualizan las alternativas de la auditoría [02](02_RBAC_ACTUAL_Y_PROPUESTO.md), sin modificar ese documento histórico.
 
 ## Registro
 
@@ -17,6 +17,7 @@ Fecha: **24-10-2026**. Fuente de aprobación: nuevo encargo «Plan maestro de mi
 | D09 | El equipo indicó «pasamos a la siguiente fase» después del commit | Fase 02 autorizada; 03 y posteriores siguen sin autorización |
 | D10 | El equipo pidió «hace un commit y sigue con la siguiente fase» tras 02 | Commit local 9bb41e9 creado; fase 03 autorizada e implementada. Fase 04 y posteriores pendientes de autorización |
 | D11 | El equipo pidió «commit y siguiente fase» tras 03 | Commit local 5941404 creado; fase 04 autorizada. Fase 05 y posteriores pendientes de autorización |
+| D12 | El equipo indicó «ya ahora seguimos con la fase 5» después de conservar 00–04 en e74a914 y descartar la integración pendiente con Ubuntu | Fase 05 autorizada; no autoriza desplegar en Ubuntu, nuevo commit ni avanzar a 06. D09–D11 describen el alcance histórico en su momento |
 
 La selección concreta de Soporte utiliza la autorización expresa para conservar perfil y mensajes propios cuando sean necesarios. `manage:own-pin` mantiene el PIN propio independiente, requerido por los contratos de operaciones sensibles; no crea un permiso de administración del PIN ajeno ni un restablecimiento de contraseña. `manage:users` representa la capacidad administrativa existente; no acredita que estén implementadas las futuras credenciales temporales, recuperación o consulta de auditoría. No se añadieron capacidades ficticias para funciones que aún no existen.
 
@@ -91,3 +92,9 @@ El gate administrativo ahora se evalúa **después** de autenticar y autorizar: 
 D11 actualiza la autorización después de D10; la matriz de 25 capacidades no cambia. Se verificaron 18 operaciones productivas para los nueve roles con tokens Keycloak, PIN y persistencia reales de laboratorio. Los siete roles funcionales conservan su acceso productivo; Desarrollador conserva el acceso del técnico antiguo y nuevo Soporte queda fuera del negocio.
 
 La única corrección de código productivo resuelve el destinatario de la notificación de revisión desde `Pedidos.id_usuario` dentro de la transacción existente. El DTO público lo omitía y el mensaje no se creaba. Se conserva el actor autenticado, el responsable original, la matriz, las transiciones y el PIN. Es una corrección compartida por Auth0 y Keycloak, no una concesión nueva de permisos. Evidencia, fallos previos y límites: [12](12_EVIDENCIA_Y_VERIFICACION_FASE_04.md).
+
+## Aplicación técnica en fase 05
+
+D12 autoriza la validación de Ventas, Cobranzas, historial, métricas, PIN, mensajes y contacto de privacidad/incidentes. La matriz y los destinos asignables siguen idénticos. Se comprobaron 135 decisiones HTTP de nueve roles con tokens Keycloak y persistencia MySQL reales de laboratorio, además de regresión de 00–04.
+
+El correo de verify para Keycloak procede del usuario local validado; Auth0 conserva su claim anterior. El encabezado remonta la campana por proveedor/sujeto para descartar mensajes de otra cuenta. Los conflictos de unicidad conocidos de cliente y nota se convierten en 409, conservando errores desconocidos y rollback; no se reasignan clientes, pedidos ni actores para resolver carreras. El texto de denegación de revisión de pagos distingue la política nueva del antiguo Soporte Auth0. Ninguna corrección modifica las reglas PIN, recuperación, transiciones, asignaciones de roles o integración comercial. Detalle y verificación: [13](13_EVIDENCIA_Y_VERIFICACION_FASE_05.md).

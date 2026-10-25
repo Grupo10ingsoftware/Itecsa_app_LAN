@@ -1,5 +1,6 @@
 import { AppError } from "../../../errors/AppError.js";
 import ClientRepo from "../repo/clients.repo.js";
+import { isUniqueConstraint } from '../../../database/uniqueConstraint.js';
 
 class ClientService {
   constructor({ repo } = {}) {
@@ -37,12 +38,18 @@ class ClientService {
 
     if (existingClient) return existingClient;
 
-    return this.repo.create({
-      rut_cliente,
-      nombre_cliente,
-      razon_social,
-      estado_cliente: estado_cliente ?? "ACTIVO",
-    });
+    try {
+      return await this.repo.create({
+        rut_cliente, nombre_cliente, razon_social,
+        estado_cliente: estado_cliente ?? "ACTIVO",
+      });
+    } catch (error) {
+      if (isUniqueConstraint(error, { model: 'Cliente', index: 'rut_cliente_UNIQUE', field: 'rut_cliente' })) {
+        // The enclosing transaction rolls back; retry resolves the committed client.
+        throw new AppError(409, "El cliente se registro simultaneamente. Actualiza e intenta nuevamente.", 'CLIENT_CREATE_CONFLICT');
+      }
+      throw error;
+    }
   }
   async getClient(id) {
     const client = await this.repo.get(id);

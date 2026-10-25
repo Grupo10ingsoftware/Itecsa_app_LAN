@@ -71,7 +71,9 @@ export async function updPaymentStateOperation(service, orderId, newPaymentStatu
     if (currentPaymentStatus !== PAYMENT_STATUS.PENDIENTE) {
       if (authorizationForProvider(data.identityProvider)?.can(data.role, data.permissions, P.REVISE_PAYMENT_STATUS) !== true) {
         const error = new AppError(403,
-          "Solo Administrador Cobranzas o Soporte puede modificar una decision de pago.",
+          data.identityProvider === 'keycloak'
+            ? "No tienes permiso para modificar una decision de pago resuelta."
+            : "Solo Administrador Cobranzas o Soporte puede modificar una decision de pago.",
         );
         throw error;
       }

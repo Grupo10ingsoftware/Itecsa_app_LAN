@@ -1,12 +1,12 @@
 # Plan maestro y estado de la migración modular
 
-Fecha: **24-10-2026**. Repositorio empresarial: `D:\Universidad\Ing software II\Itecsa_app_LAN`; rama `POC/KEYCLOAK`; base de auditoría `34dfd7c09f876285c1ea84d9020a44a1414ba468`; base de fase 02 `66a75c07e70004f4f83fa015ffe7ab828aa9e9f6`.
+Fecha de actualización: **25-10-2026**. Repositorio empresarial: `D:\Universidad\Ing software II\Itecsa_app_LAN`; rama `POC/KEYCLOAK`; base de auditoría `34dfd7c09f876285c1ea84d9020a44a1414ba468`; base de fase 02 `66a75c07e70004f4f83fa015ffe7ab828aa9e9f6`; base de fase 05 `e74a9142a8fc4dda00bf8c14bce07bf4f1557ad3`.
 
 Este documento registra la ejecución del nuevo plan autorizado por el equipo. Los documentos [01](01_AUTH0_INVENTARIO_EXHAUSTIVO.md), [02](02_RBAC_ACTUAL_Y_PROPUESTO.md), [03](03_AUTH0_VS_KEYCLOAK.md), [04](04_GUIA_CONFIGURACION_KEYCLOAK.md) y [05](05_PLAN_INICIAL_MIGRACION_IDENTIDAD.md) se conservan íntegros como auditoría y propuesta histórica. Sus siete etapas y alternativas pendientes no reemplazan el orden 00–10 del nuevo encargo. Las decisiones posteriores expresas están en [07](07_DECISIONES_APROBADAS.md).
 
 ## Alcance y estado
 
-El equipo autorizó inicialmente 00–01, pidió su commit local (`66a75c07e70004f4f83fa015ffe7ab828aa9e9f6`) y después indicó «pasamos a la siguiente fase», autorizando **02**. Se versionó 02 en **`9bb41e9bb93e50e730a6ad7b873dfd8c68dd9498`** y se ejecutó 03. La petición posterior «commit y siguiente fase» autorizó el commit **`594140465b3d097618e353e19b2e40a4af618b14`** de 03 y el avance exclusivo a **04** desde ese estado limpio. No hay autorización para 05 o posteriores. No hubo pushes, despliegues, migraciones empresariales ni cambios del realm real; las únicas escrituras de datos de pruebas fueron en laboratorios desechables. Terminar técnicamente una fase no autoriza la siguiente.
+El equipo autorizó inicialmente 00–01, pidió su commit local (`66a75c07e70004f4f83fa015ffe7ab828aa9e9f6`) y después indicó «pasamos a la siguiente fase», autorizando **02**. Se versionó 02 en **`9bb41e9bb93e50e730a6ad7b873dfd8c68dd9498`** y se ejecutó 03. La petición posterior «commit y siguiente fase» autorizó el commit **`594140465b3d097618e353e19b2e40a4af618b14`** de 03 y el avance exclusivo a **04**. Esta quedó versionada en **`e74a9142a8fc4dda00bf8c14bce07bf4f1557ad3`**. La instrucción actual «ya ahora seguimos con la fase 5» autoriza exclusivamente **05**, desde ese árbol limpio. No autoriza 06, un nuevo commit o la integración con Ubuntu que se había descartado. Durante 05 no hubo pushes, despliegues, migraciones empresariales ni cambios del realm real; las únicas escrituras de datos de pruebas fueron en laboratorios desechables. Terminar técnicamente una fase no autoriza la siguiente.
 
 | Fase | Objetivo | Estado y condición de avance |
 |---|---|---|
@@ -14,8 +14,8 @@ El equipo autorizó inicialmente 00–01, pidió su commit local (`66a75c07e7000
 | 01 | Matriz de nueve roles y 25 capacidades | Entregada y versionada en 66a75c0; avance a 02 autorizado |
 | 02 | Autorización y contrato de identidad Keycloak | Entregada y versionada en 9bb41e9; verificada con Keycloak/MySQL reales de laboratorio; configuración empresarial pendiente |
 | 03 | Vistas, navegación y acceso funcional | Entregada y versionada en 5941404; regresión escritorio/móvil aprobada |
-| 04 | Kanban, pedidos, producción y calendario | Verificada con identidad, PIN, servicios y SQL reales de laboratorio; corregida identidad del destinatario de revisión. Aprobable para revisión; cambios locales pendientes de commit |
-| 05 | Ventas, cobranzas, historial, métricas, PIN y mensajes | No iniciada |
+| 04 | Kanban, pedidos, producción y calendario | Versionada en e74a914; regresión real de identidad/PIN/SQL y navegador conservada |
+| 05 | Ventas, cobranzas, historial, métricas, PIN y mensajes | Implementada y verificada en laboratorio: 135 decisiones por nueve roles, concurrencia, auditoría, privacidad y mensajes. Correcciones de contacto local, conflictos 409 y notificaciones al cambiar de sujeto; cambios locales revisables, sin commit. Aceptación empresarial pendiente |
 | 06 | Servicios administrativos Keycloak y persistencia | No iniciada |
 | 07 | Creación de cuentas y credenciales iniciales | No iniciada |
 | 08 | Estabilización y regresión acumulada | No iniciada |
@@ -25,6 +25,8 @@ El equipo autorizó inicialmente 00–01, pidió su commit local (`66a75c07e7000
 Los títulos abreviados de 03–05 describen su ámbito; el encargo del equipo conserva el detalle normativo de cada fase. Evidencia histórica 00–01: [08](08_EVIDENCIA_FASES_00_01.md). Evidencia y configuración 02: [10](10_EVIDENCIA_Y_CONFIGURACION_FASE_02.md). Evidencia, matriz de vistas e instrucciones 03: [11](11_EVIDENCIA_Y_VERIFICACION_FASE_03.md). Pruebas acumuladas: [09](09_MATRIZ_PRUEBAS_ACUMULADAS.md).
 
 La evidencia y guía de 04 están en [12](12_EVIDENCIA_Y_VERIFICACION_FASE_04.md). Las tres regresiones físicas MySQL anteriormente pendientes se ejecutaron satisfactoriamente en un segundo MySQL efímero, conservando intactos sus tests y guardas originales. Los documentos 08/10/11 conservan los resultados históricos de sus fases, incluidas las omisiones de aquel momento.
+
+La evidencia de 05 está en [13](13_EVIDENCIA_Y_VERIFICACION_FASE_05.md): alcance por módulo, cambios justificados, fallos previos, matriz de operaciones, comandos reproducibles y límites. La regresión acumulada pasa sin cambiar la matriz, los algoritmos PIN, la fuente Manager o los datos empresariales. La configuración reproducible del realm sigue siendo la del laboratorio de 02; no es un reconciliador listo para aplicar sobre usuarios existentes de Ubuntu. Su integración exige una tarea expresa, respaldo recuperable y revisión de diferencias y sujetos antes del corte.
 
 ## Frontera implementada
 

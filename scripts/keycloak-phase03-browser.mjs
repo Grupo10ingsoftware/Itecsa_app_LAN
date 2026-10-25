@@ -14,8 +14,9 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function main() {
   const production = process.argv.slice(2).includes('--production');
-  assert.deepEqual(process.argv.slice(2), production ? ['--run', '--production'] : ['--run'],
-    'Uso: node scripts/keycloak-phase03-browser.mjs --run [--production]');
+  const business = process.argv.slice(2).includes('--business');
+  assert.deepEqual(process.argv.slice(2), business ? ['--run', '--production', '--business'] : production ? ['--run', '--production'] : ['--run'],
+    'Uso: node scripts/keycloak-phase03-browser.mjs --run [--production [--business]]');
   const candidates = [process.env.ITECSA_BROWSER_BIN,
     join(process.env.LOCALAPPDATA || '', 'BraveSoftware/Brave-Browser/Application/brave.exe'),
     'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
@@ -77,6 +78,7 @@ async function main() {
     await command('Page.enable'); await command('Runtime.enable');
     console.log('Browser:', (await command('Browser.getVersion')).product);
     const fixtures = [
+      ...(business ? [['business', 'BUSINESS_TEST_RESULT', 1440, 1000], ['business', 'BUSINESS_TEST_RESULT', 390, 844]] : []),
       ...(production ? [['production', 'PRODUCTION_TEST_RESULT', 1440, 1000], ['production', 'PRODUCTION_TEST_RESULT', 390, 844]] : []),
       ['navigation', 'NAVIGATION_TEST_RESULT', 1440, 1000],
       ['navigation', 'NAVIGATION_TEST_RESULT', 390, 844],
@@ -97,7 +99,7 @@ async function main() {
         await pause(100);
       }
       assert.equal(result, `${marker}:PASS`, `${fixture} ${width}x${height}: ${result}`);
-      const report = await command('Runtime.evaluate', { expression: 'JSON.stringify(window.__PRODUCTION_REPORT__ || window.__NAVIGATION_REPORT__ || {})', returnByValue: true });
+      const report = await command('Runtime.evaluate', { expression: 'JSON.stringify(window.__BUSINESS_REPORT__ || window.__PRODUCTION_REPORT__ || window.__NAVIGATION_REPORT__ || {})', returnByValue: true });
       console.log(`${fixture} ${width}x${height}: PASS ${report.result?.value}`);
     }
   } finally {
