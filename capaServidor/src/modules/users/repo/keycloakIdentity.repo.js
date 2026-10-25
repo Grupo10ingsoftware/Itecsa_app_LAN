@@ -1,12 +1,46 @@
 import { randomUUID } from 'node:crypto';
 import getPrismaClient from '../../../database/prisma.js';
-import { isActiveUserStatus } from '../../../config/userLifecycle.js';
-import { ROLES } from '../../../../../shared/keycloakAuthorization.js';
+import { isActiveUserStatus, ACTIVE_USER_STATUSES, USER_STATUS } from '../../../config/userLifecycle.js';
+import { ROLES, ASSIGNABLE_ROLES } from '../../../../../shared/keycloakAuthorization.js';
+import { USER_RESPONSE_SELECT, UserRepository } from './users.repo.js';
 
 // New-provider persistence is independent of the legacy Auth0 repository.
 export class KeycloakIdentityRepository {
   constructor({ prisma } = {}) { this.prisma = prisma; }
   get client() { return this.prisma ?? getPrismaClient(); }
+  userScope(issuer, { search = '', estadoUsuario = '', rolUsuario = '' } = {}) {
+    const where = { rol_usuario: { in: [...ASSIGNABLE_ROLES] }, ExternalIdentity: { is: { provider: 'keycloak', issuer } } };
+    if (rolUsuario) where.rol_usuario = { equals: rolUsuario, in: [...ASSIGNABLE_ROLES] };
+    if (estadoUsuario) where.estado_usuario = ACTIVE_USER_STATUSES.includes(estadoUsuario)
+      ? { in: [...ACTIVE_USER_STATUSES] } : estadoUsuario;
+    if (search) where.OR = ['nombre_usuario', 'apellido_usuario', 'correo_usuario', 'rut_usuario'].map(field => ({ [field]: { contains: search } }))
+      .concat({ ExternalIdentity: { is: { username: { contains: search } } } });
+    return where;
+  }
+  async list(issuer, { page, perPage, ...filters }) {
+    const where = this.userScope(issuer, filters);
+    const [rows, total] = await Promise.all([
+      this.client.usuario.findMany({ where, skip: (page - 1) * perPage, take: perPage, orderBy: { id_usuario: 'desc' },
+        select: { ...USER_RESPONSE_SELECT, ExternalIdentity: { select: { subject: true, username: true } } } }),
+      this.client.usuario.count({ where }),
+    ]);
+    return { usuarios: rows.map(row => {
+      const identityBindingConflict = row.id_auth0 !== row.ExternalIdentity.subject;
+      return { idUsuario: row.id_usuario, idUsuarioAutenticacionExterna: identityBindingConflict ? null : row.ExternalIdentity.subject,
+        identityBindingConflict,
+        username: row.ExternalIdentity.username, nombreUsuario: row.nombre_usuario, apellidoUsuario: row.apellido_usuario,
+        rutUsuario: row.rut_usuario, correoUsuario: row.correo_usuario, rolUsuario: row.rol_usuario, estadoUsuario: row.estado_usuario };
+    }), total, page, perPage };
+  }
+  async summary(issuer) {
+    const groups = await this.client.usuario.groupBy({ by: ['estado_usuario'], where: this.userScope(issuer), _count: { _all: true } });
+    const counts = new Map(groups.map(group => [group.estado_usuario, group._count._all]));
+    return { totalUsuarios: groups.reduce((sum, group) => sum + group._count._all, 0),
+      vinculados: ACTIVE_USER_STATUSES.reduce((sum, status) => sum + (counts.get(status) ?? 0), 0),
+      desvinculados: counts.get(USER_STATUS.UNLINKED) ?? 0, pendientes: counts.get(USER_STATUS.PENDING_FIRST_LOGIN) ?? 0,
+      pendientesRol: counts.get(USER_STATUS.PENDING_ROLE) ?? 0 };
+  }
+  movements(userId, filters) { return new UserRepository({ prisma: this.client }).listMovements(userId, filters); }
   actor(subject) {
     return this.client.usuario.findUnique({ where: { id_auth0: subject },
       select: { id_usuario: true, rol_usuario: true, estado_usuario: true } });

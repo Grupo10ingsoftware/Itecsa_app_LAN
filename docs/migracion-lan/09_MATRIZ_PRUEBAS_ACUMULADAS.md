@@ -1,5 +1,30 @@
 # Matriz de pruebas acumuladas
 
+## Integración posterior en el desarrollo habitual: estado vigente
+
+Por instrucción expresa del equipo, se retiraron los laboratorios y no se repitieron suites funcionales ni se crearon más copias. La configuración se aplicó a `itecsa-web` y `itecsa-backend-admin` existentes y se reconstruyeron los dos servicios habituales de Compose. Frontend `127.0.0.1:5173`, liveness API `127.0.0.1:3000` y discovery Keycloak `127.0.0.1:18080` respondieron HTTP 200. El adaptador administrativo del backend habitual pudo consultar el realm real: tres usuarios previos, cero usuarios sintéticos. Aiven conserva TLS, tiene dos tablas nuevas de identidad, tres vínculos explícitos y cero operaciones de preparación de prueba. Docker conserva únicamente los dos contenedores habituales, sin volúmenes de laboratorio. Son comprobaciones de arranque/configuración; no una nueva regresión funcional completa. Detalle vigente en [15](15_EVIDENCIA_INTEGRACION_FASE_06_5.md). Los resultados siguientes describen la validación histórica anterior al retiro del laboratorio.
+
+## Actualización 06.5: Ubuntu real
+
+Evidencia y reproducción: [15](15_EVIDENCIA_INTEGRACION_FASE_06_5.md). Las secciones siguientes conservan los resultados históricos de cada fase; no se suman las regresiones repetidas como pruebas diferentes.
+
+| Conjunto ejecutado sobre las fuentes 06.5 | Resultado |
+|---|---|
+| Backend completo en imagen con Prisma generado | 1.134 contabilizadas: 1.130 aprobadas, cuatro omitidas, cero fallos; incluye la nueva prueba de transporte administrativo |
+| Adaptador administrativo focal | Nueve aprobadas, incluidas restricciones del origen Docker exclusivo de test |
+| Frontend unitario y SSR | 51 node:test aprobadas; comprobaciones SSR previas conservadas, incluidas 411 de navegación y 251 de identidad |
+| Regresión Docker 00–06 | 72 iniciales, dos tras reiniciar el IdP de laboratorio, tres físicas MySQL; aprobadas |
+| Brave contra Ubuntu | Nueve logins reales con PKCE, claims exactos, 81 decisiones API y 81 guards de rutas; PIN, producción, fecha y pago persistidos; seis preparaciones departamentales |
+| Soporte visible contra Ubuntu | Formulario real creó séptima cuenta pendiente/deshabilitada; destinos privilegiados rechazados |
+| Sesión Brave contra Ubuntu | Recarga, cambio de usuario, renovación automática y verify del nuevo access token; terminación detectada al renovar; cero refresh indefinidos |
+| Respaldo Ubuntu | Archivo integral consistente y recuperación real del realm en copia aislada; originales preservados |
+| Lint y build frontend | Aprobados; 565 módulos; salida solo en contenedor temporal |
+| Seguridad de sincronización | Seis pruebas Python aprobadas, incluidas escritura atómica del diario y ausencia del cliente compartido sin mutación |
+| Browser de regresión previo | Negocio 29+29, producción 70+70 y navegación 243+243; authSession/métricas/paymentPin aprobados; su API es sintética |
+| Persistencia local después de reiniciar los tres servicios propios | Nueve bindings/PIN y siete preparaciones, auditoría productiva, pago y fecha conservados |
+
+Una ejecución inicial del backend local Windows falló por el cliente Prisma local sin generar. Se conservó ese resultado como impedimento del entorno y se ejecutó la suite completa en la imagen correcta; no se modificaron expectativas de negocio para ocultarlo. El primer verificador de terminación de sesión también falló por esperar una revocación inmediata de un JWT recién emitido; el caso final comprueba el siguiente refresh real y conserva los tiempos globales del realm.
+
 Fecha de actualización: **25-10-2026**. Las secciones iniciales conservan la evidencia histórica 00–01 sobre `34dfd7c09f876285c1ea84d9020a44a1414ba468`. Las actualizaciones posteriores registran lo ensayado en cada fase; 05 parte de `e74a9142a8fc4dda00bf8c14bce07bf4f1557ad3`. Reproducción: [08](08_EVIDENCIA_FASES_00_01.md), [10](10_EVIDENCIA_Y_CONFIGURACION_FASE_02.md), [13](13_EVIDENCIA_Y_VERIFICACION_FASE_05.md). Matriz: [07](07_DECISIONES_APROBADAS.md).
 
 ## Ejecuciones conservadas

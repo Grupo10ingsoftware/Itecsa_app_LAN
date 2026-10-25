@@ -35,7 +35,7 @@ const matchesPreparation = (external, operation) => !external.enabled && externa
   && (external.email ?? null) === operation.input.email
   && external.firstName === operation.input.firstName && external.lastName === operation.input.lastName;
 
-// Backend foundation only. Public administrative routes remain gated until phase 07.
+// Preparation only: enabling an account and delivering credentials are separate operations.
 export class KeycloakIdentityAdministrationService {
   constructor({ management, repository = new KeycloakIdentityRepository(), pins = pinService } = {}) {
     this.management = management ?? new KeycloakManagementService();
@@ -69,6 +69,19 @@ export class KeycloakIdentityAdministrationService {
     return { localUserId: binding.user_id, subject, username: external.username, email: binding.Usuario.correo_usuario,
       externalEmail: external.email ?? null, issuer: binding.issuer, role: binding.Usuario.rol_usuario,
       localState: binding.Usuario.estado_usuario, enabled: external.enabled };
+  }
+  async list(context, filters) {
+    await this.authorize(context);
+    if (filters.rolUsuario && !ASSIGNABLE_ROLES.includes(filters.rolUsuario)) reject('IDENTITY_TARGET_FORBIDDEN', 403);
+    return this.repository.list(this.management.config.issuer, filters);
+  }
+  async summary(context) {
+    await this.authorize(context);
+    return this.repository.summary(this.management.config.issuer);
+  }
+  async movements(context, subject, filters) {
+    const target = await this.inspect(context, subject);
+    return this.repository.movements(target.localUserId, filters);
   }
   async findByUsername(context, username) {
     await this.authorize(context);

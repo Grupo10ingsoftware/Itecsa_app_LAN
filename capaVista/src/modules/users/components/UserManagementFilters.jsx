@@ -1,6 +1,7 @@
 import { useAuth } from "../../../hooks/useAuth";
 import { getRoleLabel, manageableRoles } from '../../../config/roles'
 import UserButton from './UserButton'
+import { authorizationForProvider } from '../../../../../shared/identityAuthorization.js'
 import styles from '../pages/UserManagementPage.module.css'
 
 const STATUS_FILTERS = Object.freeze([
@@ -26,7 +27,7 @@ export default function UserManagementFilters({
 }) {
   const hasActiveFilters = Boolean(activeRole || activeStatus || searchTerm.trim())
 
-  const { user: actor } = useAuth()
+  const { user: actor, provider } = useAuth()
   return (
     <section className={styles.filtersShell} aria-label="Busqueda y filtros de usuarios">
       <div className={styles.filtersTopbar}>
@@ -36,7 +37,7 @@ export default function UserManagementFilters({
           <input
             id="user-management-search"
             onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Buscar por nombre, apellido, correo o RUT"
+            placeholder={provider === 'keycloak' ? 'Buscar por nombre de acceso, nombre, apellido, correo o RUT' : 'Buscar por nombre, apellido, correo o RUT'}
             type="search"
             value={searchTerm}
           />
@@ -89,7 +90,7 @@ export default function UserManagementFilters({
               >
                 <span>Todos</span>
               </button>
-              {manageableRoles(actor?.rolUsuario).map((role) => (
+              {(provider === 'keycloak' ? authorizationForProvider(provider).manageableRoles(actor?.rolUsuario) : manageableRoles(actor?.rolUsuario)).map((role) => (
                 <button
                   aria-pressed={activeRole === role}
                   className={`${styles.filterChip} ${activeRole === role ? styles.filterChipActive : ''}`}

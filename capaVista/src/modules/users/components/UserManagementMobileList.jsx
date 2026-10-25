@@ -3,7 +3,7 @@ import UserButton from './UserButton'
 import UserStatusBadge from './UserStatusBadge'
 import styles from '../pages/UserManagementPage.module.css'
 
-export default function UserManagementMobileList({ isLoading, onEditUser, onViewMovements, users }) {
+export default function UserManagementMobileList({ isLoading, onEditUser, onViewMovements, users, readOnly = false }) {
   if (isLoading) {
     return (
       <div className={styles.mobileList}>
@@ -26,6 +26,8 @@ export default function UserManagementMobileList({ isLoading, onEditUser, onView
         <article className={styles.mobileUserCard} key={user.id}>
           <header>
             <strong>{user.nombreListado}</strong>
+            {user.username && <small>{user.username}</small>}
+            {user.identityBindingConflict && <small>Vinculo pendiente de conciliacion</small>}
             <UserStatusBadge status={user.estadoUsuario} />
           </header>
           <dl>
@@ -45,7 +47,7 @@ export default function UserManagementMobileList({ isLoading, onEditUser, onView
           <footer className={styles.userActions}>
             <UserButton icon="bi-pencil-fill" disabled={!user.idUsuarioAutenticacionExterna}
                       onClick={() => onEditUser(user)} variant="secondary">
-              Editar
+              {readOnly ? 'Consultar' : 'Editar'}
             </UserButton>
             <UserButton
               icon="bi-clock-history"

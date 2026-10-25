@@ -5,9 +5,10 @@ import { respondError } from '../../../errors/httpErrors.js';
 import { roleFromPayload } from '../../../../../shared/keycloakAuthorization.js';
 import { IdentityAdministrationError } from '../service/keycloakIdentityAdministration.service.js';
 import { KeycloakServiceError } from '../service/keycloakManagement.service.js';
+import { validateListUsersQuery, validateUserMovementsQuery } from '../validators/adminUsers.validator.js';
 
-// Deliberately NOT mounted by the application in phase 06. The lab exercises this
-// factory with real JWT middleware; phase 07 must review its final account workflow.
+// Mounted by the normal server when IDENTITY_PREPARATION_ENABLED=true.
+// Preparation keeps accounts disabled; credential delivery is a later workflow.
 export function createKeycloakIdentityPreparationRouter({ authenticate = checkJwt, service } = {}) {
   if (!service) throw Error('El servicio administrativo es obligatorio.');
   const router = Router();
@@ -23,6 +24,17 @@ export function createKeycloakIdentityPreparationRouter({ authenticate = checkJw
       return respondError(error, req, res);
     }
   };
+  router.get('/users', run(async (req, res) => {
+    const query = validateListUsersQuery(req.query);
+    if (!query.valid) return res.status(400).json({ message: query.message });
+    return res.json(await service.list(context(req), query.filters));
+  }));
+  router.get('/users/summary', run(async (req, res) => res.json(await service.summary(context(req)))));
+  router.get('/users/:subject/movements', run(async (req, res) => {
+    const query = validateUserMovementsQuery(req.query);
+    if (!query.valid) return res.status(400).json({ message: query.message });
+    return res.json(await service.movements(context(req), req.params.subject, query.filters));
+  }));
   router.get('/identities/by-username/:username', run(async (req, res) => {
     const user = await service.findByUsername(context(req), req.params.username);
     return res.status(user ? 200 : 404).json(user ?? { code: 'IDENTITY_NOT_FOUND' });

@@ -10,7 +10,7 @@ services:
       NODE_ENV: development
       SALES_NOTE_SOURCE: ${SALES_NOTE_SOURCE:-fixture}
       PORT: 3000
-      FRONTEND_ORIGIN: http://localhost:5173
+      FRONTEND_ORIGIN: http://127.0.0.1:5173
       DB_SSL_CA_PATH: /run/secrets/aiven-ca.pem
       TRUST_PROXY: 0
     secrets:

@@ -13,7 +13,18 @@ export function resolveKeycloakAdministration(env = process.env) {
   if ([env.KEYCLOAK_CLIENT_ID?.trim(), roleClientId].includes(clientId)) fail();
   const timeoutMs = Number(env.KEYCLOAK_ADMIN_TIMEOUT_MS ?? 5000);
   if (!Number.isInteger(timeoutMs) || timeoutMs < 100 || timeoutMs > 30000) fail();
-  return Object.freeze({ issuer: issuer.href, tokenUrl: issuer.href + '/protocol/openid-connect/token',
-    adminUrl: issuer.origin + match[1] + '/admin/realms/' + match[2],
+  let transportOrigin = issuer.origin;
+  if (env.KEYCLOAK_ADMIN_TRANSPORT_ORIGIN) {
+    // Docker reaches the host tunnel through its internal gateway. This changes
+    // only transport; JWT validation and persisted bindings keep the public issuer.
+    if (!['development', 'test'].includes(env.APP_ENV)) fail();
+    let transport;
+    try { transport = new URL(env.KEYCLOAK_ADMIN_TRANSPORT_ORIGIN); } catch { fail(); }
+    if (transport.origin !== env.KEYCLOAK_ADMIN_TRANSPORT_ORIGIN || transport.username || transport.password
+      || transport.protocol !== issuer.protocol) fail();
+    transportOrigin = transport.origin;
+  }
+  return Object.freeze({ issuer: issuer.href, tokenUrl: transportOrigin + issuer.pathname + '/protocol/openid-connect/token',
+    adminUrl: transportOrigin + match[1] + '/admin/realms/' + match[2],
     roleClientId, clientId, clientSecret: env.KEYCLOAK_ADMIN_CLIENT_SECRET, timeoutMs });
 }

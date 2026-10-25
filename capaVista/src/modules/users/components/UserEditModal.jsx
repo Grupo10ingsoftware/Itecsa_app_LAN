@@ -17,7 +17,7 @@ function createFormState(user) {
   }
 }
 
-export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, onSave, onUnlink, onCredentials, user }) {
+export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, onSave, onUnlink, onCredentials, user, readOnly = false }) {
   const [values, setValues] = useState(() => (user ? createFormState(user) : null))
   const { user: actor, provider } = useAuth()
   const [pin, setPin] = useState('')
@@ -80,6 +80,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
 
   async function handleSubmit(event) {
     event.preventDefault()
+    if (readOnly) return
 
     const trimmedPin = pin.trim()
 
@@ -127,8 +128,8 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
         <header className={editStyles.header}>
           <div>
             <span className={editStyles.kicker}>Usuario</span>
-            <h2 id="user-edit-modal-title">Editar usuario</h2>
-            <p id="user-edit-modal-description">Modifica la informacion del usuario en el sistema.</p>
+            <h2 id="user-edit-modal-title">{readOnly ? 'Consultar usuario' : 'Editar usuario'}</h2>
+            <p id="user-edit-modal-description">{readOnly ? 'Consulta la identidad. La edicion y las acciones de cuenta aun no estan habilitadas.' : 'Modifica la informacion del usuario en el sistema.'}</p>
           </div>
           <button
             aria-label="Cerrar modal de edicion"
@@ -149,6 +150,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
             <div>
               <h3>{user.nombreCompleto}</h3>
               <p>{user.rutUsuario}</p>
+              {readOnly && <p>{user.username} · Keycloak: {user.enabled ? 'Habilitado' : 'Deshabilitado'} · {user.estadoUsuario}</p>}
             </div>
           </div>
 
@@ -166,6 +168,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
                   required
                   type="text"
                   value={values.nombreUsuario}
+                  disabled={readOnly}
                 />
               </span>
             </label>
@@ -182,6 +185,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
                   required
                   type="text"
                   value={values.apellidoUsuario}
+                  disabled={readOnly}
                 />
               </span>
             </label>
@@ -198,6 +202,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
                   required={provider !== 'keycloak'}
                   type="email"
                   value={values.correoUsuario}
+                  disabled={readOnly}
                 />
               </span>
             </label>
@@ -208,7 +213,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
                 <i className="bi bi-people" aria-hidden="true" />
                 <select
                   aria-describedby={isCurrentUser ? 'edit-user-role-help' : undefined}
-                  disabled={isCurrentUser}
+                  disabled={isCurrentUser || readOnly}
                   id="edit-user-role"
                   name="rolUsuario"
                   onChange={handleChange}
@@ -225,7 +230,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
               {isCurrentUser && <small className={editStyles.fieldHelp} id="edit-user-role-help">{SELF_ROLE_EDIT_MESSAGE}</small>}
             </label>
 
-            <label className={`${editStyles.field} ${editStyles.fieldWide}`} htmlFor="edit-user-pin">
+            {!readOnly && <label className={`${editStyles.field} ${editStyles.fieldWide}`} htmlFor="edit-user-pin">
               <span className={editStyles.fieldLabel}>PIN de autorizacion</span>
               <span className={`${editStyles.controlWrap} ${pinError ? editStyles.controlInvalid : ''}`}>
                 <i className="bi bi-lock" aria-hidden="true" />
@@ -247,7 +252,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
                 />
               </span>
               {pinError && <small className={editStyles.fieldError} id="edit-user-pin-error">{pinError}</small>}
-            </label>
+            </label>}
           </div>
         </div>
 
@@ -257,9 +262,9 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
           </div>
         )}
         <footer className={editStyles.actions}>
-          {provider === 'keycloak' && onCredentials && <UserButton disabled={isSubmitting || isCurrentUser || !['Activo', 'Vinculado', 'Pendiente'].includes(user.estadoUsuario)}
+          {!readOnly && provider === 'keycloak' && onCredentials && <UserButton disabled={isSubmitting || isCurrentUser || !['Activo', 'Vinculado', 'Pendiente'].includes(user.estadoUsuario)}
             onClick={() => onCredentials(user)} variant="secondary">Establecer credenciales</UserButton>}
-          <UserButton
+          {!readOnly && <UserButton
             className={`${editStyles.actionButton} ${editStyles.unlinkButton}`}
             disabled={isSubmitting || isCurrentUser || user.estadoUsuario === 'Desvinculado'}
             onClick={() => onUnlink(user)}
@@ -267,19 +272,19 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
             variant="danger"
           >
             Desvincular
-          </UserButton>
+          </UserButton>}
           <div className={editStyles.primaryActions}>
             <UserButton className={editStyles.actionButton} disabled={isSubmitting} onClick={onClose} variant="secondary">
-              Cancelar
+              {readOnly ? 'Cerrar' : 'Cancelar'}
             </UserButton>
-            <UserButton
+            {!readOnly && <UserButton
               className={`${editStyles.actionButton} ${editStyles.saveButton}`}
               disabled={isSubmitting || !canSubmit}
               type="submit"
               variant="primary"
             >
               {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
-            </UserButton>
+            </UserButton>}
           </div>
         </footer>
       </form>

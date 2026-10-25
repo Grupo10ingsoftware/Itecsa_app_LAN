@@ -16,7 +16,6 @@ const KanbanBoardPage = lazy(() => import('../modules/kanban/pages/KanbanBoardPa
 const ProfilePage = lazy(informationPageLoaders[APP_ROUTES.PROFILE])
 const PaymentConfirmationPage = lazy(() => import('../modules/payments/pages/PaymentConfirmationPage'))
 const UserManagementPage = lazy(() => import('../modules/users/pages/UserManagementPage'))
-const SupportHomePage = lazy(() => import('../modules/users/pages/SupportHomePage'))
 const OrderCreatePage = lazy(() => import('../modules/orders/pages/OrderCreatePage'))
 const PasswordResetPage = lazy(() => import('../modules/auth/pages/PasswordResetPage'))
 const OrderHistoryPage = lazy(() => import('../modules/orderHistory/pages/OrderHistoryPage'))
@@ -42,9 +41,8 @@ function HomeRedirect() {
 }
 
 function UsersEntry() {
-  const { provider } = useAuth()
   return <RoleGuard requiredPermission={PERMISSIONS.MANAGE_USERS_VISUALLY}>
-    {provider === 'keycloak' ? <SupportHomePage /> : <UserManagementPage />}
+    <UserManagementPage />
   </RoleGuard>
 }
 

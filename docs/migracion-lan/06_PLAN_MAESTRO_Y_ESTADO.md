@@ -1,22 +1,31 @@
 # Plan maestro y estado de la migración modular
 
+## Estado vigente: integración en el desarrollo habitual, 25-10-2026
+
+La instrucción posterior del equipo autoriza retirar los laboratorios y aplicar la configuración comprobada al entorno habitual, sin crear más copias. Esa instrucción reemplaza las restricciones históricas de integración aislada descritas más abajo. La aplicación usa ahora `itecsa-web`, `itecsa-backend-admin`, los dos servicios de `compose.yaml`, Aiven existente y Keycloak Ubuntu existente. URL: **http://127.0.0.1:5173**. Los puertos 5174/3001 y la base MySQL de laboratorio se retiraron.
+
+La preparación de fase 06 se monta en el servidor normal bajo `/api/admin/identity`, con habilitación explícita, JWT, rol, estado y PIN. Sigue preparando cuentas deshabilitadas; no completa la entrega de credenciales de 07. Los usuarios Auth0 históricos no se migran por coincidencia de nombre/correo. Detalle vigente y limpieza: [15](15_EVIDENCIA_INTEGRACION_FASE_06_5.md).
+
+Los apartados siguientes conservan el registro de las fases y sus límites **en el momento de cada entrega**; las afirmaciones sobre laboratorios activos o ausencia de integración están sustituidas por este estado vigente.
+
 Fecha de actualización: **25-10-2026**. Repositorio empresarial: `D:\Universidad\Ing software II\Itecsa_app_LAN`; rama `POC/KEYCLOAK`; base de auditoría `34dfd7c09f876285c1ea84d9020a44a1414ba468`; base de fase 02 `66a75c07e70004f4f83fa015ffe7ab828aa9e9f6`; base de fase 05 `e74a9142a8fc4dda00bf8c14bce07bf4f1557ad3`; base de fase 06 `9e440102c3c94d12e4a5263c5a8b72df6bd41c4e`.
 
 Este documento registra la ejecución del nuevo plan autorizado por el equipo. Los documentos [01](01_AUTH0_INVENTARIO_EXHAUSTIVO.md), [02](02_RBAC_ACTUAL_Y_PROPUESTO.md), [03](03_AUTH0_VS_KEYCLOAK.md), [04](04_GUIA_CONFIGURACION_KEYCLOAK.md) y [05](05_PLAN_INICIAL_MIGRACION_IDENTIDAD.md) se conservan íntegros como auditoría y propuesta histórica. Sus siete etapas y alternativas pendientes no reemplazan el orden 00–10 del nuevo encargo. Las decisiones posteriores expresas están en [07](07_DECISIONES_APROBADAS.md).
 
 ## Alcance y estado
 
-El equipo autorizó inicialmente 00–01 y después el avance secuencial mediante instrucciones expresas. Los commits locales son 66a75c0 (00–01), 9bb41e9 (02), 5941404 (03), e74a914 (04) y 9e44010 (05). La petición actual «hace un commit y parte con la siguiente fase» autorizó el último commit y el avance exclusivo a **06**, desde árbol limpio. No autoriza 07 ni la integración Ubuntu descartada. Durante 05–06 no hubo pushes, despliegues, migraciones empresariales ni cambios del realm real; las únicas escrituras de datos de pruebas fueron en laboratorios desechables. Terminar técnicamente una fase no autoriza la siguiente. El historial de autorizaciones se conserva en [07](07_DECISIONES_APROBADAS.md).
+El equipo autorizó inicialmente 00–01 y después el avance secuencial mediante instrucciones expresas. Los commits locales son 66a75c0 (00–01), 9bb41e9 (02), 5941404 (03), e74a914 (04), 9e44010 (05) y ad41e54 (06). Durante 05–06 las escrituras se limitaron a laboratorios desechables. El encargo posterior **06.5** autoriza expresamente la integración Ubuntu antes cancelada, sobre ad41e54 limpio, con respaldo, preservación y MySQL de pruebas separado. La ventana de mantenimiento y la copia privada de credenciales se aprobaron por separado. No autoriza 07, commit de 06.5, push ni despliegue definitivo. Terminar técnicamente una fase no autoriza la siguiente. El historial de autorizaciones se conserva en [07](07_DECISIONES_APROBADAS.md).
 
 | Fase | Objetivo | Estado y condición de avance |
 |---|---|---|
 | 00 | Protección del repositorio y línea base | Entregada; avance a 02 autorizado por el equipo. Evidencia histórica conservada |
 | 01 | Matriz de nueve roles y 25 capacidades | Entregada y versionada en 66a75c0; avance a 02 autorizado |
-| 02 | Autorización y contrato de identidad Keycloak | Entregada y versionada en 9bb41e9; verificada con Keycloak/MySQL reales de laboratorio; configuración empresarial pendiente |
+| 02 | Autorización y contrato de identidad Keycloak | Entregada y versionada en 9bb41e9; configuración integrada en Ubuntu como entorno de pruebas 06.5; aceptación empresarial definitiva pendiente |
 | 03 | Vistas, navegación y acceso funcional | Entregada y versionada en 5941404; regresión escritorio/móvil aprobada |
 | 04 | Kanban, pedidos, producción y calendario | Versionada en e74a914; regresión real de identidad/PIN/SQL y navegador conservada |
 | 05 | Ventas, cobranzas, historial, métricas, PIN y mensajes | Versionada en 9e44010 por petición expresa; regresión de 135 decisiones por nueve roles y escenarios SQL/browser conservada |
-| 06 | Servicios administrativos Keycloak y persistencia | Implementada y verificada en laboratorio: adaptador independiente, preparación deshabilitada, registro persistente y conciliación. Migración aditiva ensayada desde esquema 9e44010; rutas futuras verificadas sin montarlas en la aplicación. Cambios locales revisables; integración empresarial pendiente |
+| 06 | Servicios administrativos Keycloak y persistencia | Versionada en ad41e54; adaptador, preparación deshabilitada, diario y conciliación verificados. Fábrica expuesta únicamente por el entry point de integración 06.5; el arranque empresarial conserva el gate |
+| 06.5 | Integración real con Keycloak Ubuntu | Servidor respaldado y recuperación comprobada; configuración idempotente y aplicación separada en 127.0.0.1:5174. Nueve roles, operaciones reales, formulario Soporte, renovación y terminación de sesión comprobados. Evidencia y límites en [15](15_EVIDENCIA_INTEGRACION_FASE_06_5.md). Revisión del equipo pendiente; sin avanzar a 07 |
 | 07 | Creación de cuentas y credenciales iniciales | No iniciada |
 | 08 | Estabilización y regresión acumulada | No iniciada |
 | 09 | Login definitivo, primer ingreso, perfil y recuperación | No iniciada |

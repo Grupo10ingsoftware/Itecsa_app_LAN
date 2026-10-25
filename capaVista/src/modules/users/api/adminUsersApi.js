@@ -13,7 +13,11 @@ function buildQueryString(params) {
   return queryString ? `?${queryString}` : ''
 }
 
-export function createAdminUsersApi(apiClient) {
+export function createAdminUsersApi(apiClient, { provider = 'auth0' } = {}) {
+  const keycloak = provider === 'keycloak'
+  const base = keycloak ? '/admin/identity/users' : '/admin/users'
+  const unavailable = async () => { throw Object.assign(new Error('Operacion no habilitada'), { status: 503,
+    payload: { code: 'IDENTITY_OPERATION_NOT_IMPLEMENTED', message: 'Esta operacion todavia no esta habilitada para Keycloak.' } }) }
   // Deduplicate only simultaneous reads. Completed activity is never retained:
   // each deliberate reopen must be authorized by the backend again.
   const movementsInFlight = new Map()
@@ -23,7 +27,7 @@ export function createAdminUsersApi(apiClient) {
     if (inFlight) return inFlight
 
     const request = apiClient.get(
-      `/admin/users/${encodeURIComponent(userId)}/movements${buildQueryString({ page, perPage, search })}`,
+      `${base}/${encodeURIComponent(userId)}/movements${buildQueryString({ page, perPage, search })}`,
     ).finally(() => {
       if (movementsInFlight.get(key) === request) movementsInFlight.delete(key)
     })
@@ -34,7 +38,7 @@ export function createAdminUsersApi(apiClient) {
   return {
     listUsers: ({ page = 1, perPage = 10, search = '', estadoUsuario = '', rolUsuario = '' } = {}) =>
       apiClient.get(
-        `/admin/users${buildQueryString({
+        `${base}${buildQueryString({
           page,
           perPage,
           search,
@@ -43,10 +47,14 @@ export function createAdminUsersApi(apiClient) {
         })}`,
     ),
     getMovements,
-    setTemporaryPassword: ({ userId, pin, identityVerified }) => apiClient.post(
+    inspectUser: userId => apiClient.get(`/admin/identity/identities/${encodeURIComponent(userId)}`),
+    reconcile: ({ operationId, pin }) => apiClient.post(`/admin/identity/operations/${encodeURIComponent(operationId)}/reconcile`, { pin }),
+    setTemporaryPassword: keycloak ? unavailable : ({ userId, pin, identityVerified }) => apiClient.post(
       `/admin/users/${encodeURIComponent(userId)}/temporary-password`, { pin, identityVerified }),
-    getSummary: () => apiClient.get('/admin/users/summary'),
-    createUser: ({ nombreUsuario, apellidoUsuario, rutUsuario, correoUsuario, rolUsuario }) =>
+    getSummary: () => apiClient.get(`${base}/summary`),
+    createUser: keycloak ? ({ username, nombreUsuario, apellidoUsuario, correoUsuario, rolUsuario, pin }) =>
+      apiClient.post('/admin/identity/identities/prepare', { pin, identity: { username, firstName: nombreUsuario,
+        lastName: apellidoUsuario, email: correoUsuario || null, role: rolUsuario } }) : ({ nombreUsuario, apellidoUsuario, rutUsuario, correoUsuario, rolUsuario }) =>
       apiClient.post('/admin/users', {
         nombreUsuario,
         apellidoUsuario,
@@ -54,7 +62,7 @@ export function createAdminUsersApi(apiClient) {
         correoUsuario,
         rolUsuario,
       }),
-    updateUser: ({
+    updateUser: keycloak ? unavailable : ({
       idUsuarioAutenticacionExterna,
       nombreUsuario,
       apellidoUsuario,
@@ -69,12 +77,12 @@ export function createAdminUsersApi(apiClient) {
         rolUsuario,
         pin,
       }),
-    unlinkUser: ({ idUsuarioAutenticacionExterna, pin }) =>
+    unlinkUser: keycloak ? unavailable : ({ idUsuarioAutenticacionExterna, pin }) =>
       apiClient.patch(`/admin/users/${encodeURIComponent(idUsuarioAutenticacionExterna)}/status`, {
         estadoUsuario: USER_STATUS.UNLINKED,
         pin,
       }),
-    requestPasswordSetupEmail: ({ correoUsuario }) =>
+    requestPasswordSetupEmail: keycloak ? unavailable : ({ correoUsuario }) =>
       apiClient.post('/admin/users/password-setup-email', { correoUsuario }),
   }
 }

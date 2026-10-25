@@ -38,6 +38,7 @@ export default function UserManagementTable({
   totalPages,
   totalUsers,
   users,
+  readOnly = false,
 }) {
   const pageItems = buildNearbyPages(currentPage, totalPages)
   const canGoPrevious = currentPage > 1 && !isLoading
@@ -74,7 +75,8 @@ export default function UserManagementTable({
             {!isLoading &&
               users.map((user) => (
                 <tr key={user.id}>
-                  <td className={styles.nameCell}>{user.nombreListado}</td>
+                  <td className={styles.nameCell}>{user.nombreListado}{user.username && <small className="d-block">{user.username}</small>}
+                    {user.identityBindingConflict && <small className="d-block">Vinculo pendiente de conciliacion</small>}</td>
                   <td>{user.rutUsuario}</td>
                   <td className={styles.emailCell}>{user.correoUsuario || 'Sin correo'}</td>
                   <td>{getRoleLabel(user.rolUsuario)}</td>
@@ -90,7 +92,7 @@ export default function UserManagementTable({
                       onClick={() => onEditUser(user)}
                       variant="secondary"
                     >
-                      Editar
+                      {readOnly ? 'Consultar' : 'Editar'}
                     </UserButton>
                     <UserButton
                       className={styles.actionButton}
@@ -114,6 +116,7 @@ export default function UserManagementTable({
         onEditUser={onEditUser}
         onViewMovements={onViewMovements}
         users={users}
+        readOnly={readOnly}
       />
 
       <footer className={styles.paginationFooter} aria-label="Resumen y paginacion de usuarios">

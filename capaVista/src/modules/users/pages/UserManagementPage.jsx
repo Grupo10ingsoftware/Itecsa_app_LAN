@@ -51,6 +51,8 @@ function mapApiUser(user) {
     correoUsuario: user.correoUsuario ?? '',
     rolUsuario: user.rolUsuario ?? 'Sin rol asignado',
     estadoUsuario: displayUserStatus(user.estadoUsuario ?? 'Vinculado'),
+    username: user.username,
+    identityBindingConflict: user.identityBindingConflict === true,
   }
 }
 
@@ -95,7 +97,8 @@ function getErrorText(error) {
 }
 
 export default function UserManagementPage() {
-  const { identityUser, loginWithRedirect } = useAuth()
+  const { identityUser, loginWithRedirect, provider } = useAuth()
+  const keycloak = provider === 'keycloak'
   const adminUsersApi = useAdminUsersApi()
   const latestRequestRef = useRef(0)
   const latestSummaryRequestRef = useRef(createLatestRequestTracker())
@@ -200,6 +203,7 @@ export default function UserManagementPage() {
         vinculados: response.vinculados ?? 0,
         desvinculados: response.desvinculados ?? 0,
         pendientes: response.pendientes ?? 0,
+        pendientesRol: response.pendientesRol ?? 0,
       })
       setSummaryState({ error: '', hasData: true, isLoading: false })
     } catch (error) {
@@ -285,6 +289,15 @@ export default function UserManagementPage() {
   }
 
   async function handleCreatedUser(user) {
+    if (keycloak) {
+      if (user.outcome === 'identity_prepared') setIsCreateModalOpen(false)
+      setPage(1)
+      await refreshAfterMutation({ type: user.outcome === 'identity_prepared' ? 'info' : 'warning',
+        text: user.outcome === 'identity_prepared'
+          ? 'Cuenta preparada. Permanece pendiente y deshabilitada; aun no tiene credenciales.'
+          : `Preparacion incompleta. No repitas el alta con otro nombre. Referencia: ${user.operationId}.` })
+      return
+    }
     const completed = isCompletedUserCreation(user)
     if (completed || user.outcome === 'pending_credentials') setIsCreateModalOpen(false)
     setPage(1)
@@ -297,6 +310,13 @@ export default function UserManagementPage() {
         : 'El alta quedo incompleta y requiere conciliacion. Revisa el detalle antes de cerrar.',
     })
   }
+  async function handleInspectUser(user) {
+    if (!keycloak) { setEditingUser(user); return }
+    try {
+      const detail = await adminUsersApi.inspectUser(user.idUsuarioAutenticacionExterna)
+      setEditingUser({ ...user, username: detail.username, enabled: detail.enabled })
+    } catch (error) { setActionMessage({ type: 'danger', text: getErrorText(error) }) }
+  }
 
   return (
     <main className={`container-fluid ${styles.page}`} aria-labelledby="user-management-title">
@@ -307,6 +327,7 @@ export default function UserManagementPage() {
             Gestion de usuarios
           </h1>
           <p className={styles.pageSubtitle}>Administra usuarios, roles y estado de vinculacion del sistema.</p>
+          {keycloak && <p role="status">Puedes consultar cuentas y movimientos, y preparar cuentas pendientes. La edicion, los cambios de rol, la activacion, la desactivacion y la entrega de credenciales aun no estan habilitados.</p>}
         </header>
 
         <UserSummaryCards
@@ -352,7 +373,8 @@ export default function UserManagementPage() {
           <UserManagementTable
             currentPage={page}
             isLoading={isLoading}
-            onEditUser={setEditingUser}
+            onEditUser={handleInspectUser}
+            readOnly={keycloak}
             onViewMovements={setMovementsUser}
             onPageChange={setPage}
             totalPages={totalPages}
@@ -388,6 +410,7 @@ export default function UserManagementPage() {
         }}
         isCurrentUser={Boolean(editingUser?.isCurrentUser)}
         user={editingUser}
+        readOnly={keycloak}
       />
       <UserUnlinkConfirmModal
         isOpen={Boolean(unlinkingUser)}

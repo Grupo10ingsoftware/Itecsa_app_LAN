@@ -33,6 +33,8 @@ import PrivacyRequestService from './modules/privacy/service/privacyRequest.serv
 import { createIncidentReportRouter } from './modules/security/routes/incidentReport.routes.js';
 import IncidentReportController from './modules/security/controller/incidentReport.controller.js';
 import IncidentReportService from './modules/security/service/incidentReport.service.js';
+import { createKeycloakIdentityPreparationRouter } from './modules/users/routes/keycloakIdentityPreparation.routes.js';
+import { KeycloakIdentityAdministrationService } from './modules/users/service/keycloakIdentityAdministration.service.js';
 class Server {
   constructor({ env = process.env, appEnvironment = currentAppEnvironment(), logger = safeLogger } = {}) {
     // Creamos como propiedad misma de la clase servidor
@@ -122,6 +124,11 @@ class Server {
         includeDebugRoutes: this.environment.demoFeaturesEnabled && this.appEnvironment !== "production",
       }),
     )
+    if (this.env.AUTH_PROVIDER === 'keycloak' && this.env.IDENTITY_PREPARATION_ENABLED === 'true') {
+      this.app.use('/api/admin/identity', createKeycloakIdentityPreparationRouter({
+        service: new KeycloakIdentityAdministrationService(),
+      }));
+    }
     this.app.use( this.paths.admin, adminUsersRoutes)
     this.app.use( this.paths.health, healthRoutes)
     this.app.use('/internal', createInternalHealthRouter({ logger: this.logger }))

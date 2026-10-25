@@ -11,6 +11,8 @@ const server = await createServer({
 try {
   const stage4 = await server.ssrLoadModule('/test/stage4.cases.jsx')
   await stage4.run()
+  const keycloakUsers = await server.ssrLoadModule('/test/keycloakUsers.cases.jsx')
+  await keycloakUsers.run()
   const metrics = await server.ssrLoadModule('/test/metrics.cases.jsx')
   metrics.run()
   const authorization = await server.ssrLoadModule('/test/authorization.cases.jsx')

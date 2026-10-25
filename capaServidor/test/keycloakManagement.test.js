@@ -21,6 +21,20 @@ test('server administration configuration is explicit, HTTPS constrained and sep
   ]) assert.throws(() => resolveKeycloakAdministration({ ...env, ...change }), /Configuracion/);
 });
 
+test('Docker transport preserves issuer and is limited to development or test', () => {
+  const transport = { ...env, NODE_ENV: 'test', KEYCLOAK_ADMIN_TRANSPORT_ORIGIN: 'http://host.docker.internal:18080' };
+  const result = resolveKeycloakAdministration(transport);
+  assert.equal(result.issuer, env.KEYCLOAK_ISSUER);
+  assert.equal(result.tokenUrl, 'http://host.docker.internal:18080/auth/realms/synthetic/protocol/openid-connect/token');
+  assert.equal(result.adminUrl, 'http://host.docker.internal:18080/auth/admin/realms/synthetic');
+  assert.equal(resolveKeycloakAdministration({ ...transport, APP_ENV: 'development', NODE_ENV: 'development' }).issuer, env.KEYCLOAK_ISSUER);
+  for (const change of [{ APP_ENV: 'production' }, { APP_ENV: 'unknown' },
+    ...['http://user:password@host.test', 'http://host.test/path', 'http://host.test/#fragment',
+      'http://host.test?x=y', 'https://host.test', 'http://host.test/'].map(KEYCLOAK_ADMIN_TRANSPORT_ORIGIN => ({ KEYCLOAK_ADMIN_TRANSPORT_ORIGIN }))]) {
+    assert.throws(() => resolveKeycloakAdministration({ ...transport, ...change }));
+  }
+});
+
 test('concurrent administration reads share one service token; expiry obtains a fresh token without refresh grant', async () => {
   let now = 0, tokens = 0;
   const api = new KeycloakManagementService({ env, clock: () => now, fetcher: async (url, options) => {

@@ -5,6 +5,7 @@ import { useAuth } from '../../../hooks/useAuth'
 import { useAdminUsersApi } from '../hooks/useAdminUsersApi'
 import { hasValidationErrors, validateUserCreateForm } from '../utils/userValidation'
 import { canRequestPasswordSetupEmail } from '../utils/userCreationOutcome'
+import { authorizationForProvider } from '../../../../../shared/identityAuthorization.js'
 import styles from './UserCreateForm.module.css'
 
 const INITIAL_VALUES = Object.freeze({
@@ -13,6 +14,8 @@ const INITIAL_VALUES = Object.freeze({
   rutUsuario: '',
   correoUsuario: '',
   rolUsuario: '',
+  username: '',
+  pin: '',
 })
 
 const INITIAL_ERRORS = Object.freeze({
@@ -21,6 +24,8 @@ const INITIAL_ERRORS = Object.freeze({
   rutUsuario: [],
   correoUsuario: [],
   rolUsuario: [],
+  username: [],
+  pin: [],
 })
 
 const MESSAGE_TYPES = Object.freeze({
@@ -126,6 +131,7 @@ function buildCreatedUserMessage(user) {
 
 export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, onCreated } = {}) {
   const { loginWithRedirect, user: actor, provider } = useAuth()
+  const keycloak = provider === 'keycloak'
   const adminUsersApi = useAdminUsersApi()
   const [values, setValues] = useState(INITIAL_VALUES)
   const [fieldErrors, setFieldErrors] = useState(INITIAL_ERRORS)
@@ -141,18 +147,29 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
 
   function handleFieldChange(event) {
     const { name, value } = event.target
+    if (keycloak && createdUser && name !== 'pin') return
 
     setValues((currentValues) => ({
       ...currentValues,
       [name]: value,
     }))
-    clearResultState()
+    if (!keycloak || !createdUser) clearResultState()
   }
 
   async function handleSubmit(event) {
     event.preventDefault()
+    if (isSubmitting || (keycloak && createdUser)) return
 
-    const nextErrors = validateUserCreateForm(values, { optionalEmail: provider === 'keycloak' })
+    const nextErrors = validateUserCreateForm(values, { optionalEmail: keycloak, requireRut: !keycloak })
+    if (keycloak) {
+      nextErrors.username = values.username && values.username === values.username.trim().toLowerCase()
+        && values.username.length <= 255 && !/\s/u.test(values.username)
+        && [...values.username].every(char => char.codePointAt(0) > 32) ? [] : ['Ingresa un nombre de acceso en minusculas, sin espacios.']
+      nextErrors.pin = /^\d{6}$/.test(values.pin) ? [] : ['Ingresa tu PIN de 6 digitos.']
+      if (!authorizationForProvider(provider).manageableRoles(actor?.rolUsuario).includes(values.rolUsuario)) {
+        nextErrors.rolUsuario = ['No puedes asignar ese rol.']
+      }
+    }
     setFieldErrors(nextErrors)
     clearResultState()
 
@@ -166,6 +183,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
       rutUsuario: values.rutUsuario.trim().toUpperCase(),
       correoUsuario: values.correoUsuario.trim().toLowerCase() || (provider === 'keycloak' ? null : ''),
       rolUsuario: values.rolUsuario,
+      ...(keycloak ? { username: values.username, pin: values.pin } : {}),
     }
 
     setIsSubmitting(true)
@@ -174,16 +192,33 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
     try {
       const user = await adminUsersApi.createUser(payload)
       setCreatedUser(user)
-      setMessage(buildCreatedUserMessage(user))
-      setValues(INITIAL_VALUES)
+      setMessage(keycloak ? { type: user.outcome === 'identity_prepared' ? MESSAGE_TYPES.INFO : MESSAGE_TYPES.WARNING,
+        text: user.outcome === 'identity_prepared'
+          ? 'Cuenta preparada, pendiente y deshabilitada. La entrega de credenciales aun no esta habilitada.'
+          : `Preparacion incompleta. No repitas el alta. Referencia: ${user.operationId}.` } : buildCreatedUserMessage(user))
+      if (!keycloak || user.outcome === 'identity_prepared') setValues(INITIAL_VALUES)
       setFieldErrors(INITIAL_ERRORS)
       onCreated?.(user)
     } catch (error) {
       setMessage(getErrorMessage(error))
     } finally {
+      if (keycloak) setValues(current => ({ ...current, pin: '' }))
       setIsSubmitting(false)
       onBusyChange?.(false)
     }
+  }
+  async function handleReconcile() {
+    if (!/^\d{6}$/.test(values.pin)) { setFieldErrors(current => ({ ...current, pin: ['Ingresa tu PIN de 6 digitos.'] })); return }
+    setIsSubmitting(true); onBusyChange?.(true)
+    try {
+      const result = await adminUsersApi.reconcile({ operationId: createdUser.operationId, pin: values.pin })
+      setCreatedUser(result)
+      setMessage({ type: result.outcome === 'identity_prepared' ? MESSAGE_TYPES.INFO : MESSAGE_TYPES.WARNING,
+        text: result.outcome === 'identity_prepared' ? 'Cuenta preparada. Permanece pendiente y deshabilitada.'
+          : `La operacion sigue pendiente de revision. Referencia: ${result.operationId}.` })
+      onCreated?.(result)
+    } catch (error) { setMessage(getErrorMessage(error)) }
+    finally { setValues(current => ({ ...current, pin: '' })); setIsSubmitting(false); onBusyChange?.(false) }
   }
 
   async function handlePasswordSetupEmailRequest() {
@@ -252,6 +287,14 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
             )}
           </div>
         )}
+        {keycloak && <div className={styles.fieldCard}>
+          <div className={styles.fieldContent}>
+            <label htmlFor="user-username">Nombre de acceso <span>*</span></label>
+            <input id="user-username" name="username" value={values.username} onChange={handleFieldChange}
+              autoComplete="off" maxLength={255} disabled={Boolean(createdUser)} aria-invalid={Boolean(fieldErrors.username?.length)} aria-describedby="user-username-errors" />
+            <FieldErrors errors={fieldErrors.username ?? []} id="user-username-errors" />
+          </div>
+        </div>}
 
         <div className={`${styles.fieldCard} ${nombreUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
           <div className={styles.fieldContent}>
@@ -309,7 +352,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
 
         <div className={`${styles.fieldCard} ${rutUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
           <div className={styles.fieldContent}>
-            <label htmlFor="user-rut">RUT <span>*</span></label>
+            <label htmlFor="user-rut">RUT {!keycloak && <span>*</span>}</label>
             <input
               aria-describedby="user-rut-errors"
               aria-invalid={rutUsuarioErrors.length > 0}
@@ -320,7 +363,9 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
               placeholder="Ej: 12.345.678-9"
               type="text"
               value={values.rutUsuario}
+              disabled={keycloak}
             />
+            {keycloak && <p className={styles.fieldHelp}>La preparacion actual no registra RUT.</p>}
             <FieldErrors errors={rutUsuarioErrors} id="user-rut-errors" />
           </div>
         </div>
@@ -337,7 +382,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
               value={values.rolUsuario}
             >
               <option value="">Selecciona un rol</option>
-              {manageableRoles(actor?.rolUsuario).map((role) => (
+              {(keycloak ? authorizationForProvider(provider).manageableRoles(actor?.rolUsuario) : manageableRoles(actor?.rolUsuario)).map((role) => (
                 <option key={role} value={role}>
                   {getRoleLabel(role)}
                 </option>
@@ -360,13 +405,21 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
             />
             <p className={styles.fieldHelp} id="user-password-help">
               {provider === 'keycloak'
-                ? 'La cuenta quedara pendiente de credenciales. Establecelas desde Editar usuario mediante HTTPS.'
+                ? 'La cuenta quedara deshabilitada y pendiente. La activacion y entrega de credenciales aun no estan habilitadas.'
                 : 'El usuario establecera su contraseña mediante el procedimiento de correo de Auth0.'}
             </p>
           </div>
         </div>
+        {keycloak && <div className={styles.fieldCard}>
+          <div className={styles.fieldContent}>
+            <label htmlFor="user-prepare-pin">Tu PIN de autorizacion <span>*</span></label>
+            <input id="user-prepare-pin" name="pin" type="password" inputMode="numeric" maxLength={6} autoComplete="off"
+              value={values.pin} onChange={handleFieldChange} aria-invalid={Boolean(fieldErrors.pin?.length)} aria-describedby="user-prepare-pin-errors" />
+            <FieldErrors errors={fieldErrors.pin ?? []} id="user-prepare-pin-errors" />
+          </div>
+        </div>}
 
-        {createdUser && (
+        {createdUser && !keycloak && (
           <section className={styles.creationResult}>
             <h2>Resultado de creacion</h2>
             <dl>
@@ -401,6 +454,8 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
             {isRequestingPasswordEmail ? 'Solicitando correo...' : 'Solicitar correo'}
           </button>
         )}
+        {keycloak && createdUser?.outcome === 'needs_reconciliation' && <button className={styles.secondaryButton}
+          type="button" disabled={isBusy} onClick={handleReconcile}>Conciliar preparacion</button>}
 
         <button
           className={styles.submitButton}
@@ -408,7 +463,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
           type="submit"
         >
           <i className="bi bi-plus-circle" aria-hidden="true" />
-          {isSubmitting ? 'Creando usuario...' : 'Crear usuario'}
+          {isSubmitting ? (keycloak ? 'Preparando cuenta...' : 'Creando usuario...') : (keycloak ? 'Preparar cuenta pendiente' : 'Crear usuario')}
         </button>
       </footer>
     </form>

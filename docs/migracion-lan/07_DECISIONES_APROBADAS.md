@@ -4,6 +4,8 @@ Fecha de actualización: **25-10-2026**. Fuente de aprobación: nuevo encargo «
 
 ## Registro
 
+**Actualización vigente, posterior a D16:** el equipo aclaró que se trata de software en desarrollo, ordenó borrar los laboratorios y autorizó los cambios necesarios en el entorno habitual y en Keycloak Ubuntu. Se retiran los recursos sintéticos, se reutilizan los clientes reales y Aiven, y no se crean más copias ni se repiten suites de pruebas. Se conserva el respaldo frío anterior; no se crea otro. No se solicitan otra vez las autorizaciones ya dadas. Alcance realizado en [15](15_EVIDENCIA_INTEGRACION_FASE_06_5.md). Las limitaciones de D08–D16 describen su contexto histórico.
+
 | ID | Decisión expresa / aplicación concreta | Estado |
 |---|---|---|
 | D01 | Nueve roles: siete funcionales actuales, Desarrollador y nuevo Soporte | Aprobada; política aislada implementada |
@@ -19,6 +21,9 @@ Fecha de actualización: **25-10-2026**. Fuente de aprobación: nuevo encargo «
 | D11 | El equipo pidió «commit y siguiente fase» tras 03 | Commit local 5941404 creado; fase 04 autorizada. Fase 05 y posteriores pendientes de autorización |
 | D12 | El equipo indicó «ya ahora seguimos con la fase 5» después de conservar 00–04 en e74a914 y descartar la integración pendiente con Ubuntu | Fase 05 autorizada; no autoriza desplegar en Ubuntu, nuevo commit ni avanzar a 06. D09–D11 describen el alcance histórico en su momento |
 | D13 | El equipo pidió «hace un commit y parte con la siguiente fase» después de la entrega 05 | Commit local 9e44010 creado; fase 06 autorizada. Sin autorizar 07, commit de 06, push o despliegue. Los límites anteriores conservan su contexto histórico |
+| D14 | El equipo pidió después solo el commit de 06 y encargó expresamente la integración 06.5 con Ubuntu | Base ad41e54; se reactiva exclusivamente la integración antes cancelada. Autoriza configuración aditiva, usuarios sintéticos y aplicación/MySQL aislados; no 07, commit, push ni despliegue definitivo |
+| D15 | El equipo autorizó mantenimiento de hasta cinco minutos y confirmó que su compañero no estaba configurando Keycloak | Respaldo frío integral y recuperación aislada comprobados; interrupción observada 14,34 s. Sin cambiar almacenamiento, usuarios anteriores o passwords reales |
+| D16 | El equipo autorizó expresamente copiar runtime privado desde Ubuntu al temporal protegido de Windows | Destino concreto documentado en [15](15_EVIDENCIA_INTEGRACION_FASE_06_5.md); credenciales sintéticas y secreto técnico fuera de Git/logs/informe; entrega humana en HTML local privado sin secreto técnico |
 
 La selección concreta de Soporte utiliza la autorización expresa para conservar perfil y mensajes propios cuando sean necesarios. `manage:own-pin` mantiene el PIN propio independiente, requerido por los contratos de operaciones sensibles; no crea un permiso de administración del PIN ajeno ni un restablecimiento de contraseña. `manage:users` representa la capacidad administrativa existente; no acredita que estén implementadas las futuras credenciales temporales, recuperación o consulta de auditoría. No se añadieron capacidades ficticias para funciones que aún no existen.
 
