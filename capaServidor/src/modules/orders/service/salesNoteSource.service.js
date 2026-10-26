@@ -12,6 +12,12 @@ const DEFAULT_FIXTURE_PATH = path.resolve(
 );
 const fixtureRepositories = new Set();
 
+export const PRODUCT_TYPE = Object.freeze({
+  YOYO: "Yoyo",
+  LANYARD: "Lanyard",
+  TARJETA: "Tarjeta",
+});
+
 function normalizeText(value) {
   return typeof value === "string" ? value.trim() : "";
 }
@@ -31,9 +37,9 @@ function resolveProductType(item = {}) {
   const family = normalizeText(item.familia).toUpperCase();
   const subfamily = normalizeText(item.subfamilia).toUpperCase();
 
-  if (subfamily === "YOYO") return "Yoyo";
-  if (family === "LANYARD" && subfamily === "LANYARD") return "Lanyard";
-  if (family === "TARJETAS" && subfamily === "TARJETAS") return "Tarjeta";
+  if (subfamily === "YOYO") return PRODUCT_TYPE.YOYO;
+  if (family === "LANYARD" && subfamily === "LANYARD") return PRODUCT_TYPE.LANYARD;
+  if (family === "TARJETAS" && subfamily === "TARJETAS") return PRODUCT_TYPE.TARJETA;
 
   return null;
 }

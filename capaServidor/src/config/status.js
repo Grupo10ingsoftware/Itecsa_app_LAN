@@ -9,6 +9,9 @@ export const ORDER_STATUS = Object.freeze({
     LISTO_PRODUCCION: "Listo para produccion",
     EN_PRODUCCION: "En produccion",
     LISTO_ENTREGA: "Listo para entrega",
+    ENTREGADO: "Entregado",
+    CANCELADO: "Cancelado",
+    EN_REVISION: "En revisión",
 });
 
 export const PAYMENT_CONFIRMATION_REQUIRED_MESSAGE =

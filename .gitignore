@@ -2,6 +2,8 @@
 deploy/production.env
 deploy/mysql-lab.env
 deploy/mysql-lab/certs/
+deploy/mysql-lab/private/
+deploy/mysql-lab/state/
 .env*
 !.env.example
 !**/.env.example

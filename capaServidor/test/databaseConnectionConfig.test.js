@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { resolveDatabaseConnection } from "../src/database/connectionConfig.js";
+import { createStrictTlsOptions, resolveDatabaseConnection } from "../src/database/connectionConfig.js";
 
 const temporary = mkdtempSync(path.join(tmpdir(), "itecsa-db-config-"));
 const caPath = path.join(temporary, "ca.pem");
@@ -34,6 +34,20 @@ test("API and CLI may use different accounts for the same TLS destination", () =
     assert.equal(result.user, "api_user");
     assert.equal(result.database, "itecsa_lab");
     assert.match(result.ca, /synthetic test CA/);
+});
+
+test("TLS validates the explicitly selected database host", () => {
+    const calls = [];
+    const options = createStrictTlsOptions("127.0.0.1", "synthetic CA", {
+        checkServerIdentity(host, certificate) {
+            calls.push({ host, certificate });
+            return undefined;
+        },
+    });
+    const certificate = { subjectaltname: "IP Address:127.0.0.1" };
+    assert.equal(options.checkServerIdentity("localhost", certificate), undefined);
+    assert.deepEqual(calls, [{ host: "127.0.0.1", certificate }]);
+    assert.equal(options.rejectUnauthorized, true);
 });
 
 test("rejects a different CLI host, port or database without exposing secrets", () => {
@@ -81,7 +95,7 @@ test("unencrypted connections remain limited to the test environment", () => {
     assert.equal(resolveDatabaseConnection(env).sslMode, "disabled");
 });
 
-test("laboratory profile pins its address and requires its URL", () => {
+test("laboratory API profile pins its address without receiving the migration URL", () => {
     const env = base({ DB_TARGET: "mysql-lab-docker" });
     assert.throws(() => resolveDatabaseConnection(env), /DB_HOST=mysql/);
     env.DB_HOST = "mysql";
@@ -90,7 +104,8 @@ test("laboratory profile pins its address and requires its URL", () => {
     env.DATABASE_URL = url.href;
     assert.equal(resolveDatabaseConnection(env).host, "mysql");
     delete env.DATABASE_URL;
-    assert.throws(() => resolveDatabaseConnection(env), /DATABASE_URL es obligatorio/);
+    assert.equal(resolveDatabaseConnection(env).host, "mysql");
+    assert.throws(() => resolveDatabaseConnection(env, { requireUrl: true }), /DATABASE_URL es obligatorio/);
 });
 
 test("a selected missing environment file fails instead of falling back", () => {

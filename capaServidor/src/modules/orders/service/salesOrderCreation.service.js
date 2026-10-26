@@ -6,8 +6,13 @@ import { isUniqueConstraint } from '../../../database/uniqueConstraint.js';
 export const DUPLICATE_SALES_NOTE_MESSAGE =
   "Esta Nota de Venta ya fue registrada en el sistema y no puede volver a ingresarse.";
 
+export const PRIORITY_LABEL = Object.freeze({
+  URGENT: "Urgencia",
+  CONTRACT: "Prioridad por contrato",
+});
+
 function normalizePriorityLabels(priority) {
-  return priority === "urgent" ? ["Urgencia"] : priority === "contract" ? ["Prioridad por contrato"] : [];
+  return priority === "urgent" ? [PRIORITY_LABEL.URGENT] : priority === "contract" ? [PRIORITY_LABEL.CONTRACT] : [];
 }
 
 export default class SalesOrderCreationService {

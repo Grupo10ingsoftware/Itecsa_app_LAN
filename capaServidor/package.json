@@ -12,6 +12,12 @@
     "prisma:validate": "node ../tooling/prisma/node_modules/prisma/build/index.js validate",
     "prisma:migrate:dev": "node ../tooling/prisma/node_modules/prisma/build/index.js migrate dev",
     "prisma:migrate:status": "node ../tooling/prisma/node_modules/prisma/build/index.js migrate status",
+    "prisma:seed": "node ../tooling/prisma/node_modules/prisma/build/index.js db seed --config prisma.config.ts",
+    "mysql-lab:init": "node scripts/mysqlLabInitialize.mjs",
+    "mysql-lab:catalogs": "node scripts/mysqlLabCatalogCheck.mjs",
+    "mysql-lab:bootstrap-accounts": "node scripts/mysqlLabBootstrapAccounts.mjs",
+    "mysql-lab:verify": "node scripts/mysqlLabVerify.mjs",
+    "mysql-lab:physical-check": "node scripts/mysqlLabPhysicalCheck.mjs",
     "orders:preflight": "node scripts/ordersPreflight.mjs",
     "pin:retention:preview": "node scripts/previewPinRecoveryRetention.mjs",
     "retention:preview": "node scripts/previewBusinessRetention.mjs",
@@ -27,7 +33,8 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "express-oauth2-jwt-bearer": "^1.10.0"
+    "express-oauth2-jwt-bearer": "^1.10.0",
+    "mariadb": "3.5.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

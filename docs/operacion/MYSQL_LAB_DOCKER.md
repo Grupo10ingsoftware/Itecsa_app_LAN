@@ -66,23 +66,26 @@ etiqueta cargada; comprobar que corresponde al digest registrado. Los comandos
 anteriores usan `--pull never` para no depender del registro. La validacion
 estatica no comprueba disponibilidad de la imagen ni permisos de certificados.
 
-## Conexion futura de la aplicacion
+## Perfiles de aplicacion e inicializacion
 
-La API y Prisma CLI comparten una validacion estatica del destino. Los perfiles
-del laboratorio son completos e independientes de `capaServidor/.env`:
+La API y el inicializador usan archivos distintos. La API solo recibe la cuenta
+`itecsa_app`; las plantillas `*.init.example` agregan la cuenta
+`itecsa_migrator` y la confirmacion explicita de la base. El inicializador
+construye `DATABASE_URL` con la API `URL`, por lo que las contrasenas pueden
+contener comillas, barras, Unicode y saltos de linea sin interpolacion manual.
 
-| Ejecucion | Plantilla para copiar | Direccion MySQL | CA de la API |
-| --- | --- | --- | --- |
-| Computador | `capaServidor/env.mysql-lab.host.example` a `capaServidor/.env.mysql-lab.host` | `127.0.0.1:33307` | Ruta absoluta al `ca.pem` del laboratorio |
-| Contenedor API | `capaServidor/env.mysql-lab.docker.example` a `capaServidor/.env.mysql-lab.docker` | `mysql:3306` | `/run/secrets/mysql-lab-ca.pem` |
+| Uso | Computador | Docker |
+| --- | --- | --- |
+| API | `capaServidor/env.mysql-lab.host.example` | `capaServidor/env.mysql-lab.docker.example` |
+| Inicializador | `capaServidor/env.mysql-lab.host.init.example` | `capaServidor/env.mysql-lab.docker.init.example` |
+| MySQL | `127.0.0.1:33307` | `mysql:3306` |
+| CA | ruta absoluta local | `/run/secrets/mysql-lab-ca.pem` |
 
-Sustituir todos los marcadores, incluidos los secretos no relacionados con MySQL.
-El archivo Docker recibe la CA mediante `compose.api.mysql.lab.yaml`; no copiar
-la clave privada del servidor a la API. La cuenta de Prisma CLI puede diferir
-de la cuenta de la API, pero su URL debe señalar el mismo host, puerto y base.
-Ambas rutas TLS deben usar la misma CA y `sslaccept=strict`. En el computador,
-codificar usuario, clave y ruta absoluta de la CA al escribir `DATABASE_URL`,
-especialmente si la ruta contiene espacios.
+Copiar cada plantilla que se vaya a usar a un archivo `.env.mysql-lab.*`,
+reemplazar sus marcadores y limitar sus permisos. Todos esos archivos locales
+estan ignorados por Git. La API no debe recibir `DB_MIGRATION_PASSWORD` ni
+`DATABASE_URL`. El certificado de servidor debe validar el nombre usado por el
+perfil: IP SAN `127.0.0.1` y DNS SAN `mysql`.
 
 La configuracion base de MySQL sigue sin publicar puertos. Solo para pruebas
 desde el computador, el override `compose.mysql.lab.host.yaml` publicara 3306
@@ -93,14 +96,14 @@ docker compose --env-file deploy/mysql-lab.env -f compose.mysql.lab.yaml -f comp
 ```
 
 El puerto puede ajustarse con `MYSQL_HOST_PORT`; entonces cambiar tambien
-`DB_PORT` y `DATABASE_URL` del perfil host. Para seleccionar ese perfil desde
+`DB_PORT` del perfil host. Para seleccionar ese perfil desde
 `capaServidor`, usar
 `DB_TARGET=mysql-lab-host DOTENV_PATH=.env.mysql-lab.host npm run dev` o
-anteponer ambas variables a un comando Prisma CLI. `DB_TARGET` obliga a usar
-la direccion local incluso si el shell contiene variables antiguas. Si el
-archivo seleccionado falta o no se puede leer, la API y la CLI fallan antes
-de utilizar una conexion. El `.env` actual de Aiven permanece como perfil
-predeterminado cuando no se selecciona otro archivo.
+seleccionar el archivo equivalente del inicializador cuando corresponda.
+`DB_TARGET` obliga a usar la direccion local incluso si el shell contiene
+variables antiguas. Si el archivo seleccionado falta o no se puede leer, el
+proceso falla antes de utilizar una conexion. El `.env` actual de Aiven
+permanece intacto y sigue siendo el perfil predeterminado de desarrollo.
 
 Para ejecutar despues la API en Docker, `compose.api.mysql.lab.yaml` usa el
 perfil Docker indicado por `LAB_API_ENV_FILE=./capaServidor/.env.mysql-lab.docker`,
@@ -117,6 +120,98 @@ LAB_API_ENV_FILE=./capaServidor/env.mysql-lab.docker.example docker compose -f c
 La plantilla permite esta comprobacion estatica; para un arranque posterior,
 seleccionar el archivo local `.env.mysql-lab.docker` ya completado.
 
-Estos archivos no crean tablas ni catalogos y no ejecutan migraciones. La
-conexion fisica, los certificados reales y los permisos de una eventual cuenta
-CLI distinta se validaran en la siguiente tarea.
+## Historial y catalogos iniciales
+
+Se conserva sin cambios el historial actual de 15 migraciones. La reconciliacion
+`20260901000000_reconcile_pre_september_schema` incluye una guarda que exige
+una reconstruccion vacia antes de transformar las tablas legadas. El
+inicializador rechaza una base con tablas de aplicacion y sin
+`_prisma_migrations`, y tambien rechaza migraciones fallidas o revertidas. La
+ejecucion consecutiva real del historial sobre MySQL 8.4 queda pendiente de la
+validacion fisica.
+
+El seed toma sus valores de las constantes que ya consume la aplicacion y de
+las relaciones cubiertas por la regresion integral. Prepara:
+
+- estados de pago y etapas del pedido;
+- productos Yoyo, Lanyard y Tarjeta;
+- etiquetas Urgencia y Prioridad por contrato;
+- subprocesos Impresion, Corte y Empaquetado;
+- relaciones de Tarjeta y Lanyard con esos tres subprocesos;
+- capacidad Lanyard de 1200.
+
+Las capacidades de Tarjeta y Yoyo se escriben como `NULL`. Yoyo no recibe una
+relacion de subprocesos no versionada; la validacion informa que una linea nueva
+conservara `id_estado_subproceso = null`. El seed se ejecuta en una transaccion:
+crea filas ausentes, acepta coincidencias exactas, permite catalogos ajenos y
+aborta antes de escribir cuando un identificador o identidad esperada entra en
+conflicto. Una segunda ejecucion exacta no crea filas.
+
+## Secuencia controlada para la tarea de puesta en marcha
+
+Esta secuencia queda documentada para una ejecucion posterior. Ningun paso se
+incorpora al arranque de la API.
+
+1. Levantar MySQL y esperar su healthcheck con el Compose del laboratorio.
+2. Ejecutar de forma explicita el servicio manual `account-bootstrap` mediante
+   `docker compose ... --profile tools run --rm account-bootstrap`. El servicio
+   no tiene red y comparte solamente el volumen del socket Unix con MySQL.
+3. El bootstrap comprueba por socket `DATABASE()`, hostname fijo,
+   `@@server_uuid`, MySQL 8.4 y `require_secure_transport`. Luego deja
+   `itecsa_app` con `SELECT`, `INSERT`, `UPDATE`, `DELETE`, y
+   `itecsa_migrator` con privilegios sobre `itecsa_lab.*`. Las contrasenas se
+   pasan al conector como parametros; no habilitar historial de cliente ni
+   logging de consultas durante esta operacion.
+4. El bootstrap guarda `deploy/mysql-lab/state/instance.env`, ignorado por Git,
+   con el UUID, hostname y puerto interno del volumen. Conservarlo junto al
+   volumen; si cambia el UUID, investigar y rechazar la inicializacion.
+5. Ejecutar explicitamente `npm run mysql-lab:init` con el perfil host, o el
+   servicio manual `db-init` con el perfil Docker. Antes de Prisma, el proceso
+   abre una conexion TLS de solo lectura con la cuenta API y compara UUID,
+   hostname, base, puerto interno, usuario efectivo, version, transporte seguro
+   y ausencia de indicadores de Aiven. La CA valida tambien el nombre local del
+   certificado.
+6. Solo tras esas comprobaciones se ejecutan, en orden, `prisma migrate deploy`,
+   `prisma db seed` y la validacion de catalogos. La URL de migracion solo existe
+   en el entorno del proceso hijo; el seed y la comprobacion usan la cuenta API.
+
+Los comandos previstos, despues de aprobar la validacion fisica, son:
+
+```bash
+mkdir -p deploy/mysql-lab/state
+chmod 700 deploy/mysql-lab/state
+docker compose --env-file deploy/mysql-lab.env --profile tools -f compose.mysql.lab.yaml run --rm account-bootstrap
+```
+
+Para inicializar desde el computador, con el override de puerto ya activo:
+
+```bash
+cd capaServidor
+DOTENV_PATH=.env.mysql-lab.host.init npm run mysql-lab:init
+```
+
+Para inicializar desde Docker:
+
+```bash
+LAB_API_ENV_FILE=./capaServidor/.env.mysql-lab.docker \
+LAB_INIT_ENV_FILE=./capaServidor/.env.mysql-lab.docker.init \
+docker compose --profile tools -f compose.api.mysql.lab.yaml run --rm db-init
+```
+
+El inicializador no contiene `migrate reset`, `db push`, borrado de tablas,
+bases ni volumenes. Repetirlo aplica solo migraciones pendientes, vuelve a
+ejecutar el seed idempotente y valida los catalogos. El bootstrap de cuentas
+tambien admite repeticion para rotar las dos contrasenas del laboratorio. Una
+configuracion rotulada como laboratorio se rechaza si el destino efectivo no
+coincide con la identidad registrada.
+
+## Pendientes de validacion fisica
+
+La siguiente tarea debe ejecutar las 15 migraciones en una instancia MySQL
+8.4 vacia, comparar el esquema fisico con Prisma, comprobar las sentencias de
+cuentas y sus privilegios, ejecutar el seed dos veces, validar UUID y TLS, y
+probar fisicamente el comportamiento de pedidos Yoyo. Hasta completar esas
+pruebas no se considera validada la inicializacion real.
+
+La primera ejecucion local y sus resultados se registran en
+`docs/operacion/MYSQL_LAB_VALIDACION_LOCAL.md`.

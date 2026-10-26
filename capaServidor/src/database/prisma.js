@@ -1,6 +1,6 @@
 import { createRequire } from "node:module";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import { resolveDatabaseConnection } from "./connectionConfig.js";
+import { createStrictTlsOptions, resolveDatabaseConnection } from "./connectionConfig.js";
 
 let prisma;
 const require = createRequire(import.meta.url);
@@ -22,7 +22,7 @@ function readPrismaConfiguration() {
         database,
         connectTimeout,
         socketTimeout,
-        ...(sslMode === "required" ? { ssl: { ca } } : {}),
+        ...(sslMode === "required" ? { ssl: createStrictTlsOptions(host, ca) } : {}),
         connectionLimit: 10,
     };
 }

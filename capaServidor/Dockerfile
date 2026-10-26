@@ -1,5 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM node:22-bookworm-slim AS dependencies
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y ca-certificates openssl \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app/tooling/prisma
 COPY tooling/prisma/package*.json ./
 RUN npm ci
@@ -15,6 +18,7 @@ FROM dependencies AS development
 COPY --chown=node:node capaServidor/src ./src
 COPY --chown=node:node capaServidor/data ./data
 COPY --chown=node:node capaServidor/test ./test
+COPY --chown=node:node capaServidor/scripts ./scripts
 COPY --chown=node:node shared /app/shared
 COPY --chown=node:node scripts/rbac.mjs /app/scripts/rbac.mjs
 COPY --chown=node:node docs/auth0/rbac.expected.json /app/docs/auth0/rbac.expected.json
@@ -32,6 +36,9 @@ ARG APP_VERSION=development
 LABEL org.opencontainers.image.source="https://github.com/Grupo10ingsoftware/itecsa-app"
 LABEL org.opencontainers.image.revision=$APP_VERSION
 WORKDIR /app/capaServidor
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y ca-certificates openssl \
+    && rm -rf /var/lib/apt/lists/*
 ENV APP_ENV=production NODE_ENV=production PORT=3000 APP_VERSION=$APP_VERSION
 COPY --from=production-dependencies /app/capaServidor/node_modules ./node_modules
 # Keep the generated client even if npm pruning removes generated/extraneous files.

@@ -4,6 +4,7 @@ services:
   mysql:
     image: ${MYSQL_IMAGE:-mysql@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69}
     command: ["mysqld", "--defaults-extra-file=/etc/mysql-lab.cnf"]
+    hostname: itecsa-mysql-lab
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Definir MYSQL_ROOT_PASSWORD en deploy/mysql-lab.env}
       MYSQL_ROOT_HOST: localhost
@@ -14,6 +15,7 @@ services:
       - mysql_data:/var/lib/mysql
       - ./deploy/mysql-lab/mysql.cnf:/etc/mysql-lab.cnf:ro
       - ./deploy/mysql-lab/certs:/run/mysql-tls:ro
+      - mysql_socket:/var/run/mysqld
     networks:
       - mysql_private
     healthcheck:
@@ -25,8 +27,31 @@ services:
     restart: unless-stopped
     stop_grace_period: 1m
 
+  account-bootstrap:
+    profiles: ["tools"]
+    build:
+      context: .
+      dockerfile: capaServidor/Dockerfile
+      target: development
+    network_mode: none
+    user: "0:0"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Definir MYSQL_ROOT_PASSWORD en deploy/mysql-lab.env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?Definir MYSQL_DATABASE en deploy/mysql-lab.env}
+      MYSQL_USER: ${MYSQL_USER:?Definir MYSQL_USER en deploy/mysql-lab.env}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Definir MYSQL_PASSWORD en deploy/mysql-lab.env}
+      MYSQL_MIGRATION_USER: ${MYSQL_MIGRATION_USER:?Definir MYSQL_MIGRATION_USER en deploy/mysql-lab.env}
+      MYSQL_MIGRATION_PASSWORD: ${MYSQL_MIGRATION_PASSWORD:?Definir MYSQL_MIGRATION_PASSWORD en deploy/mysql-lab.env}
+      MYSQL_LAB_INSTANCE_FILE: /run/mysql-lab-state/instance.env
+    command: ["npm", "run", "mysql-lab:bootstrap-accounts"]
+    volumes:
+      - mysql_socket:/var/run/mysqld
+      - ./deploy/mysql-lab/state:/run/mysql-lab-state
+    restart: "no"
+
 volumes:
   mysql_data:
+  mysql_socket:
 
 networks:
   mysql_private:

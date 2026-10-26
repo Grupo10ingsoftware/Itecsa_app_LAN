@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import tls from "node:tls";
 import { fileURLToPath } from "node:url";
 
 const serverRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -8,6 +9,16 @@ const labTargets = new Set(["mysql-lab-host", "mysql-lab-docker"]);
 
 function invalid(message) {
     throw new Error(`Configuracion de base de datos invalida: ${message}`);
+}
+
+export function createStrictTlsOptions(host, ca, { checkServerIdentity = tls.checkServerIdentity } = {}) {
+    return {
+        ca,
+        rejectUnauthorized: true,
+        // mariadb upgrades an existing TCP socket. Without this callback Node
+        // authorizes that socket as "localhost" instead of the selected host.
+        checkServerIdentity: (_socketHost, certificate) => checkServerIdentity(host, certificate),
+    };
 }
 
 export function assertSelectedEnvironmentFile(env = process.env) {
@@ -62,7 +73,7 @@ export function resolveDatabaseConnection(env = process.env, { allowUnconfigured
 
     const urlValue = env.DATABASE_URL?.trim();
     if (env.DATABASE_URL !== undefined && !urlValue) invalid("DATABASE_URL no puede estar vacio.");
-    if (!urlValue && (requireUrl || labTargets.has(target))) invalid("DATABASE_URL es obligatorio para este perfil.");
+    if (!urlValue && requireUrl) invalid("DATABASE_URL es obligatorio para este perfil.");
     if (urlValue) {
         let url;
         try { url = new URL(urlValue); } catch { invalid("DATABASE_URL no es una URL valida."); }

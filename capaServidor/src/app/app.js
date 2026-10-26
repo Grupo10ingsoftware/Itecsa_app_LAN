@@ -1,4 +1,4 @@
-import "dotenv/config";
+import { config as loadEnvironment } from "dotenv";
 import Server from "../server.js";
 import { disconnectPrismaClient } from "../database/prisma.js";
 import { registerShutdown } from './shutdown.js';
@@ -9,6 +9,10 @@ import { resolveDatabaseConnection } from "../database/connectionConfig.js";
 import { safeLogger } from "../shared/safeLogger.js";
 import { startTemporaryDataCleanup } from "../modules/security/service/temporaryDataCleanup.service.js";
 import { resolveIdentityConfiguration } from '../config/identity.js';
+
+loadEnvironment(process.env.DOTENV_PATH
+    ? { path: process.env.DOTENV_PATH, override: true }
+    : undefined);
 
 const requiredEnvironmentVariables = [
     "FRONTEND_ORIGIN",

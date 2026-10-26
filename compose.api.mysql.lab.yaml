@@ -20,6 +20,26 @@ services:
     init: true
     stop_grace_period: 15s
 
+  db-init:
+    profiles: ["tools"]
+    build:
+      context: .
+      dockerfile: capaServidor/Dockerfile
+      target: development
+    env_file: ${LAB_INIT_ENV_FILE:-./capaServidor/env.mysql-lab.docker.init.example}
+    environment:
+      DB_TARGET: mysql-lab-docker
+    secrets:
+      - source: mysql_lab_ca
+        target: mysql-lab-ca.pem
+    volumes:
+      - ./deploy/mysql-lab/state:/run/mysql-lab-state:ro
+    networks:
+      - mysql_private
+    command: ["npm", "run", "mysql-lab:init"]
+    init: true
+    restart: "no"
+
 networks:
   mysql_private:
     name: itecsa-mysql-lab-private
