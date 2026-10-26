@@ -7,6 +7,7 @@ WORKDIR /app/tooling/prisma
 COPY tooling/prisma/package*.json ./
 RUN npm ci
 WORKDIR /app/capaServidor
+RUN mkdir -p /app/capaServidor/certs
 COPY capaServidor/package*.json ./
 RUN npm ci
 COPY capaServidor/prisma ./prisma

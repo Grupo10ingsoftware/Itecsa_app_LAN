@@ -14,11 +14,10 @@ services:
       # Only the API container uses the host gateway; the token issuer stays public.
       KEYCLOAK_JWKS_URI: http://host.docker.internal:18080/realms/itecsa/protocol/openid-connect/certs
       KEYCLOAK_ADMIN_TRANSPORT_ORIGIN: http://host.docker.internal:18080
-      DB_SSL_CA_PATH: /run/secrets/aiven-ca.pem
       TRUST_PROXY: 0
     secrets:
       - source: database_ca
-        target: aiven-ca.pem
+        target: /app/capaServidor/certs/aiven-ca.pem
     ports:
       - "127.0.0.1:3000:3000"
     init: true
