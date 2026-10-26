@@ -31,7 +31,14 @@ export async function initializeMysqlLab(env = process.env, {
   }
 
   const databaseUrl = buildMigrationDatabaseUrl(env);
-  const childEnv = { ...env, DATABASE_URL: databaseUrl };
+  const childEnv = {
+    ...env,
+    ...(env.DB_TARGET === "mysql-docker" ? {
+      DB_USER: env.DB_MIGRATION_USER,
+      DB_PASSWORD: env.DB_MIGRATION_PASSWORD,
+    } : {}),
+    DATABASE_URL: databaseUrl,
+  };
   const options = { env: childEnv, secrets: [env.DB_PASSWORD, env.DB_MIGRATION_PASSWORD, databaseUrl] };
   runner(process.execPath, [prismaCli, "migrate", "deploy", "--config", "prisma.config.ts"], options);
   runner(process.execPath, [prismaCli, "db", "seed", "--config", "prisma.config.ts"], options);

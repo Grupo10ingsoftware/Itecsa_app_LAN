@@ -22,10 +22,22 @@
     "mysql-lab:physical-check": "node scripts/mysqlLabPhysicalCheck.mjs",
     "orders:preflight": "node scripts/ordersPreflight.mjs",
     "retention:preview": "node scripts/previewBusinessRetention.mjs",
-    "prisma:studio": "node ../tooling/prisma/node_modules/prisma/build/index.js studio"
+    "prisma:studio": "node ../tooling/prisma/node_modules/prisma/build/index.js studio",
+    "mysql:bootstrap-accounts": "node scripts/mysqlBootstrapAccounts.mjs",
+    "mysql:deploy": "node scripts/mysqlDeploy.mjs",
+    "mysql:verify": "node scripts/mysqlVerify.mjs",
+    "mysql:maintenance": "node scripts/mysqlMaintenance.mjs",
+    "mysql:generate-tls": "node scripts/mysqlGenerateTls.mjs",
+    "mysql:backup": "node scripts/mysqlBackup.mjs",
+    "mysql:restore": "node scripts/mysqlRestore.mjs"
   },
   "nodemonConfig": {
-    "watch": ["src", "../shared", "data/demo", ".env"],
+    "watch": [
+      "src",
+      "../shared",
+      "data/demo",
+      ".env"
+    ],
     "ext": "js,mjs,cjs,json,env",
     "signal": "SIGTERM"
   },

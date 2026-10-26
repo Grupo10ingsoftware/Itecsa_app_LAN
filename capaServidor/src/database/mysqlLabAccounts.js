@@ -11,6 +11,10 @@ const MYSQL_LAB = Object.freeze({
   migrationUser: "itecsa_migrator",
 });
 
+function expectedHostname(env) {
+  return env.MYSQL_EXPECTED_HOSTNAME ?? env.MYSQL_LAB_EXPECTED_HOSTNAME ?? MYSQL_LAB.hostname;
+}
+
 function fail(message) {
   throw new Error(`Bootstrap MySQL rechazado: ${message}`);
 }
@@ -25,9 +29,9 @@ export function validateAccountBootstrapEnvironment(env = process.env) {
     if (env[key] === undefined || env[key] === "") fail(`falta ${key}.`);
   }
   if (!IDENTIFIER.test(env.MYSQL_DATABASE)) fail("MYSQL_DATABASE no es un identificador permitido.");
-  if (env.MYSQL_DATABASE !== MYSQL_LAB.database) fail("MYSQL_DATABASE no coincide con la base fija del laboratorio.");
-  if (env.MYSQL_USER !== MYSQL_LAB.apiUser) fail("MYSQL_USER no coincide con la cuenta API fija del laboratorio.");
-  if (env.MYSQL_MIGRATION_USER !== MYSQL_LAB.migrationUser) fail("MYSQL_MIGRATION_USER no coincide con la cuenta migradora fija del laboratorio.");
+  if (!env.MYSQL_STANDALONE && env.MYSQL_DATABASE !== MYSQL_LAB.database) fail("MYSQL_DATABASE no coincide con la base fija del laboratorio.");
+  if (!env.MYSQL_STANDALONE && env.MYSQL_USER !== MYSQL_LAB.apiUser) fail("MYSQL_USER no coincide con la cuenta API fija del laboratorio.");
+  if (!env.MYSQL_STANDALONE && env.MYSQL_MIGRATION_USER !== MYSQL_LAB.migrationUser) fail("MYSQL_MIGRATION_USER no coincide con la cuenta migradora fija del laboratorio.");
   if (env.MYSQL_USER === env.MYSQL_MIGRATION_USER) fail("las cuentas API y migradora deben ser distintas.");
   account(env.MYSQL_USER, "MYSQL_USER");
   account(env.MYSQL_MIGRATION_USER, "MYSQL_MIGRATION_USER");
@@ -35,7 +39,7 @@ export function validateAccountBootstrapEnvironment(env = process.env) {
 
 export async function bootstrapMysqlLabAccounts(env = process.env, {
   connector = mariadb,
-  identityPath = env.MYSQL_LAB_INSTANCE_FILE ?? "/run/mysql-lab-state/instance.env",
+  identityPath = env.MYSQL_INSTANCE_FILE ?? env.MYSQL_LAB_INSTANCE_FILE ?? "/run/mysql-state/instance.env",
 } = {}) {
   validateAccountBootstrapEnvironment(env);
   const connection = await connector.createConnection({
@@ -50,11 +54,18 @@ export async function bootstrapMysqlLabAccounts(env = process.env, {
       @@version_comment AS versionComment, @@require_secure_transport AS secureTransport`);
     const server = rows[0];
     if (server.databaseName !== env.MYSQL_DATABASE) fail("DATABASE() no coincide con MYSQL_DATABASE.");
-    if (server.hostname !== MYSQL_LAB.hostname) fail("el socket no pertenece al hostname del laboratorio.");
+    if (server.hostname !== expectedHostname(env)) fail("el socket no pertenece al hostname esperado.");
     if (!/^[0-9a-f-]{36}$/i.test(String(server.serverUuid ?? ""))) fail("server_uuid no es valido.");
     if (!String(server.version).startsWith("8.4.")) fail("la instancia local no usa MySQL 8.4.");
     if (Number(server.secureTransport) !== 1) fail("require_secure_transport no esta habilitado.");
     if (/aiven/i.test(`${server.hostname} ${server.versionComment}`)) fail("se detectaron indicadores de Aiven.");
+    if (env.MYSQL_REQUIRE_EMPTY === "1") {
+      const tables = await connection.query(
+        "SELECT TABLE_NAME AS tableName FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?",
+        [env.MYSQL_DATABASE],
+      );
+      if (tables.length) fail("install/restore requiere una base nueva sin tablas.");
+    }
     try { fs.accessSync(path.dirname(identityPath), fs.constants.W_OK); }
     catch { fail("el directorio de identidad local no es escribible."); }
 
@@ -71,6 +82,11 @@ export async function bootstrapMysqlLabAccounts(env = process.env, {
     await connection.query(`GRANT ALL PRIVILEGES ON ${schema}.* TO ${migrator}`);
 
     const identity = [
+      `MYSQL_SERVER_UUID=${server.serverUuid}`,
+      `MYSQL_SERVER_HOSTNAME=${server.hostname}`,
+      `MYSQL_SERVER_PORT=${server.serverPort}`,
+      `MYSQL_COMPOSE_PROJECT=${env.COMPOSE_PROJECT_NAME ?? ""}`,
+      `MYSQL_DATABASE=${env.MYSQL_DATABASE}`,
       `MYSQL_LAB_SERVER_UUID=${server.serverUuid}`,
       `MYSQL_LAB_SERVER_HOSTNAME=${server.hostname}`,
       `MYSQL_LAB_SERVER_PORT=${server.serverPort}`,
