@@ -1,3 +1,4 @@
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useRef, useState } from 'react'
 import { PAYMENT_STATUS } from '@/config/status'
 import styles from './PaymentActionConfirmModal.module.css'
@@ -12,7 +13,7 @@ export default function PaymentCredentialsModal({
   description,
   kicker = 'Validación de pago',
   errorMessage = '',
-  manageFocus = false,
+  manageFocus = true,
   layerClassName = '',
 }) {
   const [pin, setPin] = useState('')
@@ -141,8 +142,8 @@ export default function PaymentCredentialsModal({
             className={styles.credentialsPrimaryButton}
             disabled={isSubmitting || !canSubmit}
             type="submit"
-          >
-            {isSubmitting ? 'Confirmando...' : 'Confirmar'}
+           aria-busy={isSubmitting}>
+            <LoadingAction busy={isSubmitting} context="Confirmar">Confirmar</LoadingAction>
           </button>
         </footer>
       </form>

@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import styles from '../pages/UserManagementPage.module.css'
 
 const SUMMARY_CARDS = Object.freeze([
@@ -17,7 +18,8 @@ export default function UserSummaryCards({ isLoading = false, summary }) {
           </span>
           <span className={styles.summaryContent}>
             <span>{card.label}</span>
-            <strong>{summary ? (summary[card.key] ?? 0) : (isLoading ? '…' : '—')}</strong>
+            <strong>{summary ? (summary[card.key] ?? 0) : isLoading ? <LoadingIndicator scope="action" context={card.label} /> : '—'}</strong>
+            {summary && isLoading && <LoadingIndicator scope="action" context={`Actualizar ${card.label}`} />}
           </span>
         </article>
       ))}

@@ -1,3 +1,4 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../hooks/useAuth'
@@ -47,7 +48,7 @@ export default function AccessDeniedPage() {
         <div className={styles.body}>
           <p className={styles.description} aria-live="polite">
             {isRetrying
-              ? 'Comprobando nuevamente tu acceso…'
+              ? <LoadingIndicator announce={false} context="Verificación de acceso" />
               : retryFailed
                 ? 'No fue posible validar esta sesión. Puedes reintentar o iniciar una sesión nueva.'
                 : 'No tienes permisos para acceder a este recurso.'}
@@ -56,9 +57,9 @@ export default function AccessDeniedPage() {
             {isAuthenticated && homeForIdentity(provider, user) !== '/access-denied' && (
               <button className={styles.button} onClick={() => navigate(homeForIdentity(provider, user), { replace: true })} type="button">Ir a mi inicio</button>
             )}
-            <button className={styles.button} disabled={isRetrying} onClick={retryAccess} type="button">
+            <button className={styles.button} disabled={isRetrying} onClick={retryAccess} type="button" aria-busy={isRetrying}>
               <i className="bi bi-arrow-clockwise" />
-              {isRetrying ? 'Verificando…' : 'Reintentar acceso'}
+              <LoadingAction busy={isRetrying} context="Reintentar acceso">Reintentar acceso</LoadingAction>
             </button>
             <button className={styles.secondaryButton} onClick={logout} type="button">
               Cerrar sesión

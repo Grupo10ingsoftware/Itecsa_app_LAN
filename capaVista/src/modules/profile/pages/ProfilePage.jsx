@@ -1,3 +1,4 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../../hooks/useAuth'
 import { useAuthApi } from '../../auth/hooks/useAuthApi'
@@ -216,7 +217,7 @@ export default function ProfilePage() {
             <button className={styles.outlineButton} type="button" disabled={!loadedProfile || pinStatus !== 'active'}
               onClick={() => setHistoryOpen(true)}><i className="bi bi-calendar3" aria-hidden="true" />Ver historial completo</button>
           </header>
-          {!loadedProfile ? <p role="status">{profileError ? 'Actividad no disponible.' : 'Cargando actividad…'}</p>
+          {!loadedProfile ? <>{profileError ? <p role="status">Actividad no disponible.</p> : <LoadingIndicator context="Actividad reciente" />}</>
             : !loadedProfile.records?.length ? <p role="status">Aún no tienes registros asociados.</p>
               : <UserMovementsTable records={loadedProfile.records} label="Actividad reciente del usuario" />}
         </section>
@@ -237,7 +238,7 @@ export default function ProfilePage() {
                 <div className="modal-body text-center">
                   <p>Guardalo en un lugar seguro. Despues de aceptar no volvera a mostrarse.</p>
                   <div className="display-5 fw-bold font-monospace" aria-live="polite">
-                    {visiblePin || '------'}
+                    {visiblePin || (pinError ? 'PIN no disponible' : <LoadingIndicator scope="action" context="PIN operativo" />)}
                   </div>
                   {pinError && <div className="alert alert-danger mt-3 mb-0">{pinError}</div>}
                 </div>
@@ -247,8 +248,8 @@ export default function ProfilePage() {
                     disabled={!visiblePin || isPinBusy}
                     onClick={acknowledgePin}
                     type="button"
-                  >
-                    {isPinBusy ? 'Guardando...' : 'Aceptar'}
+                   aria-busy={isPinBusy}>
+                    <LoadingAction busy={isPinBusy} context="Aceptar">Aceptar</LoadingAction>
                   </button>
                 </div>
               </div>
@@ -303,16 +304,16 @@ export default function ProfilePage() {
                       disabled={isPinBusy || !loadedProfile?.email}
                       onClick={requestRecovery}
                       type="button"
-                    >
-                      Generar codigo
+                     aria-busy={isPinBusy}>
+                      <LoadingAction busy={isPinBusy}>Generar codigo</LoadingAction>
                     </button>
                   ) : (
                     <button
                       className="btn btn-dark"
                       disabled={isPinBusy || recoveryCode.length !== 6}
                       type="submit"
-                    >
-                      Validar codigo
+                     aria-busy={isPinBusy}>
+                      <LoadingAction busy={isPinBusy}>Validar codigo</LoadingAction>
                     </button>
                   )}
                 </div>

@@ -3,6 +3,7 @@ import { PERMISSIONS } from "../../../config/permissions";
 import { useEffect, useId, useRef } from 'react'
 import { PAYMENT_STATUS } from '@/config/status'
 import styles from './PaymentRowActions.module.css'
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 
 const ACTION_OPTIONS = [
   {
@@ -53,6 +54,7 @@ function PaymentActionOption({
 }
 
 function ManageButton({
+  busy = false,
   disabled = false,
   disabledTooltip,
   isMobile,
@@ -155,8 +157,8 @@ function ManageButton({
           onToggle(order.id)
         }}
         type="button"
-      >
-        Gestionar
+       aria-busy={busy}>
+        <LoadingAction busy={busy} surface="light" context="Actualizar pago">Gestionar</LoadingAction>
       </button>
 
       {isOpen && !disabled && (
@@ -217,6 +219,7 @@ export default function PaymentRowActions({
       }`}
     >
       {canUpdatePaymentStatus && (!isResolved || canRevise) && <ManageButton
+        busy={isUpdatingPaymentStatus}
         disabled={isManageDisabled}
         disabledTooltip={manageDisabledTooltip}
         isMobile={isMobile}

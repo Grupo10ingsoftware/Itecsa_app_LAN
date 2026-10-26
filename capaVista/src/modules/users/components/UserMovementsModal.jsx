@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useRef, useState } from 'react'
 import UserMovementsTable from './UserMovementsTable'
 import styles from './UserMovementsModal.module.css'
@@ -62,14 +63,14 @@ export default function UserMovementsModal({ user, api, onClose, title = 'Movimi
         </button>
       </form>
       <div className={styles.scroll} aria-busy={loading}>
-        {loading ? <p className={styles.state} role="status">Cargando movimientos…</p> : error ? <div className={styles.state} role="alert">
+        {loading ? <LoadingIndicator context="movimientos" /> : error ? <div className={styles.state} role="alert">
           <p>{error}</p><button className={styles.button} type="button" onClick={() => setQuery({ ...query })}>Reintentar</button>
         </div> : !result?.records?.length ? <p className={styles.state} role="status">No existen movimientos para esta consulta.</p>
           : <UserMovementsTable records={result.records} includeTime />}
       </div>
     </div>
     <footer className={styles.footer}>
-      <span role="status">{loading ? 'Consultando historial…' : error ? 'Consulta pendiente' : total
+      <span>{loading ? null : error ? 'Consulta pendiente' : total
         ? `Mostrando ${(query.page - 1) * query.perPage + 1}–${Math.min(query.page * query.perPage, total)} de ${total} registros`
         : '0 registros'}</span>
       <nav className={styles.pagination} aria-label="Paginación de movimientos">

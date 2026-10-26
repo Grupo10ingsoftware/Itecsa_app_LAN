@@ -1,9 +1,14 @@
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import styles from '../styles/Kanban.module.css';
+import { useRef } from 'react'
+import { useModalDialog } from '../../users/hooks/useModalDialog'
 
 export function CancelProductionModal({ submitCancellation, isCancelling, setIsCancelModalOpen, setCancelPin, setCancelError, cancelPin, setCancelComment, cancelComment, cancelError }) {
+  const modalRef = useRef(null)
+  useModalDialog({ containerRef: modalRef, isOpen: true, canClose: !isCancelling, onClose: () => setIsCancelModalOpen(false) })
   return (
     <div className={styles.operatorModalLayer} role="presentation">
-      <form className={styles.operatorModal} onSubmit={submitCancellation} role="dialog" aria-labelledby="cancel-production-title">
+      <form ref={modalRef} aria-modal="true" className={styles.operatorModal} onSubmit={submitCancellation} role="dialog" aria-labelledby="cancel-production-title">
         <header className={styles.operatorModalHeader}>
           <div>
             <span className={styles.offcanvasKicker}>Confirmacion requerida</span>
@@ -55,8 +60,8 @@ export function CancelProductionModal({ submitCancellation, isCancelling, setIsC
           <button className={styles.resetFilterButton} disabled={isCancelling} onClick={() => setIsCancelModalOpen(false)} type="button">
             Volver
           </button>
-          <button className={styles.orderCardButton} disabled={isCancelling} type="submit">
-            {isCancelling ? 'Cancelando...' : 'Confirmar cancelacion'}
+          <button className={styles.orderCardButton} disabled={isCancelling} type="submit" aria-busy={isCancelling}>
+            <LoadingAction busy={isCancelling} context="Confirmar cancelacion">Confirmar cancelacion</LoadingAction>
           </button>
         </footer>
       </form>

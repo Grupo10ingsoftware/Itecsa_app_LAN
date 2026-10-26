@@ -1,3 +1,4 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import styles from './PaymentActionConfirmModal.module.css'
 import DocumentPreviewModalLayout from './DocumentPreviewModalLayout'
 import { getPaymentActionMeta } from '../utils/paymentDocuments'
@@ -82,9 +83,9 @@ export default function PaymentActionConfirmModal({
         disabled={isUpdating || isLoadingDetails || Boolean(detailsError)}
         onClick={onValidate}
         type="button"
-      >
+       aria-busy={isUpdating}>
         <span>
-          {isUpdating ? actionMeta?.completedLabel : actionMeta?.holdLabel}
+          <LoadingAction busy={isUpdating}>{actionMeta?.holdLabel}</LoadingAction>
         </span>
       </button>
     </>
@@ -101,6 +102,7 @@ export default function PaymentActionConfirmModal({
 
   return (
     <DocumentPreviewModalLayout
+      busy={isUpdating}
       bodyClassName={styles.confirmModalBody}
       closeAriaLabel={isDetailMode ? 'Cerrar detalle de pago' : 'Cancelar cambio de estado'}
       description={
@@ -116,10 +118,7 @@ export default function PaymentActionConfirmModal({
       variant={isDetailMode ? 'salesNote' : 'actionConfirm'}
     >
       {isLoadingDetails ? (
-        <div className={styles.detailsState} role="status">
-          <span className="spinner-border spinner-border-sm" aria-hidden="true" />
-          Cargando información del pedido...
-        </div>
+        <LoadingIndicator scope="dialog" context="Información del pedido" />
       ) : detailsError ? (
         <div className={`${styles.detailsState} ${styles.detailsError}`} role="alert">
           {detailsError}

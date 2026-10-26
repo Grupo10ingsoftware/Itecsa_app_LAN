@@ -4,6 +4,7 @@ import { useAuth } from '../../../hooks/useAuth'
 import { safeReturnPath } from '../../../app/providers/keycloakSession.js'
 import { resolvePostLoginPath } from '../../../config/navigationAccess'
 import { APP_ROUTES } from '../../../config/routes'
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 
 export default function LoginRedirect() {
   const { identityUser, error, authStatus, isAuthenticated, isLoading, loginWithRedirect, logout, provider, user } = useAuth()
@@ -18,7 +19,7 @@ export default function LoginRedirect() {
   if (isAuthenticated) return <Navigate replace to={resolvePostLoginPath(returnTo, provider, user)} />
   if (authStatus === 'access-denied') return <Navigate replace to={APP_ROUTES.ACCESS_DENIED} />
 
-  // Only failures render UI here. Normal login and legacy logged_out links redirect silently.
+  // El indicador acompaña la redirección automática sin agregar pasos al login.
   if (error && !canRedirect && !isLoading) {
     return (
       <main className="container py-5">
@@ -31,5 +32,5 @@ export default function LoginRedirect() {
       </main>
     )
   }
-  return null
+  return <LoadingIndicator scope="screen" context="Inicio de sesión" />
 }

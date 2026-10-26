@@ -3,13 +3,15 @@ import { CalendarDayCell } from './CalendarDayCell.jsx';
 import { DayOrdersModal } from './DayOrdersModal.jsx';
 import { OrderDetailModal } from './CalendarOrderDetailModal.jsx';
 import { DeliveryChangeConfirmModal, DeliveryChangeCredentialsModal } from './DeliveryChangeModals.jsx';
-import { useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { buildMonthGrid, isBusinessDateKey, isSameMonth, groupItemsByDate, WEEK_DAYS } from '../utils/calendarUtils';
 import { useAuth } from '../../../hooks/useAuth';
 import { PERMISSIONS } from '../../../config/permissions';
 import styles from './ProductionCalendarGrid.module.css';
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 
 export default function ProductionCalendarGrid({
+  isLoading = false,
   allItems,
   getOrderDetail,
   draggedItemId,
@@ -23,6 +25,12 @@ export default function ProductionCalendarGrid({
   const [selectedDayKey, setSelectedDayKey] = useState(null)
   const [selectedDetailOrder, setSelectedDetailOrder] = useState(null)
   const [detailError, setDetailError] = useState(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const detailRequest = useRef(0)
+  useEffect(() => {
+    const requests = detailRequest
+    return () => { requests.current++ }
+  }, [])
   const [pendingChange, setPendingChange] = useState(null)
   const [isCredentialStepOpen, setIsCredentialStepOpen] = useState(false)
   const [dropTargetDate, setDropTargetDate] = useState(null)
@@ -51,9 +59,16 @@ export default function ProductionCalendarGrid({
   const { hasPermission } = useAuth()
 
   async function openDetail(item) {
+    const id = ++detailRequest.current
+    setSelectedDetailOrder(item)
+    setDetailLoading(true)
     setDetailError(null)
-    try { setSelectedDetailOrder(await getOrderDetail(item.id)) }
-    catch { setDetailError('No fue posible cargar el detalle del pedido.') }
+    try {
+      const detail = await getOrderDetail(item.id)
+      if (id === detailRequest.current) setSelectedDetailOrder(detail)
+    } catch {
+      if (id === detailRequest.current) setDetailError('No fue posible cargar el detalle del pedido.')
+    } finally { if (id === detailRequest.current) setDetailLoading(false) }
   }
 
   function handleDropTransferItem(itemId) {
@@ -118,19 +133,19 @@ export default function ProductionCalendarGrid({
 
   return (
     <>
-      <div className={styles.calendarGridStack}>
-        <TransferOrdersTray
+      <div className={styles.calendarGridStack} aria-busy={isLoading}>
+        {!isLoading && <TransferOrdersTray
           draggedItemId={draggedItemId}
           items={transferItems}
           onDragEnd={handleDragEnd}
           onDragStart={onDragStart}
           onDropTransferItem={handleDropTransferItem}
           onOpenDetail={openDetail}
-        />
+        />}
 
         {toolbar && <div className={styles.calendarToolbarSlot}>{toolbar}</div>}
 
-        <section className={styles.calendarShell} aria-label="Calendario mensual de produccion">
+        {isLoading ? <LoadingIndicator context="Calendario de producción" /> : <section className={styles.calendarShell} aria-label="Calendario mensual de produccion">
           <div className={styles.calendarLayout}>
             <div className={styles.businessCalendar}>
               <div className={styles.weekHeader}>
@@ -166,7 +181,7 @@ export default function ProductionCalendarGrid({
               onOpenDetail={openDetail}
             />
           </div>
-        </section>
+        </section>}
       </div>
 
       <DayOrdersModal
@@ -178,10 +193,11 @@ export default function ProductionCalendarGrid({
         onDragStart={onDragStart}
         onOpenDetail={openDetail}
       />
-      {detailError && <div role="alert">{detailError}</div>}
       <OrderDetailModal
         order={selectedDetailOrder}
-        onClose={() => setSelectedDetailOrder(null)}
+        isLoading={detailLoading}
+        error={detailError}
+        onClose={() => { detailRequest.current++; setSelectedDetailOrder(null); setDetailLoading(false) }}
       />
       <DeliveryChangeConfirmModal
         change={!isCredentialStepOpen ? pendingChange : null}

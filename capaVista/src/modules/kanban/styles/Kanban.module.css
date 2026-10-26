@@ -521,6 +521,12 @@
   outline: none;
 }
 
+.orderCardButton:disabled[aria-busy="true"] {
+  background: var(--page-header-black, #000);
+  border-color: var(--page-header-black, #000);
+  color: var(--page-white, #fff);
+}
+
 .orderCardCorrection {
   background: #fffbeb;
   border-color: rgba(202, 138, 4, 0.45);

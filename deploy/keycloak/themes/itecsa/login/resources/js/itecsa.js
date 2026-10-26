@@ -17,6 +17,9 @@ export function initializeAuthForms(root = document) {
   root.querySelectorAll('a[data-once-link]').forEach(link => {
     if (link.dataset.bound) return
     link.dataset.bound = 'true'
+    root.defaultView?.addEventListener('pageshow', event => {
+      if (event.persisted) link.removeAttribute('aria-disabled')
+    })
     link.addEventListener('click', event => {
       if (link.getAttribute('aria-disabled') === 'true') { event.preventDefault(); return }
       link.setAttribute('aria-disabled', 'true')
@@ -40,6 +43,18 @@ export function initializeAuthForms(root = document) {
     form.dataset.bound = 'true'
     let submitting = false
     let submitted = false
+    const buttons = [...form.querySelectorAll('[type=submit]')]
+    const originalContent = new Map(buttons.map(button => [button, button.innerHTML]))
+    const restore = () => {
+      submitting = false
+      form.removeAttribute('aria-busy')
+      buttons.forEach(button => {
+        button.removeAttribute('aria-disabled')
+        button.innerHTML = originalContent.get(button)
+      })
+    }
+    // Una página restaurada desde BFCache debe aceptar otro POST nativo.
+    root.defaultView?.addEventListener('pageshow', event => { if (event.persisted) restore() })
     const password = form.querySelector('#password-new')
     const confirmation = form.querySelector('#password-confirm')
     const rules = password ? [...root.querySelectorAll('[data-password-rule]')] : []
@@ -103,9 +118,11 @@ export function initializeAuthForms(root = document) {
       submitting = true
       form.setAttribute('aria-busy', 'true')
       // Keep successful controls (including named submit buttons) in the native POST.
-      form.querySelectorAll('[type=submit]').forEach(button => button.setAttribute('aria-disabled', 'true'))
+      buttons.forEach(button => button.setAttribute('aria-disabled', 'true'))
       const submitter = event.submitter
-      if (submitter?.dataset.loadingLabel) submitter.textContent = submitter.dataset.loadingLabel
+      if (submitter) {
+        submitter.innerHTML = '<span class="itecsa-loading" data-scope="action" data-surface="dark" role="status" aria-live="polite"><svg class="itecsa-loading__ring" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="itecsa-loading__track" cx="24" cy="24" r="20"/><circle class="itecsa-loading__arc" cx="24" cy="24" r="20"/></svg><span>Cargando...</span></span>'
+      }
     })
   })
 }

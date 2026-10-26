@@ -305,12 +305,13 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
               {readOnly ? 'Cerrar' : 'Cancelar'}
             </UserButton>
             {!readOnly && <UserButton
+              busy={isSubmitting}
               className={`${editStyles.actionButton} ${editStyles.saveButton}`}
               disabled={isSubmitting || !canSubmit}
               type="submit"
               variant="primary"
             >
-              {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
+              Guardar cambios
             </UserButton>}
           </div>
         </footer>

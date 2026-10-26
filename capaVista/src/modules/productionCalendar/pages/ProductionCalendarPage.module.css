@@ -26,6 +26,7 @@
 }
 
 .calendarPanel {
+  min-width: 0;
   background: #fff;
   border: 1px solid var(--calendar-border);
   border-radius: 0.85rem;

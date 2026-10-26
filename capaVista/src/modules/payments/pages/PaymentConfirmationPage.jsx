@@ -1,3 +1,4 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { PERMISSIONS } from '@/config/permissions'
 import { PAYMENT_STATUS } from '@/config/status'
@@ -69,6 +70,7 @@ export default function PaymentConfirmationPage() {
   const loadPaymentData = useCallback(async () => {
     const requestId = ++loadRequestId.current
     setIsLoading(true)
+    setLoadingMore(false)
     setLoadError(null)
     setUpdateError(null)
 
@@ -97,7 +99,7 @@ export default function PaymentConfirmationPage() {
   }, [activeFilter, dateFrom, dateTo, paymentsApi, searchTerm])
 
   async function loadMorePayments() {
-    if (!pageInfo.hasMore || !pageInfo.nextCursor || loadingMore) return
+    if (!pageInfo.hasMore || !pageInfo.nextCursor || loadingMore || isLoading) return
     const requestId = loadRequestId.current
     setLoadingMore(true)
     try {
@@ -108,16 +110,17 @@ export default function PaymentConfirmationPage() {
     } catch (error) {
       if (requestId === loadRequestId.current) setLoadError(error?.payload?.message ?? 'No fue posible cargar más pedidos de pago.')
     } finally {
-      setLoadingMore(false)
+      if (requestId === loadRequestId.current) setLoadingMore(false)
     }
   }
 
   useEffect(() => {
+    const requests = loadRequestId
     const loadTimer = window.setTimeout(() => {
       loadPaymentData()
     }, 0)
 
-    return () => window.clearTimeout(loadTimer)
+    return () => { window.clearTimeout(loadTimer); requests.current++ }
   }, [loadPaymentData])
 
   const filteredOrders = orders
@@ -444,7 +447,7 @@ export default function PaymentConfirmationPage() {
         )}
 
         {isLoading ? (
-          <div className={styles.loadingState}>Cargando pedidos de pago...</div>
+          <LoadingIndicator context="pedidos de pago" />
         ) : (
           <>
             <PaymentOrdersTable
@@ -470,7 +473,7 @@ export default function PaymentConfirmationPage() {
               onViewDetail={openPaymentDetail}
               orders={filteredOrders}
             />
-            {pageInfo.hasMore && <button disabled={loadingMore} onClick={loadMorePayments} type="button">{loadingMore ? 'Cargando…' : 'Cargar más pedidos'}</button>}
+            {pageInfo.hasMore && <button disabled={loadingMore} onClick={loadMorePayments} type="button" aria-busy={loadingMore}><LoadingAction surface="light" busy={loadingMore} context="Cargar más pedidos">Cargar más pedidos</LoadingAction></button>}
           </>
         )}
       </PageSurface>

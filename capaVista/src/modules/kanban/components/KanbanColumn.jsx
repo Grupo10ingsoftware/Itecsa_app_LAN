@@ -1,3 +1,4 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import {
   baseColumns,
   STAGE_BACKWARD_MESSAGE,
@@ -35,12 +36,26 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
   const [moveError, setMoveError] = useState(null)
   const [pageInfo, setPageInfo] = useState({ nextCursor: null, hasMore: false })
   const [loadingMore, setLoadingMore] = useState(false)
+  const listRequestId = useRef(0)
+  const morePending = useRef(false)
+  const moveValidation = useRef(false)
+  const [validatingMove, setValidatingMove] = useState(false)
   const [pendingProductionMove, setPendingProductionMove] = useState(null)
   const kanbanApi = useKanbanApi()
   const { hasPermission } = useAuth()
 
   useEffect(() => {
+    const requests = detailRequestId
+    return () => { requests.current++ }
+  }, [])
+
+  useEffect(() => {
+    const requests = listRequestId
+    const id = ++requests.current
     const loadOrders = async () => {
+      setLoading(true)
+      setLoadingMore(false)
+      morePending.current = false
       try {
         setLoadError(null)
 
@@ -52,6 +67,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
           }),
           kanbanApi.getOrderStatuses(),
         ])
+        if (id !== listRequestId.current) return
 
         if (ordersResult.status === 'fulfilled') {
           const orderItems = ordersResult.value?.items ?? []
@@ -81,18 +97,22 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
           setColumns(baseColumns)
         }
       } catch {
+        if (id !== listRequestId.current) return
         setLoadError('No fue posible cargar las ordenes.')
         setColumns(baseColumns)
       } finally {
-        setLoading(false)
+        if (id === listRequestId.current) setLoading(false)
       }
     }
 
     loadOrders()
+    return () => { requests.current++ }
   }, [filters?.clientName, filters?.salesNoteNumber, filters?.productType, kanbanApi, refreshKey])
 
   async function loadMoreOrders() {
-    if (!pageInfo.hasMore || !pageInfo.nextCursor || loadingMore) return
+    if (!pageInfo.hasMore || !pageInfo.nextCursor || loading || morePending.current) return
+    const id = listRequestId.current
+    morePending.current = true
     setLoadingMore(true)
     try {
       const result = await kanbanApi.getOrders({
@@ -101,6 +121,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
         search: filters?.salesNoteNumber || filters?.clientName || '',
         productType: filters?.productType || '',
       })
+      if (id !== listRequestId.current) return
       const nextOrders = (result.items ?? [])
         .filter((order) => order?.salesNoteNumber)
         .map(normalizeOrder)
@@ -108,9 +129,9 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
       setOrders((current) => [...current, ...nextOrders.filter((next) => !current.some((item) => item.id === next.id))])
       setPageInfo(result.pageInfo ?? { nextCursor: null, hasMore: false })
     } catch {
-      setLoadError('No fue posible cargar más ordenes.')
+      if (id === listRequestId.current) setLoadError('No fue posible cargar más ordenes.')
     } finally {
-      setLoadingMore(false)
+      if (id === listRequestId.current) { morePending.current = false; setLoadingMore(false) }
     }
   }
 
@@ -123,7 +144,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
   }
 
   async function handleDragEnd(event) {
-    if (event.canceled || !hasPermission(PERMISSIONS.MOVE_ORDERS)) return
+    if (moveValidation.current || event.canceled || !hasPermission(PERMISSIONS.MOVE_ORDERS)) return
 
     const { source, target } = event.operation
     if (!source || !target) return
@@ -140,8 +161,15 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
     }
     let transitionOrder = order
     if (targetStep === 3) {
-      try { transitionOrder = normalizeOrder(await kanbanApi.getOrderDetail(order.id)) }
+      const version = listRequestId.current
+      moveValidation.current = true
+      setValidatingMove(true)
+      try {
+        transitionOrder = normalizeOrder(await kanbanApi.getOrderDetail(order.id))
+        if (version !== listRequestId.current) return
+      }
       catch { setMoveError('No fue posible validar el detalle del pedido.'); return }
+      finally { moveValidation.current = false; setValidatingMove(false) }
     }
     if (targetStep === 3 && (!transitionOrder.items?.length || transitionOrder.items.some((item) => !isItemReadyForDelivery(item)))) {
       setMoveError('Todos los detalles deben completar sus subprocesos y los lanyards deben llegar al 100% antes de pasar a Listo para Entrega.')
@@ -330,6 +358,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
           <Toast.Body>{moveError}</Toast.Body>
         </Toast>
       </ToastContainer>
+      {validatingMove && <LoadingIndicator scope="action" context="Validación del pedido antes del traslado" />}
       <DragDropProvider onDragEnd={handleDragEnd}>
         <div className={styles.kanbanWrapper}>
           {columns.map((column) => {
@@ -349,7 +378,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
                 id={column.title}
                 key={column.title}
               >
-                {loading && <div className={styles.emptyColumn}>Cargando ordenes...</div>}
+                {loading && <LoadingIndicator context="Pedidos de la columna" />}
                 {!loading && columnOrders.length > 0
                   ? columnOrders.map((order) => (
                       <KanbanCard
@@ -376,8 +405,8 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
       </DragDropProvider>
       {pageInfo.hasMore && (
         <div className="d-flex justify-content-center mt-3">
-          <button className="btn btn-outline-primary" disabled={loadingMore} onClick={loadMoreOrders} type="button">
-            {loadingMore ? 'Cargando…' : 'Cargar más pedidos'}
+          <button className="btn btn-outline-primary" disabled={loadingMore} onClick={loadMoreOrders} type="button" aria-busy={loadingMore}>
+            <LoadingAction surface="light" busy={loadingMore} context="Cargar más pedidos">Cargar más pedidos</LoadingAction>
           </button>
         </div>
       )}

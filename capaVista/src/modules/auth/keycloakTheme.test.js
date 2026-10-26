@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { fireEvent } from '@testing-library/react'
 import { initializeAuthForms, satisfiesRule } from '../../../../deploy/keycloak/themes/itecsa/login/resources/js/itecsa.js'
+import { readFileSync } from 'node:fs'
 
 afterEach(() => { document.body.innerHTML = '' })
 
@@ -24,6 +25,29 @@ function formFixture() {
 const submit = (form, submitter) => form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true, submitter }))
 
 describe('native Keycloak theme interactions', () => {
+  it('comparte exactamente el CSS de React y ralentiza el giro con movimiento reducido', () => {
+    const source = readFileSync('../shared/loading/indicator.css', 'utf8')
+    const native = readFileSync('../deploy/keycloak/themes/itecsa/login/resources/css/loading.css', 'utf8')
+    expect(native).toBe(source)
+    expect(source).toContain('prefers-reduced-motion: reduce')
+    expect(source).toContain('animation-duration: 3.2s')
+    expect(source).not.toContain('animation: none')
+  })
+  it('restaura el submit nativo al regresar desde BFCache sin perder los controles POST', () => {
+    const { form, password, confirmation } = formFixture()
+    fireEvent.input(password, { target: { value: 'Abcdef1!' } })
+    fireEvent.input(confirmation, { target: { value: 'Abcdef1!' } })
+    const button = form.querySelector('[name=login]')
+    expect(submit(form, button)).toBe(true)
+    expect(form.querySelector('[role=status]').textContent).toBe('Cargando...')
+    expect(submit(form, button)).toBe(false)
+    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }))
+    expect(button.textContent).toBe('Actualizar contraseña')
+    expect(button.hasAttribute('aria-disabled')).toBe(false)
+    expect(form.hasAttribute('aria-busy')).toBe(false)
+    expect(submit(form, button)).toBe(true)
+    expect(new FormData(form, button).has('login')).toBe(true)
+  })
   it.each([
     ['Abcdef1!', 'length', 8, true], ['Abc1!', 'length', 8, false],
     ['Á', 'upperCase', 1, true], ['ñ', 'lowerCase', 1, true], ['١', 'digits', 1, true],

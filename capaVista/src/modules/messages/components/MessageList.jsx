@@ -1,13 +1,11 @@
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import { formatMessageDate, messagePreview } from '../utils/messageFormatters'
 import styles from './MessageList.module.css'
 
-export default function MessageList({ isLoading, messages, onOpen }) {
+export default function MessageList({ isLoading, messages, onOpen, openingId }) {
   if (isLoading) {
     return (
-      <div className={styles.state} role="status">
-        <span className="spinner-border text-warning" aria-hidden="true" />
-        <span>Cargando mensajes…</span>
-      </div>
+      <LoadingIndicator context="Mensajes" />
     )
   }
 
@@ -24,7 +22,8 @@ export default function MessageList({ isLoading, messages, onOpen }) {
   return (
     <div className={styles.list}>
       {messages.map((message) => (
-        <button className={`${styles.item} ${!message.leido ? styles.unread : ''}`} key={message.id_mensaje} onClick={() => onOpen(message)} type="button">
+        <button className={`${styles.item} ${!message.leido ? styles.unread : ''}`} key={message.id_mensaje} onClick={() => onOpen(message)} type="button" disabled={openingId != null} aria-busy={openingId === message.id_mensaje}>
+          {openingId === message.id_mensaje && <LoadingIndicator scope="action" context="Abrir mensaje" />}
           <span className={styles.statusIcon}>
             <i className={`bi ${message.leido ? 'bi-envelope-open' : 'bi-envelope-fill'}`} aria-hidden="true" />
           </span>

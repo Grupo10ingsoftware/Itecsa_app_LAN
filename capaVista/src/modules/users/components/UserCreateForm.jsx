@@ -1,3 +1,4 @@
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import PaymentCredentialsModal from '../../payments/components/PaymentCredentialsModal.jsx'
@@ -288,9 +289,9 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
           className={styles.submitButton}
           disabled={isBusy || Boolean(createdUser)}
           type="submit"
-        >
+         aria-busy={isSubmitting}>
           <i className="bi bi-plus-circle" aria-hidden="true" />
-          {isSubmitting ? 'Creando usuario...' : 'Crear usuario'}
+          <LoadingAction busy={isSubmitting} context="Crear usuario">Crear usuario</LoadingAction>
         </button>
       </footer>
     </form>

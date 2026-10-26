@@ -1,3 +1,4 @@
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import styles from '../styles/Kanban.module.css';
 
 export function PaymentDeconfirmationModal({ approvePaymentDeconfirmation, isApprovingDeconfirmation, closeDeconfirmationAuthModal, order, setDeconfirmationPin, setDeconfirmationError, deconfirmationPin, deconfirmationError }) {
@@ -50,8 +51,8 @@ export function PaymentDeconfirmationModal({ approvePaymentDeconfirmation, isApp
           <button className={styles.resetFilterButton} disabled={isApprovingDeconfirmation} onClick={closeDeconfirmationAuthModal} type="button">
             Cancelar
           </button>
-          <button className={styles.orderCardButton} disabled={isApprovingDeconfirmation} type="submit">
-            {isApprovingDeconfirmation ? 'Aprobando...' : 'Confirmar'}
+          <button className={styles.orderCardButton} disabled={isApprovingDeconfirmation} type="submit" aria-busy={isApprovingDeconfirmation}>
+            <LoadingAction busy={isApprovingDeconfirmation} context="Confirmar">Confirmar</LoadingAction>
           </button>
         </footer>
       </form>
