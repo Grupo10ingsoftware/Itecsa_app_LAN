@@ -34,19 +34,20 @@ function runPrisma(args, databaseUrl) {
 }
 
 const selected = resolveDatabaseConnection(process.env);
+let expected;
 const apiConnection = await openVerifiedLabConnection(process.env);
 try {
   const migrationRows = await apiConnection.query(
     "SELECT migration_name AS name, checksum, finished_at AS finishedAt, rolled_back_at AS rolledBackAt FROM _prisma_migrations ORDER BY started_at",
   );
-  const expected = fs.readdirSync(migrationsRoot, { withFileTypes: true })
+  expected = fs.readdirSync(migrationsRoot, { withFileTypes: true })
     .filter((entry) => entry.isDirectory() && fs.existsSync(path.join(migrationsRoot, entry.name, "migration.sql")))
     .map((entry) => ({
       name: entry.name,
       checksum: createHash("sha256").update(fs.readFileSync(path.join(migrationsRoot, entry.name, "migration.sql"))).digest("hex"),
     }))
     .sort((left, right) => left.name.localeCompare(right.name));
-  if (expected.length !== 16 || migrationRows.length !== expected.length) fail("el historial no contiene exactamente las 16 migraciones provisionales esperadas.");
+  if (expected.length === 0 || migrationRows.length !== expected.length) fail("el historial no coincide con las migraciones incluidas en esta imagen.");
   const actualByName = new Map(migrationRows.map((row) => [row.name, row]));
   for (const migration of expected) {
     const actual = actualByName.get(migration.name);
@@ -55,7 +56,12 @@ try {
     }
   }
   const grants = (await apiConnection.query("SHOW GRANTS")).map((row) => Object.values(row)[0]).join("\n");
-  for (const privilege of ["SELECT", "INSERT", "UPDATE", "DELETE"]) if (!grants.includes(privilege)) fail(`falta ${privilege} para la API.`);
+  const expectedPrivileges = process.env.MYSQL_EXPECT_API_READ_ONLY === "1"
+    ? ["SELECT"] : ["SELECT", "INSERT", "UPDATE", "DELETE"];
+  for (const privilege of expectedPrivileges) if (!grants.includes(privilege)) fail(`falta ${privilege} para la API.`);
+  if (process.env.MYSQL_EXPECT_API_READ_ONLY === "1" && /\bINSERT\b|\bUPDATE\b|\bDELETE\b/.test(grants)) {
+    fail("la cuenta API conserva escrituras durante mantenimiento.");
+  }
   if (/ALL PRIVILEGES|\bCREATE\b|\bALTER\b|\bDROP\b/.test(grants)) fail("la API conserva privilegios estructurales.");
   const tls = (await apiConnection.query("SHOW SESSION STATUS LIKE 'Ssl_cipher'"))[0]?.Value;
   if (!tls) fail("la sesion API no usa TLS.");
@@ -73,7 +79,7 @@ const migrator = await mariadb.createConnection({
 });
 try {
   const grants = (await migrator.query("SHOW GRANTS")).map((row) => Object.values(row)[0]).join("\n");
-  if (!grants.includes("ALL PRIVILEGES ON `itecsa_lab`.*")) fail("la cuenta migradora no controla el esquema esperado.");
+  if (!grants.includes("ALL PRIVILEGES ON `" + selected.database + "`.*")) fail("la cuenta migradora no controla el esquema esperado.");
   if (!(await migrator.query("SHOW SESSION STATUS LIKE 'Ssl_cipher'"))[0]?.Value) fail("la sesion migradora no usa TLS.");
 } finally {
   await migrator.end();
@@ -83,10 +89,12 @@ const db = getPrismaClient();
 try {
   const catalogs = await validateMysqlLabCatalog(db);
   if (!catalogs.valid) fail("los catalogos no coinciden con las definiciones versionadas.");
-  const businessCounts = await Promise.all([
-    db.pedidos.count(), db.detalle_pedido.count(), db.cliente.count(), db.usuario.count(),
-  ]);
-  if (businessCounts.some((count) => count !== 0)) fail("hay datos de negocio ajenos al seed en el laboratorio.");
+  if (process.env.DB_TARGET?.startsWith("mysql-lab")) {
+    const businessCounts = await Promise.all([
+      db.pedidos.count(), db.detalle_pedido.count(), db.cliente.count(), db.usuario.count(),
+    ]);
+    if (businessCounts.some((count) => count !== 0)) fail("hay datos de negocio ajenos al seed en el laboratorio.");
+  }
 } finally {
   await disconnectPrismaClient();
 }
@@ -94,4 +102,4 @@ try {
 const databaseUrl = buildMigrationDatabaseUrl(process.env);
 runPrisma(["migrate", "status"], databaseUrl);
 runPrisma(["migrate", "diff", "--from-config-datasource", "--to-schema", "prisma/schema.prisma", "--exit-code"], databaseUrl);
-console.log("MYSQL_LAB_VERIFY: identidad, TLS, cuentas, 16 checksums, esquema y catalogos verificados.");
+console.log(`MYSQL_VERIFY: identidad, TLS, cuentas, ${expected.length} checksums, esquema y catalogos verificados.`);

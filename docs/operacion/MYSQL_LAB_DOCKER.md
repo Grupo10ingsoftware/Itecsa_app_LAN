@@ -1,5 +1,8 @@
 # MySQL aislado para laboratorio
 
+> **Compatibilidad:** este procedimiento queda disponible para pruebas heredadas. El despliegue normal se documenta en [MYSQL_DOCKER_DESPLIEGUE.md](./MYSQL_DOCKER_DESPLIEGUE.md).
+
+
 `compose.mysql.lab.yaml` prepara un servidor MySQL independiente de los Compose
 de desarrollo y produccion. Usa MySQL 8.4.13 fijado por el digest ya utilizado
 en el laboratorio de identidad del repositorio. El volumen Docker

@@ -40,32 +40,16 @@ export const authenticatedRateLimit = createThrottleMiddleware({
     },
 });
 
-export function createPinRecoveryRateLimit({ event, throttle = securityThrottle } = {}) {
-    if (event !== "request" && event !== "confirm") {
-        throw new TypeError("Evento de recuperacion PIN desconocido.");
-    }
+export function createPinRecoveryRateLimit({ throttle = securityThrottle } = {}) {
     return createThrottleMiddleware({
         throttle,
         rules(req) {
-            // Run only after authentication. Never take the account from the body.
             const subject = req.auth?.payload?.sub;
-            if (!subject) throw new Error("La cuota PIN requiere una identidad autenticada.");
-            const scope = `pin-recovery-${event}`;
-            // Check IP first so rotating accounts cannot create unlimited quota rows.
-            const rules = [{
-                scope: `${scope}-ip`, subject: clientAddress(req),
-                limit: event === "request" ? 10 : 50, windowMs: 15 * 60_000,
-            }];
-            if (event === "request") {
-                rules.push({
-                    scope: `${scope}-cooldown`, subject, limit: 1, windowMs: 60_000,
-                });
-            }
-            rules.push({
-                scope: `${scope}-account`, subject,
-                limit: event === "request" ? 3 : 15, windowMs: 15 * 60_000,
-            });
-            return rules;
+            if (!subject) throw new Error('La cuota PIN requiere una identidad autenticada.');
+            return [
+                { scope: 'pin-recovery-ip', subject: clientAddress(req), limit: 20, windowMs: 15 * 60_000 },
+                { scope: 'pin-recovery-account', subject, limit: 5, windowMs: 15 * 60_000 },
+            ];
         },
     });
 }

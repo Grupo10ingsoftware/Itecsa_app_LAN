@@ -85,6 +85,7 @@ export function createAcknowledgePinHandler({ pins = pinService } = {}) {
     return async function acknowledgePinHandler(req, res) {
         try {
             await pins.acknowledge(req.auth?.payload?.sub);
+            safeLogger.info('pin_acknowledged', { actorId: req.auth?.payload?.sub, outcome: 'success' });
             return res.status(204).end();
         } catch (error) {
             return respondError(error, req, res);
@@ -92,28 +93,40 @@ export function createAcknowledgePinHandler({ pins = pinService } = {}) {
     };
 }
 
-export function createRequestPinRecoveryHandler({ pins = pinService } = {}) {
-    return async function requestPinRecoveryHandler(req, res) {
+export function createPinRecoveryHandler({ recovery, navigation, action, pins = pinService } = {}) {
+    return async function recoverPinHandler(req, res) {
+        res.set('Cache-Control', 'no-store');
         try {
-            await pins.requestRecovery(req.auth?.payload?.sub);
-            return res.status(202).json({ status: "sent" });
+            const actor = req.auth?.payload;
+            const input = req.body ?? {};
+            const allowed = action === 'start' ? ['refreshToken'] : action === 'cancel' ? ['state'] : ['state', 'code', 'error'];
+            if (Object.keys(input).some(key => !allowed.includes(key))) {
+                return res.status(400).json({ message: 'Solicitud de recuperacion no valida.' });
+            }
+            if (action === 'start') {
+                navigation.assertOrigin(req);
+                const started = recovery.start(actor);
+                try { navigation.hold(actor, started.state, input.refreshToken, res); }
+                catch (error) { recovery.cancel(actor, started.state); throw error; }
+                return res.status(200).json(started);
+            }
+            if (action === 'cancel') {
+                recovery.cancel(actor, input.state);
+                navigation.discard(actor, input.state, res);
+                return res.status(204).end();
+            }
+            return res.status(200).json(await recovery.finish(actor, input, pins));
         } catch (error) {
             return respondError(error, req, res);
         }
     };
 }
 
-export function createConfirmPinRecoveryHandler({ pins = pinService } = {}) {
-    return async function confirmPinRecoveryHandler(req, res) {
-        try {
-            const pinStatus = await pins.confirmRecovery(
-                req.auth?.payload?.sub,
-                req.body?.code,
-            );
-            return res.status(200).json({ pinStatus });
-        } catch (error) {
-            return respondError(error, req, res);
-        }
+export function createResumePinSessionHandler({ navigation }) {
+    return async (req, res) => {
+        res.set('Cache-Control', 'no-store');
+        try { return res.status(200).json(await navigation.resume(req, res)); }
+        catch (error) { return respondError(error, req, res); }
     };
 }
 

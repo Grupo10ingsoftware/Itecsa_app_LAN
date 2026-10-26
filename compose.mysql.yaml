@@ -1,0 +1,250 @@
+x-db-tools: &db-tools
+  image: ${DB_TOOLS_IMAGE:-itecsa-db-tools:local}
+  build:
+    context: .
+    dockerfile: capaServidor/Dockerfile
+    target: database-tools
+    args:
+      APP_VERSION: ${APP_VERSION:?Definir APP_VERSION en deploy/mysql.env}
+  profiles: ["tools"]
+  environment: &db-environment
+    APP_ENV: production
+    NODE_ENV: production
+    APP_VERSION: ${APP_VERSION}
+    DB_TARGET: mysql-docker
+    DB_HOST: mysql
+    DB_PORT: "3306"
+    DB_USER: ${MYSQL_USER:?Definir MYSQL_USER}
+    DB_PASSWORD: ${MYSQL_PASSWORD:?Definir MYSQL_PASSWORD}
+    DB_NAME: ${MYSQL_DATABASE:?Definir MYSQL_DATABASE}
+    DB_SSL_MODE: required
+    DB_SSL_CA_PATH: /run/secrets/mysql-ca.pem
+    DB_MIGRATION_USER: ${MYSQL_MIGRATION_USER:?Definir MYSQL_MIGRATION_USER}
+    DB_MIGRATION_PASSWORD: ${MYSQL_MIGRATION_PASSWORD:?Definir MYSQL_MIGRATION_PASSWORD}
+    MYSQL_INIT_CONFIRM: ${MYSQL_DATABASE}
+    MYSQL_INSTANCE_FILE: /run/mysql-state/instance.env
+    MYSQL_EXPECTED_HOSTNAME: itecsa-mysql
+    COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME:?Definir COMPOSE_PROJECT_NAME}
+
+services:
+  mysql:
+    image: ${MYSQL_IMAGE:-mysql@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69}
+    command: ["mysqld", "--defaults-extra-file=/etc/itecsa-mysql.cnf"]
+    hostname: itecsa-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Definir MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: localhost
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?Definir MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER:?Definir MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Definir MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - mysql_socket:/var/run/mysqld
+      - ./deploy/mysql/mysql.cnf:/etc/itecsa-mysql.cnf:ro
+      - mysql_tls:/run/mysql-tls:ro
+    networks: [mysql_private]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "--protocol=TCP", "--host=127.0.0.1", "--ssl-mode=VERIFY_CA", "--ssl-ca=/run/mysql-tls/ca.pem", "ping"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 10
+    restart: unless-stopped
+    stop_grace_period: 1m
+
+  api:
+    image: ${API_IMAGE:-itecsa-api:local}
+    build:
+      context: .
+      dockerfile: capaServidor/Dockerfile
+      target: production
+      args:
+        APP_VERSION: ${APP_VERSION:?Definir APP_VERSION}
+    env_file: ${API_ENV_FILE:-./capaServidor/.env.mysql.docker}
+    environment:
+      APP_ENV: production
+      NODE_ENV: production
+      APP_VERSION: ${APP_VERSION}
+      PORT: "3000"
+      DB_TARGET: mysql-docker
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_SSL_MODE: required
+      DB_SSL_CA_PATH: /run/secrets/mysql-ca.pem
+      ENABLE_DEMO_ROUTES: "false"
+    secrets:
+      - source: mysql_ca
+        target: mysql-ca.pem
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: [default, mysql_private]
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${API_PORT:-3000}:3000"
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 15s
+
+  web:
+    image: ${WEB_IMAGE:-itecsa-web:local}
+    build:
+      context: .
+      dockerfile: capaVista/Dockerfile
+      target: production
+      args:
+        APP_VERSION: ${APP_VERSION:?Definir APP_VERSION}
+    env_file: ${WEB_ENV_FILE:-./capaVista/.env}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${WEB_PORT:-8080}:8080"
+    restart: unless-stopped
+
+  database-tools:
+    <<: *db-tools
+    volumes:
+      - mysql_state:/run/mysql-state:ro
+    command: ["node", "--version"]
+
+  cert-bootstrap:
+    <<: *db-tools
+    network_mode: none
+    user: "0:0"
+    environment:
+      APP_VERSION: ${APP_VERSION}
+      MYSQL_EXPECTED_HOSTNAME: itecsa-mysql
+      MYSQL_CERTS_PATH: /output/certs
+      MYSQL_PRIVATE_PATH: /output/private
+    volumes:
+      - ${MYSQL_CERTS_DIR:-./deploy/mysql/certs}:/output/certs
+      - ${MYSQL_PRIVATE_DIR:-./deploy/mysql/private}:/output/private
+    command: ["npm", "run", "mysql:generate-tls"]
+
+  cert-install:
+    <<: *db-tools
+    network_mode: none
+    user: "0:0"
+    environment:
+      APP_VERSION: ${APP_VERSION}
+    volumes:
+      - ${MYSQL_CERTS_DIR:-./deploy/mysql/certs}:/input:ro
+      - mysql_tls:/output
+    command:
+      - sh
+      - -ec
+      - |
+        install -o 999 -g 999 -m 0644 /input/ca.pem /output/ca.pem
+        install -o 999 -g 999 -m 0644 /input/server-cert.pem /output/server-cert.pem
+        install -o 999 -g 999 -m 0600 /input/server-key.pem /output/server-key.pem
+
+  account-bootstrap:
+    <<: *db-tools
+    network_mode: none
+    user: "0:0"
+    environment:
+      MYSQL_STANDALONE: "1"
+      MYSQL_EXPECTED_HOSTNAME: itecsa-mysql
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_MIGRATION_USER: ${MYSQL_MIGRATION_USER}
+      MYSQL_MIGRATION_PASSWORD: ${MYSQL_MIGRATION_PASSWORD}
+      MYSQL_INSTANCE_FILE: /run/mysql-state/instance.env
+      MYSQL_REQUIRE_EMPTY: ${MYSQL_REQUIRE_EMPTY:-0}
+      COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME}
+    volumes:
+      - mysql_socket:/var/run/mysqld
+      - mysql_state:/run/mysql-state
+    command: ["npm", "run", "mysql:bootstrap-accounts"]
+
+  maintenance:
+    <<: *db-tools
+    network_mode: none
+    user: "0:0"
+    environment:
+      MYSQL_STANDALONE: "1"
+      MYSQL_EXPECTED_HOSTNAME: itecsa-mysql
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_MIGRATION_USER: ${MYSQL_MIGRATION_USER}
+      MYSQL_INSTANCE_FILE: /run/mysql-state/instance.env
+      MYSQL_MAINTENANCE_ACTION: ${MYSQL_MAINTENANCE_ACTION:-lock}
+    volumes:
+      - mysql_socket:/var/run/mysqld
+      - mysql_state:/run/mysql-state:ro
+    command: ["npm", "run", "mysql:maintenance"]
+
+  db-deploy:
+    <<: *db-tools
+    environment:
+      <<: *db-environment
+    secrets:
+      - source: mysql_ca
+        target: mysql-ca.pem
+    volumes:
+      - mysql_state:/run/mysql-state:ro
+    networks: [mysql_private]
+    command: ["npm", "run", "mysql:deploy"]
+
+  db-verify:
+    <<: *db-tools
+    environment:
+      <<: *db-environment
+      MYSQL_EXPECT_API_READ_ONLY: ${MYSQL_EXPECT_API_READ_ONLY:-0}
+    secrets:
+      - source: mysql_ca
+        target: mysql-ca.pem
+    volumes:
+      - mysql_state:/run/mysql-state:ro
+    networks: [mysql_private]
+    command: ["npm", "run", "mysql:verify"]
+
+  db-backup:
+    <<: *db-tools
+    network_mode: none
+    user: "0:0"
+    environment:
+      APP_VERSION: ${APP_VERSION}
+      COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_INSTANCE_FILE: /run/mysql-state/instance.env
+      MYSQL_BACKUP_DIR: /backups
+    volumes:
+      - mysql_socket:/var/run/mysqld
+      - mysql_state:/run/mysql-state:ro
+      - ./data/backups/mysql:/backups
+    command: ["npm", "run", "mysql:backup"]
+
+  db-restore:
+    <<: *db-tools
+    environment:
+      <<: *db-environment
+      MYSQL_BACKUP_DIR: /backups
+      MYSQL_RESTORE_FILE: ${MYSQL_RESTORE_FILE:-}
+      MYSQL_RESTORE_CONFIRM: ${MYSQL_RESTORE_CONFIRM:-}
+    secrets:
+      - source: mysql_ca
+        target: mysql-ca.pem
+    volumes:
+      - mysql_state:/run/mysql-state:ro
+      - ./data/backups/mysql:/backups:ro
+    networks: [mysql_private]
+    command: ["npm", "run", "mysql:restore"]
+
+volumes:
+  mysql_data:
+  mysql_socket:
+  mysql_state:
+  mysql_tls:
+
+networks:
+  mysql_private:
+    internal: true
+
+secrets:
+  mysql_ca:
+    file: ${MYSQL_CERTS_DIR:-./deploy/mysql/certs}/ca.pem

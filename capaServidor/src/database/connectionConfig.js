@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 
 const serverRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const databaseKeys = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"];
-const labTargets = new Set(["mysql-lab-host", "mysql-lab-docker"]);
+const dockerTargets = new Set(["mysql-docker", "mysql-lab-docker"]);
+const labTargets = new Set(["mysql-lab-host", ...dockerTargets]);
 
 function invalid(message) {
     throw new Error(`Configuracion de base de datos invalida: ${message}`);
@@ -52,7 +53,7 @@ export function resolveDatabaseConnection(env = process.env, { allowUnconfigured
     if (env.DB_TARGET !== undefined && !target) invalid("DB_TARGET no puede estar vacio.");
     if (target && target !== "aiven" && !labTargets.has(target)) invalid("DB_TARGET no es valido.");
     if (target === "mysql-lab-host" && host !== "127.0.0.1") invalid("el perfil de computador requiere DB_HOST=127.0.0.1.");
-    if (target === "mysql-lab-docker" && host !== "mysql") invalid("el perfil Docker requiere DB_HOST=mysql.");
+    if (dockerTargets.has(target) && host !== "mysql") invalid("el perfil Docker requiere DB_HOST=mysql.");
 
     const sslMode = env.DB_SSL_MODE ?? "required";
     if (sslMode !== "required" && sslMode !== "disabled") invalid("DB_SSL_MODE debe ser required o disabled.");

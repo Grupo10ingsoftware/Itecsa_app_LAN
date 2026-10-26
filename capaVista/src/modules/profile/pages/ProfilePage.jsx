@@ -1,5 +1,6 @@
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { beginPinRecovery, getPinRecoveryOutcome, clearPinRecoveryOutcome } from '../../auth/pinRecoveryBrowser'
 import { useAuth } from '../../../hooks/useAuth'
 import { useAuthApi } from '../../auth/hooks/useAuthApi'
 import RoleBadge from '../../../shared/components/data/RoleBadge'
@@ -19,6 +20,10 @@ function getDisplayValue(value, fallback = 'No informado') {
 export default function ProfilePage() {
   const { identityUser, pinStatus, refreshSession, user, provider } = useAuth()
   const authApi = useAuthApi()
+  const recoveryTask = useRef(null)
+  const [recoveryVerified, setRecoveryVerified] = useState(() => getPinRecoveryOutcome(user?.sub)?.recovered ?? false)
+  const [pinSuccess, setPinSuccess] = useState('')
+  useEffect(() => () => { recoveryTask.current?.cancel(); recoveryTask.current = null }, [user?.sub])
   const [historyOpen, setHistoryOpen] = useState(false)
   const historyApi = useMemo(() => ({ getMovements: (_subject, query) => authApi.getProfileMovements(query) }), [authApi])
   const historyUser = { idUsuarioAutenticacionExterna: user?.sub }
@@ -38,11 +43,9 @@ export default function ProfilePage() {
   const loadedProfile = profileCurrent ? profileData?.data : null
   const profileError = profileCurrent ? profileData?.error : ''
   const [visiblePin, setVisiblePin] = useState('')
-  const [pinError, setPinError] = useState('')
+  const [pinError, setPinError] = useState(() => getPinRecoveryOutcome(user?.sub)?.message ?? '')
   const [isPinBusy, setIsPinBusy] = useState(false)
   const [recoveryOpen, setRecoveryOpen] = useState(false)
-  const [recoveryRequested, setRecoveryRequested] = useState(false)
-  const [recoveryCode, setRecoveryCode] = useState('')
   const profile = useMemo(() => {
     const firstName = loadedProfile?.primerNombre ?? user?.primerNombre
     const lastName = loadedProfile?.apellidoPaterno ?? user?.apellidoPaterno
@@ -84,6 +87,7 @@ export default function ProfilePage() {
 
     try {
       await authApi.acknowledgePin()
+      if (recoveryVerified) { setPinSuccess('Tu PIN se ha actualizado correctamente'); setRecoveryVerified(false); clearPinRecoveryOutcome() }
       setVisiblePin('')
       await refreshSession()
     } catch (error) {
@@ -93,53 +97,24 @@ export default function ProfilePage() {
     }
   }
 
-  function resetRecovery() {
-    setRecoveryRequested(false)
-    setRecoveryCode('')
+  async function recoverPin() {
+    if (recoveryTask.current || isPinBusy) return
     setPinError('')
-  }
-
-  function closeRecovery() {
-    setRecoveryOpen(false)
-    resetRecovery()
-  }
-
-  async function requestRecovery() {
+    setPinSuccess('')
     setIsPinBusy(true)
-    setPinError('')
-
+    setRecoveryOpen(true)
+    const task = beginPinRecovery(authApi)
+    recoveryTask.current = task
     try {
-      await authApi.requestPinRecovery()
-      setRecoveryCode('')
-      setRecoveryRequested(true)
+      await task.result
     } catch (error) {
-      setPinError(error?.payload?.message ?? 'No fue posible enviar el codigo de recuperacion.')
+      if (recoveryTask.current === task) setPinError(error?.payload?.message ?? error.message ?? 'No fue posible recuperar el PIN.')
     } finally {
-      setIsPinBusy(false)
-    }
-  }
-
-  async function confirmRecovery(event) {
-    event.preventDefault()
-    setIsPinBusy(true)
-    setPinError('')
-
-    try {
-      await authApi.confirmPinRecovery(recoveryCode)
-      const { pin } = await authApi.revealPin()
-      setVisiblePin(pin)
-      setRecoveryOpen(false)
-      setRecoveryRequested(false)
-      setRecoveryCode('')
-      await refreshSession()
-    } catch (error) {
-      if (['PIN_RECOVERY_CODE_EXPIRED', 'PIN_RECOVERY_ATTEMPTS_EXHAUSTED'].includes(error?.payload?.code)) {
-        setRecoveryRequested(false)
-        setRecoveryCode('')
+      if (recoveryTask.current === task) {
+        recoveryTask.current = null
+        setRecoveryOpen(false)
+        setIsPinBusy(false)
       }
-      setPinError(error?.payload?.message ?? 'No fue posible validar el codigo.')
-    } finally {
-      setIsPinBusy(false)
     }
   }
 
@@ -175,7 +150,7 @@ export default function ProfilePage() {
           <section className={styles.infoPanel} aria-labelledby="personal-information-title">
             <header className={styles.cardHeader}>
               <span className={styles.cardIcon}><i className="bi bi-person" aria-hidden="true" /></span>
-              <div><h2 id="personal-information-title">Información personal</h2><p>Estos son los datos asociados a tu cuenta en ItecsaApp.</p></div>
+              <div><h2 id="personal-information-title">Información personal</h2></div>
             </header>
             <dl className={styles.infoList}>
               <div><dt>Primer nombre</dt><dd>{getDisplayValue(profile.firstName)}</dd></div>
@@ -192,7 +167,7 @@ export default function ProfilePage() {
           <section className={styles.pinPanel} aria-labelledby="personal-pin-title">
             <header className={styles.cardHeader}>
               <span className={styles.cardIcon}><i className="bi bi-shield" aria-hidden="true" /></span>
-              <div><h2 id="personal-pin-title">PIN personal</h2><p>Utiliza tu PIN para confirmar acciones sensibles en la plataforma.</p></div>
+              <div><h2 id="personal-pin-title">PIN personal</h2></div>
             </header>
             <div className={styles.pinState}>
               <span className={`${styles.pinIcon} ${pinStatus === 'active' ? styles.accepted : styles.pending}`}><i className={`bi ${pinStatus === 'active' ? 'bi-lock' : 'bi-shield-lock'}`} aria-hidden="true" /></span>
@@ -201,11 +176,12 @@ export default function ProfilePage() {
               </span>
             </div>
             {pinStatus === 'active' && <button className={styles.outlineButton} disabled={isPinBusy} type="button"
-              onClick={() => { resetRecovery(); setRecoveryOpen(true) }}><i className="bi bi-arrow-clockwise" aria-hidden="true" />Recuperar PIN</button>}
+              onClick={recoverPin}><i className="bi bi-arrow-clockwise" aria-hidden="true" />Recuperar PIN</button>}
 
           </section>
         </section>
 
+        {pinSuccess && <div className="alert alert-success" role="status">{pinSuccess}</div>}
         {pinError && pinStatus === 'active' && !recoveryOpen && <div className="alert alert-danger" role="alert">{pinError}</div>}
 
         <section className={styles.movementsPanel} aria-labelledby="movements-title">
@@ -259,65 +235,20 @@ export default function ProfilePage() {
         </>
       )}
 
-      {recoveryOpen && pinStatus === 'active' && (
+      {recoveryOpen && (
         <>
           <div className="modal d-block" role="dialog" aria-modal="true" aria-labelledby="pin-recovery-title">
             <div className="modal-dialog modal-dialog-centered">
-              <form className={`modal-content ${confirmationStyles.content}`} onSubmit={confirmRecovery}>
-                <div className="modal-header">
-                  <h2 className="modal-title fs-5" id="pin-recovery-title">Recuperar PIN</h2>
-                  <button
-                    aria-label="Cerrar"
-                    className="btn-close"
-                    disabled={isPinBusy}
-                    onClick={closeRecovery}
-                    type="button"
-                  />
-                </div>
-                <div className="modal-body">
-                  {!recoveryRequested ? (
-                    <p>
-                      {loadedProfile?.email ? 'Solicita un codigo de verificacion en tu correo para generar un nuevo PIN.' : 'La recuperacion de PIN por correo requiere un correo real registrado. Contacta al administrador.'}
-                    </p>
-                  ) : (
-                    <label className="form-label w-100">
-                      Codigo de verificacion
-                      <input
-                        className="form-control font-monospace"
-                        inputMode="numeric"
-                        maxLength={6}
-                        onChange={(event) => setRecoveryCode(event.target.value.replace(/\D/g, ''))}
-                        required
-                        value={recoveryCode}
-                      />
-                    </label>
-                  )}
-                  {pinError && <div className="alert alert-danger mb-0">{pinError}</div>}
+              <div className={`modal-content ${confirmationStyles.content}`}>
+                <div className="modal-body" aria-live="polite">
+                  <h2 className="fs-5" id="pin-recovery-title">Para recuperar tu PIN, debes autenticarte nuevamente</h2>
+                  <p>Redirigiendo al inicio de sesión seguro...</p>
+                  <LoadingIndicator scope="action" context="Recuperación de PIN" />
                 </div>
                 <div className="modal-footer">
-                  <button className="btn btn-outline-secondary" disabled={isPinBusy} onClick={closeRecovery} type="button">
-                    Cancelar
-                  </button>
-                  {!recoveryRequested ? (
-                    <button
-                      className="btn btn-dark"
-                      disabled={isPinBusy || !loadedProfile?.email}
-                      onClick={requestRecovery}
-                      type="button"
-                     aria-busy={isPinBusy}>
-                      <LoadingAction busy={isPinBusy}>Generar codigo</LoadingAction>
-                    </button>
-                  ) : (
-                    <button
-                      className="btn btn-dark"
-                      disabled={isPinBusy || recoveryCode.length !== 6}
-                      type="submit"
-                     aria-busy={isPinBusy}>
-                      <LoadingAction busy={isPinBusy}>Validar codigo</LoadingAction>
-                    </button>
-                  )}
+                  <button className="btn btn-outline-secondary" onClick={() => recoveryTask.current?.cancel()} type="button">Cancelar</button>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
           <div className="modal-backdrop show" />

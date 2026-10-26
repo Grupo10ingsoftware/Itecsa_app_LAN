@@ -73,3 +73,27 @@ test("el inicializador ejecuta migracion, seed y validacion en orden", async () 
   await initializeMysqlLab(env(), { openConnection: async () => connection, runner });
   assert.deepEqual(steps, ["connection closed", "migrate", "seed", "catalogs"]);
 });
+
+
+test("el despliegue autonomo ejecuta seed y catalogos con la cuenta migradora", async () => {
+  const source = {
+    ...env(), DB_TARGET: "mysql-docker", DB_HOST: "mysql", DB_NAME: "custom_db",
+    DB_USER: "custom_api", DB_MIGRATION_USER: "custom_migrator",
+    MYSQL_INIT_CONFIRM: "custom_db", COMPOSE_PROJECT_NAME: "itecsa-test",
+  };
+  delete source.MYSQL_LAB_INIT_CONFIRM;
+  const connection = {
+    async query(sql) { assert.match(sql, /information_schema\.TABLES/); return []; },
+    async end() {},
+  };
+  const children = [];
+  await initializeMysqlLab(source, {
+    openConnection: async () => connection,
+    runner: (_command, args, options) => children.push({ args, env: options.env }),
+  });
+  assert.equal(children.length, 3);
+  for (const child of children) {
+    assert.equal(child.env.DB_USER, "custom_migrator");
+    assert.equal(child.env.DB_PASSWORD, source.DB_MIGRATION_PASSWORD);
+  }
+});

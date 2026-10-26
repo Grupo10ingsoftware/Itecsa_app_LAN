@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test:users": "node --test src/modules/users/service/userCreation.test.js src/modules/users/service/userUpdate.test.js",
+    "test:pin": "node --test src/modules/auth/service/pinRecovery.test.js src/modules/auth/service/pinRecoveryNavigation.test.js",
     "start": "node src/app/app.js",
     "predev": "npm run prisma:generate",
     "dev": "nodemon src/app/dev.js",
@@ -20,12 +21,23 @@
     "mysql-lab:verify": "node scripts/mysqlLabVerify.mjs",
     "mysql-lab:physical-check": "node scripts/mysqlLabPhysicalCheck.mjs",
     "orders:preflight": "node scripts/ordersPreflight.mjs",
-    "pin:retention:preview": "node scripts/previewPinRecoveryRetention.mjs",
     "retention:preview": "node scripts/previewBusinessRetention.mjs",
-    "prisma:studio": "node ../tooling/prisma/node_modules/prisma/build/index.js studio"
+    "prisma:studio": "node ../tooling/prisma/node_modules/prisma/build/index.js studio",
+    "mysql:bootstrap-accounts": "node scripts/mysqlBootstrapAccounts.mjs",
+    "mysql:deploy": "node scripts/mysqlDeploy.mjs",
+    "mysql:verify": "node scripts/mysqlVerify.mjs",
+    "mysql:maintenance": "node scripts/mysqlMaintenance.mjs",
+    "mysql:generate-tls": "node scripts/mysqlGenerateTls.mjs",
+    "mysql:backup": "node scripts/mysqlBackup.mjs",
+    "mysql:restore": "node scripts/mysqlRestore.mjs"
   },
   "nodemonConfig": {
-    "watch": ["src", "../shared", "data/demo", ".env"],
+    "watch": [
+      "src",
+      "../shared",
+      "data/demo",
+      ".env"
+    ],
     "ext": "js,mjs,cjs,json,env",
     "signal": "SIGTERM"
   },
@@ -40,6 +52,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-oauth2-jwt-bearer": "^1.10.0",
+    "jose": "4.15.9",
     "mariadb": "3.5.4"
   },
   "devDependencies": {

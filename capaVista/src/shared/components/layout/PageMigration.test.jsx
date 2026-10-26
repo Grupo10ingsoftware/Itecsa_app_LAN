@@ -22,6 +22,9 @@ vi.hoisted(() => {
 })
 vi.mock('../../../hooks/useAuth', () => ({ useAuth: () => auth }))
 vi.mock('../../../hooks/useApiClient', () => ({ useApiClient: () => client }))
+vi.mock('../../../app/providers/identityContext.js', () => ({
+  useIdentity: () => ({ getRecoveryRefreshToken: vi.fn() }),
+}))
 afterEach(() => { cleanup(); vi.restoreAllMocks() })
 
 function mount(Page, route = '/') {

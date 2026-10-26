@@ -6,6 +6,20 @@ const client = (options = {}) => createApiClient({ baseUrl: 'https://fixture.inv
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals() })
 
 describe('ciclo de solicitudes y esperas', () => {
+  it('conserva cookies de recuperacion junto con la cancelacion y el timeout', async () => {
+    vi.useFakeTimers()
+    const fetch = vi.fn(pending)
+    vi.stubGlobal('fetch', fetch)
+    const check = expect(client({ timeoutMs: 100 }).post('auth/pin/recovery/start', {}, {
+      credentials: 'include',
+    })).rejects.toMatchObject({ code: API_ERROR_CODES.NETWORK_ERROR })
+    await vi.advanceTimersByTimeAsync(100)
+    await check
+    expect(fetch).toHaveBeenCalledOnce()
+    expect(fetch.mock.calls[0][1].credentials).toBe('include')
+    expect(fetch.mock.calls[0][1].signal.aborted).toBe(true)
+    expect(vi.getTimerCount()).toBe(0)
+  })
   it('finaliza y aborta una espera de red sin repetir una mutación', async () => {
     vi.useFakeTimers()
     const fetch = vi.fn(pending)
