@@ -252,7 +252,6 @@ CREATE TABLE `Tipo_Producto` (
 -- CreateTable
 CREATE TABLE `Usuario` (
     `id_usuario` INTEGER NOT NULL AUTO_INCREMENT,
-    `id_auth0` VARCHAR(128) NOT NULL,
     `correo_usuario` VARCHAR(255) NOT NULL,
     `rut_usuario` VARCHAR(12) NULL,
     `nombre_usuario` VARCHAR(100) NULL,
@@ -261,7 +260,6 @@ CREATE TABLE `Usuario` (
     `estado_usuario` VARCHAR(30) NULL,
     `ruta_firma` VARCHAR(255) NULL,
 
-    UNIQUE INDEX `Usuario_id_auth0_key`(`id_auth0`),
     UNIQUE INDEX `Usuario_correo_usuario_key`(`correo_usuario`),
     PRIMARY KEY (`id_usuario`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

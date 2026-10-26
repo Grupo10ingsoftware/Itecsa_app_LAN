@@ -26,8 +26,8 @@ export default class SalesOrderCreationService {
     const editable = validateCreateSalesOrder(input);
     let resolvedUserId = options.actorId;
     if (!Number.isSafeInteger(resolvedUserId) || resolvedUserId <= 0) {
-      if (!options.auth0UserId) throw new SalesOrderError("El usuario autenticado es obligatorio.", 403);
-      const user = await this.userRepo.findByAuth0Id(options.auth0UserId);
+      if (!options.identitySubject) throw new SalesOrderError("El usuario autenticado es obligatorio.", 403);
+      const user = await this.userRepo.findBySubject(options.identitySubject);
       resolvedUserId = user?.idUsuario;
       if (!Number.isSafeInteger(resolvedUserId) || resolvedUserId <= 0) {
         throw new SalesOrderError("No existe un usuario interno vinculado a la sesion.", 403);

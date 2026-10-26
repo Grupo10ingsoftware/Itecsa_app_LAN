@@ -121,10 +121,9 @@ class Server {
     this.app.use(
       this.paths.auth,
       createAuthRouter({
-        includeDebugRoutes: this.environment.demoFeaturesEnabled && this.appEnvironment !== "production",
       }),
     )
-    if (this.env.AUTH_PROVIDER === 'keycloak' && this.env.IDENTITY_PREPARATION_ENABLED === 'true') {
+    if ((this.env.AUTH_PROVIDER ?? 'keycloak') === 'keycloak' && this.env.IDENTITY_PREPARATION_ENABLED === 'true') {
       this.app.use('/api/admin/identity', createKeycloakIdentityPreparationRouter({
         service: new KeycloakIdentityAdministrationService(),
       }));
@@ -153,14 +152,15 @@ class Server {
 
   listen() {
     return new Promise((resolve, reject) => {
-      this.httpServer = this.app.listen(this.port, '0.0.0.0', () => {
+      this.httpServer = this.app.listen(this.port, '0.0.0.0');
+      this.httpServer.once('error', reject);
+      this.httpServer.once('listening', () => {
         this.logger.info("server.started", { outcome: "ok" });
         resolve(this.httpServer);
       });
       this.httpServer.requestTimeout = Number(this.env.HTTP_REQUEST_TIMEOUT_MS ?? 15000);
       this.httpServer.headersTimeout = Number(this.env.HTTP_HEADERS_TIMEOUT_MS ?? 10000);
       this.httpServer.keepAliveTimeout = Number(this.env.HTTP_KEEP_ALIVE_TIMEOUT_MS ?? 5000);
-      this.httpServer.once('error', reject);
     });
   }
 }

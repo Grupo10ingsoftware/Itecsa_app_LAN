@@ -5,6 +5,7 @@ import UserButton from './UserButton'
 import { useModalDialog } from '../hooks/useModalDialog'
 import styles from '../pages/UserManagementPage.module.css'
 import editStyles from './UserEditModal.module.css'
+import { validatePersonName, validateEmail } from '../utils/userValidation.js'
 
 const SELF_ROLE_EDIT_MESSAGE = 'No puedes cambiar tu propio rol.'
 
@@ -14,6 +15,7 @@ function createFormState(user) {
     apellidoUsuario: user.apellidoUsuario ?? '',
     correoUsuario: user.correoUsuario ?? '',
     rolUsuario: user.rolUsuario ?? '',
+    estadoUsuario: user.estadoUsuario === 'Vinculado' ? 'Activo' : user.estadoUsuario ?? '',
   }
 }
 
@@ -54,11 +56,11 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
     const currentRole = user?.rolUsuario ?? ''
 
     return (
-      Object.entries(values).every(([key, value]) => (key === 'correoUsuario' && provider === 'keycloak') || String(value).trim().length > 0) &&
+      Object.values(values).every(value => String(value).trim().length > 0) &&
       /^\d{6}$/.test(pin.trim()) &&
       !(isCurrentUser && values.rolUsuario !== currentRole)
     )
-  }, [isCurrentUser, pin, provider, user?.rolUsuario, values])
+  }, [isCurrentUser, pin, user?.rolUsuario, values])
 
   if (!isOpen || !user || !values) {
     return null
@@ -80,7 +82,12 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
 
   async function handleSubmit(event) {
     event.preventDefault()
-    if (readOnly) return
+    if (readOnly || isSubmitting) return
+
+    const errors = [...validatePersonName(values.nombreUsuario, 'El nombre'),
+      ...validatePersonName(values.apellidoUsuario, 'El apellido'), ...validateEmail(values.correoUsuario)]
+    if (!manageableRoles(actor?.rolUsuario).includes(values.rolUsuario)) errors.push('No puedes asignar ese rol.')
+    if (errors.length) { setSaveError(errors[0]); return }
 
     const trimmedPin = pin.trim()
 
@@ -101,13 +108,15 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
         ...user,
         nombreUsuario: values.nombreUsuario.trim(),
         apellidoUsuario: values.apellidoUsuario.trim(),
-        correoUsuario: values.correoUsuario.trim().toLowerCase() || (provider === 'keycloak' ? null : ''),
+        correoUsuario: values.correoUsuario.trim().toLowerCase(),
         rolUsuario: values.rolUsuario,
+        estadoUsuario: values.estadoUsuario,
         pin: trimmedPin,
       })
     } catch (error) {
       setSaveError(error?.message || 'No fue posible guardar los cambios. Intenta nuevamente.')
     } finally {
+      setPin('')
       setIsSubmitting(false)
     }
   }
@@ -168,7 +177,8 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
                   required
                   type="text"
                   value={values.nombreUsuario}
-                  disabled={readOnly}
+                  disabled={readOnly || isSubmitting}
+                  maxLength={100}
                 />
               </span>
             </label>
@@ -185,7 +195,8 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
                   required
                   type="text"
                   value={values.apellidoUsuario}
-                  disabled={readOnly}
+                  disabled={readOnly || isSubmitting}
+                  maxLength={100}
                 />
               </span>
             </label>
@@ -199,10 +210,11 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
                   id="edit-user-email"
                   name="correoUsuario"
                   onChange={handleChange}
-                  required={provider !== 'keycloak'}
+                  required
+                  maxLength={255}
                   type="email"
                   value={values.correoUsuario}
-                  disabled={readOnly}
+                  disabled={readOnly || isSubmitting}
                 />
               </span>
             </label>
@@ -213,7 +225,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
                 <i className="bi bi-people" aria-hidden="true" />
                 <select
                   aria-describedby={isCurrentUser ? 'edit-user-role-help' : undefined}
-                  disabled={isCurrentUser || readOnly}
+                  disabled={isCurrentUser || readOnly || isSubmitting}
                   id="edit-user-role"
                   name="rolUsuario"
                   onChange={handleChange}
@@ -230,6 +242,20 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
               {isCurrentUser && <small className={editStyles.fieldHelp} id="edit-user-role-help">{SELF_ROLE_EDIT_MESSAGE}</small>}
             </label>
 
+            <label className={editStyles.field} htmlFor="edit-user-state">
+              <span className={editStyles.fieldLabel}>Estado</span>
+              <span className={editStyles.controlWrap}>
+                <i className="bi bi-person-check" aria-hidden="true" />
+                <select id="edit-user-state" name="estadoUsuario" value={values.estadoUsuario} onChange={handleChange}
+                  disabled={isCurrentUser || readOnly || isSubmitting}>
+                  <option value="Activo">Activo</option>
+                  <option value="Desvinculado">Desvinculado</option>
+                  {['Pendiente', 'Pendiente rol'].includes(user.estadoUsuario) &&
+                    <option value={user.estadoUsuario}>{user.estadoUsuario}</option>}
+                </select>
+              </span>
+            </label>
+
             {!readOnly && <label className={`${editStyles.field} ${editStyles.fieldWide}`} htmlFor="edit-user-pin">
               <span className={editStyles.fieldLabel}>PIN de autorizacion</span>
               <span className={`${editStyles.controlWrap} ${pinError ? editStyles.controlInvalid : ''}`}>
@@ -237,7 +263,8 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
                 <input
                   aria-describedby={pinError ? 'edit-user-pin-error' : undefined}
                   aria-invalid={Boolean(pinError)}
-                  autoComplete="one-time-code"
+                  autoComplete="off"
+                  disabled={isSubmitting}
                   id="edit-user-pin"
                   inputMode="numeric"
                   maxLength={6}
@@ -264,7 +291,7 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
         <footer className={editStyles.actions}>
           {!readOnly && provider === 'keycloak' && onCredentials && <UserButton disabled={isSubmitting || isCurrentUser || !['Activo', 'Vinculado', 'Pendiente'].includes(user.estadoUsuario)}
             onClick={() => onCredentials(user)} variant="secondary">Establecer credenciales</UserButton>}
-          {!readOnly && <UserButton
+          {!readOnly && onUnlink && <UserButton
             className={`${editStyles.actionButton} ${editStyles.unlinkButton}`}
             disabled={isSubmitting || isCurrentUser || user.estadoUsuario === 'Desvinculado'}
             onClick={() => onUnlink(user)}

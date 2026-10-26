@@ -8,7 +8,7 @@ export const RESOLVED_PAYMENT_PENDING_LOCKED_MESSAGE =
 
 export async function updPaymentStateOperation(service, orderId, newPaymentStatusId, data = {}) {
   const {
-    auth0UserId,
+    identitySubject,
     id_usuario,
     actor,
     observacion,
@@ -71,9 +71,7 @@ export async function updPaymentStateOperation(service, orderId, newPaymentStatu
     if (currentPaymentStatus !== PAYMENT_STATUS.PENDIENTE) {
       if (authorizationForProvider(data.identityProvider)?.can(data.role, data.permissions, P.REVISE_PAYMENT_STATUS) !== true) {
         const error = new AppError(403,
-          data.identityProvider === 'keycloak'
-            ? "No tienes permiso para modificar una decision de pago resuelta."
-            : "Solo Administrador Cobranzas o Soporte puede modificar una decision de pago.",
+          "No tienes permiso para modificar una decision de pago resuelta.",
         );
         throw error;
       }
@@ -91,7 +89,7 @@ export async function updPaymentStateOperation(service, orderId, newPaymentStatu
 
     const resolvedUserId =
       actor?.idUsuario ??
-      await service.resolveInternalUserId({ auth0UserId, id_usuario });
+      await service.resolveInternalUserId({ identitySubject, id_usuario });
     const currentKanbanOrder = Number(currentOrder.id_etapa_general);
     const isConfirmedToRejected =
       currentPaymentStatus === PAYMENT_STATUS.CONFIRMADO &&

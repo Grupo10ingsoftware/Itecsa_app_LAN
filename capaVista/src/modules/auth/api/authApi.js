@@ -15,7 +15,6 @@ export function createAuthApi(apiClient, { subject } = {}) {
     getProfileMovements: ({ page = 1, perPage = 10, search = '' } = {}) =>
       apiClient.get(`/auth/profile/movements?${new URLSearchParams({ page, perPage, ...(search ? { search } : {}) })}`),
     verify: () => apiClient.get('/auth/verify'),
-    debugResetPin: () => apiClient.post('/auth/pin/debug-reset', {}),
     revealPin: () => apiClient.post('/auth/pin/reveal', {}),
     acknowledgePin: () => apiClient.post('/auth/pin/acknowledge', {}),
     requestPinRecovery: () => apiClient.post('/auth/pin-recovery/request', {}),

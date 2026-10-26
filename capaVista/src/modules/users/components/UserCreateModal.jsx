@@ -12,7 +12,7 @@ export default function UserCreateModal({ isOpen, onClose, onCreated }) {
     canClose: !isBusy,
     containerRef: modalRef,
     initialFocusRef: titleRef,
-    isOpen,
+    isOpen: isOpen && !isBusy,
     onClose,
   })
 

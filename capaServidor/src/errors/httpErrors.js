@@ -5,13 +5,11 @@ import { UnauthorizedError, InvalidRequestError, InsufficientScopeError } from '
 import { AppError } from './AppError.js';
 import { PinServiceError } from '../modules/auth/service/pin.service.js';
 import { PinDeliveryUnavailableError } from '../modules/auth/service/pinDelivery.service.js';
-import { Auth0ServiceError } from '../modules/users/service/auth0Management.service.js';
 import { UserRepositoryError } from '../modules/users/repo/users.repo.js';
 
 const ids = new WeakMap();
 const DIAGNOSTIC_CODES = new Set(['P1001', 'P1002', 'P2002', 'P2010', 'P2022', 'P2025',
-    'AUTH0_INVALID_RESPONSE', 'AUTH0_TOKEN_REQUEST_FAILED', 'AUTH0_PASSWORD_EMAIL_FAILED',
-    'AUTH0_LIST_ROLES_FAILED', 'USER_REPOSITORY_ERROR', 'PIN_CONFIGURATION_ERROR',
+    'USER_REPOSITORY_ERROR', 'PIN_CONFIGURATION_ERROR',
     'PIN_PENDING_DATA_INVALID', 'PIN_GENERATION_FAILED']);
 const INTERNAL = Object.freeze({ status: 500, code: 'INTERNAL_ERROR', message: 'Ocurrio un error interno.' });
 const PIN_ERRORS = {
@@ -65,11 +63,6 @@ function publicError(error) {
         if (error.code === 'USER_NOT_FOUND') return { status: 404, code: 'USER_NOT_FOUND', message: 'El usuario no existe.' };
         if (error.code === 'USER_ALREADY_EXISTS') return { status: 409, code: 'USER_ALREADY_EXISTS', message: 'Ya existe un usuario con ese correo.' };
     }
-    if (error instanceof Auth0ServiceError) {
-        if (error.code === 'USER_EMAIL_ALREADY_EXISTS') return { status: 409, code: error.code, message: 'Ya existe un usuario con ese correo.' };
-        if (error.code === 'AUTH0_CONFIGURATION_ERROR') return { status: 503, code: error.code, message: 'La configuracion administrativa de Auth0 esta incompleta.' };
-        if (error.code === 'AUTH0_INSUFFICIENT_SCOPE') return { status: 503, code: error.code, message: 'La aplicacion administrativa de Auth0 no tiene permisos suficientes para consultar o modificar usuarios.' };
-    }
     if (error instanceof InsufficientScopeError) return { status: 403, code: 'FORBIDDEN', message: 'Acceso denegado.' };
     if (error instanceof InvalidRequestError) return { status: 400, code: 'INVALID_REQUEST', message: 'La solicitud de autenticacion no es valida.' };
     if (error instanceof UnauthorizedError) return { status: 401, code: 'UNAUTHENTICATED', message: 'La sesion no es valida o no esta autenticada.' };
@@ -83,7 +76,6 @@ function safeErrorType(error) {
     if (error instanceof AppError) return 'AppError';
     if (error instanceof PinServiceError) return 'PinServiceError';
     if (error instanceof PinDeliveryUnavailableError) return 'PinDeliveryUnavailableError';
-    if (error instanceof Auth0ServiceError) return 'Auth0ServiceError';
     if (error instanceof UserRepositoryError) return 'UserRepositoryError';
     if (error instanceof UnauthorizedError) return 'AuthenticationError';
     if (['P1001', 'P1002', 'P2002', 'P2010', 'P2022', 'P2025'].includes(error?.code)) return 'PersistenceError';

@@ -30,7 +30,7 @@ let checked = false;
 try {
   await db.$transaction(async (tx) => {
     const actor = await tx.usuario.create({ data: {
-      id_auth0: "local-lab|yoyo-rollback-check",
+      id_keycloak: "local-lab-yoyo-rollback-check",
       correo_usuario: "yoyo-rollback-check@example.invalid",
       rol_usuario: "Soporte",
       estado_usuario: "Activo",

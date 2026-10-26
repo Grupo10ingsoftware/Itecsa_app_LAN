@@ -10,6 +10,7 @@ import {
 } from "node:crypto";
 import { promisify } from "node:util";
 
+import { identityKey, identityUserWhere } from '../../../database/identityBinding.js';
 import getPrismaClient from "../../../database/prisma.js";
 import {
     PinDeliveryUnavailableError,
@@ -21,7 +22,6 @@ import {
     isActiveUserStatus,
 } from "../../../config/userLifecycle.js";
 
-import { ROLES, roleFromPayload, can, PERMISSIONS } from "../../../../../shared/authorization.js";
 
 const scrypt = promisify(scryptCallback);
 const PIN_PATTERN = /^\d{6}$/;
@@ -215,22 +215,22 @@ export class PinService {
         };
     }
 
-    async findUser(auth0UserId) {
-        return this.client.usuario.findUnique({
-            where: { id_auth0: auth0UserId },
+    async findUser(identitySubject) {
+        return this.client.usuario.findFirst({
+            where: identityUserWhere(identitySubject),
         });
     }
 
-    async findUserForUpdate(transaction, auth0UserId) {
+    async findUserForUpdate(transaction, identitySubject) {
+        const key = identityKey(identitySubject);
         const users = await transaction.$queryRaw`
-            SELECT id_usuario, id_auth0, correo_usuario, nombre_usuario,
-                apellido_usuario, estado_usuario, pin_hash, pin_salt,
-                pin_accepted_at, pin_failed_attempts, pin_locked_until
-            FROM \`Usuario\`
-            WHERE id_auth0 = ${auth0UserId}
+            SELECT u.id_usuario, u.correo_usuario, u.nombre_usuario,
+                u.apellido_usuario, u.estado_usuario, u.pin_hash, u.pin_salt,
+                u.pin_accepted_at, u.pin_failed_attempts, u.pin_locked_until
+            FROM Usuario u JOIN ExternalIdentity e ON e.user_id = u.id_usuario
+            WHERE e.provider = ${key.provider} AND e.issuer = ${key.issuer} AND e.subject = ${key.subject}
             FOR UPDATE
         `;
-
         return users[0] ?? null;
     }
 
@@ -263,20 +263,20 @@ export class PinService {
         );
     }
 
-    async ensureProvisioned(auth0UserId) {
-        let user = await this.findUser(auth0UserId);
+    async ensureProvisioned(identitySubject) {
+        let user = await this.findUser(identitySubject);
         assertActiveUser(user);
 
         if (!user.pin_hash) {
             await this.provisionByUserId(user.id_usuario);
-            user = await this.findUser(auth0UserId);
+            user = await this.findUser(identitySubject);
         }
 
         return pinStatus(user);
     }
 
-    async reveal(auth0UserId) {
-        const user = await this.findUser(auth0UserId);
+    async reveal(identitySubject) {
+        const user = await this.findUser(identitySubject);
         assertActiveUser(user);
 
         if (
@@ -295,8 +295,8 @@ export class PinService {
         return this.decrypt(user);
     }
 
-    async acknowledge(auth0UserId) {
-        const user = await this.findUser(auth0UserId);
+    async acknowledge(identitySubject) {
+        const user = await this.findUser(identitySubject);
         assertActiveUser(user);
 
         if (!user.pin_hash) {
@@ -320,7 +320,7 @@ export class PinService {
         });
     }
 
-    async validate(auth0UserId, pin) {
+    async validate(identitySubject, pin) {
         if (!PIN_PATTERN.test(String(pin ?? ""))) {
             throw new PinServiceError(
                 "PIN_FORMAT_INVALID",
@@ -329,7 +329,7 @@ export class PinService {
         }
 
         const result = await this.client.$transaction(async (transaction) => {
-            const user = await this.findUserForUpdate(transaction, auth0UserId);
+            const user = await this.findUserForUpdate(transaction, identitySubject);
             assertActiveUser(user);
 
             if (!user.pin_hash || !user.pin_accepted_at) {
@@ -407,54 +407,11 @@ export class PinService {
         return result.user;
     }
 
-    async debugReset(payload) {
-        if (currentAppEnvironment() !== "development") {
-            throw new PinServiceError("PIN_DEBUG_DISABLED", "La generacion debug solo esta disponible en desarrollo.", { status: 403 });
-        }
-        if (!payload?.sub || roleFromPayload(payload) !== ROLES.SOPORTE ||
-            !can(ROLES.SOPORTE, payload.permissions, PERMISSIONS.MANAGE_PIN)) {
-            throw new PinServiceError("PIN_DEBUG_FORBIDDEN", "Esta accion requiere el rol Soporte.", { status: 403 });
-        }
-        const user = await this.findUser(payload.sub);
-        assertActiveUser(user);
-        if (user.rol_usuario !== ROLES.SOPORTE) {
-            throw new PinServiceError("PIN_DEBUG_FORBIDDEN", "Renueva tu sesion para verificar tu rol.", { status: 403 });
-        }
-        for (let attempt = 0; attempt < 20; attempt += 1) {
-            const credential = await this.buildCredential();
-            if (await matchesHash(credential.pin, user.pin_hash, user.pin_salt)) continue;
-            try {
-                await this.client.$transaction(async (tx) => {
-                    const result = await tx.usuario.updateMany({
-                        where: {
-                            id_usuario: user.id_usuario,
-                            rol_usuario: ROLES.SOPORTE,
-                            estado_usuario: { in: [...ACTIVE_USER_STATUSES] },
-                            pin_hash: user.pin_hash,
-                        },
-                        data: credential.data,
-                    });
-                    if (result.count !== 1) {
-                        throw new PinServiceError("PIN_DEBUG_CONFLICT", "La cuenta cambio. Actualiza tu sesion e intenta nuevamente.", { status: 409 });
-                    }
-                    await tx.pinRecoveryChallenge.updateMany({
-                        where: { id_usuario: user.id_usuario, used_at: null },
-                        data: { used_at: this.now() },
-                    });
-                });
-                return "pending_acknowledgement";
-            } catch (error) {
-                if (error?.code !== "P2002") throw error;
-            }
-        }
-        throw new PinServiceError("PIN_GENERATION_FAILED", "No fue posible generar un PIN unico.", { status: 500 });
-    }
-
-    async requestRecovery(auth0UserId) {
+    async requestRecovery(identitySubject) {
         const code = sixDigits();
         const hashed = await hashValue(code);
         const { user, challenge } = await this.client.$transaction(async (transaction) => {
-            const user = await this.findUserForUpdate(transaction, auth0UserId);
+            const user = await this.findUserForUpdate(transaction, identitySubject);
             assertActiveUser(user);
             const now = this.now();
 
@@ -516,7 +473,7 @@ export class PinService {
         }
     }
 
-    async confirmRecovery(auth0UserId, code) {
+    async confirmRecovery(identitySubject, code) {
         if (!RECOVERY_CODE_PATTERN.test(String(code ?? ""))) {
             throw new PinServiceError(
                 "PIN_RECOVERY_CODE_FORMAT_INVALID",
@@ -524,7 +481,7 @@ export class PinService {
             );
         }
 
-        const user = await this.findUser(auth0UserId);
+        const user = await this.findUser(identitySubject);
         assertActiveUser(user);
 
         const challenge = await this.client.pinRecoveryChallenge.findFirst({
@@ -595,7 +552,7 @@ export class PinService {
                 const result = await this.client.$transaction(async (transaction) => {
                     const currentUser = await this.findUserForUpdate(
                         transaction,
-                        auth0UserId,
+                        identitySubject,
                     );
                     assertActiveUser(currentUser);
                     // A queued transaction may acquire the lock after the code expires.
@@ -654,8 +611,8 @@ export class PinService {
         );
     }
 
-    async invalidateByAuth0Id(auth0UserId) {
-        const user = await this.findUser(auth0UserId);
+    async invalidateBySubject(identitySubject) {
+        const user = await this.findUser(identitySubject);
         if (!user) return;
 
         await this.client.$transaction([

@@ -17,7 +17,7 @@ export const ROUTE_ACCESS = Object.freeze([
 export function homeForIdentity(provider, user) {
   const policy = authorizationForProvider(provider)
   const allowed = permission => policy?.can(user?.rolUsuario, user?.permissions, permission) === true
-  if (provider === 'keycloak' && allowed(P.MANAGE_USERS)) return APP_ROUTES.ADMIN_USERS
+  if (provider === 'keycloak' && allowed(P.MANAGE_USERS) && !allowed(P.READ_ORDERS)) return APP_ROUTES.ADMIN_USERS
   if (allowed(P.READ_ORDERS)) return APP_ROUTES.KANBAN
   if (allowed(P.READ_PROFILE)) return APP_ROUTES.PROFILE
   if (allowed(P.READ_MESSAGES)) return APP_ROUTES.MESSAGES

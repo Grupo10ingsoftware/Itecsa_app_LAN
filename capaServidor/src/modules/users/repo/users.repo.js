@@ -1,12 +1,12 @@
+import { identityUserWhere } from '../../../database/identityBinding.js';
 import getPrismaClient from "../../../database/prisma.js";
 import {
-    ACTIVE_USER_STATUSES,
     USER_STATUS,
 } from "../../../config/userLifecycle.js";
 
 export const USER_RESPONSE_SELECT = Object.freeze({
     id_usuario: true,
-    id_auth0: true,
+    ExternalIdentity: { select: { provider: true, issuer: true, subject: true } },
     correo_usuario: true,
     rut_usuario: true,
     nombre_usuario: true,
@@ -30,7 +30,7 @@ function toUserResponse(user) {
 
     return {
         idUsuario: user.id_usuario,
-        idAuth0: user.id_auth0,
+        identitySubject: user.ExternalIdentity?.subject ?? null,
         correoUsuario: user.correo_usuario,
         rutUsuario: user.rut_usuario,
         nombreUsuario: user.nombre_usuario,
@@ -38,10 +38,6 @@ function toUserResponse(user) {
         rolUsuario: user.rol_usuario,
         estadoUsuario: user.estado_usuario,
     };
-}
-
-function normalizeEmail(correoUsuario) {
-    return correoUsuario.trim().toLowerCase();
 }
 
 function mapRepositoryError(error) {
@@ -78,27 +74,10 @@ export class UserRepository {
         return this.prisma;
     }
 
-    async findByEmail(correoUsuario) {
+    async findBySubject(identitySubject) {
         try {
-            const user = await this.client.usuario.findUnique({
-                where: {
-                    correo_usuario: normalizeEmail(correoUsuario),
-                },
-                select: USER_RESPONSE_SELECT,
-            });
-
-            return toUserResponse(user);
-        } catch (error) {
-            throw mapRepositoryError(error);
-        }
-    }
-
-    async findByAuth0Id(auth0UserId) {
-        try {
-            const user = await this.client.usuario.findUnique({
-                where: {
-                    id_auth0: auth0UserId,
-                },
+            const user = await this.client.usuario.findFirst({
+                where: identityUserWhere(identitySubject),
                 select: USER_RESPONSE_SELECT,
             });
 
@@ -171,288 +150,18 @@ export class UserRepository {
         return { records, total, page, perPage };
     }
 
-    buildListWhere({ search = "", estadoUsuario = "", rolUsuario = "", allowedRoles } = {}) {
-        const where = {};
-
-        if (search) {
-            where.OR = [
-                { nombre_usuario: { contains: search } },
-                { apellido_usuario: { contains: search } },
-                { correo_usuario: { contains: search } },
-                { rut_usuario: { contains: search } },
-            ];
-        }
-
-        if (estadoUsuario === USER_STATUS.UNLINKED) {
-            where.estado_usuario = USER_STATUS.UNLINKED;
-        } else if (ACTIVE_USER_STATUSES.includes(estadoUsuario)) {
-            where.estado_usuario = { in: [...ACTIVE_USER_STATUSES] };
-        } else if (estadoUsuario === USER_STATUS.PENDING_FIRST_LOGIN) {
-            where.estado_usuario = USER_STATUS.PENDING_FIRST_LOGIN;
-        } else if (estadoUsuario === USER_STATUS.PENDING_ROLE) {
-            where.estado_usuario = USER_STATUS.PENDING_ROLE;
-        }
-
-        if (rolUsuario) {
-            where.rol_usuario = rolUsuario;
-        }
-
-        if (allowedRoles) where.AND = [{rol_usuario: {in: allowedRoles}}];
-        return where;
-    }
-
-    async list({ page = 1, perPage = 10, search = "", estadoUsuario = "", rolUsuario = "", allowedRoles } = {}) {
-        const safePage = Number.isInteger(page) && page > 0 ? page : 1;
-        const safePerPage =
-            Number.isInteger(perPage) && perPage > 0 && perPage <= 50 ? perPage : 10;
-        const where = this.buildListWhere({ search, estadoUsuario, rolUsuario, allowedRoles });
-
-        try {
-            const [users, total] = await Promise.all([
-                this.client.usuario.findMany({
-                    where,
-                    orderBy: { id_usuario: "desc" },
-                    skip: (safePage - 1) * safePerPage,
-                    take: safePerPage,
-                    select: USER_RESPONSE_SELECT,
-                }),
-                this.client.usuario.count({ where }),
-            ]);
-
-            return {
-                usuarios: users.map(toUserResponse),
-                total,
-                page: safePage,
-                perPage: safePerPage,
-            };
-        } catch (error) {
-            throw mapRepositoryError(error);
-        }
-    }
-
-    async getSummary({allowedRoles} = {}) {
-        const where = allowedRoles ? {rol_usuario:{in:allowedRoles}} : {};
-        try {
-            const groups = await this.client.usuario.groupBy({
-                by: ["estado_usuario"],
-                where,
-                _count: { _all: true },
-            });
-            const counts = new Map(
-                groups.map((group) => [group.estado_usuario, group._count._all]),
-            );
-            const totalUsuarios = groups.reduce(
-                (total, group) => total + group._count._all,
-                0,
-            );
-            const vinculados = ACTIVE_USER_STATUSES.reduce(
-                (total, status) => total + (counts.get(status) ?? 0),
-                0,
-            );
-            const desvinculados = counts.get(USER_STATUS.UNLINKED) ?? 0;
-            const pendientes = counts.get(USER_STATUS.PENDING_FIRST_LOGIN) ?? 0;
-            const pendientesRol = counts.get(USER_STATUS.PENDING_ROLE) ?? 0;
-
-            return {
-                totalUsuarios,
-                vinculados,
-                desvinculados,
-                pendientes,
-                pendientesRol,
-            };
-        } catch (error) {
-            throw mapRepositoryError(error);
-        }
-    }
-
-    async create({
-        auth0UserId,
-        correoUsuario,
-        rutUsuario,
-        nombreUsuario,
-        apellidoUsuario,
-        rolUsuario,
-        estadoUsuario,
-    }) {
-        try {
-            const user = await this.client.usuario.create({
-                data: {
-                    id_auth0: auth0UserId,
-                    correo_usuario: normalizeEmail(correoUsuario),
-                    rut_usuario: rutUsuario,
-                    nombre_usuario: nombreUsuario,
-                    apellido_usuario: apellidoUsuario,
-                    rol_usuario: rolUsuario,
-                    estado_usuario: estadoUsuario,
-                },
-                select: USER_RESPONSE_SELECT,
-            });
-
-            return toUserResponse(user);
-        } catch (error) {
-            throw mapRepositoryError(error);
-        }
-    }
-
-    async updateByAuth0Id(auth0UserId, {
-        correoUsuario,
-        nombreUsuario,
-        apellidoUsuario,
-        rolUsuario,
-    }) {
-        try {
-            const user = await this.client.usuario.update({
-                where: { id_auth0: auth0UserId },
-                data: {
-                    correo_usuario: normalizeEmail(correoUsuario),
-                    nombre_usuario: nombreUsuario,
-                    apellido_usuario: apellidoUsuario,
-                    rol_usuario: rolUsuario,
-                },
-                select: USER_RESPONSE_SELECT,
-            });
-
-            return toUserResponse(user);
-        } catch (error) {
-            throw mapRepositoryError(error);
-        }
-    }
-
-    async beginRoleTransition(auth0UserId, currentRole) {
-        try {
-            const result = await this.client.usuario.updateMany({
-                where: {
-                    id_auth0: auth0UserId,
-                    rol_usuario: currentRole,
-                    estado_usuario: { in: [...ACTIVE_USER_STATUSES] },
-                },
-                data: { estado_usuario: USER_STATUS.PENDING_ROLE },
-            });
-
-            if (result.count !== 1) {
-                throw new UserRepositoryError(
-                    "USER_CONCURRENT_UPDATE",
-                    "El usuario cambio mientras se iniciaba la actualizacion de rol.",
-                );
-            }
-        } catch (error) {
-            if (error instanceof UserRepositoryError) throw error;
-            throw mapRepositoryError(error);
-        }
-    }
-
-    async completeRoleTransition(auth0UserId, currentRole, {
-        correoUsuario,
-        nombreUsuario,
-        apellidoUsuario,
-        rolUsuario,
-    }) {
-        try {
-            const result = await this.client.usuario.updateMany({
-                where: {
-                    id_auth0: auth0UserId,
-                    rol_usuario: currentRole,
-                    estado_usuario: USER_STATUS.PENDING_ROLE,
-                },
-                data: {
-                    correo_usuario: normalizeEmail(correoUsuario),
-                    nombre_usuario: nombreUsuario,
-                    apellido_usuario: apellidoUsuario,
-                    rol_usuario: rolUsuario,
-                    estado_usuario: USER_STATUS.ACTIVE,
-                },
-            });
-
-            if (result.count !== 1) {
-                throw new UserRepositoryError(
-                    "USER_CONCURRENT_UPDATE",
-                    "El usuario cambio mientras se confirmaba la actualizacion de rol.",
-                );
-            }
-
-            return this.findByAuth0Id(auth0UserId);
-        } catch (error) {
-            if (error instanceof UserRepositoryError) throw error;
-            throw mapRepositoryError(error);
-        }
-    }
-
-    async cancelRoleTransition(auth0UserId, currentRole) {
-        try {
-            const result = await this.client.usuario.updateMany({
-                where: {
-                    id_auth0: auth0UserId,
-                    rol_usuario: currentRole,
-                    estado_usuario: USER_STATUS.PENDING_ROLE,
-                },
-                data: { estado_usuario: USER_STATUS.ACTIVE },
-            });
-
-            if (result.count !== 1) {
-                throw new UserRepositoryError(
-                    "USER_CONCURRENT_UPDATE",
-                    "El usuario cambio mientras se cancelaba la actualizacion de rol.",
-                );
-            }
-        } catch (error) {
-            if (error instanceof UserRepositoryError) throw error;
-            throw mapRepositoryError(error);
-        }
-    }
-
-    async updateStatusIfCurrent(auth0UserId, currentStatus, nextStatus) {
-        try {
-            const result = await this.client.usuario.updateMany({
-                where: {
-                    id_auth0: auth0UserId,
-                    estado_usuario: currentStatus,
-                },
-                data: { estado_usuario: nextStatus },
-            });
-
-            if (result.count !== 1) {
-                throw new UserRepositoryError(
-                    "USER_CONCURRENT_UPDATE",
-                    "El estado del usuario cambio durante la operacion.",
-                );
-            }
-
-            return this.findByAuth0Id(auth0UserId);
-        } catch (error) {
-            if (error instanceof UserRepositoryError) throw error;
-            throw mapRepositoryError(error);
-        }
-    }
-
-    async updateRoleIfCurrent(auth0UserId, currentRole, nextRole) {
+    async activateOnFirstAccess(identitySubject, role) {
         try {
             await this.client.usuario.updateMany({
                 where: {
-                    id_auth0: auth0UserId,
-                    rol_usuario: currentRole,
-                    estado_usuario: { in: [...ACTIVE_USER_STATUSES] },
-                },
-                data: { rol_usuario: nextRole },
-            });
-            return this.findByAuth0Id(auth0UserId);
-        } catch (error) {
-            if (error instanceof UserRepositoryError) throw error;
-            throw mapRepositoryError(error);
-        }
-    }
-
-    async activateOnFirstAccess(auth0UserId, role) {
-        try {
-            await this.client.usuario.updateMany({
-                where: {
-                    id_auth0: auth0UserId,
+                    ...identityUserWhere(identitySubject),
                     rol_usuario: role,
                     estado_usuario: USER_STATUS.PENDING_FIRST_LOGIN,
                 },
                 data: { estado_usuario: USER_STATUS.ACTIVE },
             });
             // La lectura posterior resuelve accesos concurrentes y revocaciones simultaneas.
-            return this.findByAuth0Id(auth0UserId);
+            return this.findBySubject(identitySubject);
         } catch (error) {
             throw mapRepositoryError(error);
         }

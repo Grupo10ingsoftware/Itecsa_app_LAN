@@ -16,7 +16,7 @@ const segment = value => {
 const ordinary = role => { if (!ASSIGNABLE_ROLES.includes(role)) throw new KeycloakServiceError('KEYCLOAK_ROLE_FORBIDDEN', { category: 'authorization', status: 403 }); };
 const validText = (value, max) => typeof value === 'string' && value.trim() && value.length <= max && !/[\u0000-\u001f]/u.test(value);
 
-// No Auth0 imports, SDK, retries of mutations or credentials in errors.
+// Mutations are not retried; credentials never appear in errors.
 export class KeycloakManagementService {
   constructor({ env = process.env, fetcher = fetch, clock = Date.now } = {}) {
     this.config = resolveKeycloakAdministration(env);
@@ -132,6 +132,20 @@ export class KeycloakManagementService {
   async setEnabled(subject, enabled) {
     if (typeof enabled !== 'boolean') invalid();
     await this.request('/users/' + segment(subject), { method: 'PUT', body: { enabled }, expected: [204] });
+  }
+
+  async setTemporaryPassword(subject, password) {
+    if (!validText(password, 255)) invalid();
+    await this.request('/users/' + segment(subject) + '/reset-password', {
+      method: 'PUT', expected: [204], body: { type: 'password', value: password, temporary: true },
+    });
+  }
+
+  async hasTemporaryPassword(subject) {
+    const user = await this.getUser(subject);
+    const { data } = await this.request('/users/' + segment(subject) + '/credentials');
+    return Array.isArray(data) && data.some(credential => credential.type === 'password')
+      && user.requiredActions?.includes('UPDATE_PASSWORD') === true;
   }
 
   async logout(subject) {

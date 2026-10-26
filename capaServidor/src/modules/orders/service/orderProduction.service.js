@@ -104,7 +104,7 @@ export async function updGeneralStepOperation(service, orderId, stepId, options 
   ));
 }
 
-export async function sendToReviewOperation(service, orderId, comment, { auth0UserId } = {}) {
+export async function sendToReviewOperation(service, orderId, comment, { identitySubject } = {}) {
   const normalizedComment = typeof comment === "string" ? comment.trim() : "";
   if (!normalizedComment) {
     const error = new AppError(400, "El comentario de revision es obligatorio.");
@@ -127,7 +127,7 @@ export async function sendToReviewOperation(service, orderId, comment, { auth0Us
     throw error;
   }
 
-  const userId = await service.resolveInternalUserId({ auth0UserId });
+  const userId = await service.resolveInternalUserId({ identitySubject });
   return service.runInTransaction(async ({ repo }) => {
     const updatedOrder = await repo.sendToReview(orderId, {
       userId,

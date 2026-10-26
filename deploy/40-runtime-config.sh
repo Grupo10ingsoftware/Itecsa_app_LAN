@@ -1,9 +1,8 @@
 #!/bin/sh
 set -eu
 
-provider="${VITE_AUTH_PROVIDER:-auth0}"
+provider="${VITE_AUTH_PROVIDER:-keycloak}"
 case "$provider" in
-    auth0) required="VITE_AUTH0_DOMAIN VITE_AUTH0_CLIENT_ID VITE_AUTH0_AUDIENCE" ;;
     keycloak) required="VITE_KEYCLOAK_URL VITE_KEYCLOAK_REALM VITE_KEYCLOAK_CLIENT_ID VITE_KEYCLOAK_AUDIENCE" ;;
     *) echo "Proveedor de autenticacion invalido" >&2; exit 1 ;;
 esac
@@ -19,7 +18,7 @@ umask 022
 # jq escapes quotes, backslashes and newlines; never use raw envsubst for JavaScript.
 {
     printf 'window.__ITECSA_CONFIG__ = '
-    jq -cn --arg provider "$provider" '{authProvider: $provider, auth0Domain: env.VITE_AUTH0_DOMAIN, auth0ClientId: env.VITE_AUTH0_CLIENT_ID, auth0Audience: env.VITE_AUTH0_AUDIENCE, keycloakUrl: env.VITE_KEYCLOAK_URL, keycloakRealm: env.VITE_KEYCLOAK_REALM, keycloakClientId: env.VITE_KEYCLOAK_CLIENT_ID, keycloakAudience: env.VITE_KEYCLOAK_AUDIENCE, apiBaseUrl: env.VITE_API_BASE_URL}'
+    jq -cn --arg provider "$provider" '{authProvider: $provider, keycloakUrl: env.VITE_KEYCLOAK_URL, keycloakRealm: env.VITE_KEYCLOAK_REALM, keycloakClientId: env.VITE_KEYCLOAK_CLIENT_ID, keycloakAudience: env.VITE_KEYCLOAK_AUDIENCE, apiBaseUrl: env.VITE_API_BASE_URL}'
     printf ';\n'
 } > /tmp/runtime-config.js.tmp
 mv /tmp/runtime-config.js.tmp /tmp/runtime-config.js

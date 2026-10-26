@@ -17,9 +17,9 @@ const labNames = new Set([...Array.from({ length: 9 }, (_, i) => `p065-role-${i}
   ...Array.from({ length: 6 }, (_, i) => `p065-prepared-ordinary-${i}`), 'p065-prepared-visible']);
 let auth, expires = 0;
 
-function password() {
+export function readOperatorPassword(label = 'Keycloak admin password: ') {
   assert.ok(process.stdin.isTTY, 'Use an interactive terminal');
-  process.stdout.write('Keycloak admin password: ');
+  process.stdout.write(label);
   process.stdin.setRawMode(true); process.stdin.resume(); process.stdin.setEncoding('utf8');
   return new Promise((resolve, reject) => {
     let value = '';
@@ -79,7 +79,7 @@ export function patchEnv(relative, changes) {
 }
 
 export async function startAdmin() {
-  await token({ grant_type: 'password', client_id: 'admin-cli', username: 'admin', password: await password() });
+  await token({ grant_type: 'password', client_id: 'admin-cli', username: 'admin', password: await readOperatorPassword() });
 }
 export async function closeAdmin() {
   if (auth?.refresh_token) await fetch(base + '/realms/master/protocol/openid-connect/logout', {
@@ -162,8 +162,8 @@ async function main() {
   patchEnv('capaServidor/.env', { AUTH_PROVIDER: 'keycloak', KEYCLOAK_ALLOW_HTTP: 'true',
     KEYCLOAK_ISSUER: contract.issuer, KEYCLOAK_AUDIENCE: contract.audience,
     KEYCLOAK_CLIENT_ID: contract.clientId, KEYCLOAK_ROLE_CLIENT_ID: contract.roleClientId,
-    KEYCLOAK_JWKS_URI: 'http://host.docker.internal:18080/realms/itecsa/protocol/openid-connect/certs',
-    KEYCLOAK_ADMIN_TRANSPORT_ORIGIN: 'http://host.docker.internal:18080',
+    KEYCLOAK_JWKS_URI: contract.issuer + '/protocol/openid-connect/certs',
+    KEYCLOAK_ADMIN_TRANSPORT_ORIGIN: new URL(contract.issuer).origin,
     KEYCLOAK_ADMIN_CLIENT_ID: contract.adminClientId, KEYCLOAK_ADMIN_CLIENT_SECRET: secret.value,
     IDENTITY_PREPARATION_ENABLED: 'true', FRONTEND_ORIGIN: contract.origin });
   patchEnv('capaVista/.env', { VITE_AUTH_PROVIDER: 'keycloak', VITE_KEYCLOAK_URL: base,
@@ -189,8 +189,44 @@ async function main() {
   console.log(`Removed ${labUsers.length} synthetic users and both laboratory clients; original users preserved.`);
   console.log('Development URL: ' + contract.origin);
 }
+async function applyDeveloperUsers() {
+  await startAdmin();
+  const [spa, roleClient, capabilityClient] = await Promise.all([
+    client(contract.clientId), client(contract.roleClientId), client(contract.capabilityClientId),
+  ]);
+  const capabilities = await request(`/clients/${capabilityClient.id}/roles?max=1000`);
+  const temporaryRead = capabilities.find(role=>role.name==='read:users');
+  if(temporaryRead)assert.equal(temporaryRead.description,'Consulta de usuarios sin administracion de cuentas', 'Refuse to remove an unowned role');
+  assert.deepEqual(capabilities.filter(role=>role.name!=='read:users').map(role=>role.name).sort(),[...contract.capabilities].sort());
+  const before={};
+  for(const role of contract.roles) {
+    before[role]=await request(`/clients/${roleClient.id}/roles/${encodeURIComponent(role)}/composites`);
+    assert.ok(before[role].every(value=>value.containerId===capabilityClient.id));
+    assert.deepEqual(before[role].filter(value=>role!=='Desarrollador'||!['read:users','manage:users'].includes(value.name)).map(value=>value.name).sort(),
+      contract.rolePermissions[role].filter(value=>role!=='Desarrollador'||value!=='manage:users').sort());
+  }
+  const developerPath=`/clients/${roleClient.id}/roles/Desarrollador/composites`;
+  const scopePath=`/clients/${spa.id}/scope-mappings/clients/${capabilityClient.id}`;
+  if(temporaryRead) {
+    if(before.Desarrollador.some(role=>role.id===temporaryRead.id))await request(developerPath,'DELETE',[temporaryRead]);
+    if((await request(scopePath)).some(role=>role.id===temporaryRead.id))await request(scopePath,'DELETE',[temporaryRead]);
+    await request(`/clients/${capabilityClient.id}/roles/${encodeURIComponent(temporaryRead.name)}`,'DELETE');
+  }
+  const manage=capabilities.find(role=>role.name==='manage:users');assert.ok(manage);
+  if(!before.Desarrollador.some(role=>role.id===manage.id))await request(developerPath,'POST',[manage]);
+  if(!(await request(scopePath)).some(role=>role.id===manage.id))await request(scopePath,'POST',[manage]);
+  for(const role of contract.roles) {
+    const actual=await request(`/clients/${roleClient.id}/roles/${encodeURIComponent(role)}/composites`);
+    assert.deepEqual(actual.map(value=>value.name).sort(),[...contract.rolePermissions[role]].sort());
+  }
+  assert.deepEqual((await request(`/clients/${capabilityClient.id}/roles?max=1000`)).map(role=>role.name).sort(),[...contract.capabilities].sort());
+  console.log('Desarrollador: 25 capabilities including manage:users. Soporte unchanged: 5. Catalog remains 25; no user or password changes.');
+}
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  try { await main(); }
+  try {
+    if(process.argv.slice(2).length===1&&process.argv[2]==='--developer-users')await applyDeveloperUsers();
+    else await main();
+  }
   catch (error) { console.error('Configuration stopped: ' + error.message); process.exitCode = 1; }
   finally { await closeAdmin(); }
 }

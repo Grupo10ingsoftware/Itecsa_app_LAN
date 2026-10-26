@@ -46,7 +46,7 @@ try {
       checksum: createHash("sha256").update(fs.readFileSync(path.join(migrationsRoot, entry.name, "migration.sql"))).digest("hex"),
     }))
     .sort((left, right) => left.name.localeCompare(right.name));
-  if (expected.length !== 15 || migrationRows.length !== expected.length) fail("el historial no contiene exactamente las 15 migraciones esperadas.");
+  if (expected.length !== 16 || migrationRows.length !== expected.length) fail("el historial no contiene exactamente las 16 migraciones provisionales esperadas.");
   const actualByName = new Map(migrationRows.map((row) => [row.name, row]));
   for (const migration of expected) {
     const actual = actualByName.get(migration.name);
@@ -94,4 +94,4 @@ try {
 const databaseUrl = buildMigrationDatabaseUrl(process.env);
 runPrisma(["migrate", "status"], databaseUrl);
 runPrisma(["migrate", "diff", "--from-config-datasource", "--to-schema", "prisma/schema.prisma", "--exit-code"], databaseUrl);
-console.log("MYSQL_LAB_VERIFY: identidad, TLS, cuentas, 15 checksums, esquema y catalogos verificados.");
+console.log("MYSQL_LAB_VERIFY: identidad, TLS, cuentas, 16 checksums, esquema y catalogos verificados.");

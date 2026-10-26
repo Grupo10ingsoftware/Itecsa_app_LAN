@@ -1,5 +1,10 @@
 # Validación local de MySQL 8.4 en Docker
 
+> Evidencia histórica del commit `4f4d4c1`, anterior a la integración de
+> `POC/KEYCLOAK`. Sus resultados siguen describiendo esa ejecución, pero el
+> historial Prisma provisional cambió después y requiere una nueva validación
+> física desde una base vacía antes del despliegue LAN.
+
 Fecha de ejecución: 2026-10-25. Esta validación utilizó únicamente recursos
 locales del laboratorio. No se abrió una conexión a Aiven ni se modificaron sus
 credenciales.

@@ -12,7 +12,6 @@ import UserUnlinkConfirmModal from '../components/UserUnlinkConfirmModal'
 import UserMovementsModal from '../components/UserMovementsModal'
 import UserSummaryCards from '../components/UserSummaryCards'
 import { createLatestRequestTracker } from '../utils/latestRequestTracker'
-import { isCompletedUserCreation } from '../utils/userCreationOutcome'
 import { displayUserStatus } from '../../../config/userLifecycle.js'
 import styles from './UserManagementPage.module.css'
 
@@ -42,7 +41,7 @@ function mapApiUser(user) {
   return {
     id: user.idUsuarioAutenticacionExterna ?? user.idUsuario,
     idUsuario: user.idUsuario,
-    idUsuarioAutenticacionExterna: user.idUsuarioAutenticacionExterna ?? user.idAuth0,
+    idUsuarioAutenticacionExterna: user.idUsuarioAutenticacionExterna,
     nombreUsuario,
     apellidoUsuario,
     nombreCompleto,
@@ -73,18 +72,6 @@ function getErrorText(error) {
     return 'No fue posible contactar la API. Revisa la conexion e intenta nuevamente.'
   }
 
-  if (error?.payload?.code === 'AUTH0_CONFIGURATION_ERROR') {
-    return 'La configuracion Auth0 Management del backend esta incompleta.'
-  }
-
-  if (error?.payload?.code === 'AUTH0_INSUFFICIENT_SCOPE') {
-    const requiredScopes = Array.isArray(error.payload.requiredScopes)
-      ? error.payload.requiredScopes.join(', ')
-      : 'read:users, create:users, update:users, read:roles'
-
-    return `La aplicacion M2M no tiene los permisos Auth0 Management requeridos: ${requiredScopes}.`
-  }
-
   if (error?.payload?.message) {
     return error.payload.message
   }
@@ -97,8 +84,7 @@ function getErrorText(error) {
 }
 
 export default function UserManagementPage() {
-  const { identityUser, loginWithRedirect, provider } = useAuth()
-  const keycloak = provider === 'keycloak'
+  const { identityUser, loginWithRedirect } = useAuth()
   const adminUsersApi = useAdminUsersApi()
   const latestRequestRef = useRef(0)
   const latestSummaryRequestRef = useRef(createLatestRequestTracker())
@@ -289,32 +275,19 @@ export default function UserManagementPage() {
   }
 
   async function handleCreatedUser(user) {
-    if (keycloak) {
-      if (user.outcome === 'identity_prepared') setIsCreateModalOpen(false)
-      setPage(1)
-      await refreshAfterMutation({ type: user.outcome === 'identity_prepared' ? 'info' : 'warning',
-        text: user.outcome === 'identity_prepared'
-          ? 'Cuenta preparada. Permanece pendiente y deshabilitada; aun no tiene credenciales.'
-          : `Preparacion incompleta. No repitas el alta con otro nombre. Referencia: ${user.operationId}.` })
-      return
-    }
-    const completed = isCompletedUserCreation(user)
-    if (completed || user.outcome === 'pending_credentials') setIsCreateModalOpen(false)
+    if (user.outcome === 'user_created') setIsCreateModalOpen(false)
     setPage(1)
-    await refreshAfterMutation({
-      type: completed ? 'success' : 'warning',
-      text: user.outcome === 'pending_credentials'
-        ? 'Cuenta registrada. Usa Editar usuario para establecer credenciales por HTTPS; no se envio correo.'
-        : completed
-        ? 'Usuario creado correctamente.'
-        : 'El alta quedo incompleta y requiere conciliacion. Revisa el detalle antes de cerrar.',
-    })
+    await refreshAfterMutation({ type: user.outcome === 'user_created' ? 'info' : 'warning',
+      text: user.outcome === 'user_created'
+        ? 'Usuario creado. Deberá cambiar su contraseña temporal al iniciar sesión.'
+        : 'Preparacion incompleta. No repitas el alta con otro nombre. Referencia: ' + user.operationId + '.' })
   }
   async function handleInspectUser(user) {
-    if (!keycloak) { setEditingUser(user); return }
     try {
       const detail = await adminUsersApi.inspectUser(user.idUsuarioAutenticacionExterna)
-      setEditingUser({ ...user, username: detail.username, enabled: detail.enabled })
+      setEditingUser({ ...user, username: detail.username, enabled: detail.enabled,
+        nombreUsuario: detail.firstName, apellidoUsuario: detail.lastName, correoUsuario: detail.email,
+        rolUsuario: detail.role, estadoUsuario: detail.localState })
     } catch (error) { setActionMessage({ type: 'danger', text: getErrorText(error) }) }
   }
 
@@ -327,7 +300,7 @@ export default function UserManagementPage() {
             Gestion de usuarios
           </h1>
           <p className={styles.pageSubtitle}>Administra usuarios, roles y estado de vinculacion del sistema.</p>
-          {keycloak && <p role="status">Puedes consultar cuentas y movimientos, y preparar cuentas pendientes. La edicion, los cambios de rol, la activacion, la desactivacion y la entrega de credenciales aun no estan habilitados.</p>}
+          <p role="status">Puedes crear usuarios y editar sus datos, rol y estado con tu PIN de autorizacion.</p>
         </header>
 
         <UserSummaryCards
@@ -374,7 +347,6 @@ export default function UserManagementPage() {
             currentPage={page}
             isLoading={isLoading}
             onEditUser={handleInspectUser}
-            readOnly={keycloak}
             onViewMovements={setMovementsUser}
             onPageChange={setPage}
             totalPages={totalPages}
@@ -403,14 +375,8 @@ export default function UserManagementPage() {
         isOpen={Boolean(editingUser)}
         onClose={() => setEditingUser(null)}
         onSave={handleSaveUser}
-        onCredentials={user => { setEditingUser(null); setCredentialUser(user) }}
-        onUnlink={(user) => {
-          setEditingUser(null)
-          setUnlinkingUser(user)
-        }}
         isCurrentUser={Boolean(editingUser?.isCurrentUser)}
         user={editingUser}
-        readOnly={keycloak}
       />
       <UserUnlinkConfirmModal
         isOpen={Boolean(unlinkingUser)}

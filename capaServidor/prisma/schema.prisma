@@ -192,7 +192,7 @@ model Tipo_Producto {
 
 model Usuario {
   id_usuario             Int                     @id @default(autoincrement())
-  id_auth0               String?                 @unique @db.VarChar(128)
+  id_keycloak            String?                 @unique @db.VarChar(128)
   correo_usuario         String?                 @unique @db.VarChar(255)
   rut_usuario            String?                 @db.VarChar(12)
   nombre_usuario         String?                 @db.VarChar(100)
@@ -219,7 +219,6 @@ model Usuario {
   ExternalIdentity       ExternalIdentity?
 }
 
-// Additive identity binding; the historical Usuario PK and id_auth0 remain intact.
 model ExternalIdentity {
   id_external_identity Int     @id @default(autoincrement())
   provider             String  @db.VarChar(20)

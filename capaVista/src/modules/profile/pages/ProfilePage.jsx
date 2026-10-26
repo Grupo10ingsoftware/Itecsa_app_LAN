@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ROLES } from '../../../config/roles'
 import { useAuth } from '../../../hooks/useAuth'
 import { useAuthApi } from '../../auth/hooks/useAuthApi'
 import RoleBadge from '../../../shared/components/data/RoleBadge'
@@ -86,20 +85,6 @@ export default function ProfilePage() {
       await refreshSession()
     } catch (error) {
       setPinError(error?.payload?.message ?? 'No fue posible confirmar la recepcion del PIN.')
-    } finally {
-      setIsPinBusy(false)
-    }
-  }
-
-  async function debugResetPin() {
-    setIsPinBusy(true)
-    setPinError('')
-    setVisiblePin('')
-    try {
-      await authApi.debugResetPin()
-      await refreshSession()
-    } catch (error) {
-      setPinError(error?.payload?.message ?? 'No fue posible generar el PIN.')
     } finally {
       setIsPinBusy(false)
     }
@@ -220,11 +205,7 @@ export default function ProfilePage() {
             </div>
             {pinStatus === 'active' && <button className={styles.outlineButton} disabled={isPinBusy} type="button"
               onClick={() => { resetRecovery(); setRecoveryOpen(true) }}><i className="bi bi-arrow-clockwise" aria-hidden="true" />Recuperar PIN</button>}
-            {provider !== 'keycloak' && import.meta.env.DEV && import.meta.env.VITE_ENABLE_DEMO_ROUTES === 'true' && profile.role === ROLES.SOPORTE && pinStatus === 'active' && <div>
-              <button className={styles.outlineButton} type="button" disabled={isPinBusy} onClick={debugResetPin}>
-                {isPinBusy ? 'Generando...' : 'Generar nuevo PIN (debug)'}
-              </button><p className={styles.debugHint}>El PIN anterior dejará de funcionar.</p>
-            </div>}
+
           </section>
         </section>
 

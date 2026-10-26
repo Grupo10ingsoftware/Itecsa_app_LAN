@@ -85,10 +85,10 @@ export default class ProductionLoadService {
     };
   }
 
-  async saveDailyLoad({ date, entries, auth0UserId } = {}) {
+  async saveDailyLoad({ date, entries, identitySubject } = {}) {
     const dateKey = normalizeDateKey(date);
     const normalizedEntries = normalizeEntries(entries);
-    const user = await this.userRepo.findByAuth0Id(auth0UserId);
+    const user = await this.userRepo.findBySubject(identitySubject);
 
     if (!user?.idUsuario) {
       const error = new AppError(403, "No existe un usuario interno vinculado a la sesion.");

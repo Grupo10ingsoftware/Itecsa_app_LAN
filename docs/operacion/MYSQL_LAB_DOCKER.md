@@ -122,13 +122,14 @@ seleccionar el archivo local `.env.mysql-lab.docker` ya completado.
 
 ## Historial y catalogos iniciales
 
-Se conserva sin cambios el historial actual de 15 migraciones. La reconciliacion
+El historial provisional contiene 16 migraciones tras integrar el trabajo de
+Keycloak. La reconciliacion
 `20260901000000_reconcile_pre_september_schema` incluye una guarda que exige
 una reconstruccion vacia antes de transformar las tablas legadas. El
 inicializador rechaza una base con tablas de aplicacion y sin
 `_prisma_migrations`, y tambien rechaza migraciones fallidas o revertidas. La
-ejecucion consecutiva real del historial sobre MySQL 8.4 queda pendiente de la
-validacion fisica.
+cadena anterior de 15 migraciones fue validada fisicamente; la cadena provisional
+actual debe validarse nuevamente desde una base vacia antes del despliegue LAN.
 
 El seed toma sus valores de las constantes que ya consume la aplicacion y de
 las relaciones cubiertas por la regresion integral. Prepara:
@@ -207,7 +208,7 @@ coincide con la identidad registrada.
 
 ## Pendientes de validacion fisica
 
-La siguiente tarea debe ejecutar las 15 migraciones en una instancia MySQL
+La siguiente validacion fisica debe ejecutar las 16 migraciones provisionales en una instancia MySQL
 8.4 vacia, comparar el esquema fisico con Prisma, comprobar las sentencias de
 cuentas y sus privilegios, ejecutar el seed dos veces, validar UUID y TLS, y
 probar fisicamente el comportamiento de pedidos Yoyo. Hasta completar esas

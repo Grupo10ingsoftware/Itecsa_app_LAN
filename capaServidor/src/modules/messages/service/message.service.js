@@ -42,12 +42,12 @@ class MessageService {
         this.userRepo = userRepo ?? new UserRepository();
     }
 
-    async resolveUser(auth0UserId) {
-        if (!auth0UserId) {
+    async resolveUser(identitySubject) {
+        if (!identitySubject) {
             throw createHttpError(401, "No se pudo identificar al usuario.");
         }
 
-        const user = await this.userRepo.findByAuth0Id(auth0UserId);
+        const user = await this.userRepo.findBySubject(identitySubject);
 
         if (!user) {
             throw createHttpError(404, "Usuario interno no encontrado.");
@@ -56,8 +56,8 @@ class MessageService {
         return user;
     }
 
-    async getInbox(auth0UserId, query = {}) {
-        const user = await this.resolveUser(auth0UserId);
+    async getInbox(identitySubject, query = {}) {
+        const user = await this.resolveUser(identitySubject);
         const status = query.status ?? "all";
         const sort = query.sort ?? "latest";
 
@@ -92,8 +92,8 @@ class MessageService {
         });
     }
 
-    async getNotifications(auth0UserId, query = {}) {
-        const user = await this.resolveUser(auth0UserId);
+    async getNotifications(identitySubject, query = {}) {
+        const user = await this.resolveUser(identitySubject);
         const requestedLimit = query.limit
             ? parsePositiveInteger(query.limit, "limit")
             : 10;
@@ -110,8 +110,8 @@ class MessageService {
         };
     }
 
-    async getMessage(auth0UserId, messageId) {
-        const user = await this.resolveUser(auth0UserId);
+    async getMessage(identitySubject, messageId) {
+        const user = await this.resolveUser(identitySubject);
         const parsedMessageId = parsePositiveInteger(messageId, "messageId");
         const message = await this.repo.findUserMessage(user.idUsuario, parsedMessageId);
 
@@ -122,8 +122,8 @@ class MessageService {
         return message;
     }
 
-    async markAsRead(auth0UserId, messageId) {
-        const user = await this.resolveUser(auth0UserId);
+    async markAsRead(identitySubject, messageId) {
+        const user = await this.resolveUser(identitySubject);
         const parsedMessageId = parsePositiveInteger(messageId, "messageId");
         const current = await this.repo.findUserMessage(user.idUsuario, parsedMessageId);
 
@@ -138,8 +138,8 @@ class MessageService {
         return this.repo.markAsRead(user.idUsuario, parsedMessageId);
     }
 
-    async hideNotification(auth0UserId, messageId) {
-        const user = await this.resolveUser(auth0UserId);
+    async hideNotification(identitySubject, messageId) {
+        const user = await this.resolveUser(identitySubject);
         const parsedMessageId = parsePositiveInteger(messageId, "messageId");
         const current = await this.repo.findUserMessage(user.idUsuario, parsedMessageId);
 
@@ -154,8 +154,8 @@ class MessageService {
         return this.repo.hideNotification(user.idUsuario, parsedMessageId);
     }
 
-    async clearNotifications(auth0UserId) {
-        const user = await this.resolveUser(auth0UserId);
+    async clearNotifications(identitySubject) {
+        const user = await this.resolveUser(identitySubject);
         const result = await this.repo.hideAllNotifications(user.idUsuario);
 
         return {
