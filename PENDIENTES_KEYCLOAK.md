@@ -1,5 +1,7 @@
 # Identidad Keycloak: alcance y pendientes
 
+Actualización de autenticación del 26-10-2026: `/login` es ahora una entrada automática a Keycloak y se retiró el panel «Sesión cerrada». El tema `itecsa` quedó instalado y activo en Ubuntu 26.8.1; el operador confirmó ingreso y retorno directo al login después del logout. El diagnóstico, los archivos, las pruebas y sus límites, el empaquetado y la reversión se documentan en [deploy/keycloak/README.md](deploy/keycloak/README.md). El tema se despliega por separado de las imágenes de SPA y API.
+
 Estado del código al 25-10-2026. La aplicación admite únicamente Keycloak. Este documento distingue lo conectado de los flujos que faltan; no habilita operaciones administrativas adicionales.
 
 ## Arranque reproducible de desarrollo

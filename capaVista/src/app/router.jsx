@@ -5,7 +5,7 @@ import { PERMISSIONS } from '../config/permissions'
 import { resolvePostLoginPath } from '../config/navigationAccess'
 import { useAuth } from '../hooks/useAuth'
 import AccessDeniedPage from '../modules/auth/pages/AccessDeniedPage'
-import LoginPage from '../modules/auth/pages/LoginPage'
+import LoginRedirect from '../modules/auth/pages/LoginRedirect'
 import AppLayout from '../shared/components/layout/AppLayout'
 import ProtectedRoute from '../shared/components/navigation/ProtectedRoute'
 import RoleGuard from '../shared/components/navigation/RoleGuard'
@@ -50,7 +50,7 @@ export default function AppRouter() {
   return (
     <Suspense fallback={<ModuleLoadingState />}>
       <Routes>
-        <Route path={APP_ROUTES.LOGIN} element={<LoginPage />} />
+        <Route path={APP_ROUTES.LOGIN} element={<LoginRedirect />} />
         <Route path={APP_ROUTES.PASSWORD_RESET} element={<PasswordResetPage />} />
         <Route path={APP_ROUTES.ACCESS_DENIED} element={<AccessDeniedPage />} />
 

@@ -11,7 +11,12 @@ export function KeycloakIdentityProvider({ children, onRedirect }) {
     realm: runtimeConfig.keycloakRealm, clientId: runtimeConfig.keycloakClientId }), window, onRedirect)
   const session = keycloakSession
   const snapshot = useSyncExternalStore(session.subscribe, session.getSnapshot, session.getSnapshot)
-  useEffect(() => { void session.init() }, [session])
+  useEffect(() => {
+    void session.init()
+    const handlePageShow = event => { if (event.persisted) void session.resume() }
+    window.addEventListener('pageshow', handlePageShow)
+    return () => window.removeEventListener('pageshow', handlePageShow)
+  }, [session])
   const actions = useMemo(() => ({
     getAccessToken: session.getAccessToken, getSessionKey: () => session.getSnapshot().sessionKey,
     getVerificationKey: () => session.getSnapshot().verificationKey,

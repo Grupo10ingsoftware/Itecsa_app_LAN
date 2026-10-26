@@ -23,6 +23,7 @@ COPY --chown=node:node shared /app/shared
 RUN chown -R node:node /app
 USER node
 ENV APP_ENV=development NODE_ENV=development PORT=3000
+ENV ITECSA_DOCKER_DEVELOPMENT=true NODE_OPTIONS="--import=/app/capaServidor/scripts/dockerDevelopmentEnvironment.mjs"
 EXPOSE 3000
 CMD ["npm", "run", "dev"]
 

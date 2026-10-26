@@ -147,11 +147,7 @@ export function AuthProvider({ children }) {
   }, [isAuthenticated, isLoading, subject, provider, sessionKey, verificationKey, verifySession])
 
   const logout = useCallback(() => {
-    identityLogout({
-      logoutParams: {
-        returnTo: window.location.origin,
-      },
-    })
+    void identityLogout()
   }, [identityLogout])
 
   const hasCurrentVerification = isCurrentVerification(verifiedSession, { subject, provider, sessionKey, verificationKey })
