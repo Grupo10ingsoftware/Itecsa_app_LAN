@@ -142,3 +142,37 @@ describe('Keycloak navigation and session lifecycle', () => {
     expect(safeReturnPath(value)).toBe('/kanban')
   })
 })
+
+describe('Keycloak PIN recovery session', () => {
+  it('restores the original tokens with PKCE and session monitoring', async () => {
+    const restored = { token: 'original-access', refreshToken: 'original-refresh', idToken: 'original-id', subject: 'original', sid: 'original-session' }
+    const keycloak = { authenticated: true, token: restored.token, refreshToken: restored.refreshToken,
+      tokenParsed: { sub: restored.subject, sid: restored.sid }, init: vi.fn().mockResolvedValue(true),
+      updateToken: vi.fn().mockResolvedValue(false), isTokenExpired: () => false, clearToken: vi.fn() }
+    const browser = { isSecureContext: true, crypto: { subtle: {} },
+      location: { href: 'http://127.0.0.1:5173/perfil', origin: 'http://127.0.0.1:5173' } }
+    const session = createKeycloakSession(keycloak, browser, vi.fn(), restored)
+
+    await session.init()
+
+    expect(keycloak.init).toHaveBeenCalledWith(expect.objectContaining({ token: restored.token, refreshToken: restored.refreshToken,
+      idToken: restored.idToken, pkceMethod: 'S256', checkLoginIframe: true }))
+    expect(await session.getRecoveryRefreshToken()).toBe(restored.refreshToken)
+    expect(session.getSnapshot().user.sub).toBe('original')
+  })
+
+  it('never publishes a different account during restored SDK initialization', async () => {
+    const keycloak = { authenticated: true, token: 'different-token', tokenParsed: { sub: 'other', sid: 'other' },
+      init: vi.fn().mockResolvedValue(true), clearToken: vi.fn() }
+    const browser = { isSecureContext: true, crypto: { subtle: {} },
+      location: { href: 'http://127.0.0.1:5173/perfil', origin: 'http://127.0.0.1:5173' } }
+    const session = createKeycloakSession(keycloak, browser, vi.fn(),
+      { subject: 'original', sid: 'session', token: 'original-token', refreshToken: 'original-refresh' })
+
+    await session.init()
+
+    expect(session.getSnapshot().isAuthenticated).toBe(false)
+    expect(session.getSnapshot().user).toBeNull()
+    expect(keycloak.clearToken).toHaveBeenCalled()
+  })
+})

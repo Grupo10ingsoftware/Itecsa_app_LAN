@@ -5,7 +5,7 @@ import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthProvider } from './AuthProvider'
 
-export default function AppProviders({ children }) {
+export default function AppProviders({ children, recoverySession }) {
   const navigate = useNavigate()
   const handleRedirectCallback = useCallback(
     path => navigate('/', { replace: true, state: { returnTo: safeReturnPath(path) } }),
@@ -15,7 +15,7 @@ export default function AppProviders({ children }) {
     return <div role="alert" className="alert alert-danger m-4">{error.message}</div>
   }
   return (
-    <KeycloakIdentityProvider onRedirect={handleRedirectCallback}>
+    <KeycloakIdentityProvider onRedirect={handleRedirectCallback} recoverySession={recoverySession}>
       <AuthProvider>{children}</AuthProvider>
     </KeycloakIdentityProvider>
   )
