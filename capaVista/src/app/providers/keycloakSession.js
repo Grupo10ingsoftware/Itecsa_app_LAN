@@ -4,7 +4,7 @@ export function safeReturnPath(value) {
   return value
 }
 
-export function createKeycloakSession(keycloak, browser, onRedirect = () => {}) {
+export function createKeycloakSession(keycloak, browser, onRedirect = () => {}, recoverySession) {
   let snapshot = { isLoading: true, isAuthenticated: false, user: null, error: null, sessionKey: 0, verificationKey: 0 }
   const listeners = new Set()
   let initialization, renewal, generation = 0
@@ -17,6 +17,7 @@ export function createKeycloakSession(keycloak, browser, onRedirect = () => {}) 
   const publish = () => {
     const claims = keycloak.tokenParsed
     if (!keycloak.authenticated || !keycloak.token || typeof claims?.sub !== 'string' || !claims.sub) throw Error('Sesion Keycloak incompleta.')
+    if (recoverySession && (claims.sub !== recoverySession.subject || claims.sid !== recoverySession.sid)) throw Error('La cuenta original no coincide.')
     if (snapshot.user?.sub !== claims.sub || !snapshot.isAuthenticated) generation++
     notify({ isLoading: false, isAuthenticated: true, error: null, sessionKey: generation, verificationKey: snapshot.verificationKey + 1,
       user: { sub: claims.sub, name: claims.name || claims.preferred_username,
@@ -54,7 +55,9 @@ export function createKeycloakSession(keycloak, browser, onRedirect = () => {}) 
           if (!browser.isSecureContext || !browser.crypto?.subtle) throw Object.assign(Error('Keycloak con PKCE requiere un origen seguro HTTPS o localhost.'), { code: 'AUTH_CONFIGURATION_ERROR' })
           const callback = new URL(browser.location.href).searchParams.has('code')
           const authenticated = await keycloak.init({ flow: 'standard', pkceMethod: 'S256', responseMode: 'query',
-            checkLoginIframe: true, redirectUri: browser.location.origin, enableLogging: false })
+            checkLoginIframe: true, redirectUri: browser.location.origin, enableLogging: false,
+            ...(recoverySession ? { token: recoverySession.token, refreshToken: recoverySession.refreshToken,
+              ...(recoverySession.idToken ? { idToken: recoverySession.idToken } : {}) } : {}) })
           if (authenticated) {
             publish()
             if (callback) {
@@ -62,7 +65,8 @@ export function createKeycloakSession(keycloak, browser, onRedirect = () => {}) 
               browser.sessionStorage.removeItem('itecsa.returnTo')
               onRedirect(path)
             }
-          } else notify({ isLoading: false })
+          } else if (recoverySession) throw Error('No fue posible restaurar la cuenta original.')
+          else notify({ isLoading: false })
         } catch (error) { invalid(error) }
       })()
       return initialization
@@ -89,5 +93,10 @@ export function createKeycloakSession(keycloak, browser, onRedirect = () => {}) 
       } catch (error) { invalid(error) }
     },
     getAccessToken,
+    async getRecoveryRefreshToken() {
+      await getAccessToken()
+      if (!keycloak.refreshToken) throw Error('La sesión no permite continuar la recuperación.')
+      return keycloak.refreshToken
+    },
   }
 }

@@ -97,7 +97,10 @@ class Server {
     this.app.use(supportAudit);
 
     // Cors
-    this.app.use(cors( {origin : this.env.FRONTEND_ORIGIN}));
+    this.app.use(cors((req, callback) => callback(null, {
+      origin: this.env.FRONTEND_ORIGIN,
+      ...(req.path.startsWith('/api/auth/pin/recovery/') ? { credentials: true } : {}),
+    })));
 
     // Parseo y lectura del Body - Recibir datos
 

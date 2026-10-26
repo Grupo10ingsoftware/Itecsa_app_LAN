@@ -91,7 +91,7 @@ export function createApiClient({ baseUrl = getDefaultBaseUrl(), getAccessToken,
     })
   }
 
-  async function request(path, { method = 'GET', headers, body, responseType } = {}) {
+  async function request(path, { method = 'GET', headers, body, responseType, credentials } = {}) {
     if (!isSessionCurrent()) throw createSessionInvalidError()
     const token = await getBearerToken(getAccessToken)
     if (!isSessionCurrent()) throw createSessionInvalidError()
@@ -110,6 +110,7 @@ export function createApiClient({ baseUrl = getDefaultBaseUrl(), getAccessToken,
       response = await fetch(buildUrl(baseUrl, path), {
         method,
         headers: requestHeaders,
+        ...(credentials ? { credentials } : {}),
         body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
       })
     } catch (error) {
