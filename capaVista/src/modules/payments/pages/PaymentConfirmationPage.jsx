@@ -15,6 +15,8 @@ import {
   normalizePaymentOrders,
 } from '../utils/paymentOrders'
 import styles from './PaymentConfirmationPage.module.css'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 
 const FILTERS = [
   { key: PAYMENT_STATUS.PENDIENTE, label: 'Pendientes' },
@@ -400,18 +402,13 @@ export default function PaymentConfirmationPage() {
   }, [])
 
   return (
-    <main className={`container-fluid ${styles.page}`}>
-      <section className={styles.dashboardShell}>
-        <header
-          className={`${styles.hero} d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between gap-3`}
-        >
-          <div>
-            <span className={styles.sectionLabel}>Cobranzas</span>
-            <h1 className={styles.pageTitle}>Confirmacion de pago</h1>
-          </div>
-        </header>
+    <PageShell className={styles.page}>
+      <PageSurface className={styles.dashboardShell}>
+        <PageHeader title="Confirmacion de pago" />
 
-        <PaymentSummaryCards counters={counters} />
+        <div className={styles.summaryBoundary}>
+          <PaymentSummaryCards counters={counters} />
+        </div>
 
         <PaymentFilters
           activeFilter={activeFilter}
@@ -476,7 +473,7 @@ export default function PaymentConfirmationPage() {
             {pageInfo.hasMore && <button disabled={loadingMore} onClick={loadMorePayments} type="button">{loadingMore ? 'Cargando…' : 'Cargar más pedidos'}</button>}
           </>
         )}
-      </section>
+      </PageSurface>
 
       <PaymentActionConfirmModal
         detailsError={previewDetailsError}
@@ -507,6 +504,6 @@ export default function PaymentConfirmationPage() {
           targetStatus={credentialsTransition.targetStatus}
         />
       )}
-    </main>
+    </PageShell>
   )
 }

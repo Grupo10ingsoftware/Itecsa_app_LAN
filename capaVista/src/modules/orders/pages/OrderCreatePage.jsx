@@ -7,6 +7,7 @@ import OrderNotice from '../components/OrderNotice'
 import SalesNoteStep from '../components/SalesNoteStep'
 import { ORDER_CREATE_VIEW_MODE, useOrderCreateFlow } from '../../../hooks/useOrderCreateFlow'
 import styles from './OrderCreatePage.module.css'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
 
 export default function OrderCreatePage() {
   const navigate = useNavigate()
@@ -25,18 +26,18 @@ export default function OrderCreatePage() {
 
   if (flow.viewMode === ORDER_CREATE_VIEW_MODE.SUCCESS && flow.registeredOrder) {
     return (
-      <main className={styles.page}>
+      <div className={`${styles.page} ${styles.successPage}`}>
         <OrderCreateSuccess
           onCreateAnother={actions.resetFlow}
           onGoKanban={actions.goToKanban}
         />
-      </main>
+      </div>
     )
   }
 
   return (
-    <main className={styles.page}>
-      <section className={styles.dashboardShell} inert={flow.showConfirmModal || undefined}>
+    <PageShell className={styles.page}>
+      <PageSurface className={styles.dashboardShell} inert={flow.showConfirmModal || undefined}>
         <OrderCreateHeader />
 
         <div className={styles.content}>
@@ -72,7 +73,7 @@ export default function OrderCreatePage() {
             </button>
           </div>
         </div>
-      </section>
+      </PageSurface>
 
       {flow.showConfirmModal && (
         <OrderCreateConfirmModal
@@ -82,6 +83,6 @@ export default function OrderCreatePage() {
           onConfirm={actions.handleConfirmRegister}
         />
       )}
-    </main>
+    </PageShell>
   )
 }

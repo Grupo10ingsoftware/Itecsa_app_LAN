@@ -4,6 +4,8 @@ import { APP_ROUTES } from '../../../config/routes'
 import { useOrderHistoryApi } from '../hooks/useOrderHistoryApi'
 import { formatDate, formatDateTime, formatDuration } from '../utils/orderHistoryFormatters'
 import styles from './OrderHistoryDetailPage.module.css'
+import PageShell from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 
 const EVENT_TYPES = [
   ['all', 'Todos los registros'],
@@ -72,15 +74,16 @@ export default function OrderHistoryDetailPage() {
     setCursor(pageInfo.nextCursor)
   }
 
-  if (loading && !order) return <main className={styles.state}>Cargando historial…</main>
-  if (error && !order) return <main className={styles.state}><p>{error}</p><Link to={APP_ROUTES.ORDER_HISTORY}>Volver al historial</Link></main>
+  if (loading && !order) return <div className={styles.state}>Cargando historial…</div>
+  if (error && !order) return <div className={styles.state}><p>{error}</p><Link to={APP_ROUTES.ORDER_HISTORY}>Volver al historial</Link></div>
 
   return (
-    <main className={`container-fluid ${styles.page}`}>
-      <header className={styles.hero}>
-        <div><span>Historial consolidado</span><h1>{order?.salesNoteNumber ?? `Pedido #${orderId}`}</h1><p>{order?.client.name ?? 'Cliente no disponible'}</p></div>
-        <Link to={APP_ROUTES.ORDER_HISTORY}><i className="bi bi-arrow-left" aria-hidden="true" /> Volver</Link>
-      </header>
+    <PageShell className={styles.page}>
+      <PageHeader title={order?.salesNoteNumber ?? `Pedido #${orderId}`} actions={
+        <Link className={styles.backLink} to={APP_ROUTES.ORDER_HISTORY}><i className="bi bi-arrow-left" aria-hidden="true" /> Volver</Link>
+      }>
+        <p>{order?.client.name ?? 'Cliente no disponible'}</p>
+      </PageHeader>
 
       {error && <div className={styles.error}>{error}</div>}
       {order && (
@@ -145,6 +148,6 @@ export default function OrderHistoryDetailPage() {
           </section>
         </>
       )}
-    </main>
+    </PageShell>
   )
 }

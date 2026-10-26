@@ -9,6 +9,8 @@ import {
   subscribeMetricsSummary,
 } from '../utils/metricsPage'
 import styles from './MetricsPage.module.css'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 import { escapeReportHtml, spreadsheetCell } from '../utils/reportFormatting'
 
 const PRODUCT_COLORS = ['#f97316', '#2563eb', '#248f55']
@@ -110,9 +112,9 @@ export default function MetricsPage() {
     URL.revokeObjectURL(link.href)
   }
 
-  return <main className={`container-fluid ${styles.page}`}>
-    <section className={styles.dashboardShell}>
-      <header className={styles.hero}><div><span className={styles.sectionLabel}>Producción</span><h1 className={styles.pageTitle}>Métricas</h1><p className={styles.pageSubtitle}>Indicadores calculados sobre el periodo seleccionado.</p></div></header>
+  return <PageShell className={styles.page}>
+    <PageSurface className={styles.dashboardShell}>
+      <PageHeader title="Métricas" />
       <div className={styles.content}>
         <section className={styles.periodFilters} aria-label="Periodo de métricas">
           <div className={styles.periodModes}>
@@ -181,6 +183,6 @@ export default function MetricsPage() {
 
         </>}
       </div>
-    </section>
-  </main>
+    </PageSurface>
+  </PageShell>
 }

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import CalendarFilters from '../components/CalendarFilters'
 import CalendarHeader from '../components/CalendarHeader'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
 import CalendarToolbar from '../components/CalendarToolbar'
 import ProductionCalendarGrid from '../components/ProductionCalendarGrid'
 import { useOrdersCalendarApi } from '../hooks/useOrdersCalendarApi'
@@ -185,8 +186,8 @@ export default function ProductionCalendarPage() {
   }
 
   return (
-    <main className={`container-fluid ${styles.page}`}>
-      <section className={styles.dashboardShell}>
+    <PageShell className={styles.page}>
+      <PageSurface className={styles.dashboardShell}>
         <CalendarHeader
           isFiltersOpen={isFiltersOpen}
           onToggleFilters={() => setIsFiltersOpen((currentValue) => !currentValue)}
@@ -223,7 +224,7 @@ export default function ProductionCalendarPage() {
             />
           </section>
         </div>
-      </section>
-    </main>
+      </PageSurface>
+    </PageShell>
   )
 }

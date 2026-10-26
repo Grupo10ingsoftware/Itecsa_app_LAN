@@ -4,6 +4,8 @@ import { APP_ROUTES } from '../../../config/routes'
 import { useMessagesApi } from '../hooks/useMessagesApi'
 import { formatMessageDate, notifyMessagesChanged } from '../utils/messageFormatters'
 import styles from './MessageDetailPage.module.css'
+import PageShell from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 
 export default function MessageDetailPage() {
   const { messageId } = useParams()
@@ -38,8 +40,9 @@ export default function MessageDetailPage() {
   }, [loadMessage])
 
   return (
-    <main className={`container-fluid ${styles.page}`}>
+    <PageShell maxWidth="56rem">
       <section className={styles.shell}>
+        {!isLoading && message && <PageHeader title="Detalle del mensaje" />}
         <Link className={styles.backLink} to={APP_ROUTES.MESSAGES}>
           <i className="bi bi-arrow-left" aria-hidden="true" /> Volver a la bandeja
         </Link>
@@ -60,7 +63,7 @@ export default function MessageDetailPage() {
               <div className={styles.mailIcon}><i className="bi bi-envelope-open" aria-hidden="true" /></div>
               <div className={styles.heading}>
                 <span className={styles.eyebrow}>Mensaje recibido</span>
-                <h1>{message.Asunto}</h1>
+                <h2>{message.Asunto}</h2>
                 <time dateTime={message.fecha_publicacion}>{formatMessageDate(message.fecha_publicacion)}</time>
               </div>
               <span className={styles.readBadge}><i className="bi bi-check2-all" aria-hidden="true" /> Leído</span>
@@ -81,6 +84,6 @@ export default function MessageDetailPage() {
           </article>
         )}
       </section>
-    </main>
+    </PageShell>
   )
 }

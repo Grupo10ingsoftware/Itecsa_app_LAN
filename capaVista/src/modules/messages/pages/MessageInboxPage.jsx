@@ -7,6 +7,8 @@ import MessageList from '../components/MessageList'
 import { useMessagesApi } from '../hooks/useMessagesApi'
 import { notifyMessagesChanged } from '../utils/messageFormatters'
 import styles from './MessageInboxPage.module.css'
+import PageShell from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 
 const DEFAULT_FILTERS = Object.freeze({ status: 'all', sort: 'latest', from: '', to: '' })
 const PAGE_SIZE = 12
@@ -69,19 +71,14 @@ export default function MessageInboxPage() {
   }
 
   return (
-    <main className={`container-fluid ${styles.page}`} aria-labelledby="message-inbox-title">
+    <PageShell maxWidth="78rem" aria-labelledby="message-inbox-title">
       <section className={styles.shell}>
-        <header className={styles.hero}>
-          <div>
-            <span className={styles.eyebrow}>Centro de comunicaciones</span>
-            <h1 id="message-inbox-title">Bandeja de entrada</h1>
-            <p>Revisa novedades, cambios y comunicaciones vinculadas a tus pedidos.</p>
-          </div>
+        <PageHeader title="Bandeja de entrada" titleId="message-inbox-title" actions={
           <div className={styles.totalCard} aria-label={`${result.total} mensajes encontrados`}>
             <i className="bi bi-envelope-paper" aria-hidden="true" />
             <span><strong>{result.total}</strong> mensajes</span>
           </div>
-        </header>
+        } />
 
         <MessageFilters
           filters={filters}
@@ -111,6 +108,6 @@ export default function MessageInboxPage() {
           </nav>
         )}
       </section>
-    </main>
+    </PageShell>
   )
 }

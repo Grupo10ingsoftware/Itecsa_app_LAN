@@ -1,9 +1,5 @@
-.page { color: var(--itexsa-text); background: #f8fafc; min-height: calc(100vh - 4.5rem); padding: 1.25rem clamp(.8rem, 2vw, 1.5rem) 2rem; }
-.shell { display: grid; gap: 1rem; max-width: 90rem; margin: 0 auto; }
-.header { background: #080808; border: 1px solid #27272a; border-radius: .9rem; padding: 1.4rem 1.8rem; color: #fff; }
-.sectionLabel { color: var(--itexsa-orange); font-size: .8rem; font-weight: 850; text-transform: uppercase; letter-spacing: .1em; }
-.pageTitle { color: #fff; font-size: clamp(2rem, 3.6vw, 3rem); font-weight: 850; text-transform: uppercase; margin: .3rem 0 .4rem; line-height: 1.1; }
-.header p { margin: 0; font-size: 1rem; color: #e5e7eb; }
+.page { color: var(--itexsa-text); }
+.shell { display: grid; gap: 1rem; }
 .profileGrid { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr); }
 .photoPanel, .infoPanel, .pinPanel, .movementsPanel { background: #fff; border: 1px solid #e2e8f0; border-radius: .85rem; padding: 1.1rem; min-width: 0; }
 .photoPanel { display: flex; flex-direction: column; padding: 1.5rem 1.1rem 0; }
@@ -45,5 +41,5 @@
 .movementsHeader .outlineButton { flex-shrink: 0; }
 .movementsHeader .cardIcon { width: 3rem; height: 3rem; font-size: 1.4rem; }
 @media (max-width: 1199.98px) { .profileGrid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); } .pinPanel { grid-column: 1 / -1; } .pinIcon { height: 5rem; width: 5rem; font-size: 2.2rem; } }
-@media (max-width: 767.98px) { .profileGrid { grid-template-columns: minmax(0, 1fr); } .pinPanel { grid-column: auto; } .movementsHeader { align-items: stretch; flex-direction: column; } .header { padding: 1.25rem; } }
+@media (max-width: 767.98px) { .profileGrid { grid-template-columns: minmax(0, 1fr); } .pinPanel { grid-column: auto; } .movementsHeader { align-items: stretch; flex-direction: column; } }
 @media (max-width: 399.98px) { .infoList > div { grid-template-columns: 1fr; gap: .2rem; } .cardIcon { width: 2.8rem; height: 2.8rem; font-size: 1.4rem; } }

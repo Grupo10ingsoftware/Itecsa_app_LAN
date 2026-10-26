@@ -3,6 +3,8 @@ import { useAuth } from '../../../hooks/useAuth'
 import { useAuthApi } from '../../auth/hooks/useAuthApi'
 import RoleBadge from '../../../shared/components/data/RoleBadge'
 import styles from './ProfilePage.module.css'
+import PageShell from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 import { formatProfileDate } from '../utils/profileFormatters'
 import { displayUserStatus, isActiveUserStatus } from '../../../config/userLifecycle'
 import UserMovementsModal from '../../users/components/UserMovementsModal'
@@ -141,15 +143,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className={`container-fluid ${styles.page}`} aria-labelledby="profile-title">
+    <PageShell className={styles.page} maxWidth="90rem" aria-labelledby="profile-title">
       <section className={styles.shell}>
-        <header className={styles.header}>
-          <span className={styles.sectionLabel}>Usuario</span>
-          <h1 className={styles.pageTitle} id="profile-title">
-            Mi perfil
-          </h1>
-          <p>Revisa tu información personal y la actividad reciente de tu cuenta.</p>
-        </header>
+        <PageHeader title="Mi perfil" titleId="profile-title" />
 
         {profileError && (
           <div className="alert alert-danger" role="alert">
@@ -326,6 +322,6 @@ export default function ProfilePage() {
           <div className="modal-backdrop show" />
         </>
       )}
-    </main>
+    </PageShell>
   )
 }

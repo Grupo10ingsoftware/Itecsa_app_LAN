@@ -1,4 +1,24 @@
 :root {
+  --page-header-black: #000000;
+  --page-brand-orange: #FE5A00;
+  --page-brand-orange-rgb: 254, 90, 0;
+  --page-white: #FFFFFF;
+  --page-background: #F5F6F8;
+  --page-border: #D9DEE5;
+  --page-space-x: 20px;
+  --page-space-y: 20px;
+  --page-max-width: 1760px;
+  --page-radius: 16px;
+  --page-stripe-size: 4px;
+  --page-header-space-x: 32px;
+  --page-header-space-x-small: 20px;
+  --page-header-space-y: 24px;
+  --page-header-min-height: 100px;
+  --page-header-gap: 24px;
+  --page-font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --page-title-small: 24px;
+  --page-title-medium: 36px;
+  --page-title-large: 48px;
   --itexsa-border: #e5e7eb;
   --itexsa-orange: #f97316;
   --itexsa-orange-rgb: 249, 115, 22;

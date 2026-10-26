@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import KanbanColumn from '../components/KanbanColumn'
 import KanbanFilters from '../components/KanbanFilters'
 import styles from './KanbanBoardPage.module.css'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 import { useAuth } from '../../../hooks/useAuth'
 import { PERMISSIONS } from '../../../config/permissions'
 import { useKanbanApi } from '../hooks/useKanbanApi'
@@ -143,16 +145,9 @@ export default function KanbanBoardPage() {
   }
 
   return (
-    <main className={`container-fluid ${styles.page}`}>
-      <section className={styles.dashboardShell}>
-        <header className={styles.hero}>
-          <div>
-            <span className={styles.sectionLabel}>Produccion</span>
-            <h1 className={styles.pageTitle}>Kanban</h1>
-            <p className={styles.pageSubtitle}>
-              Vista principal de seguimiento de produccion con arrastre de ordenes entre estados.
-            </p>
-          </div>
+    <PageShell className={styles.page}>
+      <PageSurface className={styles.dashboardShell}>
+        <PageHeader title="Kanban" actions={
           <div className={styles.heroActions}>
             <aside className={`${styles.capacityMeter} ${styles[loadLevel]}`} aria-label="Carga Operativa">
               <div className={styles.capacityHeader}>
@@ -176,7 +171,7 @@ export default function KanbanBoardPage() {
               <p>Solo pedidos lanyard en En produccion.</p>
             </aside>
           </div>
-        </header>
+        } />
 
         <div className={styles.content}>
           <KanbanFilters
@@ -185,7 +180,7 @@ export default function KanbanBoardPage() {
           />
           <KanbanColumn filters={appliedFilters} refreshKey={kanbanRefreshKey} />
         </div>
-      </section>
+      </PageSurface>
       {isCapacityOpen && (
         <div className={styles.modalLayer} role="presentation">
           <form className={styles.capacityModal} onSubmit={saveProductionLoad} role="dialog" aria-modal="true" aria-labelledby="capacity-title">
@@ -261,6 +256,6 @@ export default function KanbanBoardPage() {
           </form>
         </div>
       )}
-    </main>
+    </PageShell>
   )
 }

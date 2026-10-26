@@ -14,6 +14,8 @@ import UserSummaryCards from '../components/UserSummaryCards'
 import { createLatestRequestTracker } from '../utils/latestRequestTracker'
 import { displayUserStatus } from '../../../config/userLifecycle.js'
 import styles from './UserManagementPage.module.css'
+import PageShell from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 
 const EMPTY_SUMMARY = Object.freeze({
   totalUsuarios: 0,
@@ -292,16 +294,9 @@ export default function UserManagementPage() {
   }
 
   return (
-    <main className={`container-fluid ${styles.page}`} aria-labelledby="user-management-title">
+    <PageShell className={styles.page} aria-labelledby="user-management-title">
       <section className={styles.dashboardShell}>
-        <header className={styles.hero}>
-          <span className={styles.sectionLabel}>Administracion</span>
-          <h1 className={styles.pageTitle} id="user-management-title">
-            Gestion de usuarios
-          </h1>
-          <p className={styles.pageSubtitle}>Administra usuarios, roles y estado de vinculacion del sistema.</p>
-          <p role="status">Puedes crear usuarios y editar sus datos, rol y estado con tu PIN de autorizacion.</p>
-        </header>
+        <PageHeader title="Gestion de usuarios" titleId="user-management-title" />
 
         <UserSummaryCards
           isLoading={summaryState.isLoading}
@@ -318,6 +313,7 @@ export default function UserManagementPage() {
         )}
 
         <div className={styles.content}>
+          <p className="mb-0 text-secondary" role="status">Puedes crear usuarios y editar sus datos, rol y estado con tu PIN de autorizacion.</p>
           {actionMessage && (
             <div className={`${styles.feedbackMessage} ${styles[`feedback${actionMessage.type}`]}`} role="status">
               <span>{actionMessage.text}</span>
@@ -384,6 +380,6 @@ export default function UserManagementPage() {
         onConfirm={handleUnlinkUser}
         user={unlinkingUser}
       />
-    </main>
+    </PageShell>
   )
 }

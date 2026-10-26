@@ -4,6 +4,8 @@ import { APP_ROUTES } from '../../../config/routes'
 import { useOrderHistoryApi } from '../hooks/useOrderHistoryApi'
 import { formatDate } from '../utils/orderHistoryFormatters'
 import styles from './OrderHistoryPage.module.css'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 
 const STATUS_FILTERS = [
   { label: 'Confirmación de Pago', value: 'Confirmación de Pago' },
@@ -87,15 +89,11 @@ export default function OrderHistoryPage() {
   const noRegisteredOrders = !loading && !error && orders.length === 0 && cursorStack.length === 1 && !status && !search && !dateRange.from && !dateRange.to
 
   return (
-    <main className={`container-fluid ${styles.page}`}>
-      <header className={styles.hero}>
-        <div>
-          <span>Registro de actividades</span>
-          <h1>Historial de pedidos</h1>
-          <p>Consulta pedidos y revisa su trazabilidad consolidada.</p>
-        </div>
-        <strong>{orders.length} resultados en esta página</strong>
-      </header>
+    <PageShell className={styles.page}>
+      <PageSurface>
+      <PageHeader title="Historial de pedidos" actions={
+        <strong className={styles.resultCount}>{orders.length} resultados en esta página</strong>
+      } />
 
       <section className={styles.panel}>
         <div className={styles.statusFilters} aria-label="Filtros por estado">
@@ -169,6 +167,7 @@ export default function OrderHistoryPage() {
           </nav>
         )}
       </section>
-    </main>
+      </PageSurface>
+    </PageShell>
   )
 }
