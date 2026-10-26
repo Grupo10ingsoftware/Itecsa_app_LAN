@@ -149,9 +149,7 @@ export default function KanbanBoardPage() {
           <div>
             <span className={styles.sectionLabel}>Produccion</span>
             <h1 className={styles.pageTitle}>Kanban</h1>
-            <p className={styles.pageSubtitle}>
-              Vista principal de seguimiento de produccion con arrastre de ordenes entre estados.
-            </p>
+
           </div>
           <div className={styles.heroActions}>
             <aside className={`${styles.capacityMeter} ${styles[loadLevel]}`} aria-label="Carga Operativa">

@@ -123,7 +123,7 @@ export default function ProfilePage() {
           <h1 className={styles.pageTitle} id="profile-title">
             Mi perfil
           </h1>
-          <p>Revisa tu información personal y la actividad reciente de tu cuenta.</p>
+          
         </header>
 
         {profileError && (
@@ -153,7 +153,7 @@ export default function ProfilePage() {
           <section className={styles.infoPanel} aria-labelledby="personal-information-title">
             <header className={styles.cardHeader}>
               <span className={styles.cardIcon}><i className="bi bi-person" aria-hidden="true" /></span>
-              <div><h2 id="personal-information-title">Información personal</h2><p>Estos son los datos asociados a tu cuenta en ItecsaApp.</p></div>
+              <div><h2 id="personal-information-title">Información personal</h2></div>
             </header>
             <dl className={styles.infoList}>
               <div><dt>Primer nombre</dt><dd>{getDisplayValue(profile.firstName)}</dd></div>
@@ -170,7 +170,7 @@ export default function ProfilePage() {
           <section className={styles.pinPanel} aria-labelledby="personal-pin-title">
             <header className={styles.cardHeader}>
               <span className={styles.cardIcon}><i className="bi bi-shield" aria-hidden="true" /></span>
-              <div><h2 id="personal-pin-title">PIN personal</h2><p>Utiliza tu PIN para confirmar acciones sensibles en la plataforma.</p></div>
+              <div><h2 id="personal-pin-title">PIN personal</h2></div>
             </header>
             <div className={styles.pinState}>
               <span className={`${styles.pinIcon} ${pinStatus === 'active' ? styles.accepted : styles.pending}`}><i className={`bi ${pinStatus === 'active' ? 'bi-lock' : 'bi-shield-lock'}`} aria-hidden="true" /></span>

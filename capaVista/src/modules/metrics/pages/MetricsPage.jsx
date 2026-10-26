@@ -112,7 +112,7 @@ export default function MetricsPage() {
 
   return <main className={`container-fluid ${styles.page}`}>
     <section className={styles.dashboardShell}>
-      <header className={styles.hero}><div><span className={styles.sectionLabel}>Producción</span><h1 className={styles.pageTitle}>Métricas</h1><p className={styles.pageSubtitle}>Indicadores calculados sobre el periodo seleccionado.</p></div></header>
+      <header className={styles.hero}><div><span className={styles.sectionLabel}>Producción</span><h1 className={styles.pageTitle}>Métricas</h1></div></header>
       <div className={styles.content}>
         <section className={styles.periodFilters} aria-label="Periodo de métricas">
           <div className={styles.periodModes}>

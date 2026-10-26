@@ -299,8 +299,6 @@ export default function UserManagementPage() {
           <h1 className={styles.pageTitle} id="user-management-title">
             Gestion de usuarios
           </h1>
-          <p className={styles.pageSubtitle}>Administra usuarios, roles y estado de vinculacion del sistema.</p>
-          <p role="status">Puedes crear usuarios y editar sus datos, rol y estado con tu PIN de autorizacion.</p>
         </header>
 
         <UserSummaryCards

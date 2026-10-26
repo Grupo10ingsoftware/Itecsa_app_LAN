@@ -92,7 +92,6 @@ export default function OrderHistoryPage() {
         <div>
           <span>Registro de actividades</span>
           <h1>Historial de pedidos</h1>
-          <p>Consulta pedidos y revisa su trazabilidad consolidada.</p>
         </div>
         <strong>{orders.length} resultados en esta página</strong>
       </header>
