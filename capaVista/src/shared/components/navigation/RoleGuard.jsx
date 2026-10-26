@@ -1,3 +1,4 @@
+import LoadingIndicator from '../loading/LoadingIndicator'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../../hooks/useAuth'
 
@@ -15,9 +16,7 @@ export default function RoleGuard({
 
   if (isLoading) {
     return (
-      <div className="p-4" role="status">
-        Verificando permisos...
-      </div>
+      <LoadingIndicator scope="page" context="Verificación de acceso" />
     )
   }
 

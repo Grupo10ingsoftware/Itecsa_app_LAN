@@ -84,14 +84,14 @@ function isFormDataBody(body) {
   return typeof FormData !== 'undefined' && body instanceof FormData
 }
 
-export function createApiClient({ baseUrl = getDefaultBaseUrl(), getAccessToken, isSessionCurrent = () => true } = {}) {
+export function createApiClient({ baseUrl = getDefaultBaseUrl(), getAccessToken, isSessionCurrent = () => true, timeoutMs = 45_000 } = {}) {
   if (typeof getAccessToken !== 'function') {
     throw new ApiClientError('apiClient requiere una funcion getAccessToken.', {
       code: API_ERROR_CODES.CONFIGURATION_ERROR,
     })
   }
 
-  async function request(path, { method = 'GET', headers, body, responseType, credentials } = {}) {
+  async function performRequest(path, { method = 'GET', headers, body, responseType, signal, credentials } = {}) {
     if (!isSessionCurrent()) throw createSessionInvalidError()
     const token = await getBearerToken(getAccessToken)
     if (!isSessionCurrent()) throw createSessionInvalidError()
@@ -109,6 +109,7 @@ export function createApiClient({ baseUrl = getDefaultBaseUrl(), getAccessToken,
     try {
       response = await fetch(buildUrl(baseUrl, path), {
         method,
+        signal,
         headers: requestHeaders,
         ...(credentials ? { credentials } : {}),
         body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
@@ -140,6 +141,32 @@ export function createApiClient({ baseUrl = getDefaultBaseUrl(), getAccessToken,
     }
 
     return payload
+  }
+
+  async function request(path, { signal, timeoutMs: requestTimeout = timeoutMs, ...options } = {}) {
+    const controller = new AbortController()
+    let timer, onAbort
+    // Limita también la espera del token y la lectura del cuerpo. Nunca reintenta
+    // mutaciones: un corte de conexión no demuestra que el servidor no las ejecutó.
+    const interrupted = new Promise((_, reject) => {
+      const interrupt = (reason) => {
+        controller.abort(reason)
+        reject(new ApiClientError('La solicitud no pudo completarse. Comprueba su resultado antes de repetirla.', {
+          code: API_ERROR_CODES.NETWORK_ERROR, cause: reason,
+        }))
+      }
+      onAbort = () => interrupt(signal.reason)
+      if (signal?.aborted) onAbort()
+      else signal?.addEventListener('abort', onAbort, { once: true })
+      timer = setTimeout(() => interrupt(new Error('Tiempo de espera agotado.')), requestTimeout)
+    })
+    try {
+      if (signal?.aborted) return await interrupted
+      return await Promise.race([performRequest(path, { ...options, signal: controller.signal }), interrupted])
+    } finally {
+      clearTimeout(timer)
+      signal?.removeEventListener('abort', onAbort)
+    }
   }
 
   return {

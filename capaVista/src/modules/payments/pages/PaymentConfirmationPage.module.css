@@ -37,14 +37,6 @@
   margin: 1rem 1.5rem;
 }
 
-.loadingState {
-  border-top: 1px solid var(--payment-border);
-  color: var(--payment-muted);
-  font-weight: 700;
-  padding: 2rem 1.5rem;
-  text-align: center;
-}
-
 @media (max-width: 991.98px) {
   .dashboardShell {
     overflow: hidden;

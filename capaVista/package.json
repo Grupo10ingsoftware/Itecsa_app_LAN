@@ -6,6 +6,7 @@
   "scripts": {
     "test": "vitest run",
     "dev": "vite",
+    "prebuild": "node ../scripts/sync-loading-theme.mjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

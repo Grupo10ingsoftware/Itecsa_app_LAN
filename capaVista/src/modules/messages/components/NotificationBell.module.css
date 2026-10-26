@@ -19,9 +19,10 @@
 .notificationCopy small { color: #94a3b8; font-size: .7rem; }
 .itemTrash { background: transparent; border: 0; color: #94a3b8; padding: .65rem; position: absolute; right: .35rem; top: .45rem; }
 .itemTrash:hover { color: #dc2626; }
+.itemTrash[aria-busy="true"] { align-self: center; position: static; }
 .viewAll { align-items: center; background: #fff; border: 0; border-top: 1px solid #e5e7eb; color: #c2410c; display: flex; font-size: .82rem; font-weight: 800; gap: .45rem; justify-content: center; padding: .85rem; width: 100%; }
 .viewAll:hover { background: #fff7ed; }
-.state, .error { color: #64748b; font-size: .85rem; padding: 1.25rem; text-align: center; }
+.error { color: #64748b; font-size: .85rem; padding: 1.25rem; text-align: center; }
 .error { color: #b91c1c; }
 .emptyState { align-items: center; color: #64748b; display: flex; flex-direction: column; gap: .35rem; padding: 2.25rem 1rem; text-align: center; }
 .emptyState i { color: #cbd5e1; font-size: 1.75rem; }

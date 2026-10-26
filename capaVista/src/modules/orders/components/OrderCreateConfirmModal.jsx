@@ -1,3 +1,4 @@
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useRef } from 'react'
 import styles from './OrderCreateConfirmModal.module.css'
 
@@ -106,9 +107,9 @@ export default function OrderCreateConfirmModal({ draft, isRegistering = false, 
             Cancelar
           </button>
 
-          <button className={styles.primaryButton} disabled={isRegistering} onClick={onConfirm} type="button">
+          <button className={styles.primaryButton} disabled={isRegistering} onClick={onConfirm} type="button" aria-busy={isRegistering}>
             <i className="bi bi-check-circle" aria-hidden="true" />
-            {isRegistering ? 'Registrando...' : 'Confirmar registro'}
+            <LoadingAction busy={isRegistering} context="Confirmar registro">Confirmar registro</LoadingAction>
           </button>
         </footer>
       </section>

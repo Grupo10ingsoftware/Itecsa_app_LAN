@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { APP_ROUTES } from '../../../config/routes'
@@ -133,7 +134,7 @@ export default function OrderHistoryPage() {
 
         {error && <div className={styles.error} role="alert">{error}</div>}
         {loading ? (
-          <div className={styles.state}>Cargando pedidos…</div>
+          <LoadingIndicator context="pedidos" />
         ) : orders.length === 0 ? (
           <div className={styles.state}>{noRegisteredOrders ? 'No existen pedidos hasta el momento' : 'No se encontraron pedidos'}</div>
         ) : (

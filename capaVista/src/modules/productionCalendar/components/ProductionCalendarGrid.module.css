@@ -3,7 +3,11 @@
   gap: 0.65rem;
   overflow: auto;
   padding: 0.75rem;
+  min-width: 0;
 }
+
+.calendarGridStack[aria-busy="true"] { grid-template-columns: minmax(0, 1fr); }
+.calendarGridStack[aria-busy="true"] .calendarToolbarSlot { min-width: 0; }
 
 .calendarToolbarSlot {
   min-width: 70rem;
@@ -490,6 +494,12 @@
   border-color: var(--calendar-orange);
   color: #111827;
   outline: none;
+}
+
+.primaryButton:disabled[aria-busy="true"] {
+  background: var(--page-header-black, #000);
+  border-color: var(--page-header-black, #000);
+  color: var(--page-white, #fff);
 }
 
 .secondaryButton {

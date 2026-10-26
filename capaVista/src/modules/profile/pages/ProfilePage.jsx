@@ -1,3 +1,4 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { beginPinRecovery, getPinRecoveryOutcome, clearPinRecoveryOutcome } from '../../auth/pinRecoveryBrowser'
 import { useAuth } from '../../../hooks/useAuth'
@@ -192,7 +193,7 @@ export default function ProfilePage() {
             <button className={styles.outlineButton} type="button" disabled={!loadedProfile || pinStatus !== 'active'}
               onClick={() => setHistoryOpen(true)}><i className="bi bi-calendar3" aria-hidden="true" />Ver historial completo</button>
           </header>
-          {!loadedProfile ? <p role="status">{profileError ? 'Actividad no disponible.' : 'Cargando actividad…'}</p>
+          {!loadedProfile ? <>{profileError ? <p role="status">Actividad no disponible.</p> : <LoadingIndicator context="Actividad reciente" />}</>
             : !loadedProfile.records?.length ? <p role="status">Aún no tienes registros asociados.</p>
               : <UserMovementsTable records={loadedProfile.records} label="Actividad reciente del usuario" />}
         </section>
@@ -213,7 +214,7 @@ export default function ProfilePage() {
                 <div className="modal-body text-center">
                   <p>Guardalo en un lugar seguro. Despues de aceptar no volvera a mostrarse.</p>
                   <div className="display-5 fw-bold font-monospace" aria-live="polite">
-                    {visiblePin || '------'}
+                    {visiblePin || (pinError ? 'PIN no disponible' : <LoadingIndicator scope="action" context="PIN operativo" />)}
                   </div>
                   {pinError && <div className="alert alert-danger mt-3 mb-0">{pinError}</div>}
                 </div>
@@ -223,8 +224,8 @@ export default function ProfilePage() {
                     disabled={!visiblePin || isPinBusy}
                     onClick={acknowledgePin}
                     type="button"
-                  >
-                    {isPinBusy ? 'Guardando...' : 'Aceptar'}
+                   aria-busy={isPinBusy}>
+                    <LoadingAction busy={isPinBusy} context="Aceptar">Aceptar</LoadingAction>
                   </button>
                 </div>
               </div>
@@ -242,7 +243,7 @@ export default function ProfilePage() {
                 <div className="modal-body" aria-live="polite">
                   <h2 className="fs-5" id="pin-recovery-title">Para recuperar tu PIN, debes autenticarte nuevamente</h2>
                   <p>Redirigiendo al inicio de sesión seguro...</p>
-                  <span className="spinner-border text-warning" role="status"><span className="visually-hidden">Cargando</span></span>
+                  <LoadingIndicator scope="action" context="Recuperación de PIN" />
                 </div>
                 <div className="modal-footer">
                   <button className="btn btn-outline-secondary" onClick={() => recoveryTask.current?.cancel()} type="button">Cancelar</button>

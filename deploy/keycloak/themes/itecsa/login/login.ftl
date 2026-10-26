@@ -19,7 +19,7 @@
           <#if credentialError>${kcSanitize(messagesPerField.getFirstError('username','password'))?no_esc}</#if>
         </div>
         <input type="hidden" id="id-hidden-input" name="credentialId" <#if auth.selectedCredential?has_content>value="${auth.selectedCredential}"</#if>/>
-        <button class="auth-button auth-button-primary" name="login" id="kc-login" type="submit" data-loading-label="${msg('itecsa.signingIn')}">${msg("doLogIn")}</button>
+        <button class="auth-button auth-button-primary" name="login" id="kc-login" type="submit">${msg("doLogIn")}</button>
       </form>
     </#if>
   <#elseif section == "info">

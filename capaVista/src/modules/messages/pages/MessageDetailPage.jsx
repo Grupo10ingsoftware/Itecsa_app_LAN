@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { APP_ROUTES } from '../../../config/routes'
 import { useMessagesApi } from '../hooks/useMessagesApi'
@@ -13,30 +14,35 @@ export default function MessageDetailPage() {
   const [message, setMessage] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const requestId = useRef(0)
 
   const loadMessage = useCallback(async () => {
+    const id = ++requestId.current
     setIsLoading(true)
     setError('')
 
     try {
       let response = await api.getMessage(messageId)
+      if (id !== requestId.current) return
 
       if (!response.leido) {
         response = await api.markAsRead(messageId)
         notifyMessagesChanged()
       }
 
-      setMessage(response)
+      if (id === requestId.current) setMessage(response)
     } catch (requestError) {
+      if (id !== requestId.current) return
       setError(requestError?.status === 404 ? 'El mensaje no existe o no te pertenece.' : 'No fue posible cargar el mensaje.')
     } finally {
-      setIsLoading(false)
+      if (id === requestId.current) setIsLoading(false)
     }
   }, [api, messageId])
 
   useEffect(() => {
+    const requests = requestId
     const requestTimer = window.setTimeout(() => loadMessage(), 0)
-    return () => window.clearTimeout(requestTimer)
+    return () => { window.clearTimeout(requestTimer); requests.current++ }
   }, [loadMessage])
 
   return (
@@ -47,7 +53,7 @@ export default function MessageDetailPage() {
           <i className="bi bi-arrow-left" aria-hidden="true" /> Volver a la bandeja
         </Link>
 
-        {isLoading && <div className={styles.state} role="status"><span className="spinner-border text-warning" aria-hidden="true" /> Cargando mensaje…</div>}
+        {isLoading && <LoadingIndicator context="Detalle del mensaje" />}
 
         {!isLoading && error && (
           <div className={styles.state} role="alert">

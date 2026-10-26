@@ -1,3 +1,4 @@
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { memo, useMemo } from 'react'
 import styles from './SalesNoteStep.module.css'
 
@@ -181,9 +182,9 @@ export default function SalesNoteStep({
                 )}
               </span>
 
-              <button className={styles.searchButton} disabled={isSearching || !hasCode} type="submit">
+              <button className={styles.searchButton} disabled={isSearching || !hasCode} type="submit" aria-busy={isSearching}>
                 <i className="bi bi-search" aria-hidden="true" />
-                {isSearching ? 'Buscando...' : 'Buscar informacion'}
+                <LoadingAction busy={isSearching} context="Buscar informacion">Buscar informacion</LoadingAction>
               </button>
             </div>
 

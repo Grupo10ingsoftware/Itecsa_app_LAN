@@ -13,7 +13,7 @@
 .metadata { color: #94a3b8; display: flex; flex-wrap: wrap; font-size: .72rem; gap: .8rem; }
 .metadata span { align-items: center; display: inline-flex; gap: .28rem; }
 .chevron { color: #cbd5e1; }
-.state, .emptyState { align-items: center; background: #fff; border: 1px solid #e5e7eb; border-radius: 1rem; color: #64748b; display: flex; flex-direction: column; gap: .75rem; justify-content: center; min-height: 18rem; padding: 2rem; text-align: center; }
+.emptyState { align-items: center; background: #fff; border: 1px solid #e5e7eb; border-radius: 1rem; color: #64748b; display: flex; flex-direction: column; gap: .75rem; justify-content: center; min-height: 18rem; padding: 2rem; text-align: center; }
 .emptyState h2 { color: #334155; font-size: 1.1rem; margin: .25rem 0 0; }
 .emptyState p { font-size: .86rem; margin: 0; }
 .emptyIcon { align-items: center; background: #f1f5f9; border-radius: 50%; color: #94a3b8; display: flex; font-size: 1.5rem; height: 3.75rem; justify-content: center; width: 3.75rem; }

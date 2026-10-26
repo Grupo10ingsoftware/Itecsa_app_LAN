@@ -17,13 +17,14 @@ describe('technical login entry point', () => {
   it('automatically starts Keycloak for old logout bookmarks without rendering a landing page', async () => {
     const view = open('/login?logged_out=1&from=%2Fperfil')
     await waitFor(() => expect(auth.loginWithRedirect).toHaveBeenCalledWith({ appState: { returnTo: '/perfil' } }))
-    expect(view.container.innerHTML).toBe('')
+    expect(view.container.querySelector('[data-scope="screen"]')).toBeTruthy()
+    expect(screen.queryByRole('button')).toBeNull()
   })
   it('waits for initialization and backend verification', () => {
     auth.isLoading = true
     const view = open()
     expect(auth.loginWithRedirect).not.toHaveBeenCalled()
-    expect(view.container.innerHTML).toBe('')
+    expect(view.container.querySelector('[data-scope="screen"]')).toBeTruthy()
   })
   it('does not repeatedly authenticate an identity rejected by the API', () => {
     auth.identityUser = { sub: 'subject' }

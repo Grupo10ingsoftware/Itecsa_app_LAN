@@ -1,11 +1,16 @@
-import { useState } from 'react';
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
+import { useRef, useState } from 'react';
 import styles from '../styles/Kanban.module.css';
+import { useModalDialog } from '../../users/hooks/useModalDialog'
 
 export function MoveToProductionModal({ isOpen, onClose, onConfirm, order }) {
   const [pin, setPin] = useState('')
   const [comment, setComment] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const pending = useRef(false)
+  const modalRef = useRef(null)
+  useModalDialog({ containerRef: modalRef, isOpen: Boolean(isOpen && order), canClose: !isSubmitting, onClose: handleClose })
 
   if (!isOpen || !order) {
     return null
@@ -18,7 +23,7 @@ export function MoveToProductionModal({ isOpen, onClose, onConfirm, order }) {
   }
 
   function handleClose() {
-    if (isSubmitting) return
+    if (pending.current) return
 
     resetFields()
     onClose()
@@ -26,7 +31,7 @@ export function MoveToProductionModal({ isOpen, onClose, onConfirm, order }) {
 
   async function handleSubmit(event) {
     event.preventDefault()
-    if (isSubmitting) return
+    if (pending.current) return
     const trimmedPin = pin.trim()
 
     if (!/^\d{6}$/.test(trimmedPin)) {
@@ -34,6 +39,7 @@ export function MoveToProductionModal({ isOpen, onClose, onConfirm, order }) {
       return
     }
 
+    pending.current = true
     setIsSubmitting(true)
     setError('')
 
@@ -46,6 +52,7 @@ export function MoveToProductionModal({ isOpen, onClose, onConfirm, order }) {
     } catch (submitError) {
       setError(submitError?.payload?.message ?? 'No fue posible mover la orden.')
     } finally {
+      pending.current = false
       setIsSubmitting(false)
     }
   }
@@ -53,6 +60,8 @@ export function MoveToProductionModal({ isOpen, onClose, onConfirm, order }) {
   return (
     <div className={styles.operatorModalLayer} role="presentation">
       <form
+        ref={modalRef}
+        aria-modal="true"
         aria-labelledby="move-production-modal-title"
         className={styles.operatorModal}
         onSubmit={handleSubmit}
@@ -107,8 +116,8 @@ export function MoveToProductionModal({ isOpen, onClose, onConfirm, order }) {
           <button className={styles.resetFilterButton} disabled={isSubmitting} onClick={handleClose} type="button">
             Cancelar
           </button>
-          <button className={styles.orderCardButton} disabled={isSubmitting} type="submit">
-            {isSubmitting ? 'Moviendo...' : 'Mover pedido'}
+          <button className={styles.orderCardButton} disabled={isSubmitting} type="submit" aria-busy={isSubmitting}>
+            <LoadingAction busy={isSubmitting} context="Mover pedido">Mover pedido</LoadingAction>
           </button>
         </footer>
       </form>

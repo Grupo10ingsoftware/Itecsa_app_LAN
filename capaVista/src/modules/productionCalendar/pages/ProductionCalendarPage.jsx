@@ -83,6 +83,9 @@ export default function ProductionCalendarPage() {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
   const [loadError, setLoadError] = useState(null)
   const [draggedItemId, setDraggedItemId] = useState(null)
+  const [loadedMonth, setLoadedMonth] = useState(null)
+  const [loadedPendingApi, setLoadedPendingApi] = useState(null)
+  const isLoading = loadedMonth !== monthDate || loadedPendingApi !== ordersCalendarApi
 
   useEffect(() => {
     let isMounted = true
@@ -103,6 +106,8 @@ export default function ProductionCalendarPage() {
         if (isMounted) {
           setLoadError('No fue posible cargar los pedidos compartidos del calendario.')
         }
+      } finally {
+        if (isMounted) setLoadedMonth(monthDate)
       }
     }
 
@@ -122,6 +127,7 @@ export default function ProductionCalendarPage() {
       .catch(() => {
         if (isMounted) setLoadError('No fue posible cargar los pedidos pendientes de fecha.')
       })
+      .finally(() => { if (isMounted) setLoadedPendingApi(ordersCalendarApi) })
     return () => { isMounted = false }
   }, [ordersCalendarApi])
 
@@ -206,6 +212,7 @@ export default function ProductionCalendarPage() {
 
           <section className={styles.calendarPanel}>
             <ProductionCalendarGrid
+              isLoading={isLoading}
               getOrderDetail={getOrderDetail}
               allItems={[...calendarItems, ...unscheduledItems.filter((item) => !calendarItems.some((monthItem) => String(monthItem.id) === String(item.id)))]}
               draggedItemId={draggedItemId}
@@ -214,13 +221,7 @@ export default function ProductionCalendarPage() {
               onChangeDeliveryDate={updateItemDeliveryDate}
               onDragEnd={() => setDraggedItemId(null)}
               onDragStart={setDraggedItemId}
-              toolbar={(
-                <CalendarToolbar
-                  monthDate={monthDate}
-                  onNextMonth={() => changeMonth(1)}
-                  onPreviousMonth={() => changeMonth(-1)}
-                />
-              )}
+              toolbar={<CalendarToolbar monthDate={monthDate} onNextMonth={() => changeMonth(1)} onPreviousMonth={() => changeMonth(-1)} />}
             />
           </section>
         </div>

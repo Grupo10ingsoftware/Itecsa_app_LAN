@@ -1,3 +1,4 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { APP_ROUTES } from '../../../config/routes'
@@ -74,7 +75,7 @@ export default function OrderHistoryDetailPage() {
     setCursor(pageInfo.nextCursor)
   }
 
-  if (loading && !order) return <div className={styles.state}>Cargando historial…</div>
+  if (loading && !order) return <LoadingIndicator context="historial" />
   if (error && !order) return <div className={styles.state}><p>{error}</p><Link to={APP_ROUTES.ORDER_HISTORY}>Volver al historial</Link></div>
 
   return (
@@ -110,7 +111,7 @@ export default function OrderHistoryDetailPage() {
                 {EVENT_TYPES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
               </select>
             </header>
-            {loading ? <div className={styles.empty}>Actualizando eventos…</div> : order.events.length === 0 ? <div className={styles.empty}>No existen registros para este filtro.</div> : (
+            {loading ? <LoadingIndicator context="Actualizando eventos" /> : order.events.length === 0 ? <div className={styles.empty}>No existen registros para este filtro.</div> : (
               <ol className={styles.timeline}>{order.events.map((event) => (
                 <li key={event.id}>
                   <div className={styles.marker}><i className="bi bi-clock-history" aria-hidden="true" /></div>
@@ -141,8 +142,8 @@ export default function OrderHistoryDetailPage() {
               ))}</ol>
             )}
             {pageInfo.hasMore && (
-              <button className={styles.loadMore} disabled={loadingMore} onClick={loadMore} type="button">
-                {loadingMore ? 'Cargando registros…' : 'Cargar más registros'}
+              <button className={styles.loadMore} disabled={loadingMore} onClick={loadMore} type="button" aria-busy={loadingMore}>
+                <LoadingAction busy={loadingMore} context="Cargar más registros">Cargar más registros</LoadingAction>
               </button>
             )}
           </section>

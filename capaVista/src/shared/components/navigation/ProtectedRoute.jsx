@@ -1,3 +1,4 @@
+import LoadingIndicator from '../loading/LoadingIndicator'
 import { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { APP_ROUTES } from '../../../config/routes'
@@ -9,7 +10,11 @@ export default function ProtectedRoute({ children, fallback }) {
   const { authStatus, error, isAuthenticated, isLoading, pinStatus } = useAuth()
   const location = useLocation()
   const fromPath = `${location.pathname}${location.search}${location.hash}`
-  const [authLoadingExpired, setAuthLoadingExpired] = useState(false)
+  const [wait, setWait] = useState({ isLoading, expired: false })
+  // Reiniciar antes de renderizar otra espera; un timeout antiguo no debe
+  // redirigir el primer render del siguiente ciclo de verificación.
+  if (wait.isLoading !== isLoading) setWait({ isLoading, expired: false })
+  const authLoadingExpired = wait.isLoading === isLoading && wait.expired
 
   useEffect(() => {
     if (!isLoading) {
@@ -17,7 +22,7 @@ export default function ProtectedRoute({ children, fallback }) {
     }
 
     const timeoutId = window.setTimeout(() => {
-      setAuthLoadingExpired(true)
+      setWait(current => ({ ...current, expired: true }))
     }, AUTH_LOADING_TIMEOUT_MS)
 
     return () => {
@@ -27,9 +32,7 @@ export default function ProtectedRoute({ children, fallback }) {
 
   if (isLoading && !authLoadingExpired) {
     return (
-      <div className="p-4" role="status">
-        Cargando sesion...
-      </div>
+      <LoadingIndicator scope="screen" context="Verificación de acceso" />
     )
   }
 

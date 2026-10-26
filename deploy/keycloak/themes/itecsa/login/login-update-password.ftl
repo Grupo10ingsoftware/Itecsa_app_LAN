@@ -10,7 +10,7 @@
       <@fields.input id="password-new" name="password-new" label=msg("passwordNew") type="password" autocomplete="new-password" autofocus=true invalid=messagesPerField.existsError('password') error=messagesPerField.get('password') describedBy="password-requirements"/>
       <@fields.input id="password-confirm" name="password-confirm" label=msg("passwordConfirm") type="password" autocomplete="new-password" invalid=messagesPerField.existsError('password-confirm') error=messagesPerField.get('password-confirm')/>
       <@passwordCommons.logoutOtherSessions/>
-      <button class="auth-button auth-button-primary" id="kc-submit" name="login" type="submit" data-loading-label="${msg('itecsa.updating')}">${msg("updatePasswordTitle")}</button>
+      <button class="auth-button auth-button-primary" id="kc-submit" name="login" type="submit">${msg("updatePasswordTitle")}</button>
       <#if isAppInitiatedAction??><button class="auth-button auth-button-secondary" type="submit" name="cancel-aia" value="true" formnovalidate>${msg("doCancel")}</button></#if>
     </form>
   <#elseif section == "passwordRequirements">

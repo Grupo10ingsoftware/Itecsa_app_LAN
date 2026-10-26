@@ -1,3 +1,4 @@
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../hooks/useAuth'
 import OrderCreateHeader from '../components/OrderCreateHeader'
@@ -67,9 +68,9 @@ export default function OrderCreatePage() {
               disabled={!flow.salesNoteIsValid || flow.isRegistering}
               onClick={actions.handleOpenConfirmModal}
               type="button"
-            >
+             aria-busy={flow.isRegistering}>
               <i className="bi bi-plus-circle" aria-hidden="true" />
-              {flow.isRegistering ? 'Registrando...' : 'Registrar pedido'}
+              <LoadingAction busy={flow.isRegistering} context="Registrar pedido">Registrar pedido</LoadingAction>
             </button>
           </div>
         </div>

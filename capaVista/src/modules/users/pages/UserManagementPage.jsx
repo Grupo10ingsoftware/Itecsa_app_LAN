@@ -2,13 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { API_ERROR_CODES } from '../../../services/api/apiClient'
 import { useAuth } from '../../../hooks/useAuth'
 import { useAdminUsersApi } from '../hooks/useAdminUsersApi'
-import TemporaryPasswordModal from '../components/TemporaryPasswordModal.jsx'
 import UserButton from '../components/UserButton'
 import UserCreateModal from '../components/UserCreateModal'
 import UserEditModal from '../components/UserEditModal'
 import UserManagementFilters from '../components/UserManagementFilters'
 import UserManagementTable from '../components/UserManagementTable'
-import UserUnlinkConfirmModal from '../components/UserUnlinkConfirmModal'
 import UserMovementsModal from '../components/UserMovementsModal'
 import UserSummaryCards from '../components/UserSummaryCards'
 import { createLatestRequestTracker } from '../utils/latestRequestTracker'
@@ -108,9 +106,13 @@ export default function UserManagementPage() {
   const [actionMessage, setActionMessage] = useState(null)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [movementsUser, setMovementsUser] = useState(null)
-  const [credentialUser, setCredentialUser] = useState(null)
   const [editingUser, setEditingUser] = useState(null)
-  const [unlinkingUser, setUnlinkingUser] = useState(null)
+  const [inspectingId, setInspectingId] = useState(null)
+  const inspection = useRef({ busy: false, version: 0 })
+  useEffect(() => {
+    const tracker = inspection.current
+    return () => { tracker.version++ }
+  }, [adminUsersApi])
   const currentExternalUserId = identityUser?.sub ?? null
 
   useEffect(() => {
@@ -263,19 +265,6 @@ export default function UserManagementPage() {
     }
   }
 
-  async function handleUnlinkUser(user) {
-    try {
-      await adminUsersApi.unlinkUser({
-        idUsuarioAutenticacionExterna: user.idUsuarioAutenticacionExterna,
-        pin: user.pin,
-      })
-      setUnlinkingUser(null)
-      await refreshAfterMutation({ type: 'success', text: 'Usuario desvinculado correctamente.' })
-    } catch (error) {
-      setActionMessage({ type: 'danger', text: getErrorText(error), requiresLogin: error?.status === 401 })
-    }
-  }
-
   async function handleCreatedUser(user) {
     if (user.outcome === 'user_created') setIsCreateModalOpen(false)
     setPage(1)
@@ -285,12 +274,22 @@ export default function UserManagementPage() {
         : 'Preparacion incompleta. No repitas el alta con otro nombre. Referencia: ' + user.operationId + '.' })
   }
   async function handleInspectUser(user) {
+    if (inspection.current.busy) return
+    const version = inspection.current.version
+    inspection.current.busy = true
+    setInspectingId(user.id)
     try {
       const detail = await adminUsersApi.inspectUser(user.idUsuarioAutenticacionExterna)
+      if (version !== inspection.current.version) return
       setEditingUser({ ...user, username: detail.username, enabled: detail.enabled,
         nombreUsuario: detail.firstName, apellidoUsuario: detail.lastName, correoUsuario: detail.email,
         rolUsuario: detail.role, estadoUsuario: detail.localState })
-    } catch (error) { setActionMessage({ type: 'danger', text: getErrorText(error) }) }
+    } catch (error) {
+      if (version === inspection.current.version) setActionMessage({ type: 'danger', text: getErrorText(error) })
+    } finally {
+      inspection.current.busy = false
+      if (version === inspection.current.version) setInspectingId(null)
+    }
   }
 
   return (
@@ -340,6 +339,7 @@ export default function UserManagementPage() {
           />
 
           <UserManagementTable
+            inspectingId={inspectingId}
             currentPage={page}
             isLoading={isLoading}
             onEditUser={handleInspectUser}
@@ -365,7 +365,6 @@ export default function UserManagementPage() {
         onClose={() => setIsCreateModalOpen(false)}
         onCreated={handleCreatedUser}
       />
-      {credentialUser && <TemporaryPasswordModal key={credentialUser.id} user={credentialUser} onClose={() => setCredentialUser(null)} />}
       <UserEditModal
         key={editingUser?.id ?? 'user-edit-modal'}
         isOpen={Boolean(editingUser)}
@@ -373,12 +372,6 @@ export default function UserManagementPage() {
         onSave={handleSaveUser}
         isCurrentUser={Boolean(editingUser?.isCurrentUser)}
         user={editingUser}
-      />
-      <UserUnlinkConfirmModal
-        isOpen={Boolean(unlinkingUser)}
-        onClose={() => setUnlinkingUser(null)}
-        onConfirm={handleUnlinkUser}
-        user={unlinkingUser}
       />
     </PageShell>
   )
