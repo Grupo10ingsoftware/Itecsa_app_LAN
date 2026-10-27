@@ -1,0 +1,437 @@
+{
+  "environment": "development / diagnostic process / same remote MySQL / strict TLS",
+  "node": "v22.23.4",
+  "samples": {
+    "prismaFirstQuery": {
+      "n": 1,
+      "medianMs": 2235.901,
+      "minMs": 2235.901,
+      "maxMs": 2235.901,
+      "values": [
+        {
+          "ms": 2235.901,
+          "selects": 1
+        }
+      ]
+    },
+    "prismaWarm": {
+      "n": 10,
+      "medianMs": 660.683,
+      "minMs": 443.471,
+      "maxMs": 665.216,
+      "values": [
+        {
+          "ms": 443.471,
+          "selects": 1
+        },
+        {
+          "ms": 443.486,
+          "selects": 1
+        },
+        {
+          "ms": 664.655,
+          "selects": 1
+        },
+        {
+          "ms": 661.665,
+          "selects": 1
+        },
+        {
+          "ms": 657.103,
+          "selects": 1
+        },
+        {
+          "ms": 662.385,
+          "selects": 1
+        },
+        {
+          "ms": 661.045,
+          "selects": 1
+        },
+        {
+          "ms": 665.216,
+          "selects": 1
+        },
+        {
+          "ms": 657.565,
+          "selects": 1
+        },
+        {
+          "ms": 660.321,
+          "selects": 1
+        }
+      ]
+    },
+    "driverQueryFirst": {
+      "n": 1,
+      "medianMs": 190.076,
+      "minMs": 190.076,
+      "maxMs": 190.076,
+      "values": [
+        {
+          "ms": 190.076,
+          "selects": 0
+        }
+      ]
+    },
+    "driverQueryWarm": {
+      "n": 10,
+      "medianMs": 189.412,
+      "minMs": 189.036,
+      "maxMs": 190.015,
+      "values": [
+        {
+          "ms": 189.54,
+          "selects": 0
+        },
+        {
+          "ms": 189.036,
+          "selects": 0
+        },
+        {
+          "ms": 189.125,
+          "selects": 0
+        },
+        {
+          "ms": 190.015,
+          "selects": 0
+        },
+        {
+          "ms": 189.224,
+          "selects": 0
+        },
+        {
+          "ms": 189.403,
+          "selects": 0
+        },
+        {
+          "ms": 189.258,
+          "selects": 0
+        },
+        {
+          "ms": 189.421,
+          "selects": 0
+        },
+        {
+          "ms": 189.538,
+          "selects": 0
+        },
+        {
+          "ms": 189.562,
+          "selects": 0
+        }
+      ]
+    },
+    "driverExecuteFirst": {
+      "n": 1,
+      "medianMs": 378.938,
+      "minMs": 378.938,
+      "maxMs": 378.938,
+      "values": [
+        {
+          "ms": 378.938,
+          "selects": 0
+        }
+      ]
+    },
+    "driverExecuteWarm": {
+      "n": 10,
+      "medianMs": 378.768,
+      "minMs": 377.271,
+      "maxMs": 382.619,
+      "values": [
+        {
+          "ms": 378.709,
+          "selects": 0
+        },
+        {
+          "ms": 378.217,
+          "selects": 0
+        },
+        {
+          "ms": 379.946,
+          "selects": 0
+        },
+        {
+          "ms": 378.827,
+          "selects": 0
+        },
+        {
+          "ms": 379.913,
+          "selects": 0
+        },
+        {
+          "ms": 378.558,
+          "selects": 0
+        },
+        {
+          "ms": 382.619,
+          "selects": 0
+        },
+        {
+          "ms": 379.077,
+          "selects": 0
+        },
+        {
+          "ms": 377.446,
+          "selects": 0
+        },
+        {
+          "ms": 377.271,
+          "selects": 0
+        }
+      ]
+    },
+    "identityLegacy": {
+      "n": 10,
+      "medianMs": 1273.197,
+      "minMs": 1220.545,
+      "maxMs": 1329.124,
+      "values": [
+        {
+          "ms": 1236.825,
+          "selects": 2
+        },
+        {
+          "ms": 1220.545,
+          "selects": 2
+        },
+        {
+          "ms": 1312.503,
+          "selects": 2
+        },
+        {
+          "ms": 1329.124,
+          "selects": 2
+        },
+        {
+          "ms": 1229.987,
+          "selects": 2
+        },
+        {
+          "ms": 1233.546,
+          "selects": 2
+        },
+        {
+          "ms": 1309.57,
+          "selects": 2
+        },
+        {
+          "ms": 1313.904,
+          "selects": 2
+        },
+        {
+          "ms": 1327.812,
+          "selects": 2
+        },
+        {
+          "ms": 1228.82,
+          "selects": 2
+        }
+      ]
+    },
+    "identityCurrent": {
+      "n": 10,
+      "medianMs": 1309.149,
+      "minMs": 1226.785,
+      "maxMs": 1326.732,
+      "values": [
+        {
+          "ms": 1233.586,
+          "selects": 2
+        },
+        {
+          "ms": 1307.191,
+          "selects": 2
+        },
+        {
+          "ms": 1311.801,
+          "selects": 2
+        },
+        {
+          "ms": 1326.103,
+          "selects": 2
+        },
+        {
+          "ms": 1226.785,
+          "selects": 2
+        },
+        {
+          "ms": 1232.229,
+          "selects": 2
+        },
+        {
+          "ms": 1311.106,
+          "selects": 2
+        },
+        {
+          "ms": 1312.326,
+          "selects": 2
+        },
+        {
+          "ms": 1326.732,
+          "selects": 2
+        },
+        {
+          "ms": 1227.562,
+          "selects": 2
+        }
+      ]
+    },
+    "middlewareCurrent": {
+      "n": 10,
+      "medianMs": 1309.769,
+      "minMs": 1227.815,
+      "maxMs": 1326.458,
+      "values": [
+        {
+          "ms": 1232.872,
+          "selects": 2
+        },
+        {
+          "ms": 1316.49,
+          "selects": 2
+        },
+        {
+          "ms": 1320.856,
+          "selects": 2
+        },
+        {
+          "ms": 1326.458,
+          "selects": 2
+        },
+        {
+          "ms": 1227.815,
+          "selects": 2
+        },
+        {
+          "ms": 1231.59,
+          "selects": 2
+        },
+        {
+          "ms": 1307.826,
+          "selects": 2
+        },
+        {
+          "ms": 1311.713,
+          "selects": 2
+        },
+        {
+          "ms": 1323.899,
+          "selects": 2
+        },
+        {
+          "ms": 1229.305,
+          "selects": 2
+        }
+      ]
+    },
+    "notificationsLegacyFlow": {
+      "n": 10,
+      "medianMs": 4474.827,
+      "minMs": 4417.3,
+      "maxMs": 4528.896,
+      "values": [
+        {
+          "ms": 4521.163,
+          "selects": 8
+        },
+        {
+          "ms": 4441.483,
+          "selects": 8
+        },
+        {
+          "ms": 4511.788,
+          "selects": 8
+        },
+        {
+          "ms": 4528.896,
+          "selects": 8
+        },
+        {
+          "ms": 4417.3,
+          "selects": 8
+        },
+        {
+          "ms": 4432.251,
+          "selects": 8
+        },
+        {
+          "ms": 4443.599,
+          "selects": 8
+        },
+        {
+          "ms": 4506.056,
+          "selects": 8
+        },
+        {
+          "ms": 4510.732,
+          "selects": 8
+        },
+        {
+          "ms": 4432.611,
+          "selects": 8
+        }
+      ]
+    },
+    "notificationsCurrentFlow": {
+      "n": 10,
+      "medianMs": 4435.809,
+      "minMs": 4412.57,
+      "maxMs": 4509.171,
+      "values": [
+        {
+          "ms": 4431.811,
+          "selects": 8
+        },
+        {
+          "ms": 4436.814,
+          "selects": 8
+        },
+        {
+          "ms": 4505.306,
+          "selects": 8
+        },
+        {
+          "ms": 4508.712,
+          "selects": 8
+        },
+        {
+          "ms": 4412.57,
+          "selects": 8
+        },
+        {
+          "ms": 4430.545,
+          "selects": 8
+        },
+        {
+          "ms": 4434.803,
+          "selects": 8
+        },
+        {
+          "ms": 4504.228,
+          "selects": 8
+        },
+        {
+          "ms": 4509.171,
+          "selects": 8
+        },
+        {
+          "ms": 4415.578,
+          "selects": 8
+        }
+      ]
+    }
+  },
+  "sql": {
+    "legacy": [
+      "SELECT `Usuario`.`id_usuario`, `Usuario`.`correo_usuario`, `Usuario`.`rut_usuario`, `Usuario`.`nombre_usuario`, `Usuario`.`apellido_usuario`, `Usuario`.`rol_usuario`, `Usuario`.`estado_usuario` FROM `Usuario` LEFT JOIN `ExternalIdentity` AS `j0` ON (`j0`.`user_id`) = (`Usuario`.`id_usuario`) WHERE (`j0`.`provider` = ? AND `j0`.`issuer` = ? AND `j0`.`subject` = ? AND (`j0`.`id_external_identity` IS NOT NULL)) LIMIT ? OFFSET ?",
+      "SELECT `ExternalIdentity`.`id_external_identity`, `ExternalIdentity`.`provider`, `ExternalIdentity`.`issuer`, `ExternalIdentity`.`subject`, `ExternalIdentity`.`user_id` FROM `ExternalIdentity` WHERE `ExternalIdentity`.`user_id` IN (?)"
+    ],
+    "current": [
+      "SELECT `Usuario`.`id_usuario`, `Usuario`.`correo_usuario`, `Usuario`.`rut_usuario`, `Usuario`.`nombre_usuario`, `Usuario`.`apellido_usuario`, `Usuario`.`rol_usuario`, `Usuario`.`estado_usuario` FROM `Usuario` LEFT JOIN `ExternalIdentity` AS `j0` ON (`j0`.`user_id`) = (`Usuario`.`id_usuario`) WHERE (`j0`.`provider` = ? AND `j0`.`issuer` = ? AND `j0`.`subject` = ? AND (`j0`.`id_external_identity` IS NOT NULL)) LIMIT ? OFFSET ?",
+      "SELECT `ExternalIdentity`.`id_external_identity`, `ExternalIdentity`.`provider`, `ExternalIdentity`.`issuer`, `ExternalIdentity`.`subject`, `ExternalIdentity`.`user_id` FROM `ExternalIdentity` WHERE `ExternalIdentity`.`user_id` IN (?)"
+    ]
+  },
+  "errors": 0
+}

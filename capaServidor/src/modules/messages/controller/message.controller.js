@@ -9,7 +9,7 @@ class MessageController {
 
     getInbox = async (req = request, res = response) => {
         try {
-            const result = await this.service.getInbox(req.auth?.payload?.sub, req.query);
+            const result = await this.service.getInbox(req.auth?.payload?.sub, req.query, { currentUser: req.currentUser });
 
             return res.status(200).json(result);
         } catch (error) {
@@ -19,7 +19,7 @@ class MessageController {
 
     getNotifications = async (req = request, res = response) => {
         try {
-            const result = await this.service.getNotifications(req.auth?.payload?.sub, req.query);
+            const result = await this.service.getNotifications(req.auth?.payload?.sub, req.query, { currentUser: req.currentUser });
 
             return res.status(200).json(result);
         } catch (error) {
@@ -32,6 +32,7 @@ class MessageController {
             const result = await this.service.getMessage(
                 req.auth?.payload?.sub,
                 req.params.messageId,
+                { currentUser: req.currentUser },
             );
 
             return res.status(200).json(result);
@@ -45,6 +46,7 @@ class MessageController {
             const result = await this.service.markAsRead(
                 req.auth?.payload?.sub,
                 req.params.messageId,
+                { currentUser: req.currentUser },
             );
 
             return res.status(200).json(result);
@@ -58,6 +60,7 @@ class MessageController {
             const result = await this.service.hideNotification(
                 req.auth?.payload?.sub,
                 req.params.messageId,
+                { currentUser: req.currentUser },
             );
 
             return res.status(200).json(result);
@@ -68,7 +71,7 @@ class MessageController {
 
     clearNotifications = async (req = request, res = response) => {
         try {
-            const result = await this.service.clearNotifications(req.auth?.payload?.sub);
+            const result = await this.service.clearNotifications(req.auth?.payload?.sub, { currentUser: req.currentUser });
 
             return res.status(200).json(result);
         } catch (error) {

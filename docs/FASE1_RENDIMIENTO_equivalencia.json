@@ -1,0 +1,14 @@
+{
+  "environment": "development / diagnostic process / same remote MySQL / strict TLS",
+  "node": "v22.23.4",
+  "samples": {},
+  "sql": {},
+  "errors": 0,
+  "selectCounterCoverage": "Prisma query events only; driver sample counters are not attached.",
+  "equivalence": {
+    "comparedBindings": 5,
+    "missingBinding": true,
+    "injectionParameter": true,
+    "otherIssuer": true
+  }
+}

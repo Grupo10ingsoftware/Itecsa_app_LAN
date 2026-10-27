@@ -1,0 +1,129 @@
+{
+  "environment": "development / diagnostic process / same remote MySQL / strict TLS",
+  "node": "v22.23.4",
+  "samples": {
+    "httpLegacyFirst": {
+      "n": 1,
+      "medianMs": 4707.821,
+      "minMs": 4707.821,
+      "maxMs": 4707.821,
+      "values": [
+        {
+          "ms": 4707.821,
+          "selects": 8
+        }
+      ]
+    },
+    "httpCurrentFirst": {
+      "n": 1,
+      "medianMs": 2559.781,
+      "minMs": 2559.781,
+      "maxMs": 2559.781,
+      "values": [
+        {
+          "ms": 2559.781,
+          "selects": 5
+        }
+      ]
+    },
+    "httpLegacyWarm": {
+      "n": 10,
+      "medianMs": 4467.092,
+      "minMs": 4437.042,
+      "maxMs": 4692.339,
+      "values": [
+        {
+          "ms": 4439.136,
+          "selects": 8
+        },
+        {
+          "ms": 4692.339,
+          "selects": 8
+        },
+        {
+          "ms": 4484.465,
+          "selects": 8
+        },
+        {
+          "ms": 4551.567,
+          "selects": 8
+        },
+        {
+          "ms": 4440.009,
+          "selects": 8
+        },
+        {
+          "ms": 4531.541,
+          "selects": 8
+        },
+        {
+          "ms": 4449.719,
+          "selects": 8
+        },
+        {
+          "ms": 4447.692,
+          "selects": 8
+        },
+        {
+          "ms": 4532.162,
+          "selects": 8
+        },
+        {
+          "ms": 4437.042,
+          "selects": 8
+        }
+      ]
+    },
+    "httpCurrentWarm": {
+      "n": 10,
+      "medianMs": 2562.677,
+      "minMs": 2538.416,
+      "maxMs": 2632.953,
+      "values": [
+        {
+          "ms": 2632.953,
+          "selects": 5
+        },
+        {
+          "ms": 2564.423,
+          "selects": 5
+        },
+        {
+          "ms": 2538.416,
+          "selects": 5
+        },
+        {
+          "ms": 2563.812,
+          "selects": 5
+        },
+        {
+          "ms": 2539.222,
+          "selects": 5
+        },
+        {
+          "ms": 2562.533,
+          "selects": 5
+        },
+        {
+          "ms": 2540.463,
+          "selects": 5
+        },
+        {
+          "ms": 2562.822,
+          "selects": 5
+        },
+        {
+          "ms": 2545.283,
+          "selects": 5
+        },
+        {
+          "ms": 2572.178,
+          "selects": 5
+        }
+      ]
+    }
+  },
+  "sql": {},
+  "errors": 0,
+  "httpHarness": "loopback / synthetic RS256 authority / real SELECTs / memory quota 120 per minute"
+}

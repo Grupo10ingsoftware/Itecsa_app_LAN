@@ -1,4 +1,4 @@
-import { identityUserWhere } from '../../../database/identityBinding.js';
+import { identityKey, identityUserWhere } from '../../../database/identityBinding.js';
 import getPrismaClient from "../../../database/prisma.js";
 import {
     USER_STATUS,
@@ -21,23 +21,6 @@ export class UserRepositoryError extends Error {
         this.name = "UserRepositoryError";
         this.code = code;
     }
-}
-
-function toUserResponse(user) {
-    if (!user) {
-        return null;
-    }
-
-    return {
-        idUsuario: user.id_usuario,
-        identitySubject: user.ExternalIdentity?.subject ?? null,
-        correoUsuario: user.correo_usuario,
-        rutUsuario: user.rut_usuario,
-        nombreUsuario: user.nombre_usuario,
-        apellidoUsuario: user.apellido_usuario,
-        rolUsuario: user.rol_usuario,
-        estadoUsuario: user.estado_usuario,
-    };
 }
 
 function mapRepositoryError(error) {
@@ -76,12 +59,20 @@ export class UserRepository {
 
     async findBySubject(identitySubject) {
         try {
-            const user = await this.client.usuario.findFirst({
-                where: identityUserWhere(identitySubject),
-                select: USER_RESPONSE_SELECT,
-            });
-
-            return toUserResponse(user);
+            const { provider, issuer, subject } = identityKey(identitySubject);
+            // A single indexed lookup preserves the binding scope and DTO without
+            // Prisma's separate relation SELECT. Interpolations remain parameters.
+            const users = await this.client.$queryRaw`
+                SELECT u.id_usuario AS idUsuario, e.subject AS identitySubject,
+                    u.correo_usuario AS correoUsuario, u.rut_usuario AS rutUsuario,
+                    u.nombre_usuario AS nombreUsuario, u.apellido_usuario AS apellidoUsuario,
+                    u.rol_usuario AS rolUsuario, u.estado_usuario AS estadoUsuario
+                FROM ExternalIdentity e
+                INNER JOIN Usuario u ON u.id_usuario = e.user_id
+                WHERE e.provider = ${provider} AND e.issuer = ${issuer} AND e.subject = ${subject}
+                LIMIT 1
+            `;
+            return users[0] ?? null;
         } catch (error) {
             throw mapRepositoryError(error);
         }

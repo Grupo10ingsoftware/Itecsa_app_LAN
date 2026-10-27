@@ -1,6 +1,7 @@
 import { AppError } from "../../../errors/AppError.js";
 import MessageRepository from "../repo/message.repo.js";
 import { UserRepository } from "../../users/repo/users.repo.js";
+import { isActiveUserStatus } from '../../../config/userLifecycle.js';
 
 const VALID_STATUSES = new Set(["all", "read", "unread"]);
 const VALID_SORTS = new Set(["latest", "oldest"]);
@@ -42,11 +43,20 @@ class MessageService {
         this.userRepo = userRepo ?? new UserRepository();
     }
 
-    async resolveUser(identitySubject) {
+    async resolveUser(identitySubject, { currentUser } = {}) {
         if (!identitySubject) {
             throw createHttpError(401, "No se pudo identificar al usuario.");
         }
 
+        // Only controllers may supply the current request's middleware-validated
+        // actor, separately from body/query. Calls without HTTP context still resolve.
+        if (currentUser !== undefined) {
+            if (!Number.isSafeInteger(currentUser?.idUsuario) || currentUser.idUsuario <= 0 ||
+                currentUser.identitySubject !== identitySubject || !isActiveUserStatus(currentUser.estadoUsuario)) {
+                throw createHttpError(403, "No existe una identidad activa para esta sesion.");
+            }
+            return currentUser;
+        }
         const user = await this.userRepo.findBySubject(identitySubject);
 
         if (!user) {
@@ -56,8 +66,8 @@ class MessageService {
         return user;
     }
 
-    async getInbox(identitySubject, query = {}) {
-        const user = await this.resolveUser(identitySubject);
+    async getInbox(identitySubject, query = {}, context) {
+        const user = await this.resolveUser(identitySubject, context);
         const status = query.status ?? "all";
         const sort = query.sort ?? "latest";
 
@@ -92,8 +102,8 @@ class MessageService {
         });
     }
 
-    async getNotifications(identitySubject, query = {}) {
-        const user = await this.resolveUser(identitySubject);
+    async getNotifications(identitySubject, query = {}, context) {
+        const user = await this.resolveUser(identitySubject, context);
         const requestedLimit = query.limit
             ? parsePositiveInteger(query.limit, "limit")
             : 10;
@@ -110,8 +120,8 @@ class MessageService {
         };
     }
 
-    async getMessage(identitySubject, messageId) {
-        const user = await this.resolveUser(identitySubject);
+    async getMessage(identitySubject, messageId, context) {
+        const user = await this.resolveUser(identitySubject, context);
         const parsedMessageId = parsePositiveInteger(messageId, "messageId");
         const message = await this.repo.findUserMessage(user.idUsuario, parsedMessageId);
 
@@ -122,8 +132,8 @@ class MessageService {
         return message;
     }
 
-    async markAsRead(identitySubject, messageId) {
-        const user = await this.resolveUser(identitySubject);
+    async markAsRead(identitySubject, messageId, context) {
+        const user = await this.resolveUser(identitySubject, context);
         const parsedMessageId = parsePositiveInteger(messageId, "messageId");
         const current = await this.repo.findUserMessage(user.idUsuario, parsedMessageId);
 
@@ -138,8 +148,8 @@ class MessageService {
         return this.repo.markAsRead(user.idUsuario, parsedMessageId);
     }
 
-    async hideNotification(identitySubject, messageId) {
-        const user = await this.resolveUser(identitySubject);
+    async hideNotification(identitySubject, messageId, context) {
+        const user = await this.resolveUser(identitySubject, context);
         const parsedMessageId = parsePositiveInteger(messageId, "messageId");
         const current = await this.repo.findUserMessage(user.idUsuario, parsedMessageId);
 
@@ -154,8 +164,8 @@ class MessageService {
         return this.repo.hideNotification(user.idUsuario, parsedMessageId);
     }
 
-    async clearNotifications(identitySubject) {
-        const user = await this.resolveUser(identitySubject);
+    async clearNotifications(identitySubject, context) {
+        const user = await this.resolveUser(identitySubject, context);
         const result = await this.repo.hideAllNotifications(user.idUsuario);
 
         return {
