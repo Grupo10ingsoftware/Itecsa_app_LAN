@@ -11,12 +11,15 @@ function toQueryString(params = {}) {
   return serialized ? `?${serialized}` : ''
 }
 
+let nextScope = 0
 export function createMessagesApi(apiClient) {
   return {
-    getInbox: (params) => apiClient.get(`/messages${toQueryString(params)}`),
-    getMessage: (messageId) => apiClient.get(`/messages/${messageId}`),
-    getNotifications: (limit = 10) =>
-      apiClient.get(`/messages/notifications${toQueryString({ limit })}`),
+    scopeId: ++nextScope,
+    getInbox: (params, options = {}) => apiClient.get(`/messages${toQueryString(params)}`, options),
+    getMessage: (messageId, options = {}) => apiClient.get(`/messages/${messageId}`, options),
+    openMessage: (messageId) => apiClient.post(`/messages/${messageId}/open`, {}),
+    getNotifications: (limit = 10, { signal, revision, compact = false } = {}) =>
+      apiClient.get(`/messages/notifications${toQueryString({ limit, ...(compact ? { view: 'bell', revision } : {}) })}`, { signal }),
     markAsRead: (messageId) => apiClient.patch(`/messages/${messageId}/read`, {}),
     hideNotification: (messageId) =>
       apiClient.patch(`/messages/notifications/${messageId}`),

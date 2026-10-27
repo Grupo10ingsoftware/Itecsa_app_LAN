@@ -1,36 +1,5 @@
+import { inboxQuery, detailQuery, notificationsQuery, mapJoinedMessage } from './messageRead.repo.js';
 import getPrismaClient from "../../../database/prisma.js";
-
-function mapMessageAssignment(row) {
-    if (!row) return null;
-
-    const message = row.Mensaje;
-
-    return {
-        id_mensaje: message.id_mensaje,
-        contenido: message.contenido,
-        fecha_publicacion: message.fecha_publicacion,
-        Asunto: message.Asunto,
-        id_pedido: message.id_pedido,
-        leido: row.leido_,
-        oculto: row.oculto_,
-        pedido: message.Pedidos ?? null,
-    };
-}
-
-const messageInclude = {
-    Mensaje: {
-        include: {
-            Pedidos: {
-                select: {
-                    id_pedido: true,
-                    numero_nota_venta: true,
-                    fecha_creacion: true,
-                    fecha_estimada_termino: true,
-                },
-            },
-        },
-    },
-};
 
 class MessageRepository {
     constructor({ prisma } = {}) {
@@ -77,30 +46,14 @@ class MessageRepository {
             from,
             to,
         });
-        const direction = sort === "oldest" ? "asc" : "desc";
 
         const [rows, total] = await this.client.$transaction([
-            this.client.mENSAJE_USUARIO.findMany({
-                where,
-                include: messageInclude,
-                orderBy: [
-                    {
-                        Mensaje: {
-                            fecha_publicacion: direction,
-                        },
-                    },
-                    {
-                        id_mensaje: direction,
-                    },
-                ],
-                skip: (page - 1) * perPage,
-                take: perPage,
-            }),
+            this.client.$queryRaw(inboxQuery({ userId, status, sort, from, to, page, perPage })),
             this.client.mENSAJE_USUARIO.count({ where }),
         ]);
 
         return {
-            messages: rows.map(mapMessageAssignment),
+            messages: rows.map(mapJoinedMessage),
             total,
             page,
             perPage,
@@ -109,27 +62,12 @@ class MessageRepository {
     }
 
     async listNotifications(userId, limit) {
-        const rows = await this.client.mENSAJE_USUARIO.findMany({
-            where: {
-                id_usuario: Number(userId),
-                leido_: false,
-                oculto_: false,
-            },
-            include: messageInclude,
-            orderBy: [
-                {
-                    Mensaje: {
-                        fecha_publicacion: "desc",
-                    },
-                },
-                {
-                    id_mensaje: "desc",
-                },
-            ],
-            take: limit,
-        });
+        return (await this.client.$queryRaw(notificationsQuery(userId, limit))).map(mapJoinedMessage);
+    }
 
-        return rows.map(mapMessageAssignment);
+    async getNotificationSnapshot(userId, limit) {
+        const rows = await this.client.$queryRaw(notificationsQuery(userId, limit, true));
+        return { notifications: rows.filter(row => row.id_mensaje != null).map(mapJoinedMessage), unreadCount: Number(rows[0]?.unreadCount ?? 0) };
     }
 
     async countUnreadNotifications(userId) {
@@ -143,51 +81,23 @@ class MessageRepository {
     }
 
     async findUserMessage(userId, messageId) {
-        const row = await this.client.mENSAJE_USUARIO.findUnique({
-            where: {
-                id_usuario_id_mensaje: {
-                    id_usuario: Number(userId),
-                    id_mensaje: Number(messageId),
-                },
-            },
-            include: messageInclude,
-        });
+        const rows = await this.client.$queryRaw(detailQuery(userId, messageId));
+        return mapJoinedMessage(rows[0]);
+    }
 
-        return mapMessageAssignment(row);
+    async updateAssignment(userId, messageId, data) {
+        await this.client.mENSAJE_USUARIO.updateMany({
+            where: { id_usuario: Number(userId), id_mensaje: Number(messageId) }, data,
+        });
+        return this.findUserMessage(userId, messageId);
     }
 
     async markAsRead(userId, messageId) {
-        const row = await this.client.mENSAJE_USUARIO.update({
-            where: {
-                id_usuario_id_mensaje: {
-                    id_usuario: Number(userId),
-                    id_mensaje: Number(messageId),
-                },
-            },
-            data: {
-                leido_: true,
-            },
-            include: messageInclude,
-        });
-
-        return mapMessageAssignment(row);
+        return this.updateAssignment(userId, messageId, { leido_: true });
     }
 
     async hideNotification(userId, messageId) {
-        const row = await this.client.mENSAJE_USUARIO.update({
-            where: {
-                id_usuario_id_mensaje: {
-                    id_usuario: Number(userId),
-                    id_mensaje: Number(messageId),
-                },
-            },
-            data: {
-                oculto_: true,
-            },
-            include: messageInclude,
-        });
-
-        return mapMessageAssignment(row);
+        return this.updateAssignment(userId, messageId, { oculto_: true });
     }
 
     async hideAllNotifications(userId) {

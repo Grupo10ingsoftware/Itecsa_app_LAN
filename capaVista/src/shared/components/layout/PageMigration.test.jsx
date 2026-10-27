@@ -139,6 +139,7 @@ describe('Páginas migradas sin modificar sus operaciones', () => {
     [MessageDetailPage, '/mensajes/1', /Volver a la bandeja/],
   ])('respeta el estado de error sin forzar un banner en %s', async (Page, route, link) => {
     vi.spyOn(client, 'get').mockRejectedValue(new Error('Fallo sintético'))
+    vi.spyOn(client, 'post').mockRejectedValue(new Error('Fallo sintético'))
     const { container } = mount(Page, route)
     await waitFor(() => expect(screen.queryByText(/Cargando/)).toBeNull())
     expect(container.querySelector('[data-page-header]')).toBeNull()

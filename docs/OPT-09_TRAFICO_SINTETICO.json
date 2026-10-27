@@ -1,0 +1,78 @@
+{
+  "reference": "755ce1e",
+  "node": "v24.19.0",
+  "methodology": "Virtual 60-second half-open windows [0,60000), including initial load. GET-call counts are simulated, not actual network or SQL. No real messages, writes or saturation.",
+  "payloadBytes": {
+    "full": 215017,
+    "compact": 11395,
+    "unchanged": 113
+  },
+  "scenarios": [
+    {
+      "name": "visible",
+      "tabs": 1,
+      "simulatedGetsPerMinute": {
+        "before": 12,
+        "after": 12
+      },
+      "simulatedBytesPerMinute": {
+        "before": 2580204,
+        "after": 12638
+      }
+    },
+    {
+      "name": "two_visible_tabs",
+      "tabs": 2,
+      "simulatedGetsPerMinute": {
+        "before": 24,
+        "after": 24
+      },
+      "simulatedBytesPerMinute": {
+        "before": 5160408,
+        "after": 25276
+      }
+    },
+    {
+      "name": "three_visible_tabs",
+      "tabs": 3,
+      "simulatedGetsPerMinute": {
+        "before": 36,
+        "after": 36
+      },
+      "simulatedBytesPerMinute": {
+        "before": 7740612,
+        "after": 37914
+      }
+    },
+    {
+      "name": "hidden",
+      "tabs": 1,
+      "simulatedGetsPerMinute": {
+        "before": 1,
+        "after": 0
+      },
+      "simulatedBytesPerMinute": {
+        "before": 215017,
+        "after": 0
+      }
+    },
+    {
+      "name": "focus_visibility_burst",
+      "tabs": 1,
+      "simulatedGetsPerMinute": {
+        "before": 15,
+        "after": 12
+      },
+      "simulatedBytesPerMinute": {
+        "before": 3225255,
+        "after": 12638
+      }
+    }
+  ],
+  "detection": {
+    "messageIntroducedAtVirtualMs": 12001,
+    "nextPollAtVirtualMs": 15000,
+    "waitBeforeRequestMs": 2999,
+    "note": "Same cadence before/after. Excludes SQL/HTTP/browser latency; not a real arrival-latency measurement."
+  }
+}

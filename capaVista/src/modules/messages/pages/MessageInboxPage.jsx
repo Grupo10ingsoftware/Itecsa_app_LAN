@@ -5,7 +5,6 @@ import { API_ERROR_CODES } from '../../../services/api/apiClient'
 import MessageFilters from '../components/MessageFilters'
 import MessageList from '../components/MessageList'
 import { useMessagesApi } from '../hooks/useMessagesApi'
-import { notifyMessagesChanged } from '../utils/messageFormatters'
 import styles from './MessageInboxPage.module.css'
 import PageShell from '../../../shared/components/layout/PageShell'
 import PageHeader from '../../../shared/components/layout/PageHeader'
@@ -21,6 +20,10 @@ function errorText(error) {
 
 export default function MessageInboxPage() {
   const api = useMessagesApi()
+  return <InboxSession key={api.scopeId} api={api} />
+}
+
+function InboxSession({ api }) {
   const navigate = useNavigate()
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [page, setPage] = useState(1)
@@ -28,24 +31,28 @@ export default function MessageInboxPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const requestId = useRef(0)
+  const controller = useRef(null)
   const openingRef = useRef(false)
   const [openingId, setOpeningId] = useState(null)
 
   const loadInbox = useCallback(async () => {
+    controller.current?.abort()
+    const read = new AbortController()
+    controller.current = read
     const id = ++requestId.current
     setIsLoading(true)
     setError('')
 
     try {
-      const response = await api.getInbox({ ...filters, page, perPage: PAGE_SIZE })
-      if (id !== requestId.current) return
+      const response = await api.getInbox({ ...filters, page, perPage: PAGE_SIZE }, { signal: read.signal })
+      if (read.signal.aborted || id !== requestId.current) return
       setResult({
         messages: response.messages ?? [],
         total: response.total ?? 0,
         totalPages: response.totalPages ?? 0,
       })
     } catch (requestError) {
-      if (id !== requestId.current) return
+      if (read.signal.aborted || id !== requestId.current) return
       setResult({ messages: [], total: 0, totalPages: 0 })
       setError(errorText(requestError))
     } finally {
@@ -56,7 +63,7 @@ export default function MessageInboxPage() {
   useEffect(() => {
     const requests = requestId
     const requestTimer = window.setTimeout(() => loadInbox(), 0)
-    return () => { window.clearTimeout(requestTimer); requests.current++ }
+    return () => { window.clearTimeout(requestTimer); requests.current++; controller.current?.abort() }
   }, [loadInbox])
 
   function handleFiltersChange(nextFilters) {
@@ -64,23 +71,11 @@ export default function MessageInboxPage() {
     setPage(1)
   }
 
-  async function handleOpen(message) {
+  function handleOpen(message) {
     if (openingRef.current) return
     openingRef.current = true
     setOpeningId(message.id_mensaje)
-    const id = requestId.current
-    try {
-      if (!message.leido) {
-        try {
-          await api.markAsRead(message.id_mensaje)
-          notifyMessagesChanged()
-        } catch {
-          // El detalle volverá a intentar el marcado; la navegación no se bloquea.
-        }
-      }
-
-      if (id === requestId.current) navigate(APP_ROUTES.MESSAGE_DETAIL.replace(':messageId', message.id_mensaje))
-    } finally { openingRef.current = false; setOpeningId(null) }
+    navigate(APP_ROUTES.MESSAGE_DETAIL.replace(':messageId', message.id_mensaje))
   }
 
   return (

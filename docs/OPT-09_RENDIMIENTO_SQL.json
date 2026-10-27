@@ -1,0 +1,1342 @@
+{
+  "reference": "755ce1e",
+  "node": "v24.19.0",
+  "capturedAt": "2026-10-27T20:42:03.072Z",
+  "methodology": "10 warm sequential samples, 250ms pause outside clock; same strict TLS/pool10. No real writes or p95/E2E claim.",
+  "samples": {
+    "inbox_before": {
+      "n": 10,
+      "minMs": 2077.068,
+      "medianMs": 2415.224,
+      "meanMs": 2350.063,
+      "maxMs": 2425.299,
+      "values": [
+        {
+          "ms": 2413.462,
+          "selects": 4,
+          "bytes": 4828
+        },
+        {
+          "ms": 2425.299,
+          "selects": 4,
+          "bytes": 4828
+        },
+        {
+          "ms": 2414.989,
+          "selects": 4,
+          "bytes": 4828
+        },
+        {
+          "ms": 2419.568,
+          "selects": 4,
+          "bytes": 4828
+        },
+        {
+          "ms": 2077.068,
+          "selects": 4,
+          "bytes": 4828
+        },
+        {
+          "ms": 2078.088,
+          "selects": 4,
+          "bytes": 4828
+        },
+        {
+          "ms": 2415.458,
+          "selects": 4,
+          "bytes": 4828
+        },
+        {
+          "ms": 2424.118,
+          "selects": 4,
+          "bytes": 4828
+        },
+        {
+          "ms": 2413.67,
+          "selects": 4,
+          "bytes": 4828
+        },
+        {
+          "ms": 2418.906,
+          "selects": 4,
+          "bytes": 4828
+        }
+      ]
+    },
+    "inbox_after": {
+      "n": 10,
+      "minMs": 1320.118,
+      "medianMs": 1534.288,
+      "meanMs": 1451.93,
+      "maxMs": 1540,
+      "values": [
+        {
+          "ms": 1321.628,
+          "selects": 2,
+          "bytes": 4828
+        },
+        {
+          "ms": 1540,
+          "selects": 2,
+          "bytes": 4828
+        },
+        {
+          "ms": 1331.7,
+          "selects": 2,
+          "bytes": 4828
+        },
+        {
+          "ms": 1538.651,
+          "selects": 2,
+          "bytes": 4828
+        },
+        {
+          "ms": 1533.026,
+          "selects": 2,
+          "bytes": 4828
+        },
+        {
+          "ms": 1536.933,
+          "selects": 2,
+          "bytes": 4828
+        },
+        {
+          "ms": 1539.23,
+          "selects": 2,
+          "bytes": 4828
+        },
+        {
+          "ms": 1322.464,
+          "selects": 2,
+          "bytes": 4828
+        },
+        {
+          "ms": 1320.118,
+          "selects": 2,
+          "bytes": 4828
+        },
+        {
+          "ms": 1535.55,
+          "selects": 2,
+          "bytes": 4828
+        }
+      ]
+    },
+    "filter_before": {
+      "n": 10,
+      "minMs": 2072.952,
+      "medianMs": 2387.155,
+      "meanMs": 2281.964,
+      "maxMs": 2417.34,
+      "values": [
+        {
+          "ms": 2106.09,
+          "selects": 4,
+          "bytes": 4891
+        },
+        {
+          "ms": 2110.741,
+          "selects": 4,
+          "bytes": 4891
+        },
+        {
+          "ms": 2417.34,
+          "selects": 4,
+          "bytes": 4891
+        },
+        {
+          "ms": 2072.952,
+          "selects": 4,
+          "bytes": 4891
+        },
+        {
+          "ms": 2412.791,
+          "selects": 4,
+          "bytes": 4891
+        },
+        {
+          "ms": 2088.727,
+          "selects": 4,
+          "bytes": 4891
+        },
+        {
+          "ms": 2415.61,
+          "selects": 4,
+          "bytes": 4891
+        },
+        {
+          "ms": 2416.779,
+          "selects": 4,
+          "bytes": 4891
+        },
+        {
+          "ms": 2417.088,
+          "selects": 4,
+          "bytes": 4891
+        },
+        {
+          "ms": 2361.519,
+          "selects": 4,
+          "bytes": 4891
+        }
+      ]
+    },
+    "filter_after": {
+      "n": 10,
+      "minMs": 1329.017,
+      "medianMs": 1534.745,
+      "meanMs": 1489.243,
+      "maxMs": 1545.916,
+      "values": [
+        {
+          "ms": 1329.017,
+          "selects": 2,
+          "bytes": 4891
+        },
+        {
+          "ms": 1538.924,
+          "selects": 2,
+          "bytes": 4891
+        },
+        {
+          "ms": 1499.253,
+          "selects": 2,
+          "bytes": 4891
+        },
+        {
+          "ms": 1539.676,
+          "selects": 2,
+          "bytes": 4891
+        },
+        {
+          "ms": 1534.567,
+          "selects": 2,
+          "bytes": 4891
+        },
+        {
+          "ms": 1545.916,
+          "selects": 2,
+          "bytes": 4891
+        },
+        {
+          "ms": 1538.52,
+          "selects": 2,
+          "bytes": 4891
+        },
+        {
+          "ms": 1502.126,
+          "selects": 2,
+          "bytes": 4891
+        },
+        {
+          "ms": 1534.924,
+          "selects": 2,
+          "bytes": 4891
+        },
+        {
+          "ms": 1329.503,
+          "selects": 2,
+          "bytes": 4891
+        }
+      ]
+    },
+    "page_before": {
+      "n": 10,
+      "minMs": 2359.034,
+      "medianMs": 2413.822,
+      "meanMs": 2401.861,
+      "maxMs": 2430.334,
+      "values": [
+        {
+          "ms": 2411.712,
+          "selects": 4,
+          "bytes": 4811
+        },
+        {
+          "ms": 2430.334,
+          "selects": 4,
+          "bytes": 4811
+        },
+        {
+          "ms": 2360.524,
+          "selects": 4,
+          "bytes": 4811
+        },
+        {
+          "ms": 2412.233,
+          "selects": 4,
+          "bytes": 4811
+        },
+        {
+          "ms": 2422.881,
+          "selects": 4,
+          "bytes": 4811
+        },
+        {
+          "ms": 2360.401,
+          "selects": 4,
+          "bytes": 4811
+        },
+        {
+          "ms": 2415.411,
+          "selects": 4,
+          "bytes": 4811
+        },
+        {
+          "ms": 2429.187,
+          "selects": 4,
+          "bytes": 4811
+        },
+        {
+          "ms": 2359.034,
+          "selects": 4,
+          "bytes": 4811
+        },
+        {
+          "ms": 2416.894,
+          "selects": 4,
+          "bytes": 4811
+        }
+      ]
+    },
+    "page_after": {
+      "n": 10,
+      "minMs": 1499.435,
+      "medianMs": 1535.202,
+      "meanMs": 1526.947,
+      "maxMs": 1546.716,
+      "values": [
+        {
+          "ms": 1499.435,
+          "selects": 2,
+          "bytes": 4811
+        },
+        {
+          "ms": 1537.31,
+          "selects": 2,
+          "bytes": 4811
+        },
+        {
+          "ms": 1535.232,
+          "selects": 2,
+          "bytes": 4811
+        },
+        {
+          "ms": 1545.941,
+          "selects": 2,
+          "bytes": 4811
+        },
+        {
+          "ms": 1546.716,
+          "selects": 2,
+          "bytes": 4811
+        },
+        {
+          "ms": 1502.003,
+          "selects": 2,
+          "bytes": 4811
+        },
+        {
+          "ms": 1535.172,
+          "selects": 2,
+          "bytes": 4811
+        },
+        {
+          "ms": 1530.58,
+          "selects": 2,
+          "bytes": 4811
+        },
+        {
+          "ms": 1537.528,
+          "selects": 2,
+          "bytes": 4811
+        },
+        {
+          "ms": 1499.555,
+          "selects": 2,
+          "bytes": 4811
+        }
+      ]
+    },
+    "notifications_before": {
+      "n": 10,
+      "minMs": 1959.288,
+      "medianMs": 1963.526,
+      "meanMs": 1967.847,
+      "maxMs": 1983.543,
+      "values": [
+        {
+          "ms": 1977.552,
+          "selects": 4,
+          "bytes": 19276
+        },
+        {
+          "ms": 1963.889,
+          "selects": 4,
+          "bytes": 19276
+        },
+        {
+          "ms": 1963.164,
+          "selects": 4,
+          "bytes": 19276
+        },
+        {
+          "ms": 1983.458,
+          "selects": 4,
+          "bytes": 19276
+        },
+        {
+          "ms": 1959.288,
+          "selects": 4,
+          "bytes": 19276
+        },
+        {
+          "ms": 1960.727,
+          "selects": 4,
+          "bytes": 19276
+        },
+        {
+          "ms": 1965.1,
+          "selects": 4,
+          "bytes": 19276
+        },
+        {
+          "ms": 1962.121,
+          "selects": 4,
+          "bytes": 19276
+        },
+        {
+          "ms": 1983.543,
+          "selects": 4,
+          "bytes": 19276
+        },
+        {
+          "ms": 1959.626,
+          "selects": 4,
+          "bytes": 19276
+        }
+      ]
+    },
+    "notifications_after": {
+      "n": 10,
+      "minMs": 645.639,
+      "medianMs": 663.334,
+      "meanMs": 663.041,
+      "maxMs": 677.577,
+      "values": [
+        {
+          "ms": 677.577,
+          "selects": 1,
+          "bytes": 19276
+        },
+        {
+          "ms": 671.519,
+          "selects": 1,
+          "bytes": 19276
+        },
+        {
+          "ms": 677.522,
+          "selects": 1,
+          "bytes": 19276
+        },
+        {
+          "ms": 666.566,
+          "selects": 1,
+          "bytes": 19276
+        },
+        {
+          "ms": 665.271,
+          "selects": 1,
+          "bytes": 19276
+        },
+        {
+          "ms": 646.914,
+          "selects": 1,
+          "bytes": 19276
+        },
+        {
+          "ms": 661.398,
+          "selects": 1,
+          "bytes": 19276
+        },
+        {
+          "ms": 657.175,
+          "selects": 1,
+          "bytes": 19276
+        },
+        {
+          "ms": 660.828,
+          "selects": 1,
+          "bytes": 19276
+        },
+        {
+          "ms": 645.639,
+          "selects": 1,
+          "bytes": 19276
+        }
+      ]
+    },
+    "empty_notifications_before": {
+      "n": 10,
+      "minMs": 1955.524,
+      "medianMs": 1964.905,
+      "meanMs": 1965.725,
+      "maxMs": 1978.757,
+      "values": [
+        {
+          "ms": 1978.332,
+          "selects": 4,
+          "bytes": 36
+        },
+        {
+          "ms": 1964.629,
+          "selects": 4,
+          "bytes": 36
+        },
+        {
+          "ms": 1958.542,
+          "selects": 4,
+          "bytes": 36
+        },
+        {
+          "ms": 1978.757,
+          "selects": 4,
+          "bytes": 36
+        },
+        {
+          "ms": 1956.036,
+          "selects": 4,
+          "bytes": 36
+        },
+        {
+          "ms": 1965.879,
+          "selects": 4,
+          "bytes": 36
+        },
+        {
+          "ms": 1965.181,
+          "selects": 4,
+          "bytes": 36
+        },
+        {
+          "ms": 1955.524,
+          "selects": 4,
+          "bytes": 36
+        },
+        {
+          "ms": 1977.331,
+          "selects": 4,
+          "bytes": 36
+        },
+        {
+          "ms": 1957.04,
+          "selects": 4,
+          "bytes": 36
+        }
+      ]
+    },
+    "empty_notifications_after": {
+      "n": 10,
+      "minMs": 643.641,
+      "medianMs": 659.738,
+      "meanMs": 657.902,
+      "maxMs": 664.264,
+      "values": [
+        {
+          "ms": 659.421,
+          "selects": 1,
+          "bytes": 36
+        },
+        {
+          "ms": 660.027,
+          "selects": 1,
+          "bytes": 36
+        },
+        {
+          "ms": 663.675,
+          "selects": 1,
+          "bytes": 36
+        },
+        {
+          "ms": 659.449,
+          "selects": 1,
+          "bytes": 36
+        },
+        {
+          "ms": 664.264,
+          "selects": 1,
+          "bytes": 36
+        },
+        {
+          "ms": 644.264,
+          "selects": 1,
+          "bytes": 36
+        },
+        {
+          "ms": 663.575,
+          "selects": 1,
+          "bytes": 36
+        },
+        {
+          "ms": 657.651,
+          "selects": 1,
+          "bytes": 36
+        },
+        {
+          "ms": 663.056,
+          "selects": 1,
+          "bytes": 36
+        },
+        {
+          "ms": 643.641,
+          "selects": 1,
+          "bytes": 36
+        }
+      ]
+    },
+    "detail_before": {
+      "n": 10,
+      "minMs": 1955.052,
+      "medianMs": 1968.204,
+      "meanMs": 1969.182,
+      "maxMs": 1984.3,
+      "values": [
+        {
+          "ms": 1974.028,
+          "selects": 3,
+          "bytes": 388
+        },
+        {
+          "ms": 1957.809,
+          "selects": 3,
+          "bytes": 388
+        },
+        {
+          "ms": 1980.631,
+          "selects": 3,
+          "bytes": 388
+        },
+        {
+          "ms": 1961.201,
+          "selects": 3,
+          "bytes": 388
+        },
+        {
+          "ms": 1969.173,
+          "selects": 3,
+          "bytes": 388
+        },
+        {
+          "ms": 1984.3,
+          "selects": 3,
+          "bytes": 388
+        },
+        {
+          "ms": 1967.235,
+          "selects": 3,
+          "bytes": 388
+        },
+        {
+          "ms": 1955.052,
+          "selects": 3,
+          "bytes": 388
+        },
+        {
+          "ms": 1978.115,
+          "selects": 3,
+          "bytes": 388
+        },
+        {
+          "ms": 1964.273,
+          "selects": 3,
+          "bytes": 388
+        }
+      ]
+    },
+    "detail_after": {
+      "n": 10,
+      "minMs": 641.962,
+      "medianMs": 658.336,
+      "meanMs": 656.227,
+      "maxMs": 663.245,
+      "values": [
+        {
+          "ms": 654.85,
+          "selects": 1,
+          "bytes": 388
+        },
+        {
+          "ms": 657.69,
+          "selects": 1,
+          "bytes": 388
+        },
+        {
+          "ms": 641.962,
+          "selects": 1,
+          "bytes": 388
+        },
+        {
+          "ms": 658.982,
+          "selects": 1,
+          "bytes": 388
+        },
+        {
+          "ms": 659.235,
+          "selects": 1,
+          "bytes": 388
+        },
+        {
+          "ms": 663.245,
+          "selects": 1,
+          "bytes": 388
+        },
+        {
+          "ms": 657.329,
+          "selects": 1,
+          "bytes": 388
+        },
+        {
+          "ms": 662.571,
+          "selects": 1,
+          "bytes": 388
+        },
+        {
+          "ms": 643.675,
+          "selects": 1,
+          "bytes": 388
+        },
+        {
+          "ms": 662.736,
+          "selects": 1,
+          "bytes": 388
+        }
+      ]
+    },
+    "bell_compact_after": {
+      "n": 10,
+      "minMs": 577.84,
+      "medianMs": 659.433,
+      "meanMs": 642.613,
+      "maxMs": 664.33,
+      "values": [
+        {
+          "ms": 664.33,
+          "selects": 1,
+          "bytes": 12261
+        },
+        {
+          "ms": 577.84,
+          "selects": 1,
+          "bytes": 12261
+        },
+        {
+          "ms": 663.767,
+          "selects": 1,
+          "bytes": 12261
+        },
+        {
+          "ms": 577.969,
+          "selects": 1,
+          "bytes": 12261
+        },
+        {
+          "ms": 657.688,
+          "selects": 1,
+          "bytes": 12261
+        },
+        {
+          "ms": 659.18,
+          "selects": 1,
+          "bytes": 12261
+        },
+        {
+          "ms": 644.704,
+          "selects": 1,
+          "bytes": 12261
+        },
+        {
+          "ms": 659.686,
+          "selects": 1,
+          "bytes": 12261
+        },
+        {
+          "ms": 660.631,
+          "selects": 1,
+          "bytes": 12261
+        },
+        {
+          "ms": 660.332,
+          "selects": 1,
+          "bytes": 12261
+        }
+      ]
+    },
+    "bell_unchanged_after": {
+      "n": 10,
+      "minMs": 576.95,
+      "medianMs": 658.889,
+      "meanMs": 642.194,
+      "maxMs": 664.847,
+      "values": [
+        {
+          "ms": 664.5,
+          "selects": 1,
+          "bytes": 113
+        },
+        {
+          "ms": 577.01,
+          "selects": 1,
+          "bytes": 113
+        },
+        {
+          "ms": 657.013,
+          "selects": 1,
+          "bytes": 113
+        },
+        {
+          "ms": 659.085,
+          "selects": 1,
+          "bytes": 113
+        },
+        {
+          "ms": 643.965,
+          "selects": 1,
+          "bytes": 113
+        },
+        {
+          "ms": 658.693,
+          "selects": 1,
+          "bytes": 113
+        },
+        {
+          "ms": 660.373,
+          "selects": 1,
+          "bytes": 113
+        },
+        {
+          "ms": 659.502,
+          "selects": 1,
+          "bytes": 113
+        },
+        {
+          "ms": 664.847,
+          "selects": 1,
+          "bytes": 113
+        },
+        {
+          "ms": 576.95,
+          "selects": 1,
+          "bytes": 113
+        }
+      ]
+    }
+  },
+  "sql": {
+    "inbox_before": [
+      "SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje`, `MENSAJE_USUARIO`.`leido?`, `MENSAJE_USUARIO`.`oculto?` FROM `MENSAJE_USUARIO` LEFT JOIN `Mensaje` AS `orderby_1` ON (`orderby_1`.`id_mensaje`) = (`MENSAJE_USUARIO`.`id_mensaje`) WHERE `MENSAJE_USUARIO`.`id_usuario` = ? ORDER BY `orderby_1`.`fecha_publicacion` DESC, `MENSAJE_USUARIO`.`id_mensaje` DESC LIMIT ? OFFSET ?",
+      "SELECT `Mensaje`.`id_mensaje`, `Mensaje`.`contenido`, `Mensaje`.`fecha_publicacion`, `Mensaje`.`Asunto`, `Mensaje`.`id_pedido` FROM `Mensaje` WHERE `Mensaje`.`id_mensaje` IN (?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`fecha_estimada_termino` FROM `Pedidos` WHERE `Pedidos`.`id_pedido` IN (?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje` FROM `MENSAJE_USUARIO` WHERE `MENSAJE_USUARIO`.`id_usuario` = ?) AS `sub`"
+    ],
+    "inbox_after": [
+      "SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=?\n    ORDER BY m.fecha_publicacion DESC, mu.id_mensaje DESC LIMIT ? OFFSET ?",
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje` FROM `MENSAJE_USUARIO` WHERE `MENSAJE_USUARIO`.`id_usuario` = ?) AS `sub`"
+    ],
+    "filter_before": [
+      "SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje`, `MENSAJE_USUARIO`.`leido?`, `MENSAJE_USUARIO`.`oculto?` FROM `MENSAJE_USUARIO` LEFT JOIN `Mensaje` AS `orderby_1` ON (`orderby_1`.`id_mensaje`) = (`MENSAJE_USUARIO`.`id_mensaje`) WHERE (`MENSAJE_USUARIO`.`id_usuario` = ? AND `MENSAJE_USUARIO`.`leido?` = ?) ORDER BY `orderby_1`.`fecha_publicacion` ASC, `MENSAJE_USUARIO`.`id_mensaje` ASC LIMIT ? OFFSET ?",
+      "SELECT `Mensaje`.`id_mensaje`, `Mensaje`.`contenido`, `Mensaje`.`fecha_publicacion`, `Mensaje`.`Asunto`, `Mensaje`.`id_pedido` FROM `Mensaje` WHERE `Mensaje`.`id_mensaje` IN (?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`fecha_estimada_termino` FROM `Pedidos` WHERE `Pedidos`.`id_pedido` IN (?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje` FROM `MENSAJE_USUARIO` WHERE (`MENSAJE_USUARIO`.`id_usuario` = ? AND `MENSAJE_USUARIO`.`leido?` = ?)) AS `sub`"
+    ],
+    "filter_after": [
+      "SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=? AND mu.`leido?`=0\n    ORDER BY m.fecha_publicacion ASC, mu.id_mensaje ASC LIMIT ? OFFSET ?",
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje` FROM `MENSAJE_USUARIO` WHERE (`MENSAJE_USUARIO`.`id_usuario` = ? AND `MENSAJE_USUARIO`.`leido?` = ?)) AS `sub`"
+    ],
+    "page_before": [
+      "SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje`, `MENSAJE_USUARIO`.`leido?`, `MENSAJE_USUARIO`.`oculto?` FROM `MENSAJE_USUARIO` LEFT JOIN `Mensaje` AS `orderby_1` ON (`orderby_1`.`id_mensaje`) = (`MENSAJE_USUARIO`.`id_mensaje`) WHERE `MENSAJE_USUARIO`.`id_usuario` = ? ORDER BY `orderby_1`.`fecha_publicacion` DESC, `MENSAJE_USUARIO`.`id_mensaje` DESC LIMIT ? OFFSET ?",
+      "SELECT `Mensaje`.`id_mensaje`, `Mensaje`.`contenido`, `Mensaje`.`fecha_publicacion`, `Mensaje`.`Asunto`, `Mensaje`.`id_pedido` FROM `Mensaje` WHERE `Mensaje`.`id_mensaje` IN (?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`fecha_estimada_termino` FROM `Pedidos` WHERE `Pedidos`.`id_pedido` IN (?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje` FROM `MENSAJE_USUARIO` WHERE `MENSAJE_USUARIO`.`id_usuario` = ?) AS `sub`"
+    ],
+    "page_after": [
+      "SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=?\n    ORDER BY m.fecha_publicacion DESC, mu.id_mensaje DESC LIMIT ? OFFSET ?",
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje` FROM `MENSAJE_USUARIO` WHERE `MENSAJE_USUARIO`.`id_usuario` = ?) AS `sub`"
+    ],
+    "notifications_before": [
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje` FROM `MENSAJE_USUARIO` WHERE (`MENSAJE_USUARIO`.`id_usuario` = ? AND `MENSAJE_USUARIO`.`leido?` = ? AND `MENSAJE_USUARIO`.`oculto?` = ?)) AS `sub`",
+      "SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje`, `MENSAJE_USUARIO`.`leido?`, `MENSAJE_USUARIO`.`oculto?` FROM `MENSAJE_USUARIO` LEFT JOIN `Mensaje` AS `orderby_1` ON (`orderby_1`.`id_mensaje`) = (`MENSAJE_USUARIO`.`id_mensaje`) WHERE (`MENSAJE_USUARIO`.`id_usuario` = ? AND `MENSAJE_USUARIO`.`leido?` = ? AND `MENSAJE_USUARIO`.`oculto?` = ?) ORDER BY `orderby_1`.`fecha_publicacion` DESC, `MENSAJE_USUARIO`.`id_mensaje` DESC LIMIT ? OFFSET ?",
+      "SELECT `Mensaje`.`id_mensaje`, `Mensaje`.`contenido`, `Mensaje`.`fecha_publicacion`, `Mensaje`.`Asunto`, `Mensaje`.`id_pedido` FROM `Mensaje` WHERE `Mensaje`.`id_mensaje` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`fecha_estimada_termino` FROM `Pedidos` WHERE `Pedidos`.`id_pedido` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    ],
+    "notifications_after": [
+      "SELECT page.*, totals.unreadCount FROM\n    (SELECT COUNT(*) AS unreadCount FROM MENSAJE_USUARIO WHERE id_usuario=?\n      AND `leido?`=0 AND `oculto?`=0) totals\n    LEFT JOIN (SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=?\n    AND mu.`leido?`=0 AND mu.`oculto?`=0\n    ORDER BY m.fecha_publicacion DESC, mu.id_mensaje DESC LIMIT ?) page ON TRUE ORDER BY page.fecha_publicacion DESC, page.id_mensaje DESC"
+    ],
+    "empty_notifications_before": [
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje` FROM `MENSAJE_USUARIO` WHERE (`MENSAJE_USUARIO`.`id_usuario` = ? AND `MENSAJE_USUARIO`.`leido?` = ? AND `MENSAJE_USUARIO`.`oculto?` = ?)) AS `sub`",
+      "SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje`, `MENSAJE_USUARIO`.`leido?`, `MENSAJE_USUARIO`.`oculto?` FROM `MENSAJE_USUARIO` LEFT JOIN `Mensaje` AS `orderby_1` ON (`orderby_1`.`id_mensaje`) = (`MENSAJE_USUARIO`.`id_mensaje`) WHERE (`MENSAJE_USUARIO`.`id_usuario` = ? AND `MENSAJE_USUARIO`.`leido?` = ? AND `MENSAJE_USUARIO`.`oculto?` = ?) ORDER BY `orderby_1`.`fecha_publicacion` DESC, `MENSAJE_USUARIO`.`id_mensaje` DESC LIMIT ? OFFSET ?",
+      "SELECT `Mensaje`.`id_mensaje`, `Mensaje`.`contenido`, `Mensaje`.`fecha_publicacion`, `Mensaje`.`Asunto`, `Mensaje`.`id_pedido` FROM `Mensaje` WHERE `Mensaje`.`id_mensaje` IN (NULL)",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`fecha_estimada_termino` FROM `Pedidos` WHERE `Pedidos`.`id_pedido` IN (NULL)"
+    ],
+    "empty_notifications_after": [
+      "SELECT page.*, totals.unreadCount FROM\n    (SELECT COUNT(*) AS unreadCount FROM MENSAJE_USUARIO WHERE id_usuario=?\n      AND `leido?`=0 AND `oculto?`=0) totals\n    LEFT JOIN (SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=?\n    AND mu.`leido?`=0 AND mu.`oculto?`=0\n    ORDER BY m.fecha_publicacion DESC, mu.id_mensaje DESC LIMIT ?) page ON TRUE ORDER BY page.fecha_publicacion DESC, page.id_mensaje DESC"
+    ],
+    "detail_before": [
+      "SELECT `MENSAJE_USUARIO`.`id_usuario`, `MENSAJE_USUARIO`.`id_mensaje`, `MENSAJE_USUARIO`.`leido?`, `MENSAJE_USUARIO`.`oculto?` FROM `MENSAJE_USUARIO` WHERE ((`MENSAJE_USUARIO`.`id_usuario` = ? AND `MENSAJE_USUARIO`.`id_mensaje` = ?) AND 1=1) LIMIT ? OFFSET ?",
+      "SELECT `Mensaje`.`id_mensaje`, `Mensaje`.`contenido`, `Mensaje`.`fecha_publicacion`, `Mensaje`.`Asunto`, `Mensaje`.`id_pedido` FROM `Mensaje` WHERE `Mensaje`.`id_mensaje` = ?",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`fecha_estimada_termino` FROM `Pedidos` WHERE `Pedidos`.`id_pedido` IN (?)"
+    ],
+    "detail_after": [
+      "SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=? AND mu.id_mensaje=? LIMIT 1"
+    ],
+    "bell_compact_after": [
+      "SELECT page.*, totals.unreadCount FROM\n    (SELECT COUNT(*) AS unreadCount FROM MENSAJE_USUARIO WHERE id_usuario=?\n      AND `leido?`=0 AND `oculto?`=0) totals\n    LEFT JOIN (SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=?\n    AND mu.`leido?`=0 AND mu.`oculto?`=0\n    ORDER BY m.fecha_publicacion DESC, mu.id_mensaje DESC LIMIT ?) page ON TRUE ORDER BY page.fecha_publicacion DESC, page.id_mensaje DESC"
+    ],
+    "bell_unchanged_after": [
+      "SELECT page.*, totals.unreadCount FROM\n    (SELECT COUNT(*) AS unreadCount FROM MENSAJE_USUARIO WHERE id_usuario=?\n      AND `leido?`=0 AND `oculto?`=0) totals\n    LEFT JOIN (SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=?\n    AND mu.`leido?`=0 AND mu.`oculto?`=0\n    ORDER BY m.fecha_publicacion DESC, mu.id_mensaje DESC LIMIT ?) page ON TRUE ORDER BY page.fecha_publicacion DESC, page.id_mensaje DESC"
+    ]
+  },
+  "equivalence": [
+    "inbox_0",
+    "inbox_1",
+    "inbox_2",
+    "inbox_3",
+    "inbox_4",
+    "inbox_5",
+    "inbox_6",
+    "inbox_7",
+    "notifications_limit_1",
+    "notifications_limit_10",
+    "notifications_limit_50",
+    "unassigned_detail"
+  ],
+  "errors": 0,
+  "fixture": {
+    "assignments": 49,
+    "firstPage": 12,
+    "unreadVisible": 48
+  },
+  "explain": [
+    {
+      "sql": "SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=?\n    ORDER BY m.fecha_publicacion DESC, mu.id_mensaje DESC LIMIT ? OFFSET ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "mu",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,MENSAJE_USUARIO_Mensaje_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "m",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.mu.id_mensaje",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.m.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=? AND mu.`leido?`=0\n    ORDER BY m.fecha_publicacion ASC, mu.id_mensaje ASC LIMIT ? OFFSET ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "mu",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,MENSAJE_USUARIO_Mensaje_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "49",
+          "filtered": 10,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "m",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.mu.id_mensaje",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.m.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT page.*, totals.unreadCount FROM\n    (SELECT COUNT(*) AS unreadCount FROM MENSAJE_USUARIO WHERE id_usuario=?\n      AND `leido?`=0 AND `oculto?`=0) totals\n    LEFT JOIN (SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=?\n    AND mu.`leido?`=0 AND mu.`oculto?`=0\n    ORDER BY m.fecha_publicacion DESC, mu.id_mensaje DESC LIMIT ?) page ON TRUE ORDER BY page.fecha_publicacion DESC, page.id_mensaje DESC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "<derived2>",
+          "partitions": null,
+          "type": "system",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "<derived3>",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "2",
+          "filtered": 100,
+          "Extra": "Using where"
+        },
+        {
+          "id": "3",
+          "select_type": "DERIVED",
+          "table": "mu",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,MENSAJE_USUARIO_Mensaje_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "49",
+          "filtered": 1.0000001192092896,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "3",
+          "select_type": "DERIVED",
+          "table": "m",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.mu.id_mensaje",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "3",
+          "select_type": "DERIVED",
+          "table": "p",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.m.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "MENSAJE_USUARIO",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "49",
+          "filtered": 1.0000001192092896,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=? AND mu.id_mensaje=? LIMIT 1",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": null,
+          "partitions": null,
+          "type": null,
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": null,
+          "filtered": null,
+          "Extra": "no matching row in const table"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=? AND mu.`leido?`=1\n    ORDER BY m.fecha_publicacion DESC, mu.id_mensaje DESC LIMIT ? OFFSET ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "mu",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,MENSAJE_USUARIO_Mensaje_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "49",
+          "filtered": 10,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "m",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.mu.id_mensaje",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.m.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=? AND mu.`leido?`=0\n    ORDER BY m.fecha_publicacion DESC, mu.id_mensaje DESC LIMIT ? OFFSET ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "mu",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,MENSAJE_USUARIO_Mensaje_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "49",
+          "filtered": 10,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "m",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.mu.id_mensaje",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.m.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=?\n    ORDER BY m.fecha_publicacion ASC, mu.id_mensaje ASC LIMIT ? OFFSET ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "mu",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,MENSAJE_USUARIO_Mensaje_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "m",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.mu.id_mensaje",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.m.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT m.id_mensaje, m.contenido, m.fecha_publicacion, m.Asunto, m.id_pedido, mu.`leido?` AS leido, mu.`oculto?` AS oculto, p.id_pedido AS relatedId, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino FROM MENSAJE_USUARIO mu JOIN Mensaje m ON m.id_mensaje=mu.id_mensaje LEFT JOIN Pedidos p ON p.id_pedido=m.id_pedido WHERE mu.id_usuario=? AND m.fecha_publicacion>=? AND m.fecha_publicacion<=?\n    ORDER BY m.fecha_publicacion DESC, mu.id_mensaje DESC LIMIT ? OFFSET ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "m",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "92",
+          "filtered": 11.108888626098633,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "mu",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,MENSAJE_USUARIO_Mensaje_FK",
+          "key": "PRIMARY",
+          "key_len": "8",
+          "ref": "const,mydb.m.id_mensaje",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.m.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    }
+  ],
+  "indexes": [
+    {
+      "TABLE_NAME": "MENSAJE_USUARIO",
+      "INDEX_NAME": "MENSAJE_USUARIO_Mensaje_FK",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_mensaje"
+    },
+    {
+      "TABLE_NAME": "MENSAJE_USUARIO",
+      "INDEX_NAME": "PRIMARY",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_usuario"
+    },
+    {
+      "TABLE_NAME": "MENSAJE_USUARIO",
+      "INDEX_NAME": "PRIMARY",
+      "SEQ_IN_INDEX": "2",
+      "COLUMN_NAME": "id_mensaje"
+    },
+    {
+      "TABLE_NAME": "Mensaje",
+      "INDEX_NAME": "Mensaje_Pedidos_FK",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_pedido"
+    },
+    {
+      "TABLE_NAME": "Mensaje",
+      "INDEX_NAME": "PRIMARY",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_mensaje"
+    }
+  ]
+}

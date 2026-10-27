@@ -28,7 +28,10 @@ export const client = {
     if (pathname === '/orders/calendar-summary' || pathname === '/orders/kanban-summary') return { items: [], pageInfo }
     throw new Error(`Lectura sin fixture: ${url}`)
   },
-  async post() { throw new Error('Las escrituras están deshabilitadas en la revisión visual.') },
+  async post(url) {
+    if (url === '/messages/1/open') return { message, markedAsRead: false }
+    throw new Error('Las escrituras están deshabilitadas en la revisión visual.')
+  },
   async patch() { throw new Error('Las escrituras están deshabilitadas en la revisión visual.') },
 }
 
