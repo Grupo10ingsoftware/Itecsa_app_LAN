@@ -58,6 +58,7 @@ class PaymentRecordRepo {
       id_usuario,
       id_estado_pago_anterior,
       id_estado_pago,
+      response,
     } = data;
     const createdAt = fecha_registro ?? new Date();
 
@@ -78,9 +79,7 @@ class PaymentRecordRepo {
         id_estado_pago_anterior: Number(id_estado_pago_anterior),
         id_estado_pago_nuevo: Number(id_estado_pago),
       },
-      include: {
-        Registros: true,
-      },
+      ...(response === 'receipt' ? { select: { id_registro: true } } : { include: { Registros: true } }),
     });
   }
 

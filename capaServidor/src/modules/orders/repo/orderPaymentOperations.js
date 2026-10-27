@@ -30,6 +30,7 @@ export async function updatePaymentStatusOperation(repository, id, paymentStatus
   try {
     await repository.client.pedidos.update({
       where: { id_pedido: Number(id) },
+      select: { id_pedido: true },
       data: {
         id_estado_pago: Number(paymentStatusId),
         ...(shouldUpdateOrderStage

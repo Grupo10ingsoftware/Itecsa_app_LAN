@@ -98,6 +98,7 @@ class PaymentRecordService {
       id_usuario,
       id_estado_pago_anterior,
       id_estado_pago,
+      response,
     } = data;
 
     if (!orderId) {
@@ -125,6 +126,7 @@ class PaymentRecordService {
       id_usuario,
       id_estado_pago_anterior: previousStatusId,
       id_estado_pago: nextStatusId,
+      response,
     });
   }
 

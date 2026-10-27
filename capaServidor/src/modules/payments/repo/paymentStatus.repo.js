@@ -7,6 +7,7 @@ class PaymentStatusRepo {
     this.prisma = prisma;
     this.cacheTtlMs = cacheTtlMs;
     this.cache = null;
+    this.pending = null;
   }
 
   get client() {
@@ -40,6 +41,13 @@ class PaymentStatusRepo {
       return this.cache.statuses;
     }
 
+    if (this.pending) return this.pending;
+    this.pending = this.loadAll();
+    try { return await this.pending; }
+    finally { this.pending = null; }
+  }
+
+  async loadAll() {
     const statuses = await this.client.estado_Pago.findMany({
       orderBy: { id_estado_pago: "asc" },
     });

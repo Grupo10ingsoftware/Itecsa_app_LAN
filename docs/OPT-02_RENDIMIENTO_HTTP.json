@@ -1,0 +1,412 @@
+{
+  "reference": "b8e8a94",
+  "capturedAt": "2026-10-27T19:56:38.919Z",
+  "node": "v22.23.4",
+  "environment": "isolated diagnostic container / development MySQL / unchanged strict TLS and pool 10",
+  "methodology": "10 warm sequential samples per series, 250ms pause outside clock; no p95/E2E claim; no real writes",
+  "samples": {
+    "http_workspace_before": {
+      "n": 10,
+      "minMs": 1868.52,
+      "medianMs": 1941.776,
+      "meanMs": 1941.871,
+      "maxMs": 2030.314,
+      "values": [
+        {
+          "ms": 1993.767,
+          "selects": 7,
+          "bytes": 11350
+        },
+        {
+          "ms": 2000.337,
+          "selects": 7,
+          "bytes": 11350
+        },
+        {
+          "ms": 2030.314,
+          "selects": 7,
+          "bytes": 11350
+        },
+        {
+          "ms": 1868.52,
+          "selects": 7,
+          "bytes": 11350
+        },
+        {
+          "ms": 1978.946,
+          "selects": 7,
+          "bytes": 11350
+        },
+        {
+          "ms": 1972.766,
+          "selects": 7,
+          "bytes": 11350
+        },
+        {
+          "ms": 1887.009,
+          "selects": 7,
+          "bytes": 11350
+        },
+        {
+          "ms": 1910.785,
+          "selects": 7,
+          "bytes": 11350
+        },
+        {
+          "ms": 1895.725,
+          "selects": 7,
+          "bytes": 11350
+        },
+        {
+          "ms": 1880.54,
+          "selects": 7,
+          "bytes": 11350
+        }
+      ]
+    },
+    "http_workspace_after": {
+      "n": 10,
+      "minMs": 1309.468,
+      "medianMs": 1325.09,
+      "meanMs": 1322.038,
+      "maxMs": 1329.376,
+      "values": [
+        {
+          "ms": 1327.087,
+          "selects": 3,
+          "bytes": 11350
+        },
+        {
+          "ms": 1326.951,
+          "selects": 3,
+          "bytes": 11350
+        },
+        {
+          "ms": 1314.273,
+          "selects": 3,
+          "bytes": 11350
+        },
+        {
+          "ms": 1325.547,
+          "selects": 3,
+          "bytes": 11350
+        },
+        {
+          "ms": 1323.34,
+          "selects": 3,
+          "bytes": 11350
+        },
+        {
+          "ms": 1309.468,
+          "selects": 3,
+          "bytes": 11350
+        },
+        {
+          "ms": 1329.376,
+          "selects": 3,
+          "bytes": 11350
+        },
+        {
+          "ms": 1324.632,
+          "selects": 3,
+          "bytes": 11350
+        },
+        {
+          "ms": 1325.751,
+          "selects": 3,
+          "bytes": 11350
+        },
+        {
+          "ms": 1313.956,
+          "selects": 3,
+          "bytes": 11350
+        }
+      ]
+    },
+    "http_preview_before": {
+      "n": 10,
+      "minMs": 1233.953,
+      "medianMs": 1243.235,
+      "meanMs": 1270.141,
+      "maxMs": 1323.835,
+      "values": [
+        {
+          "ms": 1238.219,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1322.463,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1236.243,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1243.193,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1309.323,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1241.142,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1323.835,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1233.953,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1243.277,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1309.763,
+          "selects": 2,
+          "bytes": 264
+        }
+      ]
+    },
+    "http_preview_after": {
+      "n": 10,
+      "minMs": 1233.368,
+      "medianMs": 1242.775,
+      "meanMs": 1269.401,
+      "maxMs": 1323.443,
+      "values": [
+        {
+          "ms": 1323.443,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1233.368,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1242.803,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1309.432,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1236.387,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1322.462,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1233.816,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1242.747,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1309.756,
+          "selects": 2,
+          "bytes": 264
+        },
+        {
+          "ms": 1239.792,
+          "selects": 2,
+          "bytes": 264
+        }
+      ]
+    },
+    "http_page_only_after": {
+      "n": 10,
+      "minMs": 1234.452,
+      "medianMs": 1243.506,
+      "meanMs": 1269.253,
+      "maxMs": 1323.029,
+      "values": [
+        {
+          "ms": 1234.452,
+          "selects": 2,
+          "bytes": 2324
+        },
+        {
+          "ms": 1244.208,
+          "selects": 2,
+          "bytes": 2324
+        },
+        {
+          "ms": 1309.706,
+          "selects": 2,
+          "bytes": 2324
+        },
+        {
+          "ms": 1236.195,
+          "selects": 2,
+          "bytes": 2324
+        },
+        {
+          "ms": 1323.029,
+          "selects": 2,
+          "bytes": 2324
+        },
+        {
+          "ms": 1234.84,
+          "selects": 2,
+          "bytes": 2324
+        },
+        {
+          "ms": 1242.803,
+          "selects": 2,
+          "bytes": 2324
+        },
+        {
+          "ms": 1308.849,
+          "selects": 2,
+          "bytes": 2324
+        },
+        {
+          "ms": 1235.614,
+          "selects": 2,
+          "bytes": 2324
+        },
+        {
+          "ms": 1322.83,
+          "selects": 2,
+          "bytes": 2324
+        }
+      ]
+    },
+    "http_summary_only_after": {
+      "n": 10,
+      "minMs": 1233.799,
+      "medianMs": 1242.385,
+      "meanMs": 1268.721,
+      "maxMs": 1322.506,
+      "values": [
+        {
+          "ms": 1242.028,
+          "selects": 2,
+          "bytes": 227
+        },
+        {
+          "ms": 1307.51,
+          "selects": 2,
+          "bytes": 227
+        },
+        {
+          "ms": 1236.841,
+          "selects": 2,
+          "bytes": 227
+        },
+        {
+          "ms": 1322.359,
+          "selects": 2,
+          "bytes": 227
+        },
+        {
+          "ms": 1234.677,
+          "selects": 2,
+          "bytes": 227
+        },
+        {
+          "ms": 1242.743,
+          "selects": 2,
+          "bytes": 227
+        },
+        {
+          "ms": 1308.627,
+          "selects": 2,
+          "bytes": 227
+        },
+        {
+          "ms": 1236.12,
+          "selects": 2,
+          "bytes": 227
+        },
+        {
+          "ms": 1322.506,
+          "selects": 2,
+          "bytes": 227
+        },
+        {
+          "ms": 1233.799,
+          "selects": 2,
+          "bytes": 227
+        }
+      ]
+    }
+  },
+  "sql": {
+    "http_workspace_before": [
+      "\n                SELECT u.id_usuario AS idUsuario, e.subject AS identitySubject,\n                    u.correo_usuario AS correoUsuario, u.rut_usuario AS rutUsuario,\n                    u.nombre_usuario AS nombreUsuario, u.apellido_usuario AS apellidoUsuario,\n                    u.rol_usuario AS rolUsuario, u.estado_usuario AS estadoUsuario\n                FROM ExternalIdentity e\n                INNER JOIN Usuario u ON u.id_usuario = e.user_id\n                WHERE e.provider = ? AND e.issuer = ? AND e.subject = ?\n                LIMIT 1\n            ",
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `Pedidos`.`id_pedido` FROM `Pedidos` LEFT JOIN `Estado_Pago` AS `j0` ON (`j0`.`id_estado_pago`) = (`Pedidos`.`id_estado_pago`) WHERE (`j0`.`nombre_estado_pago` = ? AND (`j0`.`id_estado_pago` IS NOT NULL))) AS `sub`",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`id_estado_pago`, `Pedidos`.`id_cliente` FROM `Pedidos` WHERE 1=1 ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "SELECT `Estado_Pago`.`id_estado_pago`, `Estado_Pago`.`nombre_estado_pago` FROM `Estado_Pago` WHERE `Estado_Pago`.`id_estado_pago` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social`, `Cliente`.`rut_cliente` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    ],
+    "http_workspace_after": [
+      "\n                SELECT u.id_usuario AS idUsuario, e.subject AS identitySubject,\n                    u.correo_usuario AS correoUsuario, u.rut_usuario AS rutUsuario,\n                    u.nombre_usuario AS nombreUsuario, u.apellido_usuario AS apellidoUsuario,\n                    u.rol_usuario AS rolUsuario, u.estado_usuario AS estadoUsuario\n                FROM ExternalIdentity e\n                INNER JOIN Usuario u ON u.id_usuario = e.user_id\n                WHERE e.provider = ? AND e.issuer = ? AND e.subject = ?\n                LIMIT 1\n            ",
+      "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 ORDER BY p.id_pedido DESC LIMIT ?",
+      "SELECT\n    COALESCE(SUM(s.nombre_estado_pago = 'Pendiente'), 0) AS pending,\n    COALESCE(SUM(s.nombre_estado_pago = 'Rechazado'), 0) AS rejected,\n    COALESCE(SUM(s.nombre_estado_pago = 'Confirmado'), 0) AS confirmed\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1"
+    ],
+    "http_preview_before": [
+      "\n                SELECT u.id_usuario AS idUsuario, e.subject AS identitySubject,\n                    u.correo_usuario AS correoUsuario, u.rut_usuario AS rutUsuario,\n                    u.nombre_usuario AS nombreUsuario, u.apellido_usuario AS apellidoUsuario,\n                    u.rol_usuario AS rolUsuario, u.estado_usuario AS estadoUsuario\n                FROM ExternalIdentity e\n                INNER JOIN Usuario u ON u.id_usuario = e.user_id\n                WHERE e.provider = ? AND e.issuer = ? AND e.subject = ?\n                LIMIT 1\n            ",
+      "\n      SELECT\n        p.id_pedido,\n        p.numero_nota_venta,\n        c.nombre_cliente,\n        c.razon_social,\n        c.rut_cliente,\n        u.id_usuario,\n        u.nombre_usuario,\n        u.apellido_usuario,\n        dp.id_detalle_pedido,\n        dp.cantidad,\n        NULL AS linea_origen, NULL AS codigo_origen, NULL AS producto_origen,\n        tp.nombre_producto,\n        tp.descripcion_producto\n      FROM Pedidos p\n      LEFT JOIN Cliente c ON c.id_cliente = p.id_cliente\n      LEFT JOIN Usuario u ON u.id_usuario = p.id_usuario\n      LEFT JOIN Detalle_pedido dp ON dp.id_pedido = p.id_pedido\n      LEFT JOIN Tipo_Producto tp ON tp.id_tipo_producto = dp.id_tipo_producto\n      WHERE p.id_pedido = ?\n      ORDER BY dp.id_detalle_pedido ASC\n    "
+    ],
+    "http_preview_after": [
+      "\n                SELECT u.id_usuario AS idUsuario, e.subject AS identitySubject,\n                    u.correo_usuario AS correoUsuario, u.rut_usuario AS rutUsuario,\n                    u.nombre_usuario AS nombreUsuario, u.apellido_usuario AS apellidoUsuario,\n                    u.rol_usuario AS rolUsuario, u.estado_usuario AS estadoUsuario\n                FROM ExternalIdentity e\n                INNER JOIN Usuario u ON u.id_usuario = e.user_id\n                WHERE e.provider = ? AND e.issuer = ? AND e.subject = ?\n                LIMIT 1\n            ",
+      "\n      SELECT\n        p.id_pedido,\n        p.numero_nota_venta,\n        c.nombre_cliente,\n        c.razon_social,\n        c.rut_cliente,\n        u.id_usuario,\n        u.nombre_usuario,\n        u.apellido_usuario,\n        dp.id_detalle_pedido,\n        dp.cantidad,\n        NULL AS linea_origen, NULL AS codigo_origen, NULL AS producto_origen,\n        tp.nombre_producto,\n        tp.descripcion_producto\n      FROM Pedidos p\n      LEFT JOIN Cliente c ON c.id_cliente = p.id_cliente\n      LEFT JOIN Usuario u ON u.id_usuario = p.id_usuario\n      LEFT JOIN Detalle_pedido dp ON dp.id_pedido = p.id_pedido\n      LEFT JOIN Tipo_Producto tp ON tp.id_tipo_producto = dp.id_tipo_producto\n      WHERE p.id_pedido = ?\n      ORDER BY dp.id_detalle_pedido ASC\n    "
+    ],
+    "http_page_only_after": [
+      "\n                SELECT u.id_usuario AS idUsuario, e.subject AS identitySubject,\n                    u.correo_usuario AS correoUsuario, u.rut_usuario AS rutUsuario,\n                    u.nombre_usuario AS nombreUsuario, u.apellido_usuario AS apellidoUsuario,\n                    u.rol_usuario AS rolUsuario, u.estado_usuario AS estadoUsuario\n                FROM ExternalIdentity e\n                INNER JOIN Usuario u ON u.id_usuario = e.user_id\n                WHERE e.provider = ? AND e.issuer = ? AND e.subject = ?\n                LIMIT 1\n            ",
+      "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND s.nombre_estado_pago = ? ORDER BY p.id_pedido DESC LIMIT ?"
+    ],
+    "http_summary_only_after": [
+      "\n                SELECT u.id_usuario AS idUsuario, e.subject AS identitySubject,\n                    u.correo_usuario AS correoUsuario, u.rut_usuario AS rutUsuario,\n                    u.nombre_usuario AS nombreUsuario, u.apellido_usuario AS apellidoUsuario,\n                    u.rol_usuario AS rolUsuario, u.estado_usuario AS estadoUsuario\n                FROM ExternalIdentity e\n                INNER JOIN Usuario u ON u.id_usuario = e.user_id\n                WHERE e.provider = ? AND e.issuer = ? AND e.subject = ?\n                LIMIT 1\n            ",
+      "SELECT\n    COALESCE(SUM(s.nombre_estado_pago = 'Pendiente'), 0) AS pending,\n    COALESCE(SUM(s.nombre_estado_pago = 'Rechazado'), 0) AS rejected,\n    COALESCE(SUM(s.nombre_estado_pago = 'Confirmado'), 0) AS confirmed\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1"
+    ]
+  },
+  "equivalence": [],
+  "errors": 0,
+  "httpHarness": {
+    "authority": "synthetic local RS256 JWT+JWKS",
+    "identity": "real active DB binding",
+    "includes": [
+      "real routers/controllers/DTO",
+      "identity middleware",
+      "capabilities",
+      "strict MySQL TLS"
+    ],
+    "excludes": [
+      "real Keycloak login/session",
+      "browser/render",
+      "global support audit",
+      "SQL quota writes"
+    ],
+    "quota": "memory 120/minute"
+  }
+}

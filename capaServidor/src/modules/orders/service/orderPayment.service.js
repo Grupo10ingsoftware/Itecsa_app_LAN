@@ -120,6 +120,7 @@ export async function updPaymentStateOperation(service, orderId, newPaymentStatu
     if (!updatedOrder) return null;
 
     await paymentRecordService.createPaymentRecord(orderId, {
+      response: 'receipt',
       id_usuario: resolvedUserId,
       id_estado_pago_anterior: currentOrder.id_estado_pago,
       id_estado_pago: paymentStatusId,

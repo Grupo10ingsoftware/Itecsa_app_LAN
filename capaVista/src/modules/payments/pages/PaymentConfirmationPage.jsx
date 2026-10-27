@@ -2,6 +2,7 @@ import LoadingIndicator, { LoadingAction } from '../../../shared/components/load
 import { useToast } from '../../../shared/notifications/useToast'
 import { operationFailureMessage, requiresContext, uncertainOperation } from '../../../shared/notifications/operationFeedback'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPaymentPreviewCache } from '../api/paymentPreviewCache'
 import { PERMISSIONS } from '@/config/permissions'
 import { PAYMENT_STATUS } from '@/config/status'
 import { useAuth } from '@/hooks/useAuth'
@@ -28,9 +29,17 @@ const FILTERS = [
 ]
 
 export default function PaymentConfirmationPage() {
-  const notify = useToast()
   const { hasPermission } = useAuth()
   const paymentsApi = usePaymentsApi()
+  const canRead = hasPermission(PERMISSIONS.READ_PAYMENTS)
+  const canUpdate = hasPermission(PERMISSIONS.UPDATE_PAYMENT_STATUS)
+  const canRevise = hasPermission(PERMISSIONS.REVISE_PAYMENT_STATUS)
+  return <PaymentWorkspace key={`${paymentsApi.scopeId}:${canRead}:${canUpdate}:${canRevise}`}
+    paymentsApi={paymentsApi} canRead={canRead} canUpdatePaymentStatus={canUpdate} canRevise={canRevise} />
+}
+
+function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRevise }) {
+  const notify = useToast()
   const [orders, setOrders] = useState([])
   const [counters, setCounters] = useState({ pending: 0, rejected: 0, confirmed: 0 })
   const [pageInfo, setPageInfo] = useState({ nextCursor: null, hasMore: false })
@@ -55,8 +64,49 @@ export default function PaymentConfirmationPage() {
   const [previewDetailsError, setPreviewDetailsError] = useState(null)
   const previewRequestId = useRef(0)
   const detailPreviewRequestId = useRef(0)
-  const paymentPreviewCache = useRef(new Map())
-  const canUpdatePaymentStatus = hasPermission(PERMISSIONS.UPDATE_PAYMENT_STATUS)
+  const [previewCache] = useState(() => createPaymentPreviewCache(paymentsApi))
+  const listController = useRef(null)
+  const moreController = useRef(null)
+  const summaryController = useRef(null)
+  const morePending = useRef(false)
+  const writePending = useRef(false)
+  const mounted = useRef(true)
+  const summaryScope = useRef(null)
+  const [settledSearch, setSettledSearch] = useState('')
+  const [refreshKey, setRefreshKey] = useState(0)
+  const searchPending = searchTerm.trim() !== settledSearch
+  const queryScope = `${settledSearch}\n${dateFrom}\n${dateTo}`
+  const currentScope = useRef(queryScope)
+
+  useEffect(() => {
+    mounted.current = true
+    const actionRequests = previewRequestId
+    const detailRequests = detailPreviewRequestId
+    return () => {
+      mounted.current = false
+      actionRequests.current++
+      detailRequests.current++
+      listController.current?.abort()
+      moreController.current?.abort()
+      summaryController.current?.abort()
+      previewCache.clear()
+    }
+  }, [previewCache])
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setSettledSearch(searchTerm.trim()), 250)
+    return () => window.clearTimeout(timer)
+  }, [searchTerm])
+
+  useEffect(() => {
+    const refresh = () => {
+      previewCache.clear()
+      summaryScope.current = null
+      setRefreshKey(value => value + 1)
+    }
+    window.addEventListener('focus', refresh)
+    return () => window.removeEventListener('focus', refresh)
+  }, [previewCache])
 
   useEffect(() => {
     if (canUpdatePaymentStatus) return
@@ -70,26 +120,47 @@ export default function PaymentConfirmationPage() {
     return () => window.clearTimeout(resetTimer)
   }, [canUpdatePaymentStatus])
 
-  const loadPaymentData = useCallback(async () => {
+  const loadPaymentData = useCallback(async (forceSummary = true) => {
+    if (!canRead) { setIsLoading(false); return }
+    listController.current?.abort()
+    moreController.current?.abort()
+    summaryController.current?.abort()
+    const controller = new AbortController()
+    listController.current = controller
     const requestId = ++loadRequestId.current
+    currentScope.current = queryScope
+    const includeSummary = forceSummary || !summaryScope.current
+      || summaryScope.current.key !== queryScope || Date.now() >= summaryScope.current.expires
+    previewCache.clear()
+    if (!writePending.current) {
+      previewRequestId.current++
+      detailPreviewRequestId.current++
+      setPendingTransition(null)
+      setCredentialsTransition(null)
+      setPreviewState(null)
+    }
     setIsLoading(true)
     setLoadingMore(false)
+    morePending.current = false
     setLoadError(null)
-    setUpdateError(null)
 
     try {
-      const workspace = await paymentsApi.getPaymentWorkspace({ status: activeFilter, search: searchTerm.trim(), from: dateFrom, to: dateTo, limit: 50 })
-      if (requestId !== loadRequestId.current) return
+      const workspace = await paymentsApi.getPaymentWorkspace({ status: activeFilter, search: settledSearch, from: dateFrom, to: dateTo, limit: 50,
+        ...(includeSummary ? {} : { includeSummary: false }) }, { signal: controller.signal })
+      if (controller.signal.aborted || !mounted.current || requestId !== loadRequestId.current) return
       const ordersResponse = workspace?.items
       const statusesResponse = workspace?.paymentStatuses
 
       setOrders(normalizePaymentOrders(ordersResponse))
-      setCounters(workspace?.counts ?? { pending: 0, rejected: 0, confirmed: 0 })
+      if (includeSummary) {
+        setCounters(workspace?.counts ?? { pending: 0, rejected: 0, confirmed: 0 })
+        setPaymentStatuses(Array.isArray(statusesResponse) ? statusesResponse : [])
+        summaryScope.current = { key: queryScope, expires: Date.now() + 30000 }
+      }
       setPageInfo(workspace?.pageInfo ?? { nextCursor: null, hasMore: false })
-      setPaymentStatuses(Array.isArray(statusesResponse) ? statusesResponse : [])
     } catch (error) {
-      if (requestId !== loadRequestId.current) return
-      console.error('Error cargando pagos:', error)
+      if (controller.signal.aborted || !mounted.current || requestId !== loadRequestId.current) return
+      summaryScope.current = null
       setOrders([])
       setPaymentStatuses([])
       setLoadError(
@@ -97,34 +168,44 @@ export default function PaymentConfirmationPage() {
           'No fue posible cargar los pedidos de pago.',
       )
     } finally {
-      if (requestId === loadRequestId.current) setIsLoading(false)
+      if (!controller.signal.aborted && mounted.current && requestId === loadRequestId.current) setIsLoading(false)
     }
-  }, [activeFilter, dateFrom, dateTo, paymentsApi, searchTerm])
+  }, [activeFilter, canRead, dateFrom, dateTo, paymentsApi, settledSearch, queryScope, previewCache])
 
   async function loadMorePayments() {
-    if (!pageInfo.hasMore || !pageInfo.nextCursor || loadingMore || isLoading) return
+    if (!pageInfo.hasMore || !pageInfo.nextCursor || morePending.current || isLoading || searchPending || writePending.current) return
     const requestId = loadRequestId.current
+    const controller = new AbortController()
+    moreController.current = controller
+    morePending.current = true
     setLoadingMore(true)
     try {
-      const workspace = await paymentsApi.getPaymentWorkspace({ status: activeFilter, search: searchTerm.trim(), from: dateFrom, to: dateTo, limit: 50, cursor: pageInfo.nextCursor })
-      if (requestId !== loadRequestId.current) return
-      setOrders((current) => [...current, ...normalizePaymentOrders(workspace.items).filter((next) => !current.some((item) => item.id === next.id))])
+      const workspace = await paymentsApi.getPaymentWorkspace({ status: activeFilter, search: settledSearch, from: dateFrom, to: dateTo, limit: 50, cursor: pageInfo.nextCursor, includeSummary: false }, { signal: controller.signal })
+      if (controller.signal.aborted || !mounted.current || requestId !== loadRequestId.current) return
+      setOrders((current) => {
+        const ids = new Set(current.map(item => item.id))
+        return [...current, ...normalizePaymentOrders(workspace.items).filter(item => {
+          if (ids.has(item.id)) return false
+          ids.add(item.id)
+          return true
+        })]
+      })
       setPageInfo(workspace.pageInfo)
     } catch (error) {
-      if (requestId === loadRequestId.current) setLoadError(error?.payload?.message ?? 'No fue posible cargar más pedidos de pago.')
+      if (!controller.signal.aborted && mounted.current && requestId === loadRequestId.current) setLoadError(error?.payload?.message ?? 'No fue posible cargar más pedidos de pago.')
     } finally {
-      if (requestId === loadRequestId.current) setLoadingMore(false)
+      if (!controller.signal.aborted && mounted.current && requestId === loadRequestId.current) { morePending.current = false; setLoadingMore(false) }
     }
   }
 
   useEffect(() => {
     const requests = loadRequestId
     const loadTimer = window.setTimeout(() => {
-      loadPaymentData()
+      loadPaymentData(false)
     }, 0)
 
-    return () => { window.clearTimeout(loadTimer); requests.current++ }
-  }, [loadPaymentData])
+    return () => { window.clearTimeout(loadTimer); requests.current++; listController.current?.abort(); moreController.current?.abort(); summaryController.current?.abort() }
+  }, [loadPaymentData, refreshKey])
 
   const filteredOrders = orders
 
@@ -140,7 +221,7 @@ export default function PaymentConfirmationPage() {
   )
 
   const handleUpdatePaymentStatus = useCallback(async (orderId, newStatus, credentials) => {
-    if (!canUpdatePaymentStatus || isUpdatingPaymentStatus) return false
+    if (!canUpdatePaymentStatus || writePending.current) return false
 
     const paymentStatusId = getPaymentStatusIdByName(paymentStatuses, newStatus)
 
@@ -149,11 +230,19 @@ export default function PaymentConfirmationPage() {
       return false
     }
 
+    writePending.current = true
+    listController.current?.abort()
+    moreController.current?.abort()
+    const requestId = ++loadRequestId.current
+    const scope = queryScope
+    setIsLoading(false)
+    setLoadingMore(false)
+    morePending.current = false
     setIsUpdatingPaymentStatus(true)
     setUpdateError(null)
 
     try {
-      await paymentsApi.updatePaymentStatus(orderId, {
+      const confirmed = await paymentsApi.updatePaymentStatus(orderId, {
         pin: credentials.pin,
         paymentStatusId,
         observacion:
@@ -161,25 +250,62 @@ export default function PaymentConfirmationPage() {
           `Cambio de estado a ${newStatus} desde modulo de pagos.`,
       })
 
-      await loadPaymentData()
+      if (!mounted.current) return false
+      previewCache.invalidate(orderId)
+      previewRequestId.current++
+      detailPreviewRequestId.current++
+      summaryScope.current = null
+      if (confirmed?.id !== orderId || confirmed.paymentStatus !== newStatus) throw new Error('Respuesta de pago incompleta')
+      if (requestId === loadRequestId.current && currentScope.current === scope) {
+        const normalized = normalizePaymentOrders([confirmed])[0]
+        setOrders(current => current.map(order => order.id === orderId ? { ...order, ...normalized } : order)
+          .filter(order => order.paymentStatus === activeFilter))
+        const controller = new AbortController()
+        summaryController.current = controller
+        try {
+          const summary = await paymentsApi.getPaymentWorkspace({ summaryOnly: true, search: settledSearch, from: dateFrom, to: dateTo }, { signal: controller.signal })
+          if (!controller.signal.aborted && mounted.current && requestId === loadRequestId.current) {
+            setCounters(summary.counts)
+            setPaymentStatuses(summary.paymentStatuses)
+            summaryScope.current = { key: scope, expires: Date.now() + 30000 }
+          }
+        } catch {
+          if (!controller.signal.aborted && mounted.current) setLoadError('El pago fue actualizado, pero no se pudo reconciliar el resumen. Reintenta la lectura.')
+        }
+      } else {
+        setRefreshKey(value => value + 1)
+      }
 
       setEditingStatus((prev) => ({ ...prev, [orderId]: false }))
       return true
     } catch (error) {
+      if (!mounted.current) return false
+      previewCache.invalidate(orderId)
+      summaryScope.current = null
       const message = operationFailureMessage(error, 'No fue posible actualizar el estado de pago.')
       if (requiresContext(error) || uncertainOperation(error)) setUpdateError(message)
       else notify.error(message)
+      if (error?.status === 409 || uncertainOperation(error)) {
+        // Resolve uncertainty with reads only; never resend a financial mutation.
+        if (requestId === loadRequestId.current && currentScope.current === scope) await loadPaymentData(true)
+        else setRefreshKey(value => value + 1)
+        if (mounted.current && error?.status === 409) {
+          setCredentialsTransition(null)
+          setUpdateError(message)
+        }
+      }
       return false
     } finally {
-      setIsUpdatingPaymentStatus(false)
+      writePending.current = false
+      if (mounted.current) setIsUpdatingPaymentStatus(false)
     }
   }, [
     canUpdatePaymentStatus,
-    isUpdatingPaymentStatus,
     loadPaymentData,
     paymentStatuses,
     paymentsApi,
     notify,
+    activeFilter, dateFrom, dateTo, settledSearch, queryScope, previewCache,
   ])
 
   const handleFilterChange = useCallback((filterKey) => {
@@ -208,27 +334,12 @@ export default function PaymentConfirmationPage() {
     setEditingStatus({})
   }, [])
 
-  const getPaymentPreview = useCallback((orderId) => {
-    const cachedRequest = paymentPreviewCache.current.get(orderId)
-    if (cachedRequest) return cachedRequest
-
-    const previewRequest = paymentsApi.getPaymentPreview(orderId).catch((error) => {
-      if (paymentPreviewCache.current.get(orderId) === previewRequest) {
-        paymentPreviewCache.current.delete(orderId)
-      }
-
-      throw error
-    })
-
-    paymentPreviewCache.current.set(orderId, previewRequest)
-    return previewRequest
-  }, [paymentsApi])
+  const getPaymentPreview = useCallback((orderId) => previewCache.get(orderId), [previewCache])
 
   const prefetchPaymentPreview = useCallback((order) => {
-    if (!order?.id) return
-
-    getPaymentPreview(order.id).catch(() => {})
-  }, [getPaymentPreview])
+    if (!canRead || !order?.id || writePending.current) return
+    previewCache.get(order.id, { prefetch: true }).catch(() => {})
+  }, [canRead, previewCache])
 
   const openPaymentEditor = useCallback((orderId) => {
     if (!canUpdatePaymentStatus || isUpdatingPaymentStatus) {
@@ -266,6 +377,10 @@ export default function PaymentConfirmationPage() {
 
     if (order.paymentStatus === targetStatus) {
       setEditingStatus({})
+      return
+    }
+    if (order.paymentStatus !== PAYMENT_STATUS.PENDIENTE && !canRevise) {
+      notify.warning('No tienes permiso para revisar una decisión de pago resuelta.')
       return
     }
 
@@ -312,6 +427,7 @@ export default function PaymentConfirmationPage() {
     isUpdatingPaymentStatus,
     getPaymentPreview,
     notify,
+    canRevise,
   ])
 
   const closePaymentActionConfirmation = useCallback(() => {
@@ -351,7 +467,7 @@ export default function PaymentConfirmationPage() {
       credentials,
     )
 
-    if (wasUpdated) {
+    if (wasUpdated && mounted.current) {
       setCredentialsTransition(null)
       notify.success('Estado de pago actualizado correctamente.')
       setPreviewState((currentPreview) =>
@@ -368,6 +484,7 @@ export default function PaymentConfirmationPage() {
   ])
 
   const openPaymentDetail = useCallback(async (order) => {
+    if (!canRead) return
     const requestId = detailPreviewRequestId.current + 1
     detailPreviewRequestId.current = requestId
     setPreviewState({ order })
@@ -400,7 +517,7 @@ export default function PaymentConfirmationPage() {
         setIsLoadingPreviewDetails(false)
       }
     }
-  }, [getPaymentPreview])
+  }, [canRead, getPaymentPreview])
 
   const closePaymentDetail = useCallback(() => {
     detailPreviewRequestId.current += 1
@@ -444,8 +561,9 @@ export default function PaymentConfirmationPage() {
             </button>
           </div>
         )}
+        {updateError && !credentialsTransition && <div className="alert alert-danger" role="alert">{updateError}</div>}
 
-        {isLoading ? (
+        {isLoading || searchPending ? (
           <LoadingIndicator context="pedidos de pago" />
         ) : (
           <>
