@@ -10,7 +10,7 @@
   --pin-error: #DC2626;
   position: fixed;
   inset: 0;
-  z-index: 2000;
+  z-index: var(--layer-pin-dialog, 2000);
   display: grid;
   place-items: center;
   padding: 1rem;
@@ -73,4 +73,8 @@
 .layer button:disabled { cursor: not-allowed; opacity: .65; }
 .layer :is(input, textarea):disabled { background: var(--pin-secondary-hover); }
 .secret { font: 700 2rem/1.5 ui-monospace, monospace; text-align: center; overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .layer { padding-bottom: var(--toast-reserve, 1rem); }
+  .dialog { max-height: calc(100dvh - 1rem - var(--toast-reserve, 1rem)); }
+}
 @media (max-height: 360px) { .header { padding-block: 0; } .body { padding-block: .5rem; } .footer { padding-block: .5rem; } }

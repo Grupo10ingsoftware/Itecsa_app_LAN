@@ -1,4 +1,5 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { render } from '../../../test/renderWithToast'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import KanbanColumn from './KanbanColumn'
 import KanbanOffCanvas from './KanbanOffCanvas'
@@ -74,7 +75,9 @@ describe('carga de Kanban y acciones locales', () => {
     expect(onClose).not.toHaveBeenCalled()
     await act(async () => pending.reject(Error('fixture')))
     expect(screen.queryByRole('status')).toBeNull()
-    expect(screen.getByText('No fue posible enviar el pedido a revisión.')).toBeTruthy()
+    const issue = screen.getByText(/No fue posible enviar el pedido a revisión\./)
+    expect(issue.closest('[role="dialog"]')).toBeTruthy()
+    expect(issue.textContent).toContain('Comprueba el resultado antes de repetir')
     expect(screen.getByRole('button', { name: 'Confirmar correccion' }).disabled).toBe(false)
   })
 })

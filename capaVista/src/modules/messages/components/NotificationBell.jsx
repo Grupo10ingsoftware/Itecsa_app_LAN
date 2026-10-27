@@ -1,17 +1,19 @@
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
-import { createPortal } from 'react-dom'
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { APP_ROUTES } from '../../../config/routes'
 import { useMessagesApi } from '../hooks/useMessagesApi'
 import { formatMessageDate, messagePreview, notifyMessagesChanged } from '../utils/messageFormatters'
 import styles from './NotificationBell.module.css'
-import MessagePopup from './MessagePopup'
 import { collectNewNotifications } from '../utils/popupNotifications'
+import { useToast } from '../../../shared/notifications/useToast'
+import { useMessageSound } from '../hooks/useMessageSound'
 
 const REFRESH_INTERVAL_MS = 5_000
 
-export default function NotificationBell({ popupContainer, buttonClassName }) {
+export default function NotificationBell({ buttonClassName }) {
+  const notify = useToast()
+  const playSound = useMessageSound()
   const api = useMessagesApi()
   const navigate = useNavigate()
   const rootRef = useRef(null)
@@ -25,8 +27,6 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
     tracker.active = true
     return () => { tracker.active = false; tracker.version++ }
   }, [api])
-  const [popupQueue, setPopupQueue] = useState([])
-  const dismissPopup = useCallback(() => setPopupQueue((queue) => queue.slice(1)), [])
   const [isOpen, setIsOpen] = useState(false)
   const [notifications, setNotifications] = useState([])
   const [unreadCount, setUnreadCount] = useState(0)
@@ -45,7 +45,11 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
       const incoming = result.notifications ?? []
       const { latestId, messages } = collectNewNotifications(incoming, latestIdRef.current)
       latestIdRef.current = latestId
-      if (messages.length) setPopupQueue((queue) => [...queue, ...messages])
+      for (const { id_mensaje: messageId } of messages) notify.info('Nuevo mensaje recibido.', {
+        title: 'Nuevo mensaje', source: 'messages', operation: String(messageId),
+        action: { label: 'Leer mensaje', onClick: () => navigate(APP_ROUTES.MESSAGE_DETAIL.replace(':messageId', messageId)) },
+      })
+      if (messages.length) playSound()
       setNotifications(incoming)
       setUnreadCount(result.unreadCount ?? 0)
       setError('')
@@ -55,7 +59,7 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
       loadingRef.current = false
       if (!quiet && activity.current.active) setIsLoading(false)
     }
-  }, [api])
+  }, [api, navigate, notify, playSound])
 
   const refreshNotifications = useEffectEvent((options) => loadNotifications(options))
 
@@ -100,7 +104,7 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
       setIsOpen(false)
       navigate(APP_ROUTES.MESSAGE_DETAIL.replace(':messageId', message.id_mensaje))
     } catch {
-      if (activity.current.active) setError('No fue posible abrir la notificación.')
+      if (activity.current.active) notify.error('No fue posible abrir la notificación.')
     } finally {
       actionRef.current = false
       if (activity.current.active) setAction(null)
@@ -121,7 +125,7 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
       setUnreadCount((current) => Math.max(0, current - 1))
       notifyMessagesChanged()
     } catch {
-      if (activity.current.active) setError('No fue posible limpiar la notificación.')
+      if (activity.current.active) notify.error('No fue posible limpiar la notificación.')
     } finally {
       actionRef.current = false
       if (activity.current.active) setAction(null)
@@ -141,7 +145,7 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
       setError('')
       notifyMessagesChanged()
     } catch {
-      if (activity.current.active) setError('No fue posible limpiar las notificaciones.')
+      if (activity.current.active) notify.error('No fue posible limpiar las notificaciones.')
     } finally {
       actionRef.current = false
       if (activity.current.active) setAction(null)
@@ -150,10 +154,6 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
 
   return (
     <div className={styles.root} ref={rootRef}>
-      {popupContainer && createPortal(
-        <MessagePopup message={popupQueue[0]} onDismiss={dismissPopup} />,
-        popupContainer,
-      )}
       <button
         aria-expanded={isOpen}
         aria-haspopup="dialog"

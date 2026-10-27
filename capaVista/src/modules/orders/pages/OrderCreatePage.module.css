@@ -24,7 +24,7 @@
   overflow: visible;
 }
 
-.successPage { margin: 0 auto; max-width: 1760px; padding: 1.25rem; }
+
 
 .content {
   background: var(--page-white);
@@ -107,7 +107,7 @@
 }
 
 @media (max-width: 1199.98px) {
-  .successPage { padding: 1rem; }
+
 
   .content {
     padding: 1.25rem 1.5rem 1.5rem;
@@ -121,7 +121,7 @@
 }
 
 @media (max-width: 575.98px) {
-  .successPage { padding: 0.65rem; }
+
 
   .content {
     padding: 0.85rem;

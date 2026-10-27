@@ -17,6 +17,7 @@ await writeFile(path.join(fixture, 'fixture.jsx'), `
 import {useEffect,useState} from 'react';import {createRoot} from 'react-dom/client';
 import {MemoryRouter,Routes,Route} from 'react-router-dom';
 import AppLayout from '/src/shared/components/layout/AppLayout.jsx';
+import ToastProvider from '/src/shared/notifications/ToastProvider.jsx';
 import LoadingIndicator,{LoadingAction} from '/src/shared/components/loading/LoadingIndicator.jsx';
 import PaymentCredentialsModal from '/src/modules/payments/components/PaymentCredentialsModal.jsx';
 import PinLoadingPreview from '/verify/pinLoadingFixtures.jsx';
@@ -37,9 +38,9 @@ export function Gallery(){const[busy,setBusy]=useState(false);return <main style
 </main>}
 export function Native(){useEffect(()=>{initializeAuthForms();const form=document.querySelector('[data-auth-form]');form.requestSubmit(form.querySelector('[name=login]'))},[]);return <><style>{${JSON.stringify(nativeCss)}}</style><main className="auth-layout"><section className="auth-card"><h1>Iniciar sesión</h1><form data-auth-form noValidate onSubmit={event=>event.preventDefault()}><input name="username" defaultValue="fixture" required/><input name="password" type="password" defaultValue="fixture" required/><button className="auth-button auth-button-primary" name="login" type="submit">Iniciar sesión</button></form></section></main></>}
 const route=routes.find(r=>r[0]===id);
-createRoot(document.getElementById('root')).render(id.startsWith('pin-')?<MemoryRouter><PinLoadingPreview id={id}/></MemoryRouter>:id==='native'?<Native/>:id==='gallery'?<Gallery/>:id==='modal'?<PaymentCredentialsModal description="Validación sintética" isSubmitting onCancel={()=>{}} onConfirm={()=>{}}/>:id==='guard'?<MemoryRouter><ProtectedRoute/></MemoryRouter>:route?<MemoryRouter initialEntries={[route[1]]}><Routes><Route element={<AppLayout/>}>
+createRoot(document.getElementById('root')).render(<ToastProvider>{id.startsWith('pin-')?<MemoryRouter><PinLoadingPreview id={id}/></MemoryRouter>:id==='native'?<Native/>:id==='gallery'?<Gallery/>:id==='modal'?<PaymentCredentialsModal description="Validación sintética" isSubmitting onCancel={()=>{}} onConfirm={()=>{}}/>:id==='guard'?<MemoryRouter><ProtectedRoute/></MemoryRouter>:route?<MemoryRouter initialEntries={[route[1]]}><Routes><Route element={<AppLayout/>}>
 ${pages.map(([,url],i)=>`<Route path="${url.replace('/123','/:orderId').replace('/1','/:messageId')}" element={<Page${i}/>}/>`).join('\n')}
-</Route></Routes></MemoryRouter>:null);
+</Route></Routes></MemoryRouter>:null}</ToastProvider>);
 `)
 const server = await createServer({ root, configFile: false, appType: 'mpa', plugins: [{
   name: 'isolated-loading-review', enforce: 'pre',

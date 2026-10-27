@@ -8,8 +8,3 @@ export function collectNewNotifications(notifications, previousId) {
       .sort((a, b) => Number(a.id_mensaje) - Number(b.id_mensaje)),
   }
 }
-
-export function popupPreview(content) {
-  const characters = Array.from(String(content ?? ''))
-  return characters.slice(0, 20).join('') + (characters.length > 20 ? '…' : '')
-}

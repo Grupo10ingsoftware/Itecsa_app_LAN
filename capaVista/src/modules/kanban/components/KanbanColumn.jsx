@@ -17,14 +17,15 @@ import { useAuth } from '../../../hooks/useAuth';
 import { applyOrderStagePatch } from '../utils/orderStagePatch';
 import { PERMISSIONS } from '../../../config/permissions';
 import styles from '../styles/Kanban.module.css';
-import ToastContainer from 'react-bootstrap/ToastContainer';
-import Toast from 'react-bootstrap/Toast';
+import { useToast } from '../../../shared/notifications/useToast'
+import { publicOperationMessage } from '../../../shared/notifications/operationFeedback'
 import { DragDropProvider } from '@dnd-kit/react';
 import KanbanCard from './KanbanCard';
 import KanbanOffCanvas from './KanbanOffCanvas';
 import KanbanDetailBoundary from './KanbanDetailBoundary.jsx';
 
 function KanbanColumn({ filters, refreshKey = 0 }) {
+  const notify = useToast()
   const [orders, setOrders] = useState([])
   const [columns, setColumns] = useState(baseColumns)
   const [loading, setLoading] = useState(true)
@@ -33,7 +34,6 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
   const [detailError, setDetailError] = useState(null)
   const detailRequestId = useRef(0)
   const [loadError, setLoadError] = useState(null)
-  const [moveError, setMoveError] = useState(null)
   const [pageInfo, setPageInfo] = useState({ nextCursor: null, hasMore: false })
   const [loadingMore, setLoadingMore] = useState(false)
   const listRequestId = useRef(0)
@@ -157,7 +157,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
     const currentStep = Number(order.generalStepId)
     const targetStep = Number(targetColumn.generalStepId)
     if (!((currentStep === 1 && targetStep === 2) || (currentStep === 2 && targetStep === 3) || (currentStep === 3 && targetStep === 4))) {
-      setMoveError('Esta transicion es automatica o no esta permitida.'); return
+      notify.warning('Esta transición es automática o no está permitida.'); return
     }
     let transitionOrder = order
     if (targetStep === 3) {
@@ -168,44 +168,42 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
         transitionOrder = normalizeOrder(await kanbanApi.getOrderDetail(order.id))
         if (version !== listRequestId.current) return
       }
-      catch { setMoveError('No fue posible validar el detalle del pedido.'); return }
+      catch { if (version === listRequestId.current) notify.error('No fue posible validar el detalle del pedido.'); return }
       finally { moveValidation.current = false; setValidatingMove(false) }
     }
     if (targetStep === 3 && (!transitionOrder.items?.length || transitionOrder.items.some((item) => !isItemReadyForDelivery(item)))) {
-      setMoveError('Todos los detalles deben completar sus subprocesos y los lanyards deben llegar al 100% antes de pasar a Listo para Entrega.')
+      notify.warning('Todos los detalles deben completar sus subprocesos y los lanyards deben llegar al 100% antes de pasar a Listo para Entrega.')
       return
     }
     const isForwardMove = targetStep > currentStep
 
     // Prechecks de UX; el backend vuelve a validar etapa, pago y permisos.
     if (targetStep < currentStep) {
-      setMoveError(STAGE_BACKWARD_MESSAGE)
+      notify.warning(STAGE_BACKWARD_MESSAGE)
       return
     }
 
     if (targetStep !== currentStep + 1) {
-      setMoveError(STAGE_SKIP_MESSAGE)
+      notify.warning(STAGE_SKIP_MESSAGE)
       return
     }
 
     if (isForwardMove && !isPaymentConfirmed(order)) {
-      setMoveError('Debes confirmar el pago antes de mover esta orden.')
+      notify.warning('Debes confirmar el pago antes de mover esta orden.')
       return
     }
 
     if (isForwardMove && order.paymentDeconfirmationRequested) {
-      setMoveError('Este pedido tiene una solicitud de desconfirmacion pendiente.')
+      notify.warning('Este pedido tiene una solicitud de desconfirmación pendiente.')
       return
     }
 
     const isMoveToProduction = isForwardMove && targetStep === KANBAN_EN_PRODUCCION_STEP
 
     if (isMoveToProduction && !hasPermission(PERMISSIONS.MOVE_KANBAN_TO_PRODUCTION)) {
-      setMoveError(MOVE_TO_PRODUCTION_PERMISSION_MESSAGE)
+      notify.warning(MOVE_TO_PRODUCTION_PERMISSION_MESSAGE)
       return
     }
-
-    setMoveError(null)
 
     setPendingProductionMove({ order: transitionOrder, targetColumn })
   }
@@ -267,10 +265,11 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
       })
       setOrders((current) => current.map((item) => item.id === orderId ? patchOrder(item) : item))
       setSelectedOrder((current) => current?.id === orderId ? patchOrder(current) : current)
+      notify.success('Etiqueta del pedido actualizada correctamente.')
     } catch (error) {
       setOrders((current) => current.map((item) => item.id === orderId ? order : item))
       setSelectedOrder((current) => current?.id === orderId ? order : current)
-      setMoveError(error?.payload?.message ?? 'No fue posible actualizar la etiqueta.')
+      notify.error(publicOperationMessage(error, 'No fue posible actualizar la etiqueta.'))
     }
   }
 
@@ -280,84 +279,50 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
     const { order, targetColumn } = pendingProductionMove
     await applyOrderMove(order, targetColumn, audit)
     setPendingProductionMove(null)
+    notify.success('Etapa del pedido actualizada correctamente.')
   }
 
   async function handleCompleteSubprocess(order, item, process, payload) {
-    try {
-      const updatedOrder = await kanbanApi.completeSubprocess(order.id, item.id, process.id, payload)
-      const normalizedOrder = normalizeOrder(updatedOrder)
-
-      setOrders((prevOrders) =>
-        prevOrders.map((currentOrder) => (currentOrder.id === normalizedOrder.id ? normalizedOrder : currentOrder)),
-      )
-      setSelectedOrder(normalizedOrder)
-      return true
-    } catch (error) {
-      console.error('Error completando subproceso:', error)
-      setMoveError(error?.payload?.message ?? 'No fue posible completar el subproceso.')
-      return false
-    }
+    const updatedOrder = await kanbanApi.completeSubprocess(order.id, item.id, process.id, payload)
+    const normalizedOrder = normalizeOrder(updatedOrder)
+    setOrders(prevOrders => prevOrders.map(currentOrder => currentOrder.id === normalizedOrder.id ? normalizedOrder : currentOrder))
+    setSelectedOrder(normalizedOrder)
+    notify.success('Subproceso completado correctamente.')
+    return true
   }
 
   async function handleSendToReview(order, comment) {
-    try {
-      const updatedOrder = await kanbanApi.sendToReview(order.id, comment)
-      handleUpdateOrder(normalizeOrder(updatedOrder))
-      return true
-    } catch (error) {
-      console.error('Error enviando pedido a revisión:', error)
-      setMoveError(error?.payload?.message ?? 'No fue posible enviar el pedido a revisión.')
-      return false
-    }
+    const updatedOrder = await kanbanApi.sendToReview(order.id, comment)
+    handleUpdateOrder(normalizeOrder(updatedOrder))
+    notify.success('Pedido enviado a revisión correctamente.')
+    return true
   }
 
   async function handleCancelProduction(order, payload) {
-    try {
-      await kanbanApi.cancelProduction(order.id, payload)
-      setOrders((currentOrders) => currentOrders.filter((item) => item.id !== order.id))
-      setSelectedOrder(null)
-      return true
-    } catch (error) {
-      console.error('Error cancelando la produccion:', error)
-      setMoveError(error?.payload?.message ?? 'No fue posible cancelar la produccion.')
-      return false
-    }
+    await kanbanApi.cancelProduction(order.id, payload)
+    setOrders((currentOrders) => currentOrders.filter((item) => item.id !== order.id))
+    setSelectedOrder(null)
+    notify.success('Producción cancelada correctamente.')
+    return true
   }
 
   async function handleRollbackSubprocess(order, item, process, payload) {
-    try {
-      const updated = await kanbanApi.rollbackSubprocess(order.id, item.id, process.id, payload)
-      handleUpdateOrder(normalizeOrder(updated))
-      return true
-    } catch (error) {
-      setMoveError(error?.payload?.message ?? 'No fue posible retroceder el subproceso.')
-      return false
-    }
+    const updated = await kanbanApi.rollbackSubprocess(order.id, item.id, process.id, payload)
+    handleUpdateOrder(normalizeOrder(updated))
+    notify.success('Subproceso retrocedido correctamente.')
+    return true
   }
 
   async function handleReevaluate(order) {
-    try {
-      const updated = normalizeOrder(await kanbanApi.reevaluate(order.id))
-      handleUpdateOrder(updated)
-      return true
-    } catch (error) {
-      setMoveError(error?.payload?.message ?? 'No fue posible reevaluar el pedido.')
-      return false
-    }
+    const updated = normalizeOrder(await kanbanApi.reevaluate(order.id))
+    handleUpdateOrder(updated)
+    notify.success('Pedido reevaluado correctamente.')
+    return true
   }
 
   return (
     <>
-      {loadError && <div className={styles.kanbanError}>{loadError}</div>}
-      <ToastContainer position="top-end" className="position-fixed p-3" style={{ zIndex: 1090 }}>
-        <Toast show={Boolean(moveError)} onClose={() => setMoveError(null)} autohide delay={8000} role="alert" aria-live="assertive">
-          <Toast.Header closeLabel="Cerrar notificación">
-            <i className="bi bi-exclamation-triangle-fill text-warning me-2" aria-hidden="true" />
-            <strong className="me-auto">No se pudo realizar la acción</strong>
-          </Toast.Header>
-          <Toast.Body>{moveError}</Toast.Body>
-        </Toast>
-      </ToastContainer>
+      {loadError && <div className={styles.kanbanError} role="alert">{loadError}</div>}
       {validatingMove && <LoadingIndicator scope="action" context="Validación del pedido antes del traslado" />}
       <DragDropProvider onDragEnd={handleDragEnd}>
         <div className={styles.kanbanWrapper}>

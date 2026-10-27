@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { render } from '../../../test/renderWithToast'
 import { MemoryRouter } from 'react-router-dom'
 import ProfilePage from './ProfilePage.jsx'
 

@@ -3,11 +3,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useOrdersApi } from '../modules/orders/hooks/useOrdersApi'
 import { canContinueFromSalesNote, validateSalesNoteStep } from '../modules/orders/utils/orderCreateValidation'
 import { normalizeSalesNoteCode } from '../modules/orders/utils/orderCreateFormatters'
-
-export const ORDER_CREATE_VIEW_MODE = Object.freeze({
-  CREATE: 'CREATE',
-  SUCCESS: 'SUCCESS',
-})
+import { useToast } from '../shared/notifications/useToast'
+import { publicOperationMessage, uncertainOperation, operationFailureMessage, requiresContext } from '../shared/notifications/operationFeedback'
 
 function createInitialDraft() {
   return {
@@ -16,7 +13,7 @@ function createInitialDraft() {
 }
 
 function getErrorMessage(error, fallback) {
-  return error?.payload?.message || error?.message || fallback
+  return publicOperationMessage(error, fallback)
 }
 
 function toDisplayRecord(salesNote) {
@@ -33,13 +30,12 @@ function toDisplayRecord(salesNote) {
 }
 
 export function useOrderCreateFlow({ navigate }) {
+  const notify = useToast()
   const ordersApi = useOrdersApi()
-  const [viewMode, setViewMode] = useState(ORDER_CREATE_VIEW_MODE.CREATE)
   const [draft, setDraft] = useState(createInitialDraft)
   const [errors, setErrors] = useState({})
-  const [notice, setNotice] = useState(null)
+  const [registrationIssue, setRegistrationIssue] = useState('')
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [registeredOrder, setRegisteredOrder] = useState(null)
   const [isSearching, setIsSearching] = useState(false)
   const [isRegistering, setIsRegistering] = useState(false)
   const requestVersion = useRef(0)
@@ -87,14 +83,12 @@ export function useOrderCreateFlow({ navigate }) {
 
       return { ...previous, [field]: null }
     })
-    setNotice(null)
   }
 
   async function handleSearchSalesNote() {
     if (submitting.current) return
     const code = normalizeSalesNoteCode(draft.salesNoteCode)
 
-    setNotice(null)
 
     if (!code) {
       setErrors((previous) => ({ ...previous, salesNoteCode: 'Debe ingresar el codigo de Nota de Venta.' }))
@@ -143,10 +137,6 @@ export function useOrderCreateFlow({ navigate }) {
 
     if (Object.keys(salesNoteErrors).length > 0) {
       setErrors(salesNoteErrors)
-      setNotice({
-        type: 'error',
-        message: 'Debe ingresar el codigo y buscar la informacion de la Nota de Venta antes de registrar.',
-      })
       return
     }
 
@@ -160,17 +150,22 @@ export function useOrderCreateFlow({ navigate }) {
     const payload = confirmedPayload.current
     setIsRegistering(true)
     try {
-      const order = await ordersApi.createOrder(payload)
+      await ordersApi.createOrder(payload)
       if (!mounted.current) return
 
-      setRegisteredOrder(order)
       setShowConfirmModal(false)
-      setViewMode(ORDER_CREATE_VIEW_MODE.SUCCESS)
+      setDraft(createInitialDraft())
+      setErrors({})
+      setRegistrationIssue('')
+      notify.success('Pedido registrado correctamente.', {
+        action: { label: 'Ver pedidos', onClick: () => navigate('/pagos') },
+      })
     } catch (error) {
       if (!mounted.current) return
       const message = getErrorMessage(error, 'No fue posible registrar el pedido.')
       setShowConfirmModal(false)
-      setNotice({ type: 'error', message })
+      if (uncertainOperation(error) || requiresContext(error)) setRegistrationIssue(operationFailureMessage(error, message))
+      else notify.error(message)
     } finally {
       submitting.current = false
       confirmedPayload.current = null
@@ -192,27 +187,18 @@ export function useOrderCreateFlow({ navigate }) {
     setShowConfirmModal(false)
     setDraft(createInitialDraft())
     setErrors({})
-    setNotice(null)
-    setRegisteredOrder(null)
-    setViewMode(ORDER_CREATE_VIEW_MODE.CREATE)
-  }
-
-  function goToKanban() {
-    navigate('/kanban')
+    setRegistrationIssue('')
   }
 
   return {
     draft,
     errors,
-    notice,
-    registeredOrder,
+    registrationIssue,
     isRegistering,
     isSearching,
     salesNoteIsValid,
     showConfirmModal,
-    viewMode,
     actions: {
-      goToKanban,
       handleConfirmRegister,
       handleOpenConfirmModal,
       handleSearchSalesNote,

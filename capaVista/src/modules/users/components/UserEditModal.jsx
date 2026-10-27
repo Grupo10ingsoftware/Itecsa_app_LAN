@@ -69,7 +69,11 @@ function UserEditForm({ isCurrentUser = false, onClose, onSave, onUnlink, onCred
         correoUsuario: values.correoUsuario.trim().toLowerCase(), rolUsuario: values.rolUsuario,
         estadoUsuario: values.estadoUsuario, pin: trimmedPin })
     } catch (error) {
-      if (active.current) setSaveError(error?.message || 'No fue posible guardar los cambios. Intenta nuevamente.')
+      if (active.current) {
+        const message = error?.message || 'No fue posible guardar los cambios. Intenta nuevamente.'
+        if (error?.cause?.payload?.code?.startsWith('PIN_')) setPinError(message)
+        else setSaveError(message)
+      }
     } finally {
       pending.current = false
       if (active.current) setIsSubmitting(false)

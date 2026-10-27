@@ -71,8 +71,7 @@
 }
 
 .fieldCardWide,
-.messageBox,
-.creationResult {
+.messageBox {
   grid-column: 1 / -1;
 }
 
@@ -168,11 +167,7 @@
   margin: 0;
 }
 
-.messagesuccess {
-  background: #ecfdf5;
-  border-color: #bbf7d0;
-  color: #166534;
-}
+
 
 .messagewarning {
   background: #fffbeb;
@@ -180,17 +175,9 @@
   color: #92400e;
 }
 
-.messagedanger {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #991b1b;
-}
 
-.messageinfo {
-  background: #f4f4f5;
-  border-color: #d4d4d8;
-  color: #3f3f46;
-}
+
+
 
 .messageButton,
 .cancelButton,
@@ -274,56 +261,16 @@
   padding: 0.85rem 1.35rem;
 }
 
-.creationResult {
-  background: #f4f4f5;
-  border: 1px solid #d4d4d8;
-  border-radius: 0.7rem;
-  padding: 1rem;
-}
 
-.creationResult h2 {
-  color: #111827;
-  font-size: 0.82rem;
-  font-weight: 850;
-  letter-spacing: 0.055em;
-  margin: 0 0 0.8rem;
-  text-transform: uppercase;
-}
 
-.creationResult dl {
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin: 0;
-}
 
-.creationResult dt {
-  color: #64748b;
-  font-size: 0.7rem;
-  font-weight: 850;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
 
-.creationResult dd {
-  color: #111827;
-  font-size: 0.88rem;
-  font-weight: 700;
-  margin: 0.2rem 0 0;
-  overflow-wrap: anywhere;
-}
 
 @media (max-width: 767.98px) {
-  .formContent,
-  .creationResult dl {
-    grid-template-columns: 1fr;
-  }
+  .formContent { grid-template-columns: 1fr; }
 
   .fieldCardWide,
-  .messageBox,
-  .creationResult {
-    grid-column: auto;
-  }
+  .messageBox { grid-column: auto; }
 
   .modalForm .formContent {
     padding: 1rem;

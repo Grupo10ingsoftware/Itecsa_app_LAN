@@ -440,16 +440,7 @@
   margin: 0;
 }
 
-.modalError {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 0.55rem;
-  color: #b91c1c;
-  font-size: 0.82rem;
-  font-weight: 800;
-  margin: 0;
-  padding: 0.65rem 0.75rem;
-}
+
 
 .modalFooter {
   align-items: center;

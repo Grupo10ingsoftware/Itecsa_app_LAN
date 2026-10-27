@@ -14,6 +14,8 @@ import { displayUserStatus } from '../../../config/userLifecycle.js'
 import styles from './UserManagementPage.module.css'
 import PageShell from '../../../shared/components/layout/PageShell'
 import PageHeader from '../../../shared/components/layout/PageHeader'
+import { useToast } from '../../../shared/notifications/useToast'
+import { FEEDBACK_HANDLED, publicOperationMessage, requiresContext, uncertainOperation, operationFailureMessage } from '../../../shared/notifications/operationFeedback'
 
 const EMPTY_SUMMARY = Object.freeze({
   totalUsuarios: 0,
@@ -65,7 +67,7 @@ function getErrorText(error) {
   }
 
   if (error?.status === 403) {
-    return error?.payload?.message || 'Acceso denegado. Se requiere autorizacion administrativa para gestionar usuarios.'
+    return publicOperationMessage(error, 'Acceso denegado. Se requiere autorizacion administrativa para gestionar usuarios.')
   }
 
   if (error?.code === API_ERROR_CODES.NETWORK_ERROR) {
@@ -73,7 +75,7 @@ function getErrorText(error) {
   }
 
   if (error?.payload?.message) {
-    return error.payload.message
+    return publicOperationMessage(error, 'No fue posible completar la operación. Intenta nuevamente.')
   }
 
   if (error?.status === 409) {
@@ -84,6 +86,7 @@ function getErrorText(error) {
 }
 
 export default function UserManagementPage() {
+  const notify = useToast()
   const { identityUser, loginWithRedirect } = useAuth()
   const adminUsersApi = useAdminUsersApi()
   const latestRequestRef = useRef(0)
@@ -248,7 +251,8 @@ export default function UserManagementPage() {
   }
 
   async function refreshAfterMutation(message) {
-    setActionMessage(message)
+    if (message.type === 'success') notify.success(message.text)
+    else setActionMessage(message)
     await Promise.all([loadUsers({ preserveMessage: true }), loadSummary()])
   }
 
@@ -260,15 +264,19 @@ export default function UserManagementPage() {
       setEditingUser(null)
       await refreshAfterMutation({ type: 'success', text: 'Usuario actualizado correctamente.' })
     } catch (error) {
-      setActionMessage({ type: 'danger', text: getErrorText(error), requiresLogin: error?.status === 401 })
-      throw new Error(getErrorText(error), { cause: error })
+      if (requiresContext(error) || uncertainOperation(error)) {
+        // The dialog owns correctable PIN/session/reconciliation feedback.
+        throw new Error(operationFailureMessage(error, getErrorText(error)), { cause: error })
+      }
+      notify.error(getErrorText(error))
+      return FEEDBACK_HANDLED
     }
   }
 
   async function handleCreatedUser(user) {
     if (user.outcome === 'user_created') setIsCreateModalOpen(false)
     setPage(1)
-    await refreshAfterMutation({ type: user.outcome === 'user_created' ? 'info' : 'warning',
+    await refreshAfterMutation({ type: user.outcome === 'user_created' ? 'success' : 'warning',
       text: user.outcome === 'user_created'
         ? 'Usuario creado. Deberá cambiar su contraseña temporal al iniciar sesión.'
         : 'Preparacion incompleta. No repitas el alta con otro nombre. Referencia: ' + user.operationId + '.' })
@@ -285,7 +293,10 @@ export default function UserManagementPage() {
         nombreUsuario: detail.firstName, apellidoUsuario: detail.lastName, correoUsuario: detail.email,
         rolUsuario: detail.role, estadoUsuario: detail.localState })
     } catch (error) {
-      if (version === inspection.current.version) setActionMessage({ type: 'danger', text: getErrorText(error) })
+      if (version === inspection.current.version) {
+        if (requiresContext(error)) setActionMessage({ type: 'danger', text: getErrorText(error), requiresLogin: error?.status === 401 })
+        else notify.error(getErrorText(error))
+      }
     } finally {
       inspection.current.busy = false
       if (version === inspection.current.version) setInspectingId(null)
@@ -312,7 +323,6 @@ export default function UserManagementPage() {
         )}
 
         <div className={styles.content}>
-          
           {actionMessage && (
             <div className={`${styles.feedbackMessage} ${styles[`feedback${actionMessage.type}`]}`} role="status">
               <span>{actionMessage.text}</span>

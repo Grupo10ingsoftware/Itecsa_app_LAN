@@ -42,7 +42,7 @@ function updateIsolation() {
   let branch = top
   while (branch && branch !== document.body) {
     for (const element of branch.parentElement?.children ?? []) {
-      if (element === branch) continue
+      if (element === branch || element.hasAttribute('data-toast-viewport')) continue
       previous.push({ element, hidden: element.getAttribute('aria-hidden'), inert: element.inert })
       element.inert = true
       element.setAttribute('aria-hidden', 'true')
@@ -100,7 +100,7 @@ export function useModalDialog({
 
       if (event.key !== 'Tab') return
 
-      const focusableElements = getFocusableElements(container)
+      const focusableElements = [...getFocusableElements(container), ...getFocusableElements(document.querySelector('[data-toast-viewport]'))]
       const target = nextModalFocusTarget({
         activeElement: document.activeElement,
         focusableElements,

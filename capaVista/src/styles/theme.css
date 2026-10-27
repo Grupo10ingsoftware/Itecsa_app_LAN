@@ -1,4 +1,7 @@
 :root {
+  --layer-pin-dialog: 2000;
+  /* PIN dialogs are the highest existing layer; the host only captures card clicks. */
+  --layer-toast: 2010;
   --page-header-black: #000000;
   --page-brand-orange: #FE5A00;
   --page-brand-orange-rgb: 254, 90, 0;

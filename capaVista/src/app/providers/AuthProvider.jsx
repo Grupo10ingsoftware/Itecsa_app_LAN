@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuthApi } from '../../modules/auth/hooks/useAuthApi'
 import { API_ERROR_CODES } from '../../services/api/apiClient'
 import { AuthContext } from './authContext'
+import { useToast } from '../../shared/notifications/useToast'
 
 const AUTH_STATUS = Object.freeze({
   LOADING: 'loading',
@@ -38,6 +39,7 @@ function withTimeout(promise, timeoutMs) {
 }
 
 export function AuthProvider({ children }) {
+  const notify = useToast()
   const {
     error,
     provider, sessionKey, getSessionKey, verificationKey = 0,
@@ -147,8 +149,9 @@ export function AuthProvider({ children }) {
   }, [isAuthenticated, isLoading, subject, provider, sessionKey, verificationKey, verifySession])
 
   const logout = useCallback(() => {
+    notify.endSession()
     void identityLogout()
-  }, [identityLogout])
+  }, [identityLogout, notify])
 
   const hasCurrentVerification = isCurrentVerification(verifiedSession, { subject, provider, sessionKey, verificationKey })
   const verifiedUser = isAuthenticated && hasCurrentVerification ? verifiedSession.user : null

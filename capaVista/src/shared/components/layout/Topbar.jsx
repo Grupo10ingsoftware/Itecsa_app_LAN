@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { HEADER_NAVIGATION_ROUTES } from '../../../config/routes'
 import { PERMISSIONS } from '../../../config/permissions'
@@ -10,7 +9,6 @@ import styles from './Layout.module.css'
 
 export default function Topbar({ onOpenMobileSidebar, isMobileSidebarOpen = false }) {
   const { hasPermission, provider, user } = useAuth()
-  const [popupContainer, setPopupContainer] = useState(null)
   return (
     <header className={styles.topbar}>
       <button
@@ -24,11 +22,11 @@ export default function Topbar({ onOpenMobileSidebar, isMobileSidebarOpen = fals
         <i className="bi bi-list" aria-hidden="true" />
       </button>
 
-      <div className={styles.topbarIdentity} ref={setPopupContainer}>
+      <div className={styles.topbarIdentity}>
         <ProfileSummary />
       </div>
       <nav className={styles.topbarActions} aria-label="Acciones del usuario">
-        {hasPermission(PERMISSIONS.READ_MESSAGES) && <NotificationBell key={[provider, user?.sub ?? ''].join(':')} popupContainer={popupContainer} buttonClassName={styles.headerAction} />}
+        {hasPermission(PERMISSIONS.READ_MESSAGES) && <NotificationBell key={[provider, user?.sub ?? ''].join(':')} buttonClassName={styles.headerAction} />}
         {HEADER_NAVIGATION_ROUTES.filter(route => hasPermission(route.permission)).map(route => (
           <NavLink key={route.path} to={route.path} aria-label={route.label} title={route.label}
             className={styles.headerAction} onPointerEnter={() => preloadInformationPage(route.path)}

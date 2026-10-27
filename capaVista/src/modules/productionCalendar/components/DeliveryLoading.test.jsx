@@ -1,4 +1,5 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { render } from '../../../test/renderWithToast'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { DeliveryChangeCredentialsModal } from './DeliveryChangeModals'
 
@@ -29,7 +30,9 @@ describe('operaciones de calendario protegidas por PIN', () => {
     fireEvent.change(screen.getByPlaceholderText('000000'), { target: { value: '123456' } })
     fireEvent.submit(screen.getByRole('dialog'))
     await waitFor(() => expect(screen.queryByRole('status')).toBeNull())
-    expect(screen.getByText('No fue posible cambiar la fecha de entrega.')).toBeTruthy()
+    const issue = screen.getByText(/No fue posible cambiar la fecha de entrega\./)
+    expect(issue.closest('[role="dialog"]')).toBeTruthy()
+    expect(issue.textContent).toContain('Comprueba el resultado antes de repetir')
     expect(screen.getByRole('button', { name: 'Confirmar' }).disabled).toBe(false)
     vi.restoreAllMocks()
   })

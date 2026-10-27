@@ -1,4 +1,5 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { render } from '../../../test/renderWithToast'
 import { afterEach, expect, it, vi } from 'vitest'
 import PinAuthorizationModal from './PinAuthorizationModal'
 import { AuthContext } from '../../../app/providers/authContext'
@@ -67,4 +68,20 @@ it('P4 preserves its PIN-only callback', async () => {
   render(<PaymentDeconfirmationModal order={{ id: 1, salesNoteNumber: 'NV-1' }} approvePaymentDeconfirmation={confirm} closeDeconfirmationAuthModal={vi.fn()} />)
   enter('123456'); submit()
   await waitFor(() => expect(confirm).toHaveBeenCalledWith({ pin: '123456' }))
+})
+it('general business failures emit one global toast and do not invalidate the PIN field', async () => {
+  render(<PinAuthorizationModal onConfirm={vi.fn().mockRejectedValue({ status: 409, payload: { message: 'El pedido no cumple las condiciones para avanzar.' } })} />)
+  enter('123456'); submit()
+  const message = await screen.findByText('El pedido no cumple las condiciones para avanzar.')
+  expect(message.closest('[data-toast-viewport]')).toBeTruthy()
+  expect(screen.getAllByText('El pedido no cumple las condiciones para avanzar.')).toHaveLength(1)
+  expect(screen.getByLabelText('PIN personal').getAttribute('aria-invalid')).toBe('false')
+})
+it('an uncertain write keeps a persistent form instruction without calling the PIN invalid', async () => {
+  render(<PinAuthorizationModal onConfirm={vi.fn().mockRejectedValue({ code: 'NETWORK_ERROR' })} />)
+  enter('123456'); submit()
+  const message = await screen.findByText(/Comprueba el resultado antes de repetir/)
+  expect(message.closest('[role="dialog"]')).toBeTruthy()
+  expect(document.querySelector('[data-toast-viewport] article')).toBeNull()
+  expect(screen.getByLabelText('PIN personal').getAttribute('aria-invalid')).toBe('false')
 })

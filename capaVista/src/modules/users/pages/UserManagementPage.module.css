@@ -106,16 +106,18 @@
   padding: 0.85rem 1rem;
 }
 
-.feedbacksuccess {
-  background: #ecfdf5;
-  border-color: #bbf7d0;
-  color: #146c43;
-}
+
 
 .feedbackdanger {
   background: #fff1f0;
   border-color: #fecaca;
   color: #b02a37;
+}
+
+.feedbackwarning {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
 }
 
 .filtersShell {
@@ -720,12 +722,7 @@
   gap: 1rem;
 }
 
-.confirmError {
-  color: #b02a37;
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin: 0.75rem 0 0;
-}
+
 
 @media (max-width: 1199.98px) {
 

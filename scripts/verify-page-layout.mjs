@@ -18,14 +18,15 @@ await writeFile(path.join(output, 'fixture.jsx'), `
 import React from 'react'; import {createRoot} from 'react-dom/client';
 import {MemoryRouter,Routes,Route} from 'react-router-dom';
 import AppLayout from '/src/shared/components/layout/AppLayout.jsx';
+import ToastProvider from '/src/shared/notifications/ToastProvider.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css'; import 'bootstrap-icons/font/bootstrap-icons.css';
 import '/src/styles/theme.css'; import '/src/styles/global.css'; import '/src/styles/bootstrap-overrides.css';
 ${selected.map(([id, , file], i) => `import Page${i} from '/src/modules/${file}.jsx';`).join('\n')}
 const routes=${JSON.stringify(selected.map(([id, url]) => [id, url]))};
 const id=new URLSearchParams(location.search).get('page') || routes[0][0];
-createRoot(document.getElementById('root')).render(<MemoryRouter initialEntries={[routes.find(r=>r[0]===id)[1]]}><Routes><Route element={<AppLayout/>}>
+createRoot(document.getElementById('root')).render(<ToastProvider><MemoryRouter initialEntries={[routes.find(r=>r[0]===id)[1]]}><Routes><Route element={<AppLayout/>}>
 ${selected.map(([, url], i) => `<Route path="${url.replace('/123', '/:orderId').replace('/1', '/:messageId')}" element={<Page${i}/>}/>`).join('\n')}
-</Route></Routes></MemoryRouter>);
+</Route></Routes></MemoryRouter></ToastProvider>);
 `)
 const server = await createServer({ root, configFile: false, plugins: [{
   name: 'isolated-page-review', enforce: 'pre',

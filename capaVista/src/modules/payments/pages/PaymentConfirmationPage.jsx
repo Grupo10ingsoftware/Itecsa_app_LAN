@@ -1,4 +1,6 @@
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
+import { useToast } from '../../../shared/notifications/useToast'
+import { operationFailureMessage, requiresContext, uncertainOperation } from '../../../shared/notifications/operationFeedback'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { PERMISSIONS } from '@/config/permissions'
 import { PAYMENT_STATUS } from '@/config/status'
@@ -26,6 +28,7 @@ const FILTERS = [
 ]
 
 export default function PaymentConfirmationPage() {
+  const notify = useToast()
   const { hasPermission } = useAuth()
   const paymentsApi = usePaymentsApi()
   const [orders, setOrders] = useState([])
@@ -142,7 +145,7 @@ export default function PaymentConfirmationPage() {
     const paymentStatusId = getPaymentStatusIdByName(paymentStatuses, newStatus)
 
     if (!paymentStatusId) {
-      setUpdateError('No fue posible resolver el estado de pago seleccionado.')
+      notify.error('No fue posible resolver el estado de pago seleccionado.')
       return false
     }
 
@@ -163,10 +166,9 @@ export default function PaymentConfirmationPage() {
       setEditingStatus((prev) => ({ ...prev, [orderId]: false }))
       return true
     } catch (error) {
-      setUpdateError(
-        error?.payload?.message ??
-          'No fue posible actualizar el estado de pago.',
-      )
+      const message = operationFailureMessage(error, 'No fue posible actualizar el estado de pago.')
+      if (requiresContext(error) || uncertainOperation(error)) setUpdateError(message)
+      else notify.error(message)
       return false
     } finally {
       setIsUpdatingPaymentStatus(false)
@@ -177,6 +179,7 @@ export default function PaymentConfirmationPage() {
     loadPaymentData,
     paymentStatuses,
     paymentsApi,
+    notify,
   ])
 
   const handleFilterChange = useCallback((filterKey) => {
@@ -257,7 +260,7 @@ export default function PaymentConfirmationPage() {
       setEditingStatus({})
       setPendingTransition(null)
       setCredentialsTransition(null)
-      setUpdateError('Un pago resuelto no puede volver al estado Pendiente.')
+      notify.warning('Un pago resuelto no puede volver al estado Pendiente.')
       return
     }
 
@@ -308,6 +311,7 @@ export default function PaymentConfirmationPage() {
     canUpdatePaymentStatus,
     isUpdatingPaymentStatus,
     getPaymentPreview,
+    notify,
   ])
 
   const closePaymentActionConfirmation = useCallback(() => {
@@ -349,6 +353,7 @@ export default function PaymentConfirmationPage() {
 
     if (wasUpdated) {
       setCredentialsTransition(null)
+      notify.success('Estado de pago actualizado correctamente.')
       setPreviewState((currentPreview) =>
         currentPreview?.order?.id === credentialsTransition.order.id
           ? null
@@ -359,6 +364,7 @@ export default function PaymentConfirmationPage() {
     canUpdatePaymentStatus,
     credentialsTransition,
     handleUpdatePaymentStatus,
+    notify,
   ])
 
   const openPaymentDetail = useCallback(async (order) => {
@@ -436,12 +442,6 @@ export default function PaymentConfirmationPage() {
             >
               Reintentar
             </button>
-          </div>
-        )}
-
-        {updateError && (
-          <div className={`alert alert-warning ${styles.stateMessage}`} role="alert">
-            {updateError}
           </div>
         )}
 

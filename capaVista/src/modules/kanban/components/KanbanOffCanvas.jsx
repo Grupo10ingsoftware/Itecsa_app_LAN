@@ -15,6 +15,8 @@ import {
 import { useRef, useState } from 'react';
 import styles from '../styles/Kanban.module.css';
 import { useModalDialog } from '../../users/hooks/useModalDialog'
+import { useToast } from '../../../shared/notifications/useToast'
+import { operationFailureMessage, requiresContext, uncertainOperation } from '../../../shared/notifications/operationFeedback'
 
 export default function KanbanOffCanvas(props) {
   return props.isOpen ? <KanbanOffCanvasContent key={props.order?.id ?? props.order?.salesNoteNumber ?? 'loading'} {...props} /> : null
@@ -51,7 +53,8 @@ function KanbanOffCanvasContent({
   const [cancelError, setCancelError] = useState('')
   const [isCancelling, setIsCancelling] = useState(false)
   const [isReevaluating, setIsReevaluating] = useState(false)
-  const [actionError, setActionError] = useState('')
+  const notify = useToast()
+  const [actionIssue, setActionIssue] = useState('')
   const [isSendingCorrection, setIsSendingCorrection] = useState(false)
   const correctionPending = useRef(false)
   const operationPending = useRef(false)
@@ -148,8 +151,10 @@ function KanbanOffCanvasContent({
       }
 
       resetAuthModal()
-    } catch {
-      setAuthError('No fue posible completar el subproceso.')
+    } catch (error) {
+      const message = operationFailureMessage(error, authModal.action === 'rollback' ? 'No fue posible retroceder el subproceso.' : 'No fue posible completar el subproceso.')
+      if (requiresContext(error) || uncertainOperation(error)) setAuthError(message)
+      else notify.error(message)
     } finally { operationPending.current = false; setIsCompletingSubprocess(false) }
   }
 
@@ -174,8 +179,10 @@ function KanbanOffCanvasContent({
       setCorrectionText('')
       setCorrectionError('')
       setIsCorrectionFormOpen(false)
-    } catch {
-      setCorrectionError('No fue posible enviar el pedido a revisión.')
+    } catch (error) {
+      const message = operationFailureMessage(error, 'No fue posible enviar el pedido a revisión.')
+      if (requiresContext(error) || uncertainOperation(error)) setCorrectionError(message)
+      else notify.error(message)
     } finally { correctionPending.current = false; setIsSendingCorrection(false) }
   }
 
@@ -198,8 +205,10 @@ function KanbanOffCanvasContent({
       if (wasCancelled === false) {
         setCancelError('No fue posible cancelar la produccion.')
       }
-    } catch {
-      setCancelError('No fue posible cancelar la produccion.')
+    } catch (error) {
+      const message = operationFailureMessage(error, 'No fue posible cancelar la producción.')
+      if (requiresContext(error) || uncertainOperation(error)) setCancelError(message)
+      else notify.error(message)
     } finally {
       operationPending.current = false
       setIsCancelling(false)
@@ -257,7 +266,7 @@ function KanbanOffCanvasContent({
         </header>
 
         <div className={styles.offcanvasBody}>
-          {actionError && <p className={styles.operatorModalError} role="alert">{actionError}</p>}
+          {actionIssue && <p className={styles.operatorModalError} role="alert">{actionIssue}</p>}
           <KanbanOrderSummary
             order={order}
             orderItems={orderItems}
@@ -319,7 +328,7 @@ function KanbanOffCanvasContent({
                     rows={4}
                     value={correctionText}
                   />
-                  {correctionError && <p className={styles.operatorModalError}>{correctionError}</p>}
+                  {correctionError && <p className={styles.operatorModalError} role="alert">{correctionError}</p>}
                   <div className={styles.correctionActions}>
                     <button
                       className={styles.resetFilterButton}
@@ -375,9 +384,15 @@ function KanbanOffCanvasContent({
                 if (operationPending.current) return
                 operationPending.current = true
                 setIsReevaluating(true)
-                setActionError('')
-                try { await onReevaluate?.(order) }
-                catch { setActionError('No fue posible reevaluar el pedido.') }
+                setActionIssue('')
+                try {
+                  await onReevaluate?.(order)
+                }
+                catch (error) {
+                  const message = operationFailureMessage(error, 'No fue posible reevaluar el pedido.')
+                  if (requiresContext(error) || uncertainOperation(error)) setActionIssue(message)
+                  else notify.error(message)
+                }
                 finally { operationPending.current = false; setIsReevaluating(false) }
               }} type="button" aria-busy={isReevaluating}>
                 <i className="bi bi-arrow-repeat" aria-hidden="true" />

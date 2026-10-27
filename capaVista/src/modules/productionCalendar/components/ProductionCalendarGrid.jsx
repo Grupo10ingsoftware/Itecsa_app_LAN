@@ -9,6 +9,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { PERMISSIONS } from '../../../config/permissions';
 import styles from './ProductionCalendarGrid.module.css';
 import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
+import { useToast } from '../../../shared/notifications/useToast'
 
 export default function ProductionCalendarGrid({
   isLoading = false,
@@ -22,6 +23,7 @@ export default function ProductionCalendarGrid({
   onDragStart,
   toolbar,
 }) {
+  const notify = useToast()
   const [selectedDayKey, setSelectedDayKey] = useState(null)
   const [selectedDetailOrder, setSelectedDetailOrder] = useState(null)
   const [detailError, setDetailError] = useState(null)
@@ -129,6 +131,7 @@ export default function ProductionCalendarGrid({
       currentItems.filter((item) => String(item.id) !== String(pendingChange.item.id)),
     )
     closeDeliveryChangeFlow()
+    notify.success('Fecha de entrega actualizada correctamente.')
   }
 
   return (

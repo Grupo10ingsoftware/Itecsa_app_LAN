@@ -8,6 +8,8 @@ import PageHeader from '../../../shared/components/layout/PageHeader'
 import { useAuth } from '../../../hooks/useAuth'
 import { PERMISSIONS } from '../../../config/permissions'
 import { useKanbanApi } from '../hooks/useKanbanApi'
+import { useToast } from '../../../shared/notifications/useToast'
+import { operationFailureMessage, requiresContext, uncertainOperation } from '../../../shared/notifications/operationFeedback'
 
 function toInteger(value, fallback = 0) {
   const number = Number(value)
@@ -52,6 +54,7 @@ function hasDailyLoadChange(detail) {
 }
 
 export default function KanbanBoardPage() {
+  const notify = useToast()
   const api = useKanbanApi()
   const { hasPermission } = useAuth()
   const [isCapacityOpen, setIsCapacityOpen] = useState(false)
@@ -144,8 +147,11 @@ export default function KanbanBoardPage() {
       setKanbanRefreshKey((current) => current + 1)
       setIsCapacityOpen(false)
       setCapacityError('')
+      notify.success('Carga operativa guardada correctamente.')
     } catch (error) {
-      setCapacityError(error?.payload?.message ?? error?.message ?? 'No fue posible guardar la carga operativa.')
+      const message = operationFailureMessage(error, 'No fue posible guardar la carga operativa.')
+      if (requiresContext(error) || uncertainOperation(error)) setCapacityError(message)
+      else notify.error(message)
     } finally {
       capacityPending.current = false
       setIsSavingCapacity(false)
@@ -253,7 +259,7 @@ export default function KanbanBoardPage() {
                   </label>
                 )
               })}
-              {capacityError && <p className={styles.capacityError}>{capacityError}</p>}
+              {capacityError && <p className={styles.capacityError} role="alert">{capacityError}</p>}
             </div>
             <footer>
               <button disabled={isSavingCapacity} onClick={() => setIsCapacityOpen(false)} type="button">Cancelar</button>

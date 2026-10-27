@@ -3,10 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../hooks/useAuth'
 import OrderCreateHeader from '../components/OrderCreateHeader'
 import OrderCreateConfirmModal from '../components/OrderCreateConfirmModal'
-import OrderCreateSuccess from '../components/OrderCreateSuccess'
-import OrderNotice from '../components/OrderNotice'
 import SalesNoteStep from '../components/SalesNoteStep'
-import { ORDER_CREATE_VIEW_MODE, useOrderCreateFlow } from '../../../hooks/useOrderCreateFlow'
+import { useOrderCreateFlow } from '../../../hooks/useOrderCreateFlow'
 import styles from './OrderCreatePage.module.css'
 import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
 
@@ -25,25 +23,13 @@ export default function OrderCreatePage() {
     || identityUser?.email
     || 'Usuario no identificado'
 
-  if (flow.viewMode === ORDER_CREATE_VIEW_MODE.SUCCESS && flow.registeredOrder) {
-    return (
-      <div className={`${styles.page} ${styles.successPage}`}>
-        <OrderCreateSuccess
-          onCreateAnother={actions.resetFlow}
-          onGoKanban={actions.goToKanban}
-        />
-      </div>
-    )
-  }
-
   return (
     <PageShell className={styles.page}>
       <PageSurface className={styles.dashboardShell} inert={flow.showConfirmModal || undefined}>
         <OrderCreateHeader />
 
         <div className={styles.content}>
-          <OrderNotice notice={flow.notice} />
-
+          {flow.registrationIssue && <div className="alert alert-warning" role="alert">{flow.registrationIssue}</div>}
           <SalesNoteStep
             draft={flow.draft}
             errors={flow.errors}

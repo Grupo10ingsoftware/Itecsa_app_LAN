@@ -9,11 +9,13 @@ import { useAuth } from '../../../hooks/useAuth'
 import { useAdminUsersApi } from '../hooks/useAdminUsersApi'
 import { hasValidationErrors, validateUserCreateForm } from '../utils/userValidation'
 import styles from './UserCreateForm.module.css'
+import { useToast } from '../../../shared/notifications/useToast'
+import { publicOperationMessage, requiresContext, uncertainOperation } from '../../../shared/notifications/operationFeedback'
 import { generateUsername } from '../utils/generateUsername.js'
 
 const INITIAL_VALUES = Object.freeze({ nombreUsuario: '', apellidoUsuario: '', rutUsuario: '', correoUsuario: '', rolUsuario: '', username: '' })
 const INITIAL_ERRORS = Object.freeze({ nombreUsuario: [], apellidoUsuario: [], rutUsuario: [], correoUsuario: [], rolUsuario: [], username: [] })
-const MESSAGE_TYPES = Object.freeze({ WARNING: 'warning', DANGER: 'danger', INFO: 'info' })
+const MESSAGE_TYPES = Object.freeze({ WARNING: 'warning', DANGER: 'danger' })
 
 function FieldErrors({ errors, id }) {
   return errors.length ? <div className={styles.fieldErrors} id={id}>{errors.map(error => <p key={error}>{error}</p>)}</div> : null
@@ -25,13 +27,10 @@ function getErrorMessage(error) {
   }
   if (error?.status === 403) return { type: MESSAGE_TYPES.DANGER, text: 'Acceso denegado. No tienes permisos para preparar esta cuenta.' }
   if (error?.status === 409) return { type: MESSAGE_TYPES.WARNING, text: 'La cuenta o la operacion tiene un conflicto. Revisa su estado antes de repetir el alta.' }
-  return { type: MESSAGE_TYPES.DANGER, text: error?.payload?.message || 'No se pudo confirmar la preparacion. Revisa el estado antes de repetirla.' }
+  return { type: MESSAGE_TYPES.DANGER, text: publicOperationMessage(error, 'No se pudo confirmar la preparación. Revisa el estado antes de repetirla.') }
 }
 function preparationMessage(result) {
-  return { type: result.outcome === 'user_created' ? MESSAGE_TYPES.INFO : MESSAGE_TYPES.WARNING,
-    text: result.outcome === 'user_created'
-      ? 'Usuario creado. Si no registraste la contraseña inicial, crea una nueva credencial temporal a través de Keycloak.'
-      : 'Creación incompleta. No repitas el alta. Referencia: ' + result.operationId + '.' }
+  return { type: MESSAGE_TYPES.WARNING, text: 'Creación incompleta. No repitas el alta. Referencia: ' + result.operationId + '.' }
 }
 export default function UserCreateForm(props) {
   const { user } = useAuth()
@@ -39,6 +38,7 @@ export default function UserCreateForm(props) {
 }
 
 function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreated } = {}) {
+  const notify = useToast()
   const { loginWithRedirect, user: actor } = useAuth()
   const adminUsersApi = useAdminUsersApi()
   const [values, setValues] = useState(INITIAL_VALUES)
@@ -103,7 +103,7 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
       setCreatedUser(result)
       setFieldErrors(INITIAL_ERRORS)
       setPinAction(null)
-      setMessage(preparationMessage(result))
+      setMessage(result.outcome === 'user_created' ? null : preparationMessage(result))
       if (result.outcome === 'user_created' && result.mustChangePassword && typeof temporaryPassword === 'string' && temporaryPassword) {
         setCredential({ username: values.username, temporaryPassword })
       } else {
@@ -111,7 +111,10 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
         onCreated?.(result)
       }
     } catch (error) {
-      if (active.current) setPinError(getErrorMessage(error).text)
+      if (active.current) {
+        if (requiresContext(error) || uncertainOperation(error) || error?.status === 409) setPinError(getErrorMessage(error).text)
+        else notify.error(getErrorMessage(error).text)
+      }
     } finally {
       submitting.current = false
       if (active.current) setIsSubmitting(false)

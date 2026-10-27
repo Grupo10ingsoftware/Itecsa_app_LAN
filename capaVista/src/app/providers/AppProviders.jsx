@@ -4,6 +4,7 @@ import { safeReturnPath } from './keycloakSession.js'
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthProvider } from './AuthProvider'
+import NotificationSession from '../../shared/notifications/NotificationSession'
 
 export default function AppProviders({ children, recoverySession }) {
   const navigate = useNavigate()
@@ -16,7 +17,7 @@ export default function AppProviders({ children, recoverySession }) {
   }
   return (
     <KeycloakIdentityProvider onRedirect={handleRedirectCallback} recoverySession={recoverySession}>
-      <AuthProvider>{children}</AuthProvider>
+      <NotificationSession><AuthProvider>{children}</AuthProvider></NotificationSession>
     </KeycloakIdentityProvider>
   )
 }

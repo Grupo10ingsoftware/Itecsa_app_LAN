@@ -14,6 +14,7 @@ import UserMovementsTable from '../../users/components/UserMovementsTable'
 import confirmationStyles from '../../../shared/styles/ConfirmationModal.module.css'
 import PinModal, { PinError } from '../../../shared/components/pin/PinModal'
 import pinStyles from '../../../shared/components/pin/PinModal.module.css'
+import { useToast } from '../../../shared/notifications/useToast'
 
 function getDisplayValue(value, fallback = 'No informado') {
   return String(value ?? '').trim() || fallback
@@ -25,15 +26,16 @@ export default function ProfilePage() {
 }
 
 function ProfileContent() {
+  const notify = useToast()
   const { identityUser, pinStatus, refreshSession, user, provider } = useAuth()
   const authApi = useAuthApi()
   const recoveryTask = useRef(null)
   const acknowledgementPending = useRef(false)
   const acknowledged = useRef(false)
+  const [pinAcknowledged, setPinAcknowledged] = useState(false)
   const active = useRef(false)
   useEffect(() => { active.current = true; return () => { active.current = false } }, [])
   const [recoveryVerified, setRecoveryVerified] = useState(() => getPinRecoveryOutcome(user?.sub)?.recovered ?? false)
-  const [pinSuccess, setPinSuccess] = useState('')
   useEffect(() => () => { recoveryTask.current?.cancel(); recoveryTask.current = null }, [user?.sub])
   const [historyOpen, setHistoryOpen] = useState(false)
   const historyApi = useMemo(() => ({ getMovements: (_subject, query) => authApi.getProfileMovements(query) }), [authApi])
@@ -102,7 +104,8 @@ function ProfileContent() {
       if (!acknowledged.current) await authApi.acknowledgePin()
       if (!active.current) return
       acknowledged.current = true
-      if (recoveryVerified) { setPinSuccess('Tu PIN se ha actualizado correctamente'); setRecoveryVerified(false); clearPinRecoveryOutcome() }
+      setPinAcknowledged(true)
+      if (recoveryVerified) { notify.success('Tu PIN se ha actualizado correctamente'); setRecoveryVerified(false); clearPinRecoveryOutcome() }
       setVisiblePin('')
       await refreshSession()
     } catch (error) {
@@ -116,7 +119,6 @@ function ProfileContent() {
   async function recoverPin() {
     if (recoveryTask.current || isPinBusy) return
     setPinError('')
-    setPinSuccess('')
     setIsPinBusy(true)
     setRecoveryOpen(true)
     const task = beginPinRecovery(authApi)
@@ -197,7 +199,6 @@ function ProfileContent() {
           </section>
         </section>
 
-        {pinSuccess && <div className="alert alert-success" role="status">{pinSuccess}</div>}
         {pinError && pinStatus === 'active' && !recoveryOpen && <div className="alert alert-danger" role="alert">{pinError}</div>}
 
         <section className={styles.movementsPanel} aria-labelledby="movements-title">
@@ -222,12 +223,12 @@ function ProfileContent() {
       {pinStatus === 'pending_acknowledgement' && (
         <PinModal title="Tu PIN personal" canClose={false} busy={isPinBusy}
           description="Guardalo en un lugar seguro. Despues de aceptar no volvera a mostrarse."
-          actions={<button className={pinStyles.primary} disabled={(!visiblePin && !acknowledged.current) || isPinBusy}
+          actions={<button className={pinStyles.primary} disabled={(!visiblePin && !pinAcknowledged) || isPinBusy}
             onClick={acknowledgePin} type="button" aria-busy={isPinBusy}>
-            <LoadingAction busy={isPinBusy} surface="light" context="Aceptar">{acknowledged.current ? 'Continuar' : 'Aceptar'}</LoadingAction>
+            <LoadingAction busy={isPinBusy} surface="light" context="Aceptar">{pinAcknowledged ? 'Continuar' : 'Aceptar'}</LoadingAction>
           </button>}>
           <div className={pinStyles.secret}>
-            {visiblePin || (acknowledged.current ? 'PIN aceptado' : pinError ? 'PIN no disponible' : <LoadingIndicator scope="action" context="PIN operativo" />)}
+            {visiblePin || (pinAcknowledged ? 'PIN aceptado' : pinError ? 'PIN no disponible' : <LoadingIndicator scope="action" context="PIN operativo" />)}
           </div>
           <PinError>{pinError}</PinError>
         </PinModal>
