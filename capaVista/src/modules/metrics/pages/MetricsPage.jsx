@@ -8,11 +8,12 @@ import {
   EMPTY_METRICS_SUMMARY,
   getPeriodQuery,
   subscribeMetricsSummary,
+  getMetricsScope,
 } from '../utils/metricsPage'
 import styles from './MetricsPage.module.css'
 import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
 import PageHeader from '../../../shared/components/layout/PageHeader'
-import { escapeReportHtml, spreadsheetCell } from '../utils/reportFormatting'
+import { buildSellerReport } from '../utils/reportFormatting'
 
 const PRODUCT_COLORS = ['#f97316', '#2563eb', '#248f55']
 
@@ -26,6 +27,10 @@ function formatDuration(seconds) {
 
 export default function MetricsPage() {
   const api = useMetricsApi()
+  return <MetricsContent key={getMetricsScope(api)} api={api} />
+}
+
+function MetricsContent({ api }) {
   const [period, setPeriod] = useState(createInitialPeriod)
   const [requestResult, setRequestResult] = useState({
     queryKey: '',
@@ -91,21 +96,16 @@ export default function MetricsPage() {
 
   function exportReport(format) {
     const rows = summary.sellerCompliance ?? []
-    const headers = ['Vendedor', 'Notas de venta', 'Entregados a tiempo', 'Entregados fuera de plazo', 'Ingresados con carga alta']
-    const values = rows.map((row) => [row.seller, row.salesNotes, row.deliveredOnTime, row.deliveredLate, row.enteredDuringHighLoad])
-
     if (format === 'pdf') {
       const reportWindow = window.open('', '_blank')
       if (!reportWindow) return
-      reportWindow.document.write(`<html><head><title>Reporte de cumplimiento</title></head><body><h1>Reporte de cumplimiento por vendedor</h1><p>Periodo: ${escapeReportHtml(queryFrom)} a ${escapeReportHtml(queryTo)}</p><table border="1"><thead><tr>${headers.map((header) => `<th>${escapeReportHtml(header)}</th>`).join('')}</tr></thead><tbody>${values.map((row) => `<tr>${row.map((value) => `<td>${escapeReportHtml(value)}</td>`).join('')}</tr>`).join('')}</tbody></table></body></html>`)
+      reportWindow.document.write(buildSellerReport(rows, format, queryFrom, queryTo))
       reportWindow.document.close()
       reportWindow.print()
       return
     }
 
-    const separator = format === 'excel' ? '\t' : ','
-    const content = [headers, ...values].map((row) => row.map((value) => format === 'csv' ? `"${spreadsheetCell(value).replaceAll('"', '""')}"` : spreadsheetCell(value)).join(separator)).join('\n')
-    const blob = new Blob([`\ufeff${content}`], { type: format === 'excel' ? 'application/vnd.ms-excel' : 'text/csv;charset=utf-8' })
+    const blob = new Blob([buildSellerReport(rows, format, queryFrom, queryTo)], { type: format === 'excel' ? 'application/vnd.ms-excel' : 'text/csv;charset=utf-8' })
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
     link.download = `reporte-cumplimiento-${queryFrom}-${queryTo}.${format === 'excel' ? 'xls' : 'csv'}`
@@ -151,7 +151,7 @@ export default function MetricsPage() {
               <div className={styles.dwellPanels} id="dwell-content">
                 {dwellGroups.map((group) => {
                   const items = group.key === 'subprocesses' ? visibleSubprocesses : group.items
-                  const maxDwell = Math.max(...items.map((item) => Number(item.averageSeconds)), 1)
+                  const maxDwell = items.reduce((maximum, item) => Math.max(maximum, Number(item.averageSeconds)), 1)
 
                   return <article className={styles.dwellPanel} key={group.key}>
                     <header className={styles.dwellPanelHeader}>

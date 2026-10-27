@@ -91,27 +91,54 @@ export function buildProductionChart(production, colors) {
       color: palette[index % palette.length],
     }
 
+    accumulator.segments.push(segment)
     return {
       end: segment.end,
-      segments: [...accumulator.segments, segment],
+      segments: accumulator.segments,
     }
   }, { end: 0, segments: [] })
 
   return { total, segments: result.segments }
 }
 
+const scopes = new WeakMap()
+let nextScope = 0
+export function getMetricsScope(api) {
+  if (!scopes.has(api)) scopes.set(api, ++nextScope)
+  return scopes.get(api)
+}
+
+// Only in-flight reads are shared within this API/session. No completed cache.
+const pendingSummaries = new WeakMap()
 export function subscribeMetricsSummary({ api, from, to, onSuccess, onError }) {
-  let active = true
-
-  api.getSummary({ from, to })
-    .then((result) => {
-      if (active) onSuccess(result)
+  let requests = pendingSummaries.get(api)
+  if (!requests) { requests = new Map(); pendingSummaries.set(api, requests) }
+  const key = `${from}|${to}`
+  let entry = requests.get(key)
+  if (!entry) {
+    entry = { controller: new AbortController(), listeners: new Set() }
+    requests.set(key, entry)
+    queueMicrotask(async () => {
+      if (!entry.listeners.size) return
+      try {
+        const result = await api.getSummary({ from, to, signal: entry.controller.signal })
+        for (const listener of entry.listeners) listener.onSuccess(result)
+      } catch (error) {
+        if (!entry.controller.signal.aborted) for (const listener of entry.listeners) listener.onError(error)
+      } finally {
+        if (requests.get(key) === entry) requests.delete(key)
+      }
     })
-    .catch((error) => {
-      if (active) onError(error)
-    })
-
+  }
+  const listener = { onSuccess, onError }
+  entry.listeners.add(listener)
   return () => {
-    active = false
+    entry.listeners.delete(listener)
+    queueMicrotask(() => {
+      if (!entry.listeners.size) {
+        entry.controller.abort()
+        if (requests.get(key) === entry) requests.delete(key)
+      }
+    })
   }
 }

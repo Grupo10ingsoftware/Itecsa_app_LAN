@@ -1,6 +1,7 @@
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useRef, useState } from 'react'
 import styles from '../pages/MetricsPage.module.css'
+import { getMetricsScope } from '../utils/metricsPage'
 
 export function PerformanceResult({ report }) {
   if (!report.totalOrders) return <p role="status" className={styles.emptyState}>No existen datos disponibles para generar el reporte en el período seleccionado.</p>
@@ -15,15 +16,20 @@ export function PerformanceResult({ report }) {
 }
 
 export default function ProductionPerformance({ api, period }) {
+  return <PerformanceRequest key={`${getMetricsScope(api)}|${period.from}|${period.to}`} api={api} period={period} />
+}
+
+function PerformanceRequest({ api, period }) {
   const [open, setOpen] = useState(false)
   const [report, setReport] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const active = useRef(false)
   const pending = useRef(false)
+  const controller = useRef(null)
   useEffect(() => {
     active.current = true
-    return () => { active.current = false }
+    return () => { active.current = false; controller.current?.abort() }
   }, [])
 
   async function generate() {
@@ -32,8 +38,9 @@ export default function ProductionPerformance({ api, period }) {
     setLoading(true)
     setReport(null)
     setError('')
+    controller.current = new AbortController()
     try {
-      const result = await api.getProductionPerformance(period)
+      const result = await api.getProductionPerformance({ ...period, signal: controller.current.signal })
       if (active.current) setReport(result)
     } catch (requestError) {
       if (active.current) setError(requestError?.payload?.message ?? 'No fue posible generar el reporte. Inténtalo nuevamente.')
