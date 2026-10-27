@@ -312,7 +312,7 @@ export default function UserManagementPage() {
         )}
 
         <div className={styles.content}>
-          <p className="mb-0 text-secondary" role="status">Puedes crear usuarios y editar sus datos, rol y estado con tu PIN de autorizacion.</p>
+          
           {actionMessage && (
             <div className={`${styles.feedbackMessage} ${styles[`feedback${actionMessage.type}`]}`} role="status">
               <span>{actionMessage.text}</span>
