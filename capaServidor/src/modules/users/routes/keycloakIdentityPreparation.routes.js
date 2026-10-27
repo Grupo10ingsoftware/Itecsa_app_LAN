@@ -14,7 +14,8 @@ export function createKeycloakIdentityPreparationRouter({ authenticate = checkJw
   router.use((req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
   router.use(authenticate, requireAdministrativeRole);
   const context = req => ({ provider: req.identityProvider, subject: req.auth?.payload?.sub,
-    role: roleFromPayload(req.auth?.payload), permissions: req.auth?.payload?.permissions, pin: req.body?.pin });
+    role: roleFromPayload(req.auth?.payload), permissions: req.auth?.payload?.permissions, pin: req.body?.pin,
+    currentUser: req.currentUser });
   const run = action => async (req, res) => {
     try { await action(req, res); }
     catch (error) {

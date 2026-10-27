@@ -1,0 +1,473 @@
+{
+  "environment": "development / remote MySQL / existing strict TLS / bounded sequential reads",
+  "node": "v22.23.4",
+  "samples": {
+    "list": {
+      "samples": [
+        {
+          "ms": 445.111,
+          "selects": 2
+        },
+        {
+          "ms": 442.388,
+          "selects": 2
+        },
+        {
+          "ms": 441.947,
+          "selects": 2
+        },
+        {
+          "ms": 663.112,
+          "selects": 2
+        },
+        {
+          "ms": 664.814,
+          "selects": 2
+        },
+        {
+          "ms": 661.865,
+          "selects": 2
+        },
+        {
+          "ms": 664.497,
+          "selects": 2
+        },
+        {
+          "ms": 914.368,
+          "selects": 2
+        },
+        {
+          "ms": 659.356,
+          "selects": 2
+        },
+        {
+          "ms": 665.399,
+          "selects": 2
+        }
+      ],
+      "count": 10,
+      "minMs": 441.947,
+      "maxMs": 914.368,
+      "meanMs": 622.286,
+      "medianMs": 662.488
+    },
+    "summary": {
+      "samples": [
+        {
+          "ms": 661.79,
+          "selects": 1
+        },
+        {
+          "ms": 664.628,
+          "selects": 1
+        },
+        {
+          "ms": 648.827,
+          "selects": 1
+        },
+        {
+          "ms": 660.752,
+          "selects": 1
+        },
+        {
+          "ms": 659.342,
+          "selects": 1
+        },
+        {
+          "ms": 647.89,
+          "selects": 1
+        },
+        {
+          "ms": 665.824,
+          "selects": 1
+        },
+        {
+          "ms": 567.104,
+          "selects": 1
+        },
+        {
+          "ms": 662.937,
+          "selects": 1
+        },
+        {
+          "ms": 666.326,
+          "selects": 1
+        }
+      ],
+      "count": 10,
+      "minMs": 567.104,
+      "maxMs": 666.326,
+      "meanMs": 650.542,
+      "medianMs": 661.271
+    },
+    "binding": {
+      "samples": [
+        {
+          "ms": 662.984,
+          "selects": 1
+        },
+        {
+          "ms": 651.424,
+          "selects": 1
+        },
+        {
+          "ms": 663.773,
+          "selects": 1
+        },
+        {
+          "ms": 661.405,
+          "selects": 1
+        },
+        {
+          "ms": 659.853,
+          "selects": 1
+        },
+        {
+          "ms": 648.539,
+          "selects": 1
+        },
+        {
+          "ms": 666.996,
+          "selects": 1
+        },
+        {
+          "ms": 567.05,
+          "selects": 1
+        },
+        {
+          "ms": 662.975,
+          "selects": 1
+        },
+        {
+          "ms": 665.276,
+          "selects": 1
+        }
+      ],
+      "count": 10,
+      "minMs": 567.05,
+      "maxMs": 666.996,
+      "meanMs": 651.027,
+      "medianMs": 662.19
+    },
+    "movements": {
+      "samples": [
+        {
+          "ms": 666.344,
+          "selects": 2
+        },
+        {
+          "ms": 667.556,
+          "selects": 2
+        },
+        {
+          "ms": 664.688,
+          "selects": 2
+        },
+        {
+          "ms": 673.901,
+          "selects": 2
+        },
+        {
+          "ms": 667.138,
+          "selects": 2
+        },
+        {
+          "ms": 659.675,
+          "selects": 2
+        },
+        {
+          "ms": 661.65,
+          "selects": 2
+        },
+        {
+          "ms": 657.796,
+          "selects": 2
+        },
+        {
+          "ms": 664.077,
+          "selects": 2
+        },
+        {
+          "ms": 673.892,
+          "selects": 2
+        }
+      ],
+      "count": 10,
+      "minMs": 657.796,
+      "maxMs": 673.901,
+      "meanMs": 665.672,
+      "medianMs": 665.516
+    },
+    "listReferenceSameProcess": {
+      "samples": [
+        {
+          "ms": 1252.113,
+          "selects": 3
+        },
+        {
+          "ms": 1325.474,
+          "selects": 3
+        },
+        {
+          "ms": 1317.732,
+          "selects": 3
+        },
+        {
+          "ms": 1309.738,
+          "selects": 3
+        },
+        {
+          "ms": 1229.439,
+          "selects": 3
+        },
+        {
+          "ms": 1325.234,
+          "selects": 3
+        },
+        {
+          "ms": 1324.691,
+          "selects": 3
+        },
+        {
+          "ms": 1318.804,
+          "selects": 3
+        },
+        {
+          "ms": 1325.252,
+          "selects": 3
+        },
+        {
+          "ms": 1323.981,
+          "selects": 3
+        }
+      ],
+      "count": 10,
+      "minMs": 1229.439,
+      "maxMs": 1325.474,
+      "meanMs": 1305.246,
+      "medianMs": 1321.392
+    },
+    "movementsReferenceSameProcess": {
+      "samples": [
+        {
+          "ms": 1980.247,
+          "selects": 8
+        },
+        {
+          "ms": 1971.119,
+          "selects": 8
+        },
+        {
+          "ms": 1985.637,
+          "selects": 8
+        },
+        {
+          "ms": 1976.057,
+          "selects": 8
+        },
+        {
+          "ms": 1976.812,
+          "selects": 8
+        },
+        {
+          "ms": 1970.522,
+          "selects": 8
+        },
+        {
+          "ms": 1972.579,
+          "selects": 8
+        },
+        {
+          "ms": 1982.701,
+          "selects": 8
+        },
+        {
+          "ms": 1983.771,
+          "selects": 8
+        },
+        {
+          "ms": 1976.017,
+          "selects": 8
+        }
+      ],
+      "count": 10,
+      "minMs": 1970.522,
+      "maxMs": 1985.637,
+      "meanMs": 1977.546,
+      "medianMs": 1976.434
+    }
+  },
+  "sql": {
+    "list": [
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `Usuario`.`id_usuario` FROM `Usuario` LEFT JOIN `ExternalIdentity` AS `j0` ON (`j0`.`user_id`) = (`Usuario`.`id_usuario`) WHERE (`Usuario`.`rol_usuario` IN (?,?,?,?,?,?) AND (`j0`.`provider` = ? AND `j0`.`issuer` = ? AND (`j0`.`id_external_identity` IS NOT NULL)))) AS `sub`",
+      "SELECT u.id_usuario, u.nombre_usuario, u.apellido_usuario,\n        u.rut_usuario, u.correo_usuario, u.rol_usuario, u.estado_usuario, e.subject, e.username\n        FROM Usuario u INNER JOIN ExternalIdentity e ON e.user_id = u.id_usuario\n        WHERE e.provider = 'keycloak' AND e.issuer = ? AND u.rol_usuario IN (?,?,?,?,?,?) ORDER BY u.id_usuario DESC LIMIT ? OFFSET ?"
+    ],
+    "summary": [
+      "SELECT COUNT(*) AS `_count$_all`, `Usuario`.`estado_usuario` FROM `Usuario` LEFT JOIN `ExternalIdentity` AS `j0` ON (`j0`.`user_id`) = (`Usuario`.`id_usuario`) WHERE (`Usuario`.`rol_usuario` IN (?,?,?,?,?,?) AND (`j0`.`provider` = ? AND `j0`.`issuer` = ? AND (`j0`.`id_external_identity` IS NOT NULL))) GROUP BY `Usuario`.`estado_usuario`"
+    ],
+    "binding": [
+      "SELECT e.id_external_identity, e.provider, e.issuer, e.subject, e.username, e.user_id,\n      u.id_usuario, u.rol_usuario, u.estado_usuario, u.correo_usuario, u.nombre_usuario, u.apellido_usuario\n      FROM ExternalIdentity e INNER JOIN Usuario u ON u.id_usuario = e.user_id\n      WHERE e.provider = 'keycloak' AND e.issuer = ? AND e.subject = ? LIMIT 1"
+    ],
+    "movements": [
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `Registros`.`ID_REGISTRO` FROM `Registros` WHERE `Registros`.`id_usuario` = ?) AS `sub`",
+      "SELECT r.ID_REGISTRO, r.FECHA_HORA, r.observacion,\n        rp.id_registro AS pagoId, ep.nombre_estado_pago AS pago,\n        re.id_registro AS etapaId, ee.nombre_etapa AS etapa,\n        rs.id_registro AS subprocesoId, es.nombre_estado AS subproceso\n        FROM Registros r\n        LEFT JOIN Registro_Pago rp ON rp.id_registro = r.ID_REGISTRO\n        LEFT JOIN Estado_Pago ep ON ep.id_estado_pago = rp.id_estado_pago_nuevo\n        LEFT JOIN Registro_Etapas re ON re.id_registro = r.ID_REGISTRO\n        LEFT JOIN Estado_Pedido ee ON ee.id_estado_pedido = re.id_estado_pedido\n        LEFT JOIN registro_subprocesos rs ON rs.id_registro = r.ID_REGISTRO\n        LEFT JOIN Estado_Subprocesos es ON es.id_estado_subproceso = rs.id_estado_subproceso\n        WHERE r.id_usuario = ? \n        ORDER BY r.FECHA_HORA DESC, r.ID_REGISTRO DESC LIMIT ? OFFSET ?"
+    ],
+    "listReferenceSameProcess": [
+      "SELECT `Usuario`.`id_usuario`, `Usuario`.`correo_usuario`, `Usuario`.`rut_usuario`, `Usuario`.`nombre_usuario`, `Usuario`.`apellido_usuario`, `Usuario`.`rol_usuario`, `Usuario`.`estado_usuario` FROM `Usuario` LEFT JOIN `ExternalIdentity` AS `j0` ON (`j0`.`user_id`) = (`Usuario`.`id_usuario`) WHERE (`Usuario`.`rol_usuario` IN (?,?,?,?,?,?) AND (`j0`.`provider` = ? AND `j0`.`issuer` = ? AND (`j0`.`id_external_identity` IS NOT NULL))) ORDER BY `Usuario`.`id_usuario` DESC LIMIT ? OFFSET ?",
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `Usuario`.`id_usuario` FROM `Usuario` LEFT JOIN `ExternalIdentity` AS `j0` ON (`j0`.`user_id`) = (`Usuario`.`id_usuario`) WHERE (`Usuario`.`rol_usuario` IN (?,?,?,?,?,?) AND (`j0`.`provider` = ? AND `j0`.`issuer` = ? AND (`j0`.`id_external_identity` IS NOT NULL)))) AS `sub`",
+      "SELECT `ExternalIdentity`.`id_external_identity`, `ExternalIdentity`.`subject`, `ExternalIdentity`.`username`, `ExternalIdentity`.`user_id` FROM `ExternalIdentity` WHERE `ExternalIdentity`.`user_id` IN (?,?,?,?,?,?,?,?,?,?)"
+    ],
+    "movementsReferenceSameProcess": [
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `Registros`.`ID_REGISTRO` FROM `Registros` WHERE `Registros`.`id_usuario` = ?) AS `sub`",
+      "SELECT `Registros`.`ID_REGISTRO`, `Registros`.`FECHA_HORA`, `Registros`.`observacion` FROM `Registros` WHERE `Registros`.`id_usuario` = ? ORDER BY `Registros`.`FECHA_HORA` DESC, `Registros`.`ID_REGISTRO` DESC LIMIT ? OFFSET ?",
+      "SELECT `registro_subprocesos`.`id_registro`, `registro_subprocesos`.`id_estado_subproceso` FROM `registro_subprocesos` WHERE `registro_subprocesos`.`id_registro` IN (?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Registro_Etapas`.`id_registro`, `Registro_Etapas`.`id_estado_pedido` FROM `Registro_Etapas` WHERE `Registro_Etapas`.`id_registro` IN (?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Registro_Pago`.`id_registro`, `Registro_Pago`.`id_estado_pago_nuevo` FROM `Registro_Pago` WHERE `Registro_Pago`.`id_registro` IN (?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Estado_Pago`.`id_estado_pago`, `Estado_Pago`.`nombre_estado_pago` FROM `Estado_Pago` WHERE `Estado_Pago`.`id_estado_pago` IN (?)",
+      "SELECT `Estado_Subprocesos`.`id_estado_subproceso`, `Estado_Subprocesos`.`nombre_estado` FROM `Estado_Subprocesos` WHERE `Estado_Subprocesos`.`id_estado_subproceso` IN (?)",
+      "SELECT `Estado_Pedido`.`id_estado_pedido`, `Estado_Pedido`.`nombre_etapa` FROM `Estado_Pedido` WHERE `Estado_Pedido`.`id_estado_pedido` IN (?,?)"
+    ]
+  },
+  "errors": 0,
+  "equivalence": {
+    "comparisons": 27,
+    "equal": true
+  },
+  "indices": [
+    {
+      "TABLE_NAME": "ExternalIdentity",
+      "INDEX_NAME": "external_identity_subject",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "provider"
+    },
+    {
+      "TABLE_NAME": "ExternalIdentity",
+      "INDEX_NAME": "external_identity_subject",
+      "SEQ_IN_INDEX": "2",
+      "COLUMN_NAME": "issuer"
+    },
+    {
+      "TABLE_NAME": "ExternalIdentity",
+      "INDEX_NAME": "external_identity_subject",
+      "SEQ_IN_INDEX": "3",
+      "COLUMN_NAME": "subject"
+    },
+    {
+      "TABLE_NAME": "ExternalIdentity",
+      "INDEX_NAME": "external_identity_user",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "user_id"
+    },
+    {
+      "TABLE_NAME": "ExternalIdentity",
+      "INDEX_NAME": "external_identity_username",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "provider"
+    },
+    {
+      "TABLE_NAME": "ExternalIdentity",
+      "INDEX_NAME": "external_identity_username",
+      "SEQ_IN_INDEX": "2",
+      "COLUMN_NAME": "issuer"
+    },
+    {
+      "TABLE_NAME": "ExternalIdentity",
+      "INDEX_NAME": "external_identity_username",
+      "SEQ_IN_INDEX": "3",
+      "COLUMN_NAME": "username"
+    },
+    {
+      "TABLE_NAME": "ExternalIdentity",
+      "INDEX_NAME": "PRIMARY",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_external_identity"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "idx_records_order_cursor",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_pedido"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "idx_records_order_cursor",
+      "SEQ_IN_INDEX": "2",
+      "COLUMN_NAME": "FECHA_HORA"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "idx_records_order_cursor",
+      "SEQ_IN_INDEX": "3",
+      "COLUMN_NAME": "ID_REGISTRO"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "PRIMARY",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "ID_REGISTRO"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "Registros_Pedidos_FK",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_pedido"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "Registros_Usuario_FK",
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_usuario"
+    }
+  ],
+  "movementsPlan": [
+    {
+      "table": "r",
+      "type": "ref",
+      "key": "Registros_Usuario_FK",
+      "rows": 198,
+      "extra": "Using temporary; Using filesort"
+    },
+    {
+      "table": "rp",
+      "type": "eq_ref",
+      "key": "PRIMARY",
+      "rows": 1,
+      "extra": null
+    },
+    {
+      "table": "ep",
+      "type": "ALL",
+      "key": null,
+      "rows": 3,
+      "extra": "Using where; Using join buffer (hash join)"
+    },
+    {
+      "table": "re",
+      "type": "eq_ref",
+      "key": "PRIMARY",
+      "rows": 1,
+      "extra": null
+    },
+    {
+      "table": "ee",
+      "type": "eq_ref",
+      "key": "PRIMARY",
+      "rows": 1,
+      "extra": null
+    },
+    {
+      "table": "rs",
+      "type": "eq_ref",
+      "key": "PRIMARY",
+      "rows": 1,
+      "extra": null
+    },
+    {
+      "table": "es",
+      "type": "eq_ref",
+      "key": "PRIMARY",
+      "rows": 1,
+      "extra": null
+    }
+  ]
+}

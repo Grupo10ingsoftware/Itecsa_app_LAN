@@ -1,9 +1,25 @@
 import { identityUserWhere } from '../../../database/identityBinding.js';
+import { Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import getPrismaClient from '../../../database/prisma.js';
 import { isActiveUserStatus, ACTIVE_USER_STATUSES, USER_STATUS } from '../../../config/userLifecycle.js';
 import { ADMIN_ROLES, ASSIGNABLE_ROLES } from '../../../../../shared/keycloakAuthorization.js';
-import { USER_RESPONSE_SELECT, UserRepository } from './users.repo.js';
+import { UserMovementsRepository } from './userMovements.repo.js';
+
+function listPredicate(issuer, { search = '', estadoUsuario = '', rolUsuario = '' } = {}) {
+  const conditions = [Prisma.sql`e.provider = 'keycloak'`, Prisma.sql`e.issuer = ${issuer}`,
+    Prisma.sql`u.rol_usuario IN (${Prisma.join([...ASSIGNABLE_ROLES])})`];
+  if (rolUsuario) conditions.push(Prisma.sql`u.rol_usuario = ${rolUsuario}`);
+  if (estadoUsuario) conditions.push(ACTIVE_USER_STATUSES.includes(estadoUsuario)
+    ? Prisma.sql`u.estado_usuario IN (${Prisma.join([...ACTIVE_USER_STATUSES])})`
+    : Prisma.sql`u.estado_usuario = ${estadoUsuario}`);
+  if (search) {
+    const pattern = `%${search}%`;
+    conditions.push(Prisma.sql`(u.nombre_usuario LIKE ${pattern} OR u.apellido_usuario LIKE ${pattern}
+      OR u.correo_usuario LIKE ${pattern} OR u.rut_usuario LIKE ${pattern} OR e.username LIKE ${pattern})`);
+  }
+  return Prisma.join(conditions, ' AND ');
+}
 
 // Explicit external bindings preserve local keys and actor ownership.
 export class KeycloakIdentityRepository {
@@ -21,15 +37,18 @@ export class KeycloakIdentityRepository {
   async list(issuer, { page, perPage, ...filters }) {
     const where = this.userScope(issuer, filters);
     const [rows, total] = await Promise.all([
-      this.client.usuario.findMany({ where, skip: (page - 1) * perPage, take: perPage, orderBy: { id_usuario: 'desc' },
-        select: { ...USER_RESPONSE_SELECT, ExternalIdentity: { select: { subject: true, username: true } } } }),
+      this.client.$queryRaw(Prisma.sql`SELECT u.id_usuario, u.correo_usuario, u.rut_usuario,
+        u.nombre_usuario, u.apellido_usuario, u.rol_usuario, u.estado_usuario, e.subject, e.username
+        FROM Usuario u JOIN ExternalIdentity e ON e.user_id = u.id_usuario
+        WHERE ${listPredicate(issuer, filters)} ORDER BY u.id_usuario DESC
+        LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`),
       this.client.usuario.count({ where }),
     ]);
     return { usuarios: rows.map(row => {
-      const identityBindingConflict = typeof row.ExternalIdentity?.subject !== 'string' || !row.ExternalIdentity.subject;
-      return { idUsuario: row.id_usuario, idUsuarioAutenticacionExterna: identityBindingConflict ? null : row.ExternalIdentity.subject,
+      const identityBindingConflict = typeof row.subject !== 'string' || !row.subject;
+      return { idUsuario: row.id_usuario, idUsuarioAutenticacionExterna: identityBindingConflict ? null : row.subject,
         identityBindingConflict,
-        username: row.ExternalIdentity.username, nombreUsuario: row.nombre_usuario, apellidoUsuario: row.apellido_usuario,
+        username: row.username, nombreUsuario: row.nombre_usuario, apellidoUsuario: row.apellido_usuario,
         rutUsuario: row.rut_usuario, correoUsuario: row.correo_usuario, rolUsuario: row.rol_usuario,
         estadoUsuario: row.estado_usuario?.startsWith('Actualizando:') ? 'Actualizando' : row.estado_usuario };
     }), total, page, perPage };
@@ -42,7 +61,7 @@ export class KeycloakIdentityRepository {
       desvinculados: counts.get(USER_STATUS.UNLINKED) ?? 0, pendientes: counts.get(USER_STATUS.PENDING_FIRST_LOGIN) ?? 0,
       pendientesRol: counts.get(USER_STATUS.PENDING_ROLE) ?? 0 };
   }
-  movements(userId, filters) { return new UserRepository({ prisma: this.client }).listMovements(userId, filters); }
+  movements(userId, filters) { return new UserMovementsRepository({ prisma: this.client }).list(userId, filters); }
   actor(subject) {
     return this.client.usuario.findFirst({ where: identityUserWhere(subject),
       select: { id_usuario: true, rol_usuario: true, estado_usuario: true } });
@@ -155,9 +174,13 @@ export class KeycloakIdentityRepository {
         action: 'update', resource_type: 'user', resource_id: String(binding.user_id), outcome } });
     });
   }
-  binding(issuer, subject) {
-    return this.client.externalIdentity.findUnique({ where: { provider_issuer_subject: { provider: 'keycloak', issuer, subject } },
-      include: { Usuario: { select: { id_usuario: true, rol_usuario: true, estado_usuario: true, correo_usuario: true,
-        nombre_usuario: true, apellido_usuario: true } } } });
+  async binding(issuer, subject) {
+    const rows = await this.client.$queryRaw`SELECT e.id_external_identity, e.provider, e.issuer, e.subject,
+      e.username, e.user_id, u.id_usuario, u.rol_usuario, u.estado_usuario, u.correo_usuario,
+      u.nombre_usuario, u.apellido_usuario FROM ExternalIdentity e JOIN Usuario u ON u.id_usuario = e.user_id
+      WHERE e.provider = 'keycloak' AND e.issuer = ${issuer} AND e.subject = ${subject} LIMIT 1`;
+    if (!rows.length) return null;
+    const { id_usuario, rol_usuario, estado_usuario, correo_usuario, nombre_usuario, apellido_usuario, ...binding } = rows[0];
+    return { ...binding, Usuario: { id_usuario, rol_usuario, estado_usuario, correo_usuario, nombre_usuario, apellido_usuario } };
   }
 }

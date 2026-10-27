@@ -59,10 +59,18 @@ export class KeycloakIdentityAdministrationService {
     this.repository = repository;
     this.pins = pins;
   }
-  async authorize(context, { mutation = false } = {}) {
+  async authorize(context, { mutation = false, revalidate = false } = {}) {
     if (context?.provider !== 'keycloak' || typeof context.subject !== 'string' || !context.subject || context.subject.length > 128
       || !can(context.role, context.permissions, PERMISSIONS.MANAGE_USERS)) reject('IDENTITY_ADMIN_FORBIDDEN', 403);
-    const actor = await this.repository.actor(context.subject);
+    // Reuse middleware identity only for immediate reads. Mutations and checks
+    // after remote work still consult current authorization, including around PIN.
+    let actor;
+    if (!mutation && !revalidate && context.currentUser !== undefined) {
+      const current = context.currentUser;
+      if (current?.identitySubject !== context.subject || !Number.isSafeInteger(current?.idUsuario)
+        || current.idUsuario <= 0) reject('IDENTITY_ADMIN_FORBIDDEN', 403);
+      actor = { id_usuario: current.idUsuario, rol_usuario: current.rolUsuario, estado_usuario: current.estadoUsuario };
+    } else actor = await this.repository.actor(context.subject);
     if (!actor || !isActiveUserStatus(actor.estado_usuario) || actor.rol_usuario !== context.role) reject('IDENTITY_ADMIN_FORBIDDEN', 403);
     if (mutation) {
       const pinActor = await this.pins.validate(context.subject, context.pin);
@@ -74,14 +82,13 @@ export class KeycloakIdentityAdministrationService {
     }
     return actor.id_usuario;
   }
-  async inspect(context, subject) {
-    await this.authorize(context);
+  async inspect(context, subject, { revalidateActor = false } = {}) {
+    await this.authorize(context, { revalidate: revalidateActor });
     if (subject === context.subject) reject('IDENTITY_SELF_TARGET_FORBIDDEN', 403);
     const binding = await this.repository.binding(this.management.config.issuer, subject);
     if (!binding || !ASSIGNABLE_ROLES.includes(binding.Usuario.rol_usuario)) reject('IDENTITY_TARGET_FORBIDDEN', 403);
     if (binding.Usuario.estado_usuario?.startsWith('Actualizando:')) reject('IDENTITY_UPDATE_BUSY');
-    const external = await this.management.getUser(subject);
-    const roles = await this.management.roles(subject);
+    const [external, roles] = await Promise.all([this.management.getUser(subject), this.management.roles(subject)]);
     if (binding.subject !== subject || binding.Usuario.id_usuario !== binding.user_id || binding.username !== external.username || roles.length !== 1
       || roles[0].name !== binding.Usuario.rol_usuario) reject('IDENTITY_BINDING_CONFLICT');
     return { localUserId: binding.user_id, subject, username: external.username, email: binding.Usuario.correo_usuario,
@@ -109,21 +116,22 @@ export class KeycloakIdentityAdministrationService {
     let external, remoteStarted = false, finishAttempted = false;
     try {
       if (input.state.startsWith('Pendiente') && input.state !== original.localState) reject('IDENTITY_INPUT_INVALID', 400);
-      external = await this.management.getUser(subject);
-      const roles = await this.management.roles(subject);
+      let roles;
+      [external, roles] = await Promise.all([this.management.getUser(subject), this.management.roles(subject)]);
       if (external.username !== binding.username || roles.length !== 1 || roles[0].name !== original.role) reject('IDENTITY_BINDING_CONFLICT');
       const enabled = input.state === 'Activo' || (input.state.startsWith('Pendiente') && external.enabled);
       remoteStarted = true;
       await this.management.setEnabled(subject, false);
       await this.management.logout(subject);
-      await this.management.updateAttributes(subject, { firstName: input.firstName, lastName: input.lastName,
-        ...(input.email !== external.email ? { email: input.email } : {}) });
+      const attributes = Object.fromEntries(['firstName', 'lastName', 'email']
+        .filter(key => input[key] !== external[key]).map(key => [key, input[key]]));
+      if (Object.keys(attributes).length) await this.management.updateAttributes(subject, attributes);
       if (input.role !== original.role) await this.management.replaceRole(subject, input.role);
       const verified = await this.management.getUser(subject);
       if (verified.firstName !== input.firstName || verified.lastName !== input.lastName || verified.email !== input.email) {
         reject('IDENTITY_UPDATE_NOT_CONFIRMED');
       }
-      if (await this.authorize(context) !== actorId) reject('IDENTITY_ADMIN_FORBIDDEN', 403);
+      if (await this.authorize(context, { revalidate: true }) !== actorId) reject('IDENTITY_ADMIN_FORBIDDEN', 403);
       await this.management.setEnabled(subject, enabled);
       if ((await this.management.getUser(subject)).enabled !== enabled) reject('IDENTITY_UPDATE_NOT_CONFIRMED');
       finishAttempted = true;
@@ -173,7 +181,7 @@ export class KeycloakIdentityAdministrationService {
   async findByUsername(context, username) {
     await this.authorize(context);
     const user = await this.management.findByUsername(username);
-    return user ? this.inspect(context, user.id) : null;
+    return user ? this.inspect(context, user.id, { revalidateActor: true }) : null;
   }
   async prepare(context, rawInput) {
     const actorId = await this.authorize(context, { mutation: true });
@@ -185,7 +193,7 @@ export class KeycloakIdentityAdministrationService {
     if (operation.payload_digest !== digest) reject('IDENTITY_OPERATION_PAYLOAD_CONFLICT');
     if (operation.state === 'created') return result(operation);
     if (operation.state === 'prepared') {
-      const user = await this.inspect(context, operation.external_subject);
+      const user = await this.inspect(context, operation.external_subject, { revalidateActor: true });
       if (user.enabled || user.localState !== 'Pendiente'
         || !matchesPreparation(await this.management.getUser(operation.external_subject), operation)) reject('IDENTITY_PREPARATION_CHANGED');
       return result(operation);
@@ -230,7 +238,7 @@ export class KeycloakIdentityAdministrationService {
       await this.management.replaceRole(external.id, operation.input.role);
       const verified = await this.management.getUser(external.id);
       if (!matchesPreparation(verified, operation)) reject('IDENTITY_EXTERNAL_OUTCOME_UNKNOWN');
-      if (await this.authorize(context) !== actorId) reject('IDENTITY_ADMIN_FORBIDDEN', 403);
+      if (await this.authorize(context, { revalidate: true }) !== actorId) reject('IDENTITY_ADMIN_FORBIDDEN', 403);
       let temporaryPassword;
       if (!reconcile) {
         temporaryPassword = generarContrasena();

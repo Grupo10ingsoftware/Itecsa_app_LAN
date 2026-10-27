@@ -142,8 +142,10 @@ export class KeycloakManagementService {
   }
 
   async hasTemporaryPassword(subject) {
-    const user = await this.getUser(subject);
-    const { data } = await this.request('/users/' + segment(subject) + '/credentials');
+    const credentialsPath = '/users/' + segment(subject) + '/credentials';
+    const [user, { data }] = await Promise.all([
+      this.getUser(subject), this.request(credentialsPath),
+    ]);
     return Array.isArray(data) && data.some(credential => credential.type === 'password')
       && user.requiredActions?.includes('UPDATE_PASSWORD') === true;
   }
@@ -154,11 +156,14 @@ export class KeycloakManagementService {
 
   async roleClient() {
     if (this.clientUuid) return this.clientUuid;
-    const { data } = await this.request('/clients?' + new URLSearchParams({ clientId: this.config.roleClientId }));
-    const clients = Array.isArray(data) ? data.filter(client => client.clientId === this.config.roleClientId) : [];
-    if (clients.length !== 1 || !validText(clients[0].id, 128)) throw new KeycloakServiceError('KEYCLOAK_ROLE_CLIENT_INVALID');
-    this.clientUuid = segment(clients[0].id);
-    return this.clientUuid;
+    if (!this.clientFlight) this.clientFlight = (async () => {
+      const { data } = await this.request('/clients?' + new URLSearchParams({ clientId: this.config.roleClientId }));
+      const clients = Array.isArray(data) ? data.filter(client => client.clientId === this.config.roleClientId) : [];
+      if (clients.length !== 1 || !validText(clients[0].id, 128)) throw new KeycloakServiceError('KEYCLOAK_ROLE_CLIENT_INVALID');
+      this.clientUuid = segment(clients[0].id);
+      return this.clientUuid;
+    })().finally(() => { this.clientFlight = undefined; });
+    return this.clientFlight;
   }
 
   async roles(subject, { effective = true } = {}) {
@@ -178,12 +183,12 @@ export class KeycloakManagementService {
   async replaceRole(subject, role) {
     ordinary(role);
     if ((await this.getUser(subject)).enabled) throw new KeycloakServiceError('KEYCLOAK_ROLE_CHANGE_REQUIRES_DISABLED', { status: 409 });
-    const effective = await this.roles(subject);
+    const [effective, direct, target] = await Promise.all([
+      this.roles(subject), this.roles(subject, { effective: false }), this.roleRepresentation(role),
+    ]);
     if (effective.length > 1 || effective.some(value => !ASSIGNABLE_ROLES.includes(value.name))) throw new KeycloakServiceError('KEYCLOAK_TARGET_FORBIDDEN', { status: 403 });
-    const direct = await this.roles(subject, { effective: false });
     if (direct.some(value => !ASSIGNABLE_ROLES.includes(value.name))) throw new KeycloakServiceError('KEYCLOAK_TARGET_FORBIDDEN', { status: 403 });
     const path = '/users/' + segment(subject) + '/role-mappings/clients/' + await this.roleClient();
-    const target = await this.roleRepresentation(role);
     if (direct.length) await this.request(path, { method: 'DELETE', expected: [204], body: direct.map(value => ({ id: value.id, name: value.name })) });
     await this.request(path, { method: 'POST', expected: [204], body: [target] });
     const verified = await this.roles(subject);

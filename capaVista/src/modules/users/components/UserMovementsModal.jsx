@@ -33,13 +33,14 @@ export default function UserMovementsModal({ user, api, onClose, title = 'Movimi
 
   useEffect(() => {
     let active = true
-    api.getMovements(subject, query)
+    const controller = new AbortController()
+    api.getMovements(subject, query, { signal: controller.signal })
       .then(data => { if (active) setOutcome({ query, subject, api, data }) })
       .catch(failure => {
         if (active) setOutcome({ query, subject, api,
           error: failure?.payload?.message || 'No fue posible consultar los movimientos. Intenta nuevamente.' })
       })
-    return () => { active = false }
+    return () => { active = false; controller.abort() }
   }, [api, subject, query])
 
   return <dialog ref={dialogRef} className={styles.modal} aria-labelledby="user-movements-title"

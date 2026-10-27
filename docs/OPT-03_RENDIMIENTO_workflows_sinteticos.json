@@ -1,0 +1,2470 @@
+{
+  "environment": "synthetic services / fake HTTP, DB and PIN / fixed 5ms per I/O / cold client each sample",
+  "latencyMs": 5,
+  "samples": {
+    "inspect/before": {
+      "values": [
+        {
+          "ms": 46.86,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 32.073,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 32.329,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 31.797,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 31.463,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 31.318,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 31.293,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 31.287,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 31.56,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 31.44,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 31.287,
+      "maxMs": 46.86,
+      "medianMs": 31.511,
+      "meanMs": 33.142
+    },
+    "inspect/after": {
+      "values": [
+        {
+          "ms": 21.067,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 21.408,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 21.068,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 21.049,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 21.131,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 21.291,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 21.034,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 20.938,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 21.383,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 21.278,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 20.938,
+      "maxMs": 21.408,
+      "medianMs": 21.099,
+      "meanMs": 21.165
+    },
+    "movements/before": {
+      "values": [
+        {
+          "ms": 36.529,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 36.406,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 36.519,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 35.493,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 36.371,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 36.422,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 36.594,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 36.424,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 36.743,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 36.641,
+          "actorReads": 1,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 35.493,
+      "maxMs": 36.743,
+      "medianMs": 36.471,
+      "meanMs": 36.414
+    },
+    "movements/after": {
+      "values": [
+        {
+          "ms": 26.258,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 26.151,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 26.4,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 26.306,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 26.026,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 26.238,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 26.22,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 26.191,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 26.155,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        },
+        {
+          "ms": 26.467,
+          "actorReads": 0,
+          "httpCalls": 4,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 1,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 26.026,
+      "maxMs": 26.467,
+      "medianMs": 26.229,
+      "meanMs": 26.241
+    },
+    "create/before": {
+      "values": [
+        {
+          "ms": 149.553,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 146.789,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 147.275,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 145.792,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 146.633,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 146.166,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 146.646,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 147.427,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 145.664,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 145.99,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 145.664,
+      "maxMs": 149.553,
+      "medianMs": 146.639,
+      "meanMs": 146.793
+    },
+    "create/after": {
+      "values": [
+        {
+          "ms": 131.986,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 130.565,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 129.306,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 130.33,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 130.229,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 130.397,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 131.139,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 131.27,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 129.949,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 130.899,
+          "actorReads": 3,
+          "httpCalls": 18,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "POST /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 5,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "PUT /admin/realms/test/users/:subject/reset-password": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 129.306,
+      "maxMs": 131.986,
+      "medianMs": 130.481,
+      "meanMs": 130.607
+    },
+    "reconcile/before": {
+      "values": [
+        {
+          "ms": 121.377,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 121.16,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 122.242,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 120.439,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 120.777,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 120.123,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 120.342,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 120.278,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 119.695,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 121.75,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 119.695,
+      "maxMs": 122.242,
+      "medianMs": 120.608,
+      "meanMs": 120.818
+    },
+    "reconcile/after": {
+      "values": [
+        {
+          "ms": 104.749,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 103.75,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 105.053,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 103.441,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 103.413,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 105.673,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 106.034,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 104.902,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 103.932,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        },
+        {
+          "ms": 104.545,
+          "actorReads": 3,
+          "httpCalls": 15,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 2,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/users/:subject/credentials": 1,
+            "PUT /admin/realms/test/users/:subject": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 103.413,
+      "maxMs": 106.034,
+      "medianMs": 104.647,
+      "meanMs": 104.549
+    },
+    "update-name/before": {
+      "values": [
+        {
+          "ms": 85.297,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.326,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.301,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.63,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.514,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.581,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.375,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 84.542,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 84.158,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 82.489,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 82.489,
+      "maxMs": 85.297,
+      "medianMs": 83.547,
+      "meanMs": 83.721
+    },
+    "update-name/after": {
+      "values": [
+        {
+          "ms": 78.214,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 77.173,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 78.219,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 78.838,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 77.122,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 78.234,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 79.007,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 76.994,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 77.797,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 78.517,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 76.994,
+      "maxMs": 79.007,
+      "medianMs": 78.216,
+      "meanMs": 78.011
+    },
+    "update-role/before": {
+      "values": [
+        {
+          "ms": 120.896,
+          "actorReads": 3,
+          "httpCalls": 17,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 120.758,
+          "actorReads": 3,
+          "httpCalls": 17,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 123.494,
+          "actorReads": 3,
+          "httpCalls": 17,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 120.159,
+          "actorReads": 3,
+          "httpCalls": 17,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 119.827,
+          "actorReads": 3,
+          "httpCalls": 17,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 119.907,
+          "actorReads": 3,
+          "httpCalls": 17,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 120.925,
+          "actorReads": 3,
+          "httpCalls": 17,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 121.038,
+          "actorReads": 3,
+          "httpCalls": 17,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 119.969,
+          "actorReads": 3,
+          "httpCalls": 17,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 119.776,
+          "actorReads": 3,
+          "httpCalls": 17,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 119.776,
+      "maxMs": 123.494,
+      "medianMs": 120.459,
+      "meanMs": 120.675
+    },
+    "update-role/after": {
+      "values": [
+        {
+          "ms": 100.11,
+          "actorReads": 3,
+          "httpCalls": 16,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 98.988,
+          "actorReads": 3,
+          "httpCalls": 16,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 99.174,
+          "actorReads": 3,
+          "httpCalls": 16,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 99.486,
+          "actorReads": 3,
+          "httpCalls": 16,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 99.576,
+          "actorReads": 3,
+          "httpCalls": 16,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 98.837,
+          "actorReads": 3,
+          "httpCalls": 16,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 99.374,
+          "actorReads": 3,
+          "httpCalls": 16,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 99.993,
+          "actorReads": 3,
+          "httpCalls": 16,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 99.298,
+          "actorReads": 3,
+          "httpCalls": 16,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        },
+        {
+          "ms": 99.404,
+          "actorReads": 3,
+          "httpCalls": 16,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 4,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 3,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "GET /admin/realms/test/clients/uuid/roles/:role": 1,
+            "DELETE /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1,
+            "POST /admin/realms/test/users/:subject/role-mappings/clients/uuid": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 98.837,
+      "maxMs": 100.11,
+      "medianMs": 99.389,
+      "meanMs": 99.424
+    },
+    "update-state/before": {
+      "values": [
+        {
+          "ms": 83.141,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.083,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 82.859,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.437,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 82.018,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.267,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.499,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 82.961,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 82.324,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.478,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 82.018,
+      "maxMs": 83.499,
+      "medianMs": 83.112,
+      "meanMs": 83.007
+    },
+    "update-state/after": {
+      "values": [
+        {
+          "ms": 72.76,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.851,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.828,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.796,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.98,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.465,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 71.679,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.148,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.574,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.658,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 71.679,
+      "maxMs": 72.98,
+      "medianMs": 72.709,
+      "meanMs": 72.574
+    },
+    "update-noop/before": {
+      "values": [
+        {
+          "ms": 83.003,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.138,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.003,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.59,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.169,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.356,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.09,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 82.147,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 82.989,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 83.378,
+          "actorReads": 3,
+          "httpCalls": 10,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 3,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 82.147,
+      "maxMs": 83.59,
+      "medianMs": 83.114,
+      "meanMs": 83.086
+    },
+    "update-noop/after": {
+      "values": [
+        {
+          "ms": 73.543,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.767,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 73.922,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 73.562,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.618,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.996,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.03,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.749,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.77,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        },
+        {
+          "ms": 72.627,
+          "actorReads": 3,
+          "httpCalls": 9,
+          "counters": {
+            "POST /realms/test/protocol/openid-connect/token": 1,
+            "GET /admin/realms/test/users/:subject": 3,
+            "GET /admin/realms/test/clients": 1,
+            "GET /admin/realms/test/users/:subject/role-mappings/clients/uuid/composite": 1,
+            "PUT /admin/realms/test/users/:subject": 2,
+            "POST /admin/realms/test/users/:subject/logout": 1
+          }
+        }
+      ],
+      "count": 10,
+      "minMs": 72.03,
+      "maxMs": 73.922,
+      "medianMs": 72.768,
+      "meanMs": 72.958
+    }
+  }
+}

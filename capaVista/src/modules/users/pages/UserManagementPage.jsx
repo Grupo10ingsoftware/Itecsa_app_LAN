@@ -90,6 +90,9 @@ export default function UserManagementPage() {
   const { identityUser, loginWithRedirect } = useAuth()
   const adminUsersApi = useAdminUsersApi()
   const latestRequestRef = useRef(0)
+  const listController = useRef(null)
+  const summaryController = useRef(null)
+  const preserveNextListMessage = useRef(false)
   const latestSummaryRequestRef = useRef(createLatestRequestTracker())
   const [users, setUsers] = useState([])
   const [activeStatus, setActiveStatus] = useState('')
@@ -111,26 +114,36 @@ export default function UserManagementPage() {
   const [movementsUser, setMovementsUser] = useState(null)
   const [editingUser, setEditingUser] = useState(null)
   const [inspectingId, setInspectingId] = useState(null)
-  const inspection = useRef({ busy: false, version: 0 })
+  const inspection = useRef({ busy: false, version: 0, active: false, controller: null })
   useEffect(() => {
     const tracker = inspection.current
-    return () => { tracker.version++ }
+    tracker.active = true
+    return () => {
+      tracker.active = false
+      tracker.version++
+      tracker.busy = false
+      tracker.controller?.abort()
+    }
   }, [adminUsersApi])
   const currentExternalUserId = identityUser?.sub ?? null
 
   useEffect(() => {
+    if (searchTerm.trim() === debouncedSearchTerm) return
     const debounceTimer = window.setTimeout(() => {
       setDebouncedSearchTerm(searchTerm.trim())
       setPage(1)
     }, SEARCH_DEBOUNCE_MS)
 
     return () => window.clearTimeout(debounceTimer)
-  }, [searchTerm])
+  }, [searchTerm, debouncedSearchTerm])
 
   const loadUsers = useCallback(
     async ({ preserveMessage = false, requestedPage = page } = {}) => {
       const requestId = latestRequestRef.current + 1
       latestRequestRef.current = requestId
+      listController.current?.abort()
+      const controller = new AbortController()
+      listController.current = controller
       setIsLoading(true)
 
       if (!preserveMessage) {
@@ -144,9 +157,9 @@ export default function UserManagementPage() {
           search: debouncedSearchTerm,
           estadoUsuario: activeStatus,
           rolUsuario: activeRole,
-        })
+        }, { signal: controller.signal })
 
-        if (requestId !== latestRequestRef.current) {
+        if (controller.signal.aborted || requestId !== latestRequestRef.current) {
           return
         }
 
@@ -165,7 +178,7 @@ export default function UserManagementPage() {
         )
         setTotalUsers(response.total ?? 0)
       } catch (error) {
-        if (requestId !== latestRequestRef.current) {
+        if (controller.signal.aborted || requestId !== latestRequestRef.current) {
           return
         }
 
@@ -173,7 +186,7 @@ export default function UserManagementPage() {
         setTotalUsers(0)
         setActionMessage({ type: 'danger', text: getErrorText(error), requiresLogin: error?.status === 401 })
       } finally {
-        if (requestId === latestRequestRef.current) {
+        if (!controller.signal.aborted && requestId === latestRequestRef.current) {
           setIsLoading(false)
         }
       }
@@ -184,12 +197,15 @@ export default function UserManagementPage() {
   const loadSummary = useCallback(async () => {
     const tracker = latestSummaryRequestRef.current
     const requestId = tracker.begin()
+    summaryController.current?.abort()
+    const controller = new AbortController()
+    summaryController.current = controller
     setSummaryState((current) => ({ ...current, error: '', isLoading: true }))
 
     try {
-      const response = await adminUsersApi.getSummary()
+      const response = await adminUsersApi.getSummary({ signal: controller.signal })
 
-      if (!tracker.isLatest(requestId)) return
+      if (controller.signal.aborted || !tracker.isLatest(requestId)) return
 
       setSummary({
         totalUsuarios: response.totalUsuarios ?? 0,
@@ -200,7 +216,7 @@ export default function UserManagementPage() {
       })
       setSummaryState({ error: '', hasData: true, isLoading: false })
     } catch (error) {
-      if (!tracker.isLatest(requestId)) return
+      if (controller.signal.aborted || !tracker.isLatest(requestId)) return
 
       setSummaryState((current) => ({
         ...current,
@@ -212,10 +228,16 @@ export default function UserManagementPage() {
 
   useEffect(() => {
     const requestTimer = window.setTimeout(() => {
-      loadUsers()
+      const preserveMessage = preserveNextListMessage.current
+      preserveNextListMessage.current = false
+      loadUsers({ preserveMessage })
     }, 0)
 
-    return () => window.clearTimeout(requestTimer)
+    return () => {
+      window.clearTimeout(requestTimer)
+      latestRequestRef.current++
+      listController.current?.abort()
+    }
   }, [loadUsers])
 
   useEffect(() => {
@@ -227,6 +249,7 @@ export default function UserManagementPage() {
     return () => {
       window.clearTimeout(requestTimer)
       tracker.invalidate()
+      summaryController.current?.abort()
     }
   }, [loadSummary])
 
@@ -250,10 +273,17 @@ export default function UserManagementPage() {
     setPage(1)
   }
 
-  async function refreshAfterMutation(message) {
+  async function refreshAfterMutation(message, { resetPage = false } = {}) {
     if (message.type === 'success') notify.success(message.text)
     else setActionMessage(message)
-    await Promise.all([loadUsers({ preserveMessage: true }), loadSummary()])
+    if (resetPage && page !== 1) {
+      // The page effect owns this single reload; do not also fetch the old page.
+      latestRequestRef.current++
+      listController.current?.abort()
+      preserveNextListMessage.current = true
+      setPage(1)
+      await loadSummary()
+    } else await Promise.all([loadUsers({ preserveMessage: true }), loadSummary()])
   }
 
   async function handleSaveUser(updatedUser) {
@@ -275,31 +305,34 @@ export default function UserManagementPage() {
 
   async function handleCreatedUser(user) {
     if (user.outcome === 'user_created') setIsCreateModalOpen(false)
-    setPage(1)
     await refreshAfterMutation({ type: user.outcome === 'user_created' ? 'success' : 'warning',
       text: user.outcome === 'user_created'
         ? 'Usuario creado. Deberá cambiar su contraseña temporal al iniciar sesión.'
-        : 'Preparacion incompleta. No repitas el alta con otro nombre. Referencia: ' + user.operationId + '.' })
+        : 'Preparacion incompleta. No repitas el alta con otro nombre. Referencia: ' + user.operationId + '.' }, { resetPage: true })
   }
   async function handleInspectUser(user) {
     if (inspection.current.busy) return
     const version = inspection.current.version
+    const controller = new AbortController()
+    inspection.current.controller = controller
     inspection.current.busy = true
     setInspectingId(user.id)
     try {
-      const detail = await adminUsersApi.inspectUser(user.idUsuarioAutenticacionExterna)
-      if (version !== inspection.current.version) return
+      const detail = await adminUsersApi.inspectUser(user.idUsuarioAutenticacionExterna, { signal: controller.signal })
+      if (controller.signal.aborted || version !== inspection.current.version) return
       setEditingUser({ ...user, username: detail.username, enabled: detail.enabled,
         nombreUsuario: detail.firstName, apellidoUsuario: detail.lastName, correoUsuario: detail.email,
         rolUsuario: detail.role, estadoUsuario: detail.localState })
     } catch (error) {
-      if (version === inspection.current.version) {
+      if (!controller.signal.aborted && version === inspection.current.version) {
         if (requiresContext(error)) setActionMessage({ type: 'danger', text: getErrorText(error), requiresLogin: error?.status === 401 })
         else notify.error(getErrorText(error))
       }
     } finally {
-      inspection.current.busy = false
-      if (version === inspection.current.version) setInspectingId(null)
+      if (inspection.current.controller === controller) {
+        inspection.current.busy = false
+        if (inspection.current.active) setInspectingId(null)
+      }
     }
   }
 
