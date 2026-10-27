@@ -7,7 +7,7 @@ const STATUS_FILTERS = Object.freeze([
   { value: '', label: 'Todos', countKey: 'totalUsuarios' },
   { value: 'Vinculado', label: 'Vinculados', countKey: 'vinculados' },
   { value: 'Pendiente', label: 'Pendientes', countKey: 'pendientes' },
-  { value: 'Pendiente rol', label: 'Pendientes de rol', countKey: 'pendientesRol' },
+  // { value: 'Pendiente rol', label: 'Pendientes de rol', countKey: 'pendientesRol' },
   { value: 'Desvinculado', label: 'Desvinculados', countKey: 'desvinculados' },
 ])
 
@@ -36,7 +36,7 @@ export default function UserManagementFilters({
           <input
             id="user-management-search"
             onChange={(event) => onSearchChange(event.target.value)}
-            placeholder={'Buscar por nombre de acceso, nombre, apellido, correo o RUT'}
+            placeholder="Buscar por nombre, apellido, correo o RUT"
             type="search"
             value={searchTerm}
           />

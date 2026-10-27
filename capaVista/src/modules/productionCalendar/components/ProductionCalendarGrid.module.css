@@ -123,6 +123,7 @@
   padding: 0.45rem 0.5rem;
   text-align: left;
   touch-action: none;
+  
 }
 
 .urgentEvent {
@@ -249,9 +250,12 @@
   font-weight: 850;
   line-height: 1.2;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 100%;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 
 .eventLine strong {
