@@ -4,7 +4,7 @@ import { useOrdersApi } from '../modules/orders/hooks/useOrdersApi'
 import { canContinueFromSalesNote, validateSalesNoteStep } from '../modules/orders/utils/orderCreateValidation'
 import { normalizeSalesNoteCode } from '../modules/orders/utils/orderCreateFormatters'
 import { useToast } from '../shared/notifications/useToast'
-import { publicOperationMessage, uncertainOperation, operationFailureMessage, requiresContext } from '../shared/notifications/operationFeedback'
+import { publicOperationMessage } from '../shared/notifications/operationFeedback'
 
 function createInitialDraft() {
   return {
@@ -34,7 +34,7 @@ export function useOrderCreateFlow({ navigate }) {
   const ordersApi = useOrdersApi()
   const [draft, setDraft] = useState(createInitialDraft)
   const [errors, setErrors] = useState({})
-  const [registrationIssue, setRegistrationIssue] = useState('')
+  const [showPinModal, setShowPinModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
   const [isRegistering, setIsRegistering] = useState(false)
@@ -144,31 +144,34 @@ export function useOrderCreateFlow({ navigate }) {
     setShowConfirmModal(true)
   }
 
-  async function handleConfirmRegister() {
+  function handleConfirmRegister() {
+    if (submitting.current || !confirmedPayload.current) return
+    setShowConfirmModal(false)
+    setShowPinModal(true)
+  }
+
+  async function authorizeRegister({ pin }) {
     if (submitting.current || !confirmedPayload.current) return
     submitting.current = true
     const payload = confirmedPayload.current
     setIsRegistering(true)
     try {
-      await ordersApi.createOrder(payload)
+      await ordersApi.createOrder({ ...payload, pin })
       if (!mounted.current) return
 
       setShowConfirmModal(false)
+      setShowPinModal(false)
+      confirmedPayload.current = null
       setDraft(createInitialDraft())
       setErrors({})
-      setRegistrationIssue('')
       notify.success('Pedido registrado correctamente.', {
         action: { label: 'Ver pedidos', onClick: () => navigate('/pagos') },
       })
     } catch (error) {
       if (!mounted.current) return
-      const message = getErrorMessage(error, 'No fue posible registrar el pedido.')
-      setShowConfirmModal(false)
-      if (uncertainOperation(error) || requiresContext(error)) setRegistrationIssue(operationFailureMessage(error, message))
-      else notify.error(message)
+      throw error
     } finally {
       submitting.current = false
-      confirmedPayload.current = null
       if (mounted.current) setIsRegistering(false)
     }
   }
@@ -177,6 +180,7 @@ export function useOrderCreateFlow({ navigate }) {
     if (submitting.current) return
     confirmedPayload.current = null
     setShowConfirmModal(false)
+    setShowPinModal(false)
   }
 
   function resetFlow() {
@@ -185,21 +189,22 @@ export function useOrderCreateFlow({ navigate }) {
     confirmedPayload.current = null
     setIsSearching(false)
     setShowConfirmModal(false)
+    setShowPinModal(false)
     setDraft(createInitialDraft())
     setErrors({})
-    setRegistrationIssue('')
   }
 
   return {
     draft,
     errors,
-    registrationIssue,
     isRegistering,
     isSearching,
     salesNoteIsValid,
     showConfirmModal,
+    showPinModal,
     actions: {
       handleConfirmRegister,
+      authorizeRegister,
       handleOpenConfirmModal,
       handleSearchSalesNote,
       resetFlow,

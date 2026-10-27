@@ -71,7 +71,9 @@ it('Pedidos: confirma backend antes de emitir éxito, reinicia el formulario y c
   await act(() => hook.result.current.actions.handleSearchSalesNote())
   act(() => hook.result.current.actions.handleOpenConfirmModal())
   let operation
-  act(() => { operation = hook.result.current.actions.handleConfirmRegister() })
+  act(() => hook.result.current.actions.handleConfirmRegister())
+  expect(orders.createOrder).not.toHaveBeenCalled()
+  act(() => { operation = hook.result.current.actions.authorizeRegister({ pin: '123456' }) })
   expect(viewport().querySelector('article')).toBeNull()
   await act(async () => { complete({ id: 123 }); await operation })
   expect(screen.getByText('Pedido registrado correctamente.').closest('[data-toast-viewport]')).toBeTruthy()
@@ -90,6 +92,10 @@ it('Pedidos: las validaciones no se convierten en toast y un resultado incierto 
   await act(() => hook.result.current.actions.handleSearchSalesNote())
   act(() => hook.result.current.actions.handleOpenConfirmModal())
   await act(() => hook.result.current.actions.handleConfirmRegister())
-  expect(hook.result.current.registrationIssue).toContain('Comprueba el resultado')
+  await act(async () => {
+    await expect(hook.result.current.actions.authorizeRegister({ pin: '123456' })).rejects.toEqual({ code: 'NETWORK_ERROR' })
+  })
+  expect(hook.result.current.showPinModal).toBe(true)
+  expect(hook.result.current.draft.salesNoteCode).toBe('NV-1')
   expect(viewport().querySelector('article')).toBeNull()
 })

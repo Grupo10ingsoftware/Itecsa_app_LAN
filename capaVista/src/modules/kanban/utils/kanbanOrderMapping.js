@@ -36,6 +36,7 @@ export function normalizeOrder(order) {
   return {
     id: order.id,
     clientName: order.clientName || 'Cliente sin nombre',
+    productionCompletion: order.productionCompletion ?? null,
     seller: order.seller ?? '',
     salesNoteNumber: order.salesNoteNumber,
     product,

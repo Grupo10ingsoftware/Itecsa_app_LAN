@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../hooks/useAuth'
 import OrderCreateHeader from '../components/OrderCreateHeader'
 import OrderCreateConfirmModal from '../components/OrderCreateConfirmModal'
+import PinAuthorizationModal from '../../../shared/components/pin/PinAuthorizationModal'
 import SalesNoteStep from '../components/SalesNoteStep'
 import { useOrderCreateFlow } from '../../../hooks/useOrderCreateFlow'
 import styles from './OrderCreatePage.module.css'
@@ -25,11 +26,10 @@ export default function OrderCreatePage() {
 
   return (
     <PageShell className={styles.page}>
-      <PageSurface className={styles.dashboardShell} inert={flow.showConfirmModal || undefined}>
+      <PageSurface className={styles.dashboardShell} inert={flow.showConfirmModal || flow.showPinModal || undefined}>
         <OrderCreateHeader />
 
         <div className={styles.content}>
-          {flow.registrationIssue && <div className="alert alert-warning" role="alert">{flow.registrationIssue}</div>}
           <SalesNoteStep
             draft={flow.draft}
             errors={flow.errors}
@@ -62,6 +62,13 @@ export default function OrderCreatePage() {
         </div>
       </PageSurface>
 
+      {flow.showPinModal && <PinAuthorizationModal
+        contextKey="register-sales-note" title="Autorizar registro"
+        description="Ingrese su PIN personal para registrar la Nota de Venta."
+        feedbackMode="toast" isSubmitting={flow.isRegistering}
+        onCancel={actions.closeConfirmModal} onConfirm={actions.authorizeRegister}
+        failureMessage="No fue posible registrar el pedido."
+      />}
       {flow.showConfirmModal && (
         <OrderCreateConfirmModal
           draft={flow.draft}

@@ -86,6 +86,7 @@ export function toKanbanOrderDetailDTO(order) {
   const groups = commentGroups(order);
   return {
     ...toKanbanOrderSummaryDTO(order),
+    productionCompletion: order.productionCompletion ?? null,
     seller: order.seller ?? null,
     comments: groups.all,
     commentGroups: groups,

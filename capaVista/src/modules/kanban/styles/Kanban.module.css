@@ -1421,3 +1421,12 @@
   }
 
 }
+.productionCompletion {
+  padding: 1rem;
+  border: 1px solid #b7dfc5;
+  border-radius: 12px;
+  background: #edf8f0;
+  color: #22613a;
+}
+.productionCompletion h3 { font-size: 1rem; font-weight: 700; }
+.productionCompletion p { margin-bottom: .5rem; }

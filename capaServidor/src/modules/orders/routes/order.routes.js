@@ -62,7 +62,7 @@ export function createOrderRouter({
     router.get("/:orderId/kanban-detail", authenticate, requireCapability(P.READ_ORDERS), routeController.getKanbanDetail);
     router.get("/:orderId/calendar-detail", authenticate, requireCapability(P.READ_CALENDAR), routeController.getCalendarDetail);
     router.get("/:orderId", authenticate, requireCapability(P.READ_ORDERS), routeController.getOrder);
-    router.post("/", authenticate, requireCapability(P.CREATE_ORDERS), routeController.createOrder);
+    router.post("/", authenticate, requireCapability(P.CREATE_ORDERS), validatePin, routeController.createOrder);
     router.patch(
         "/:orderId/payment-status",
         authenticate,
