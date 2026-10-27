@@ -43,6 +43,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
   const [pendingProductionMove, setPendingProductionMove] = useState(null)
   const kanbanApi = useKanbanApi()
   const { hasPermission } = useAuth()
+  const canFinishProduction = hasPermission(PERMISSIONS.MOVE_ORDERS)
 
   useEffect(() => {
     const requests = detailRequestId
@@ -75,7 +76,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
             ? orderItems
                 .filter((order) => order?.salesNoteNumber)
                 .map(normalizeOrder)
-                .filter((order) => !['terminado', 'cancelado'].includes(normalizeText(order.orderStatus)))
+                .filter((order) => Number(order.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(order.orderStatus)))
             : []
           setOrders(normalizedOrders)
           setPageInfo(ordersResult.value?.pageInfo ?? { nextCursor: null, hasMore: false })
@@ -86,7 +87,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
         if (statusesResult.status === 'fulfilled' && Array.isArray(statusesResult.value)) {
           const normalizedStatuses = statusesResult.value
             .map(normalizeStatus)
-            .filter((status) => !['terminado', 'cancelado'].includes(normalizeText(status.title)))
+            .filter((status) => Number(status.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(status.title)))
             .sort((a, b) => a.order - b.order)
 
           setColumns(normalizedStatuses.length > 0 ? normalizedStatuses : baseColumns)
@@ -125,7 +126,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
       const nextOrders = (result.items ?? [])
         .filter((order) => order?.salesNoteNumber)
         .map(normalizeOrder)
-        .filter((order) => !['terminado', 'cancelado'].includes(normalizeText(order.orderStatus)))
+        .filter((order) => Number(order.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(order.orderStatus)))
       setOrders((current) => [...current, ...nextOrders.filter((next) => !current.some((item) => item.id === next.id))])
       setPageInfo(result.pageInfo ?? { nextCursor: null, hasMore: false })
     } catch {
@@ -138,7 +139,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
   async function applyOrderMove(order, targetColumn, audit = {}) {
     const patch = await kanbanApi.moveOrder(order.id, targetColumn.generalStepId, audit)
     setOrders((prevOrders) =>
-      prevOrders.map((currentOrder) => applyOrderStagePatch(currentOrder, patch)),
+      prevOrders.map((currentOrder) => applyOrderStagePatch(currentOrder, patch)).filter(item => Number(item.generalStepId) !== 4),
     )
     setSelectedOrder((currentOrder) => applyOrderStagePatch(currentOrder, patch))
   }
@@ -156,6 +157,9 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
 
     const currentStep = Number(order.generalStepId)
     const targetStep = Number(targetColumn.generalStepId)
+    if (targetStep === 3 && !canFinishProduction) {
+      notify.warning('No tienes autorización para finalizar la producción.'); return
+    }
     if (!((currentStep === 1 && targetStep === 2) || (currentStep === 2 && targetStep === 3) || (currentStep === 3 && targetStep === 4))) {
       notify.warning('Esta transición es automática o no está permitida.'); return
     }
@@ -298,6 +302,19 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
     return true
   }
 
+  async function handleFinishProduction(order, payload) {
+    const finishingOrder = Number(order.generalStepId) === 3
+    const patch = await kanbanApi.moveOrder(order.id, finishingOrder ? 4 : 3, payload)
+    setOrders(current => current.map(item => applyOrderStagePatch(item, patch)).filter(item => Number(item.generalStepId) !== 4))
+    setSelectedOrder(current => applyOrderStagePatch(current, patch))
+    notify.success(finishingOrder ? 'Pedido terminado correctamente.' : 'Producción finalizada correctamente.')
+    // The persisted stage is authoritative even if refreshing audit metadata fails.
+    const requestId = ++detailRequestId.current
+    kanbanApi.getOrderDetail(order.id).then(detail => {
+      if (requestId === detailRequestId.current) setSelectedOrder(normalizeOrder(detail))
+    }).catch(() => {})
+  }
+
   async function handleCancelProduction(order, payload) {
     await kanbanApi.cancelProduction(order.id, payload)
     setOrders((currentOrders) => currentOrders.filter((item) => item.id !== order.id))
@@ -382,6 +399,8 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
         loadError={detailError}
         onClose={closeOrderDetail}
         onCompleteSubprocess={handleCompleteSubprocess}
+        onFinishProduction={handleFinishProduction}
+        canFinishProduction={canFinishProduction}
         canCompleteSubprocess={hasPermission(PERMISSIONS.UPDATE_SUBPROCESSES)}
         canReview={hasPermission(PERMISSIONS.REVIEW_ORDERS)}
         canRollbackSubprocess={hasPermission(PERMISSIONS.ROLLBACK_SUBPROCESSES)}

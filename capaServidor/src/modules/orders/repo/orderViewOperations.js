@@ -153,7 +153,10 @@ export async function listOrderViewsOperation(repository, { view, limit, cursor,
   const where = {
     ...(cursor ? { id_pedido: { lt: cursor.id } } : {}),
     ...(view === 'kanban'
-      ? { Estado_Pedido: { is: { nombre_etapa: { notIn: ['Terminado', 'Cancelado'], ...(status ? { equals: status } : {}) } } } }
+      ? { Estado_Pedido: { is: {
+        orden_kanban: { not: 4 },
+        nombre_etapa: { notIn: ['Terminado', 'Cancelado'], ...(status ? { equals: status } : {}) },
+      } } }
       : status ? { Estado_Pedido: { is: { nombre_etapa: status } } } : {}),
     ...(search ? { OR: [
       { numero_nota_venta: { contains: search } },
@@ -179,11 +182,18 @@ export async function getOrderViewOperation(repository, id, view) {
   });
   if (!row) return null;
   if (view === 'calendar') return { ...mapCalendarSummary(row), seller: row.usuario_manager_origen ?? null };
+  const completion = [3, 4].includes(Number(row.Estado_Pedido?.orden_kanban))
+    ? await repository.client.registros.findFirst({
+      where: { id_pedido: Number(id), Registro_Etapas: { is: { Estado_Pedido: { is: { orden_kanban: Number(row.Estado_Pedido.orden_kanban) } } } } },
+      orderBy: [{ FECHA_HORA: "desc" }, { ID_REGISTRO: "desc" }],
+      select: { FECHA_HORA: true, Usuario: { select: { nombre_usuario: true, apellido_usuario: true } } },
+    }) : null;
   const full = toOrderSummaryDTO(row);
   const summary = mapKanbanSummary(row);
   const commentGroups = mapKanbanCommentGroups(row);
   return {
     ...summary,
+    productionCompletion: completion ? { completedAt: completion.FECHA_HORA, responsible: [completion.Usuario?.nombre_usuario, completion.Usuario?.apellido_usuario].filter(Boolean).join(" ") || null } : null,
     seller: row.usuario_manager_origen ?? null,
     comments: commentGroups.all,
     commentGroups,

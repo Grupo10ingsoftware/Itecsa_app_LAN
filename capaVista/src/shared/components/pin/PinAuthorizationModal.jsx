@@ -12,7 +12,7 @@ export default function PinAuthorizationModal({ contextKey = '', ...props }) {
 
 function AuthorizationForm({ onConfirm, onCancel, observation, isSubmitting = false, errorMessage,
   failureMessage = 'No fue posible autorizar la operación.', confirmLabel, cancelLabel,
-  disableUntilValid = false, ...presentation }) {
+  disableUntilValid = false, feedbackMode = 'inline', ...presentation }) {
   const notify = useToast()
   const [pin, setPin] = useState('')
   const [comment, setComment] = useState('')
@@ -38,7 +38,8 @@ function AuthorizationForm({ onConfirm, onCancel, observation, isSubmitting = fa
     setError(''); setFormIssue('')
     setPin('') // Clear even on local validation failures, before awaiting the network.
     if (!valid) {
-      if (!/^\d{6}$/.test(enteredPin)) setError('Ingrese un PIN valido de 6 digitos.')
+      if (feedbackMode === 'toast') notify.error(!/^\d{6}$/.test(enteredPin) ? 'Ingrese un PIN valido de 6 digitos.' : 'Revise la observación requerida y su límite de caracteres.')
+      else if (!/^\d{6}$/.test(enteredPin)) setError('Ingrese un PIN valido de 6 digitos.')
       else setFormIssue('Revise la observación requerida y su límite de caracteres.')
       inputRef.current?.focus()
       return
@@ -47,11 +48,15 @@ function AuthorizationForm({ onConfirm, onCancel, observation, isSubmitting = fa
     setBusy(true); setError('')
     try {
       const result = await onConfirm({ pin: enteredPin, comment: comment.trim() })
-      if (active.current && result === false && !errorMessage) setFormIssue(failureMessage)
+      if (active.current && result === false && !errorMessage) {
+        if (feedbackMode === 'toast') notify.error(failureMessage)
+        else setFormIssue(failureMessage)
+      }
     } catch (failure) {
       if (active.current) {
         const message = operationFailureMessage(failure, failureMessage)
-        if (requiresContext(failure) || uncertainOperation(failure)) {
+        if (feedbackMode === 'toast') notify.error(message)
+        else if (requiresContext(failure) || uncertainOperation(failure)) {
           if (failure?.payload?.code?.startsWith('PIN_') || /\bPIN\b/i.test(message)) setError(message)
           else setFormIssue(message)
         }

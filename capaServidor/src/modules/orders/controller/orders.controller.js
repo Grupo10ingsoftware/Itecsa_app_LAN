@@ -86,7 +86,7 @@ class OrderController {
   createOrder = async (req = request, res = response) => {
     try {
       const order = await this.service.createOrder(req.body ?? {}, {
-        identitySubject: req.auth?.payload?.sub, actorId: req.currentUser?.idUsuario, requestId: req.requestId,
+        identitySubject: req.auth?.payload?.sub, actorId: req.pinActor?.idUsuario, requestId: req.requestId,
       });
       return res.status(201).json(toOrderCreatedDTO(order));
     } catch (error) { return respondError(error, req, res); }

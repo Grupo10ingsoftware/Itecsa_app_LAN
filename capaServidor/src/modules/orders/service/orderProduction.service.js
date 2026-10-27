@@ -46,6 +46,12 @@ export async function updGeneralStepOperation(service, orderId, stepId, options 
   const currentStep = Number(order.id_etapa_general);
   const nextStep = Number(stepId);
 
+  if ([3, 4].includes(nextStep) && (
+    authorizationForProvider(options.identityProvider)?.can(options.role, options.permissions, P.MOVE_ORDERS) !== true
+  )) {
+    throw new AppError(403, "No tienes autorizacion para finalizar este pedido.");
+  }
+
   if (!Number.isInteger(nextStep)) {
     const error = new AppError(400, "Etapa no valida");
     throw error;
@@ -57,6 +63,8 @@ export async function updGeneralStepOperation(service, orderId, stepId, options 
   }
 
   if (nextStep === currentStep) {
+    if (nextStep === 4) throw new AppError(409, "El pedido ya esta terminado.");
+    if (nextStep === 3) throw new AppError(409, "La produccion ya esta finalizada.");
     return order;
   }
 
@@ -95,7 +103,11 @@ export async function updGeneralStepOperation(service, orderId, stepId, options 
     nextStep,
     {
       userId: options.actor.idUsuario,
-      comment: options.comment,
+      comment: nextStep === 3
+        ? ["Produccion finalizada: En produccion → Listo para entrega.", typeof options.comment === "string" ? options.comment.trim() : ""].filter(Boolean).join("\n")
+        : nextStep === 4
+          ? "Pedido terminado: Listo para entrega → Terminado."
+          : options.comment,
       expectedState: {
         id_estado_pedido: order.id_estado_pedido,
         id_estado_pago: order.id_estado_pago,

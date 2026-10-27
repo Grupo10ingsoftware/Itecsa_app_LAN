@@ -1,4 +1,7 @@
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
+import PinAuthorizationModal from '../../../shared/components/pin/PinAuthorizationModal'
+import { isItemReadyForDelivery, isPaymentConfirmed } from '../utils/kanbanOrderRules'
+import { formatCommentDate } from '../utils/kanbanDetail'
 import { PaymentDeconfirmationModal } from './PaymentDeconfirmationModal.jsx';
 import { CancelProductionModal } from './CancelProductionModal.jsx';
 import { SubprocessAuthModal } from './SubprocessAuthModal.jsx';
@@ -34,12 +37,16 @@ function KanbanOffCanvasContent({
   onApprovePaymentDeconfirmation,
   onClose,
   onCompleteSubprocess,
+  onFinishProduction,
+  canFinishProduction = false,
   onRollbackSubprocess,
   onReevaluate,
   onCancelProduction,
   onSendToReview,
   order,
 }) {
+  const [finishOpen, setFinishOpen] = useState(false)
+  const [isFinishing, setIsFinishing] = useState(false)
   const [authModal, setAuthModal] = useState(null)
   const [authError, setAuthError] = useState('')
   const [isCompletingSubprocess, setIsCompletingSubprocess] = useState(false)
@@ -59,8 +66,8 @@ function KanbanOffCanvasContent({
   const correctionPending = useRef(false)
   const operationPending = useRef(false)
   const panelRef = useRef(null)
-  const isMutating = isCompletingSubprocess || isCancelling || isReevaluating || isApprovingDeconfirmation || isSendingCorrection
-  useModalDialog({ containerRef: panelRef, isOpen: Boolean(isOpen && order && !authModal && !isCancelModalOpen && !deconfirmationAuthOpen), canClose: !isMutating, onClose })
+  const isMutating = isFinishing || isCompletingSubprocess || isCancelling || isReevaluating || isApprovingDeconfirmation || isSendingCorrection
+  useModalDialog({ containerRef: panelRef, isOpen: Boolean(isOpen && order && !finishOpen && !authModal && !isCancelModalOpen && !deconfirmationAuthOpen), canClose: !isMutating, onClose })
 
   if (!isOpen || !order) {
     return null
@@ -85,6 +92,22 @@ function KanbanOffCanvasContent({
   const orderItems = getOrderItems(order)
   const commentGroups = getCommentGroups(order)
   const isInProduction = Number(order.generalStepId) === KANBAN_EN_PRODUCCION_STEP
+  const productionFinished = [3, 4].includes(Number(order.generalStepId))
+  const readyToFinishOrder = Number(order.generalStepId) === 3
+  const finishLabel = readyToFinishOrder ? 'Finalizar pedido' : 'Finalizar producción'
+  const readyToFinish = isInProduction && isPaymentConfirmed(order) && orderItems.length > 0 && orderItems.every(isItemReadyForDelivery)
+  async function finishProduction({ pin }) {
+    if (operationPending.current) return
+    operationPending.current = true
+    setIsFinishing(true)
+    try {
+      await onFinishProduction(order, { pin })
+      setFinishOpen(false)
+    } finally {
+      operationPending.current = false
+      setIsFinishing(false)
+    }
+  }
   const canRequestCorrection = canReview && Number(order.generalStepId) === KANBAN_LISTO_PRODUCCION_STEP
   const hasCorrectionRequest = Boolean(order.correctionRequested)
   const canApprovePaymentDeconfirmation =
@@ -272,6 +295,20 @@ function KanbanOffCanvasContent({
             orderItems={orderItems}
           />
 
+          {(productionFinished || readyToFinish) && (
+            <section className={styles.productionCompletion}>
+              <h3>{Number(order.generalStepId) === 4 ? 'Pedido terminado' : productionFinished ? 'Producción finalizada' : 'Proceso productivo completo'}</h3>
+              {productionFinished ? <>
+                <p>{order.orderStatus}</p>
+                {order.productionCompletion?.completedAt && <p>{formatCommentDate(order.productionCompletion.completedAt)}</p>}
+                {order.productionCompletion?.responsible && <p>{order.productionCompletion.responsible}</p>}
+                {readyToFinishOrder && canFinishProduction && <button className={styles.orderCardButton} disabled={isMutating} type="button" onClick={() => setFinishOpen(true)}>Finalizar pedido</button>}
+              </> : <>
+                <p>Todos los subprocesos están completados. El pedido puede quedar listo para entrega.</p>
+                {canFinishProduction && <button className={styles.orderCardButton} disabled={isMutating} type="button" onClick={() => setFinishOpen(true)}>Finalizar producción</button>}
+              </>}
+            </section>
+          )}
           {canApprovePaymentDeconfirmation && (
             <section className={styles.detailSection}>
               <div className={styles.deconfirmationApprovalPanel}>
@@ -407,6 +444,13 @@ function KanbanOffCanvasContent({
         </div>
       </aside>
 
+      {finishOpen && <PinAuthorizationModal
+        contextKey={`finish-${order.id}-${order.generalStepId}`} title={finishLabel}
+        description={readyToFinishOrder ? 'Ingrese su PIN personal para cambiar el pedido a Terminado.' : 'Ingrese su PIN personal para finalizar la producción del pedido.'}
+        feedbackMode="toast" isSubmitting={isFinishing} onConfirm={finishProduction}
+        onCancel={() => { if (!operationPending.current) setFinishOpen(false) }}
+        failureMessage={readyToFinishOrder ? 'No fue posible finalizar el pedido.' : 'No fue posible finalizar la producción.'}
+      />}
       {authModal && (
         <SubprocessAuthModal
           completeSubProcess={completeSubProcess}

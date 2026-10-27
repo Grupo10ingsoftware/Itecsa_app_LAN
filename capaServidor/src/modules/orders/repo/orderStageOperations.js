@@ -1,4 +1,5 @@
 import { AppError } from '../../../errors/AppError.js';
+import { isLanyardProduct } from './orderProductionRules.js';
 
 export async function transitionGeneralStageOperation(repository, { id, ordenKanban, statusName, userId, comment, now = new Date(), compact = false, expectedState }) {
   const status = await repository.client.estado_Pedido.findFirst({
@@ -85,13 +86,37 @@ export async function transitionGeneralStageOperation(repository, { id, ordenKan
 }
 
 export async function updateGeneralStepOperation(repository, id, ordenKanban, audit = {}) {
-  if (Number(ordenKanban) === 3) {
+  if ([3, 4].includes(Number(ordenKanban))) {
     await repository.lockProductionOrder(id);
+    const current = await repository.getTransitionState(id);
+    if (!current || Number(current.id_etapa_general) !== Number(ordenKanban) - 1 || current.estado_pago !== "Confirmado") {
+      throw new AppError(409, "El pedido no esta en la etapa requerida o no tiene el pago confirmado.");
+    }
     const details = await repository.client.detalle_pedido.findMany({
       where: { id_pedido: Number(id) },
-      select: { fecha_real_termino: true },
+      select: {
+        fecha_real_termino: true,
+        id_estado_subproceso: true,
+        Tipo_Producto: { select: {
+          nombre_producto: true,
+          Producto_Subproceso: {
+            orderBy: { orden_flujo: "asc" },
+            select: { id_estado_subproceso: true },
+          },
+        } },
+        Avance_Lanyard: {
+          orderBy: [{ fecha_produccion: "desc" }, { id_avance_lanyard: "desc" }],
+          take: 1,
+          select: { porcentaje_acumulado: true },
+        },
+      },
     });
-    if (details.length === 0 || details.some((detail) => !detail.fecha_real_termino)) {
+    if (details.length === 0 || details.some((detail) => {
+      const processes = detail.Tipo_Producto?.Producto_Subproceso ?? [];
+      return !detail.fecha_real_termino || !processes.length
+        || Number(processes.at(-1).id_estado_subproceso) !== Number(detail.id_estado_subproceso)
+        || (isLanyardProduct(detail.Tipo_Producto?.nombre_producto) && Number(detail.Avance_Lanyard?.[0]?.porcentaje_acumulado ?? 0) < 100);
+    })) {
       const error = new AppError(409, "Todos los detalles deben completar sus subprocesos antes de pasar a Listo para Entrega.");
       throw error;
     }
@@ -99,6 +124,7 @@ export async function updateGeneralStepOperation(repository, id, ordenKanban, au
   return repository.transitionGeneralStage({
     id,
     ordenKanban,
+    ...(Number(ordenKanban) === 4 ? { statusName: "Terminado" } : {}),
     userId: audit.userId,
     comment: audit.comment,
     now: audit.now,
