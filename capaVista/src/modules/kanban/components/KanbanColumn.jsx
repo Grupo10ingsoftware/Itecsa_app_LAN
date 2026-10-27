@@ -30,6 +30,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
   const [columns, setColumns] = useState(baseColumns)
   const [loading, setLoading] = useState(true)
   const [selectedOrder, setSelectedOrder] = useState(null)
+  const [detailScope, setDetailScope] = useState(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const [detailError, setDetailError] = useState(null)
   const detailRequestId = useRef(0)
@@ -39,6 +40,12 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
   const listRequestId = useRef(0)
   const morePending = useRef(false)
   const moveValidation = useRef(false)
+  const moreController = useRef(null)
+  const detailController = useRef(null)
+  const moveController = useRef(null)
+  const sessionVersion = useRef(0)
+  const pendingLabels = useRef(new Set())
+  const [busyLabels, setBusyLabels] = useState({ api: null, ids: new Set() })
   const [validatingMove, setValidatingMove] = useState(false)
   const [pendingProductionMove, setPendingProductionMove] = useState(null)
   const kanbanApi = useKanbanApi()
@@ -47,12 +54,21 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
 
   useEffect(() => {
     const requests = detailRequestId
-    return () => { requests.current++ }
-  }, [])
+    const version = sessionVersion
+    const labels = pendingLabels.current
+    return () => {
+      requests.current++
+      version.current++
+      detailController.current?.abort()
+      moveController.current?.abort()
+      labels.clear()
+    }
+  }, [kanbanApi])
 
   useEffect(() => {
     const requests = listRequestId
     const id = ++requests.current
+    const controller = new AbortController()
     const loadOrders = async () => {
       setLoading(true)
       setLoadingMore(false)
@@ -60,18 +76,13 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
       try {
         setLoadError(null)
 
-        const [ordersResult, statusesResult] = await Promise.allSettled([
-          kanbanApi.getOrders({
-            limit: 50,
-            search: filters?.salesNoteNumber || filters?.clientName || '',
-            productType: filters?.productType || '',
-          }),
-          kanbanApi.getOrderStatuses(),
-        ])
-        if (id !== listRequestId.current) return
-
-        if (ordersResult.status === 'fulfilled') {
-          const orderItems = ordersResult.value?.items ?? []
+        const orderWork = kanbanApi.getOrders({
+          limit: 50,
+          search: filters?.salesNoteNumber || filters?.clientName || '',
+          productType: filters?.productType || '',
+        }, { signal: controller.signal }).then(result => {
+          if (controller.signal.aborted || id !== listRequestId.current) return
+          const orderItems = result?.items ?? []
           const normalizedOrders = Array.isArray(orderItems)
             ? orderItems
                 .filter((order) => order?.salesNoteNumber)
@@ -79,24 +90,28 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
                 .filter((order) => Number(order.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(order.orderStatus)))
             : []
           setOrders(normalizedOrders)
-          setPageInfo(ordersResult.value?.pageInfo ?? { nextCursor: null, hasMore: false })
-        } else {
-          setLoadError('No fue posible cargar las ordenes.')
-        }
-
-        if (statusesResult.status === 'fulfilled' && Array.isArray(statusesResult.value)) {
-          const normalizedStatuses = statusesResult.value
+          setPageInfo(result?.pageInfo ?? { nextCursor: null, hasMore: false })
+        }).catch(() => {
+          if (!controller.signal.aborted && id === listRequestId.current) setLoadError('No fue posible cargar las ordenes.')
+        }).finally(() => {
+          if (!controller.signal.aborted && id === listRequestId.current) setLoading(false)
+        })
+        const statusWork = kanbanApi.getOrderStatuses().then(result => {
+          if (controller.signal.aborted || id !== listRequestId.current) return
+          if (!Array.isArray(result)) { setColumns(baseColumns); return }
+          const normalizedStatuses = result
             .map(normalizeStatus)
             .filter((status) => Number(status.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(status.title)))
             .sort((a, b) => a.order - b.order)
 
           setColumns(normalizedStatuses.length > 0 ? normalizedStatuses : baseColumns)
-        } else {
-          if (statusesResult.status === 'rejected') {
+        }).catch(() => {
+          if (!controller.signal.aborted && id === listRequestId.current) {
             setLoadError((current) => current || 'No fue posible cargar los estados del kanban.')
+            setColumns(baseColumns)
           }
-          setColumns(baseColumns)
-        }
+        })
+        await Promise.allSettled([orderWork, statusWork])
       } catch {
         if (id !== listRequestId.current) return
         setLoadError('No fue posible cargar las ordenes.')
@@ -107,12 +122,19 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
     }
 
     loadOrders()
-    return () => { requests.current++ }
+    return () => {
+      requests.current++
+      controller.abort()
+      moreController.current?.abort()
+      moveController.current?.abort()
+    }
   }, [filters?.clientName, filters?.salesNoteNumber, filters?.productType, kanbanApi, refreshKey])
 
   async function loadMoreOrders() {
     if (!pageInfo.hasMore || !pageInfo.nextCursor || loading || morePending.current) return
     const id = listRequestId.current
+    const controller = new AbortController()
+    moreController.current = controller
     morePending.current = true
     setLoadingMore(true)
     try {
@@ -121,13 +143,20 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
         cursor: pageInfo.nextCursor,
         search: filters?.salesNoteNumber || filters?.clientName || '',
         productType: filters?.productType || '',
-      })
+      }, { signal: controller.signal })
       if (id !== listRequestId.current) return
       const nextOrders = (result.items ?? [])
         .filter((order) => order?.salesNoteNumber)
         .map(normalizeOrder)
         .filter((order) => Number(order.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(order.orderStatus)))
-      setOrders((current) => [...current, ...nextOrders.filter((next) => !current.some((item) => item.id === next.id))])
+      setOrders((current) => {
+        const ids = new Set(current.map(item => item.id))
+        return [...current, ...nextOrders.filter(next => {
+          if (ids.has(next.id)) return false
+          ids.add(next.id)
+          return true
+        })]
+      })
       setPageInfo(result.pageInfo ?? { nextCursor: null, hasMore: false })
     } catch {
       if (id === listRequestId.current) setLoadError('No fue posible cargar más ordenes.')
@@ -137,11 +166,14 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
   }
 
   async function applyOrderMove(order, targetColumn, audit = {}) {
+    const version = sessionVersion.current
     const patch = await kanbanApi.moveOrder(order.id, targetColumn.generalStepId, audit)
+    if (version !== sessionVersion.current) return false
     setOrders((prevOrders) =>
       prevOrders.map((currentOrder) => applyOrderStagePatch(currentOrder, patch)).filter(item => Number(item.generalStepId) !== 4),
     )
     setSelectedOrder((currentOrder) => applyOrderStagePatch(currentOrder, patch))
+    return true
   }
 
   async function handleDragEnd(event) {
@@ -166,14 +198,16 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
     let transitionOrder = order
     if (targetStep === 3) {
       const version = listRequestId.current
+      const controller = new AbortController()
+      moveController.current = controller
       moveValidation.current = true
       setValidatingMove(true)
       try {
-        transitionOrder = normalizeOrder(await kanbanApi.getOrderDetail(order.id))
-        if (version !== listRequestId.current) return
+        transitionOrder = normalizeOrder(await kanbanApi.getOrderDetail(order.id, { precheck: true, signal: controller.signal }))
+        if (controller.signal.aborted || version !== listRequestId.current) return
       }
       catch { if (version === listRequestId.current) notify.error('No fue posible validar el detalle del pedido.'); return }
-      finally { moveValidation.current = false; setValidatingMove(false) }
+      finally { if (moveController.current === controller) { moveValidation.current = false; setValidatingMove(false) } }
     }
     if (targetStep === 3 && (!transitionOrder.items?.length || transitionOrder.items.some((item) => !isItemReadyForDelivery(item)))) {
       notify.warning('Todos los detalles deben completar sus subprocesos y los lanyards deben llegar al 100% antes de pasar a Listo para Entrega.')
@@ -209,23 +243,27 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
       return
     }
 
-    setPendingProductionMove({ order: transitionOrder, targetColumn })
+    setPendingProductionMove({ order: transitionOrder, targetColumn, api: kanbanApi })
   }
 
   function handleUpdateOrder(updatedOrder) {
     setOrders((prevOrders) =>
       prevOrders.map((order) => (order.id === updatedOrder.id ? updatedOrder : order)),
     )
-    setSelectedOrder(updatedOrder)
+    setSelectedOrder(current => current?.id === updatedOrder.id ? updatedOrder : current)
   }
 
   async function openOrderDetail(order) {
+    setDetailScope(kanbanApi)
     const requestId = ++detailRequestId.current
+    detailController.current?.abort()
+    const controller = new AbortController()
+    detailController.current = controller
     setSelectedOrder(order)
     setDetailError(null)
     setDetailLoading(true)
     try {
-      const detail = await kanbanApi.getOrderDetail(order.id)
+      const detail = await kanbanApi.getOrderDetail(order.id, { signal: controller.signal })
       if (requestId === detailRequestId.current) setSelectedOrder(normalizeOrder(detail))
     } catch (error) {
       if (requestId === detailRequestId.current) setDetailError(error?.payload?.message ?? 'No fue posible cargar el detalle del pedido.')
@@ -236,12 +274,14 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
 
   function closeOrderDetail() {
     detailRequestId.current += 1
+    detailController.current?.abort()
     setSelectedOrder(null)
     setDetailError(null)
     setDetailLoading(false)
   }
 
   async function handleToggleIndicator(orderId, indicator) {
+    if (pendingLabels.current.has(orderId)) return
     const order = orders.find((item) => item.id === orderId)
     if (!order) return
     const config = {
@@ -250,15 +290,12 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
       producing: ['PRODUCIÉNDOSE', !order.isProducing],
     }[indicator]
     if (!config) return
-    const optimisticPatch = {
-      urgent: { isUrgent: config[1] },
-      contractPriority: { hasContractPriority: config[1] },
-      producing: { isProducing: config[1] },
-    }[indicator]
-    setOrders((current) => current.map((item) => item.id === orderId ? { ...item, ...optimisticPatch } : item))
-    setSelectedOrder((current) => current?.id === orderId ? { ...current, ...optimisticPatch } : current)
+    const version = sessionVersion.current
+    pendingLabels.current.add(orderId)
+    setBusyLabels({ api: kanbanApi, ids: new Set(pendingLabels.current) })
     try {
       const result = await kanbanApi.setLabel(orderId, config[0], config[1])
+      if (version !== sessionVersion.current) return
       const updatedLabels = result.labels ?? []
       const patchOrder = (current) => ({
         ...current,
@@ -271,32 +308,39 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
       setSelectedOrder((current) => current?.id === orderId ? patchOrder(current) : current)
       notify.success('Etiqueta del pedido actualizada correctamente.')
     } catch (error) {
-      setOrders((current) => current.map((item) => item.id === orderId ? order : item))
-      setSelectedOrder((current) => current?.id === orderId ? order : current)
-      notify.error(publicOperationMessage(error, 'No fue posible actualizar la etiqueta.'))
+      if (version === sessionVersion.current) notify.error(publicOperationMessage(error, 'No fue posible actualizar la etiqueta.'))
+    } finally {
+      if (version === sessionVersion.current) {
+        pendingLabels.current.delete(orderId)
+        setBusyLabels({ api: kanbanApi, ids: new Set(pendingLabels.current) })
+      }
     }
   }
 
   async function confirmProductionMove(audit) {
-    if (!pendingProductionMove) return
+    if (!pendingProductionMove || pendingProductionMove.api !== kanbanApi) return
 
     const { order, targetColumn } = pendingProductionMove
-    await applyOrderMove(order, targetColumn, audit)
+    if (await applyOrderMove(order, targetColumn, audit) === false) return
     setPendingProductionMove(null)
     notify.success('Etapa del pedido actualizada correctamente.')
   }
 
   async function handleCompleteSubprocess(order, item, process, payload) {
+    const version = sessionVersion.current
     const updatedOrder = await kanbanApi.completeSubprocess(order.id, item.id, process.id, payload)
+    if (version !== sessionVersion.current) return false
     const normalizedOrder = normalizeOrder(updatedOrder)
     setOrders(prevOrders => prevOrders.map(currentOrder => currentOrder.id === normalizedOrder.id ? normalizedOrder : currentOrder))
-    setSelectedOrder(normalizedOrder)
+    setSelectedOrder(current => current?.id === normalizedOrder.id ? normalizedOrder : current)
     notify.success('Subproceso completado correctamente.')
     return true
   }
 
   async function handleSendToReview(order, comment) {
+    const version = sessionVersion.current
     const updatedOrder = await kanbanApi.sendToReview(order.id, comment)
+    if (version !== sessionVersion.current) return false
     handleUpdateOrder(normalizeOrder(updatedOrder))
     notify.success('Pedido enviado a revisión correctamente.')
     return true
@@ -316,22 +360,28 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
   }
 
   async function handleCancelProduction(order, payload) {
+    const version = sessionVersion.current
     await kanbanApi.cancelProduction(order.id, payload)
+    if (version !== sessionVersion.current) return false
     setOrders((currentOrders) => currentOrders.filter((item) => item.id !== order.id))
-    setSelectedOrder(null)
+    setSelectedOrder(current => current?.id === order.id ? null : current)
     notify.success('Producción cancelada correctamente.')
     return true
   }
 
   async function handleRollbackSubprocess(order, item, process, payload) {
+    const version = sessionVersion.current
     const updated = await kanbanApi.rollbackSubprocess(order.id, item.id, process.id, payload)
+    if (version !== sessionVersion.current) return false
     handleUpdateOrder(normalizeOrder(updated))
     notify.success('Subproceso retrocedido correctamente.')
     return true
   }
 
   async function handleReevaluate(order) {
+    const version = sessionVersion.current
     const updated = normalizeOrder(await kanbanApi.reevaluate(order.id))
+    if (version !== sessionVersion.current) return false
     handleUpdateOrder(updated)
     notify.success('Pedido reevaluado correctamente.')
     return true
@@ -373,6 +423,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
                           (Number(order.generalStepId) === 1 && hasPermission(PERMISSIONS.START_PRODUCTION))
                         )}
                         canManageIndicators={hasPermission(PERMISSIONS.MANAGE_TAGS)}
+                        indicatorsBusy={busyLabels.api === kanbanApi && busyLabels.ids.has(order.id)}
                         key={order.id}
                         onOpenDetail={() => openOrderDetail(order)}
                         onToggleIndicator={(indicator) => handleToggleIndicator(order.id, indicator)}
@@ -394,7 +445,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
       )}
       <KanbanDetailBoundary key={selectedOrder?.id ?? 'closed'} onClose={closeOrderDetail}>
       <KanbanOffCanvas
-        isOpen={selectedOrder !== null}
+        isOpen={detailScope === kanbanApi && selectedOrder !== null}
         isLoading={detailLoading}
         loadError={detailError}
         onClose={closeOrderDetail}
@@ -410,11 +461,11 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
         onRollbackSubprocess={handleRollbackSubprocess}
         onReevaluate={handleReevaluate}
         onSendToReview={handleSendToReview}
-        order={selectedOrder}
+        order={detailScope === kanbanApi ? selectedOrder : null}
       />
       </KanbanDetailBoundary>
       <MoveToProductionModal
-        isOpen={Boolean(pendingProductionMove)}
+        isOpen={pendingProductionMove?.api === kanbanApi}
         onClose={() => setPendingProductionMove(null)}
         onConfirm={confirmProductionMove}
         order={pendingProductionMove?.order}

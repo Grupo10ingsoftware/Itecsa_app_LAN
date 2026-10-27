@@ -109,16 +109,11 @@ export async function getOperation(repository, id) {
 }
 
 export async function getTransitionStateOperation(repository, id) {
-  const order = await repository.client.pedidos.findUnique({
-    where: { id_pedido: Number(id) },
-    select: {
-      id_pedido: true,
-      id_estado_pedido: true,
-      id_estado_pago: true,
-      Estado_Pedido: { select: { orden_kanban: true, nombre_etapa: true } },
-      Estado_Pago: { select: { nombre_estado_pago: true } },
-    },
-  });
+  const rows = await repository.client.$queryRaw`SELECT p.id_pedido, p.id_estado_pedido, p.id_estado_pago,
+    p.fecha_creacion, p.numero_nota_venta, ep.orden_kanban, ep.nombre_etapa, pay.nombre_estado_pago
+    FROM Pedidos p LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido
+    LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago WHERE p.id_pedido=${Number(id)} LIMIT 1`;
+  const order = rows[0];
 
   if (!order) return null;
 
@@ -126,11 +121,13 @@ export async function getTransitionStateOperation(repository, id) {
     id_pedido: order.id_pedido,
     id_estado_pedido: order.id_estado_pedido,
     id_estado_pago: order.id_estado_pago,
-    id_etapa_general: order.Estado_Pedido?.orden_kanban ?? null,
-    generalStepId: order.Estado_Pedido?.orden_kanban ?? null,
-    nombre_etapa_general: order.Estado_Pedido?.nombre_etapa ?? null,
-    estado_pago: order.Estado_Pago?.nombre_estado_pago ?? null,
-    paymentStatus: order.Estado_Pago?.nombre_estado_pago ?? null,
+    id_etapa_general: order.orden_kanban ?? null,
+    generalStepId: order.orden_kanban ?? null,
+    nombre_etapa_general: order.nombre_etapa ?? null,
+    estado_pago: order.nombre_estado_pago ?? null,
+    paymentStatus: order.nombre_estado_pago ?? null,
+    fecha_creacion: order.fecha_creacion,
+    numero_nota_venta: order.numero_nota_venta,
   };
 }
 

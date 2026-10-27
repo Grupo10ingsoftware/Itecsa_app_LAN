@@ -137,13 +137,12 @@ export async function setOrderLabelOperation(repository, { orderId, label, activ
     FECHA_HORA: new Date(), id_pedido: Number(orderId), id_usuario: Number(userId),
     observacion: `${active ? "Asignó" : "Quitó"} etiqueta ${label}.`,
   } });
-  const assignedLabels = await repository.client.pedido_Etiqueta.findMany({
-    where: { id_pedido: Number(orderId) },
-    include: { etiqueta: true },
-  });
+  const assignedLabels = await repository.client.$queryRaw`SELECT e.* FROM Pedido_Etiqueta pe
+    JOIN etiqueta e ON e.id_etiqueta=pe.id_etiqueta
+    WHERE pe.id_pedido=${Number(orderId)} ORDER BY pe.id_etiqueta ASC`;
   return {
     id_pedido: Number(orderId),
-    etiquetas: assignedLabels.map((item) => item.etiqueta).filter(Boolean),
+    etiquetas: assignedLabels,
   };
 }
 

@@ -232,8 +232,8 @@ class OrderService {
     return toSalesNotePreview(salesNote);
   }
 
-  async reevaluateOrder(orderId, { identitySubject } = {}) {
-    const order = await this.repo.get(orderId);
+  async reevaluateOrder(orderId, { identitySubject, response } = {}) {
+    const order = await this.repo.getTransitionState(orderId);
     if (!order) {
       const error = new AppError(404, "Pedido no encontrado.", "ORDER_NOT_FOUND"); throw error;
     }
@@ -248,7 +248,7 @@ class OrderService {
       this.resolveInternalUserId({ identitySubject }),
     ]);
     return this.runInTransaction(({ repo }) => repo.reevaluateFromSalesNote({
-      orderId, salesNote, userId,
+      orderId, salesNote, userId, compact: response === 'receipt',
     }));
   }
 

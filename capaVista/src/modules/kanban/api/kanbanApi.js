@@ -5,7 +5,20 @@ import {
   parseOrderStagePatchDTO,
 } from '../../orders/utils/orderDto'
 
-export function createKanbanApi(apiClient) {
+export function createKanbanApi(apiClient, { now = Date.now, statusTtlMs = 30_000 } = {}) {
+  let statuses, statusesExpireAt = 0, statusFlight
+  function getOrderStatuses({ force = false } = {}) {
+    if (!force && statuses && now() < statusesExpireAt) return Promise.resolve(statuses)
+    if (!statusFlight) statusFlight = apiClient.get('/order-status').then(result => {
+      if (Array.isArray(result)) { statuses = result; statusesExpireAt = now() + statusTtlMs }
+      return result
+    }).catch(error => {
+      statuses = undefined
+      statusesExpireAt = 0
+      throw error
+    }).finally(() => { statusFlight = null })
+    return statusFlight
+  }
   const queryString = (params = {}) => {
     const query = new URLSearchParams()
     Object.entries(params).forEach(([key, value]) => {
@@ -14,9 +27,10 @@ export function createKanbanApi(apiClient) {
     return query.size ? `?${query.toString()}` : ''
   }
   return {
-    getOrders: (params) => apiClient.get(`/orders/kanban-summary${queryString(params)}`).then(parseKanbanPageDTO),
-    getOrderDetail: (orderId) => apiClient.get(`/orders/${orderId}/kanban-detail`).then(parseKanbanOrderDetailDTO),
-    getOrderStatuses: () => apiClient.get('/order-status'),
+    getOrders: (params, options) => apiClient.get(`/orders/kanban-summary${queryString(params)}`, options).then(parseKanbanPageDTO),
+    getOrderDetail: (orderId, { precheck = false, ...options } = {}) =>
+      apiClient.get(`/orders/${orderId}/${precheck ? 'kanban-precheck' : 'kanban-detail'}`, options).then(parseKanbanOrderDetailDTO),
+    getOrderStatuses,
     moveOrder: (orderId, generalStepId, audit = {}) =>
       apiClient.request(`/orders/${orderId}/move`, {
         method: 'PATCH',
@@ -44,7 +58,7 @@ export function createKanbanApi(apiClient) {
     setLabel: (orderId, label, active) => apiClient.patch(`/orders/${orderId}/labels`, { label, active }).then(parseOrderLabelsPatchDTO),
     getCapacities: () => apiClient.get('/production-capacity'),
     updateCapacities: (capacities) => apiClient.patch('/production-capacity', { capacities }),
-    getProductionLoad: () => apiClient.get('/production-load/today'),
+    getProductionLoad: options => apiClient.get('/production-load/today', options),
     updateProductionLoad: (entries) => apiClient.patch('/production-load/today', { entries }),
   }
 }

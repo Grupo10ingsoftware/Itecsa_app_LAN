@@ -3,7 +3,7 @@ import { createLineSnapshots, salesNoteLineIdentity } from '../service/salesOrde
 import { AppError } from '../../../errors/AppError.js';
 import { ROLES } from '../../../config/roles.js';
 
-export async function reevaluateFromSalesNoteOperation(repository, { orderId, salesNote, userId }) {
+export async function reevaluateFromSalesNoteOperation(repository, { orderId, salesNote, userId, compact = false }) {
   const snapshotsSupported = await supportsOrderSnapshots(repository.client);
   const order = await repository.client.pedidos.findUnique({
     where: { id_pedido: Number(orderId) },
@@ -66,10 +66,15 @@ export async function reevaluateFromSalesNoteOperation(repository, { orderId, sa
     }
   }
 
+  // Preserve the database's equality/collation semantics: one lookup per distinct
+  // requested name inside this transaction, including a cached missing result.
+  const types = new Map();
+  const firstSubprocesses = new Map();
   for (const [index, item] of (salesNote.items ?? []).entries()) {
-    const type = await repository.client.tipo_Producto.findFirst({
+    if (!types.has(item.tipoProducto)) types.set(item.tipoProducto, await repository.client.tipo_Producto.findFirst({
       where: { nombre_producto: item.tipoProducto },
-    });
+    }));
+    const type = types.get(item.tipoProducto);
     if (!type) continue;
     const existing = existingByIdentity.get(salesNoteLineIdentity(item));
     if (existing) {
@@ -86,9 +91,10 @@ export async function reevaluateFromSalesNoteOperation(repository, { orderId, sa
         ...snapshotOmit(snapshotsSupported),
       });
     } else {
-      const first = await repository.client.producto_Subproceso.findFirst({
+      if (!firstSubprocesses.has(type.id_tipo_producto)) firstSubprocesses.set(type.id_tipo_producto, await repository.client.producto_Subproceso.findFirst({
         where: { id_tipo_producto: type.id_tipo_producto }, orderBy: { orden_flujo: "asc" },
-      });
+      }));
+      const first = firstSubprocesses.get(type.id_tipo_producto);
       await repository.client.detalle_pedido.create({ data: {
         ...snapshotData(snapshots[index], snapshotsSupported),
         id_pedido: Number(orderId), id_tipo_producto: type.id_tipo_producto,
@@ -105,7 +111,7 @@ export async function reevaluateFromSalesNoteOperation(repository, { orderId, sa
   }
 
   const updated = await repository.transitionGeneralStage({
-    id: orderId, ordenKanban: 1, userId,
+    id: orderId, ordenKanban: 1, userId, compact,
     comment: "Pedido reevaluado desde la Nota de Venta y enviado a Listo para Produccion.",
   });
 

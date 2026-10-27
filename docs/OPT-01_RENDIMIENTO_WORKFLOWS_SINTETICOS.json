@@ -1,0 +1,1745 @@
+{
+  "reference": "e7c65e3",
+  "capturedAt": "2026-10-27T17:32:54.193Z",
+  "node": "v24.19.0",
+  "environment": "SYNTHETIC: real service/repository orchestration, serial transactional double, programmed 5ms/logical IO",
+  "exclusions": [
+    "real MySQL",
+    "physical SQL/Prisma relation hydration",
+    "JWT and PIN hashing",
+    "HTTP/network",
+    "browser/render"
+  ],
+  "samples": {
+    "complete-first_before": {
+      "n": 10,
+      "minMs": 153.654,
+      "medianMs": 156.302,
+      "meanMs": 156.118,
+      "maxMs": 158.038,
+      "values": [
+        {
+          "ms": 158.038,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 155.149,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 155.205,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 155.811,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 153.654,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 156.878,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 156.035,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 156.667,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 157.173,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 156.569,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        }
+      ]
+    },
+    "complete-first_after": {
+      "n": 10,
+      "minMs": 138.291,
+      "medianMs": 139.731,
+      "meanMs": 139.523,
+      "maxMs": 140.863,
+      "values": [
+        {
+          "ms": 139.871,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 138.695,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 140.863,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 140.084,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 139.59,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 140.067,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 140.202,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 138.476,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 138.291,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 139.093,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1196,
+          "confirmedRecords": 1
+        }
+      ]
+    },
+    "complete-last_before": {
+      "n": 10,
+      "minMs": 154.465,
+      "medianMs": 155.653,
+      "meanMs": 155.672,
+      "maxMs": 157.191,
+      "values": [
+        {
+          "ms": 154.588,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 155.844,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 154.833,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 157.191,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 154.465,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 155.364,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 155.867,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 156.947,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 156.155,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 155.462,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        }
+      ]
+    },
+    "complete-last_after": {
+      "n": 10,
+      "minMs": 139.329,
+      "medianMs": 140.545,
+      "meanMs": 140.639,
+      "maxMs": 143.863,
+      "values": [
+        {
+          "ms": 141.316,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 139.521,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 140.717,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 139.466,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 140.372,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 139.447,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 143.863,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 141.524,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 140.834,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 139.329,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1190,
+          "confirmedRecords": 1
+        }
+      ]
+    },
+    "complete-lanyard-repeat_before": {
+      "n": 10,
+      "minMs": 169.691,
+      "medianMs": 171.904,
+      "meanMs": 171.686,
+      "maxMs": 173.065,
+      "values": [
+        {
+          "ms": 172.526,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 172.772,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 171.987,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 171.029,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 170.864,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 171.095,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 172.005,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 173.065,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 169.691,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 171.822,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        }
+      ]
+    },
+    "complete-lanyard-repeat_after": {
+      "n": 10,
+      "minMs": 140.163,
+      "medianMs": 155.556,
+      "meanMs": 154.12,
+      "maxMs": 157.172,
+      "values": [
+        {
+          "ms": 156.54,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 156.026,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 154.892,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 140.163,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 155.717,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 155.494,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 155.619,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 155.202,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 154.371,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 157.172,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "progress": 1,
+            "latestRecord": 1,
+            "stageRecord": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1198,
+          "confirmedRecords": 1
+        }
+      ]
+    },
+    "rollback-previous_before": {
+      "n": 10,
+      "minMs": 123.022,
+      "medianMs": 124.155,
+      "meanMs": 124.416,
+      "maxMs": 126.187,
+      "values": [
+        {
+          "ms": 125.011,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 123.849,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 125.424,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 124.444,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 123.683,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 126.187,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 125.289,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 123.382,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 123.022,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 123.866,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        }
+      ]
+    },
+    "rollback-previous_after": {
+      "n": 10,
+      "minMs": 107.515,
+      "medianMs": 108.715,
+      "meanMs": 108.764,
+      "maxMs": 110.986,
+      "values": [
+        {
+          "ms": 108.594,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 107.711,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 110.986,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 109.143,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 107.987,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 109.791,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 108.904,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 107.515,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 108.171,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 108.837,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1199,
+          "confirmedRecords": 1
+        }
+      ]
+    },
+    "rollback-finished_before": {
+      "n": 10,
+      "minMs": 123.518,
+      "medianMs": 124.396,
+      "meanMs": 124.816,
+      "maxMs": 127.121,
+      "values": [
+        {
+          "ms": 126.044,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 126.1,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 123.518,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 124.563,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 123.889,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 123.582,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 123.655,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 124.229,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 125.46,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 127.121,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "orm.order": 3,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        }
+      ]
+    },
+    "rollback-finished_after": {
+      "n": 10,
+      "minMs": 107.966,
+      "medianMs": 109.423,
+      "meanMs": 109.394,
+      "maxMs": 111.292,
+      "values": [
+        {
+          "ms": 109.349,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 108.547,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 109.821,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 109.715,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 111.292,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 108.009,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 110.506,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 109.235,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 107.966,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        },
+        {
+          "ms": 109.497,
+          "logicalCalls": {
+            "lock": 1,
+            "detail": 1,
+            "transitionState": 1,
+            "conditionalUpdate": 1,
+            "record": 1,
+            "subprocessRecord": 1,
+            "projection.root": 1,
+            "projection.details": 1,
+            "projection.history": 1,
+            "projection.comments": 1
+          },
+          "publicBytes": 1193,
+          "confirmedRecords": 1
+        }
+      ]
+    }
+  }
+}

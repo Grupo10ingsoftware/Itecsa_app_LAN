@@ -42,6 +42,7 @@ function KanbanCard({
   hasContractPriority,
   isProducing,
   canManageIndicators,
+  indicatorsBusy = false,
   canMove = false,
   onToggleIndicator,
   onOpenDetail,
@@ -100,7 +101,8 @@ function KanbanCard({
           <button
             aria-pressed={isUrgent}
             className={`${styles.cardIndicatorButton} ${styles.urgentIndicator} ${isUrgent ? styles.urgentIndicatorActive : ''}`}
-            disabled={!canManageIndicators}
+            disabled={!canManageIndicators || indicatorsBusy}
+            aria-busy={indicatorsBusy}
             onClick={(event) => {
               event.stopPropagation()
               onToggleIndicator?.('urgent')
@@ -113,7 +115,8 @@ function KanbanCard({
           <button
             aria-pressed={isProducing}
             className={`${styles.cardIndicatorButton} ${styles.producingIndicator} ${isProducing ? styles.producingIndicatorActive : ''}`}
-            disabled={!canManageIndicators}
+            disabled={!canManageIndicators || indicatorsBusy}
+            aria-busy={indicatorsBusy}
             onClick={(event) => { event.stopPropagation(); onToggleIndicator?.('producing') }}
             title={isProducing ? 'PRODUCIÉNDOSE activa' : 'Marcar como PRODUCIÉNDOSE'}
             type="button"
@@ -123,7 +126,8 @@ function KanbanCard({
           <button
             aria-pressed={hasContractPriority}
             className={`${styles.cardIndicatorButton} ${styles.contractIndicator} ${hasContractPriority ? styles.contractIndicatorActive : ''}`}
-            disabled={!canManageIndicators}
+            disabled={!canManageIndicators || indicatorsBusy}
+            aria-busy={indicatorsBusy}
             onClick={(event) => {
               event.stopPropagation()
               onToggleIndicator?.('contractPriority')
