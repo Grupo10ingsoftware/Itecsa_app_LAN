@@ -46,6 +46,7 @@ También se revisaron eliminaciones antiguas en la historia de `main`. La elimin
 
 - `git diff --check`: sin problemas. `git cherry -v` contra `POC/KEYCLOAK` y `opt-kanban`: los cinco commits de contenido exclusivo figuran como equivalentes en la rama de recuperación.
 - API: 193 pruebas completas aprobadas; 62 pruebas dirigidas de MySQL, Kanban y finalización aprobadas. Prisma generó el cliente y validó el esquema.
+- El primer check remoto detectó que el workflow ejecutaba las pruebas API antes de generar Prisma. Se corrigió el orden en los jobs de verificación y publicación para reproducir la secuencia local aprobada.
 - Web: 206 pruebas aprobadas, lint y build aprobados. Dos pruebas de migración de páginas esperaban un aviso estático eliminado antes de esta rama; se actualizaron para comprobar el botón y el reintento que sí existen.
 - Compose: `compose.yaml` y `compose.mysql.yaml` validaron estructura. Imágenes de producción web y API, y la imagen `database-tools`, construidas. No se ejecutó despliegue ni migración sobre bases de datos reales.
 - La inspección alcanza las referencias que GitHub expuso y los objetos conservados en esta copia local. Commits de ramas borradas que GitHub haya purgado, o reflogs de otros clones, no se pueden descartar ni recuperar con esta evidencia. La validación de flujos con MySQL y Keycloak reales requiere un entorno aislado configurado; no se ejecutó aquí.

@@ -34,8 +34,8 @@ jobs:
         run: |
           npm ci --prefix tooling/prisma
           npm ci --prefix capaServidor
-          (cd capaServidor && node --test)
           npm run prisma:generate --prefix capaServidor
+          (cd capaServidor && node --test)
           npm ci --prefix capaVista
           npm run lint --prefix capaVista
           npm run build --prefix capaVista
@@ -85,8 +85,8 @@ jobs:
         run: |
           npm ci --prefix tooling/prisma
           npm ci --prefix capaServidor
-          (cd capaServidor && node --test)
           npm run prisma:generate --prefix capaServidor
+          (cd capaServidor && node --test)
           npm ci --prefix capaVista
           npm run lint --prefix capaVista
           npm run build --prefix capaVista
