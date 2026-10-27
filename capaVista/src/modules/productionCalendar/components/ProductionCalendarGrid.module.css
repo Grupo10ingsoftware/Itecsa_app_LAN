@@ -436,24 +436,6 @@
   margin: 0;
 }
 
-.credentialsLabel {
-  color: var(--calendar-muted);
-  display: grid;
-  font-size: 0.74rem;
-  font-weight: 850;
-  gap: 0.38rem;
-  letter-spacing: 0.045em;
-  text-transform: uppercase;
-}
-
-.credentialsLabel input {
-  border: 1px solid #d7dee8;
-  border-radius: 0.55rem;
-  color: var(--calendar-text);
-  min-height: 2.75rem;
-  padding: 0.55rem 0.7rem;
-}
-
 .modalError {
   background: #fef2f2;
   border: 1px solid #fecaca;

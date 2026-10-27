@@ -1,8 +1,6 @@
-import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { formatDayTitle } from '../utils/calendarPresentation.js';
 import styles from './ProductionCalendarGrid.module.css';
-import { useRef, useState } from 'react';
-import { useModalDialog } from '../../users/hooks/useModalDialog'
+import PinAuthorizationModal from '../../../shared/components/pin/PinAuthorizationModal'
 
 export function DeliveryChangeConfirmModal({ change, onCancel, onConfirm }) {
   if (!change) return null
@@ -38,90 +36,9 @@ export function DeliveryChangeConfirmModal({ change, onCancel, onConfirm }) {
 }
 
 export function DeliveryChangeCredentialsModal({ change, onCancel, onConfirm }) {
-  const [pin, setPin] = useState('')
-  const [error, setError] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const submittingRef = useRef(false)
-  const modalRef = useRef(null)
-  useModalDialog({ containerRef: modalRef, isOpen: Boolean(change), canClose: !isSubmitting, onClose: onCancel })
-
   if (!change) return null
-
-  async function handleSubmit(event) {
-    event.preventDefault()
-    if (submittingRef.current) return
-    const trimmedPin = pin.trim()
-
-    if (!/^\d{6}$/.test(trimmedPin)) {
-      setError('Ingrese un PIN valido de 6 digitos.')
-      return
-    }
-
-    submittingRef.current = true
-    setIsSubmitting(true)
-
-    try {
-      await onConfirm({ pin: trimmedPin })
-    } catch (submitError) {
-      console.error('Error actualizando fecha de entrega:', submitError)
-      setError('No fue posible cambiar la fecha de entrega.')
-    } finally {
-      submittingRef.current = false
-      setIsSubmitting(false)
-    }
-  }
-
-  return (
-    <div className={styles.modalLayer} data-modal-layer="true" role="presentation">
-      <form
-        ref={modalRef}
-        aria-labelledby="delivery-credentials-title"
-        aria-modal="true"
-        className={styles.confirmModal}
-        onSubmit={handleSubmit}
-        role="dialog"
-      >
-        <header className={styles.modalHeader}>
-          <div>
-            <span>Validacion PIN</span>
-            <h2 id="delivery-credentials-title">Confirmar cambio</h2>
-          </div>
-          <button aria-label="Cerrar validacion" disabled={isSubmitting} onClick={onCancel} type="button">
-            <i className="bi bi-x-lg" aria-hidden="true" />
-          </button>
-        </header>
-
-        <div className={styles.modalBody}>
-          <p className={styles.confirmText}>
-            Ingrese su PIN para hacer efectivo el cambio de fecha de {change.item.orderNumber}.
-          </p>
-          <label className={styles.credentialsLabel}>
-            <span>PIN</span>
-            <input
-              autoComplete="one-time-code"
-              inputMode="numeric"
-              maxLength={6}
-              onChange={(event) => {
-                setPin(event.target.value.replace(/\D/g, '').slice(0, 6))
-                setError('')
-              }}
-              placeholder="000000"
-              type="password"
-              value={pin}
-            />
-          </label>
-          {error && <p className={styles.modalError}>{error}</p>}
-        </div>
-
-        <footer className={styles.modalFooter}>
-          <button className={styles.secondaryButton} disabled={isSubmitting} onClick={onCancel} type="button">
-            Cancelar
-          </button>
-          <button className={styles.primaryButton} disabled={isSubmitting} type="submit" aria-busy={isSubmitting}>
-            <LoadingAction busy={isSubmitting} context="Confirmar">Confirmar</LoadingAction>
-          </button>
-        </footer>
-      </form>
-    </div>
-  )
+  return <PinAuthorizationModal contextKey={`${change.item.id ?? change.item.orderNumber}:${change.fromDate}:${change.toDate}`}
+    title="Confirmar cambio" description={`Ingrese su PIN para hacer efectivo el cambio de fecha de ${change.item.orderNumber}.`}
+    onConfirm={({ pin }) => onConfirm({ pin })} onCancel={onCancel}
+    failureMessage="No fue posible cambiar la fecha de entrega." />
 }

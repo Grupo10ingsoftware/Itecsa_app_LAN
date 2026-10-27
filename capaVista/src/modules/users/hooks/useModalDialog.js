@@ -29,28 +29,32 @@ export function nextModalFocusTarget({ activeElement, focusableElements, shiftKe
   return null
 }
 
-function isolateBackground(container) {
-  const layer = container?.closest('[data-modal-layer="true"]')
-  const siblings = layer?.parentElement
-    ? [...layer.parentElement.children].filter((element) => element !== layer)
-    : []
-  const previousStates = siblings.map((element) => ({
-    ariaHidden: element.getAttribute('aria-hidden'),
-    element,
-    inert: element.inert,
-  }))
+// Only the top dialog owns keyboard/focus. Recompute isolation when layers are
+// replaced so an outgoing modal cannot expose the background of its successor.
+const dialogs = []
+let restoreBackground = () => {}
+let originalOverflow = ''
 
-  previousStates.forEach(({ element }) => {
-    element.inert = true
-    element.setAttribute('aria-hidden', 'true')
-  })
-
-  return () => {
-    previousStates.forEach(({ ariaHidden, element, inert }) => {
+function updateIsolation() {
+  restoreBackground()
+  const previous = []
+  const top = dialogs.at(-1)?.container
+  let branch = top
+  while (branch && branch !== document.body) {
+    for (const element of branch.parentElement?.children ?? []) {
+      if (element === branch) continue
+      previous.push({ element, hidden: element.getAttribute('aria-hidden'), inert: element.inert })
+      element.inert = true
+      element.setAttribute('aria-hidden', 'true')
+    }
+    branch = branch.parentElement
+  }
+  restoreBackground = () => {
+    for (const { element, hidden, inert } of previous) {
       element.inert = inert
-      if (ariaHidden === null) element.removeAttribute('aria-hidden')
-      else element.setAttribute('aria-hidden', ariaHidden)
-    })
+      if (hidden === null) element.removeAttribute('aria-hidden')
+      else element.setAttribute('aria-hidden', hidden)
+    }
   }
 }
 
@@ -74,19 +78,23 @@ export function useModalDialog({
 
     const container = containerRef.current
     const previousFocus = document.activeElement
-    const previousBodyOverflow = document.body.style.overflow
-    const restoreBackground = isolateBackground(container)
+    const entry = { container }
+    if (!dialogs.length) originalOverflow = document.body.style.overflow
+    dialogs.push(entry)
+    updateIsolation()
     document.body.style.overflow = 'hidden'
 
     const focusTimer = window.setTimeout(() => {
+      if (dialogs.at(-1) !== entry) return
       const target = initialFocusRef?.current ?? getFocusableElements(container)[0] ?? container
       target?.focus()
     }, 0)
 
     function handleKeyDown(event) {
+      if (dialogs.at(-1) !== entry) return
       if (event.key === 'Escape' && canCloseRef.current) {
         event.preventDefault()
-        onCloseRef.current()
+        onCloseRef.current?.()
         return
       }
 
@@ -112,9 +120,11 @@ export function useModalDialog({
     return () => {
       window.clearTimeout(focusTimer)
       document.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = previousBodyOverflow
-      restoreBackground()
-      if (previousFocus?.isConnected) previousFocus.focus()
+      const wasTop = dialogs.at(-1) === entry
+      dialogs.splice(dialogs.indexOf(entry), 1)
+      updateIsolation()
+      if (!dialogs.length) document.body.style.overflow = originalOverflow
+      if (wasTop && previousFocus?.isConnected && !previousFocus.closest('[aria-hidden="true"], [inert]')) previousFocus.focus()
     }
   }, [containerRef, initialFocusRef, isOpen])
 }

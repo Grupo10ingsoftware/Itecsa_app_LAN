@@ -163,7 +163,6 @@ export default function PaymentConfirmationPage() {
       setEditingStatus((prev) => ({ ...prev, [orderId]: false }))
       return true
     } catch (error) {
-      console.error('Error actualizando estado de pago:', error)
       setUpdateError(
         error?.payload?.message ??
           'No fue posible actualizar el estado de pago.',
@@ -501,6 +500,7 @@ export default function PaymentConfirmationPage() {
         <PaymentCredentialsModal
           key={`${credentialsTransition.order.id}:${credentialsTransition.targetStatus}`}
           isSubmitting={isUpdatingPaymentStatus}
+          errorMessage={updateError}
           onCancel={closeCredentialsValidation}
           onConfirm={completeCredentialsValidation}
           order={credentialsTransition.order}

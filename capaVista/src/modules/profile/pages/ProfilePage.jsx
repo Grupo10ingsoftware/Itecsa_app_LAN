@@ -12,15 +12,26 @@ import { displayUserStatus, isActiveUserStatus } from '../../../config/userLifec
 import UserMovementsModal from '../../users/components/UserMovementsModal'
 import UserMovementsTable from '../../users/components/UserMovementsTable'
 import confirmationStyles from '../../../shared/styles/ConfirmationModal.module.css'
+import PinModal, { PinError } from '../../../shared/components/pin/PinModal'
+import pinStyles from '../../../shared/components/pin/PinModal.module.css'
 
 function getDisplayValue(value, fallback = 'No informado') {
   return String(value ?? '').trim() || fallback
 }
 
 export default function ProfilePage() {
+  const { user } = useAuth()
+  return <ProfileContent key={user?.sub ?? ''} />
+}
+
+function ProfileContent() {
   const { identityUser, pinStatus, refreshSession, user, provider } = useAuth()
   const authApi = useAuthApi()
   const recoveryTask = useRef(null)
+  const acknowledgementPending = useRef(false)
+  const acknowledged = useRef(false)
+  const active = useRef(false)
+  useEffect(() => { active.current = true; return () => { active.current = false } }, [])
   const [recoveryVerified, setRecoveryVerified] = useState(() => getPinRecoveryOutcome(user?.sub)?.recovered ?? false)
   const [pinSuccess, setPinSuccess] = useState('')
   useEffect(() => () => { recoveryTask.current?.cancel(); recoveryTask.current = null }, [user?.sub])
@@ -65,7 +76,7 @@ export default function ProfilePage() {
   }, [identityUser, user, loadedProfile])
 
   useEffect(() => {
-    if (pinStatus !== 'pending_acknowledgement' || visiblePin) return
+    if (pinStatus !== 'pending_acknowledgement' || visiblePin || acknowledged.current) return
 
     let current = true
     authApi.revealPin()
@@ -82,18 +93,23 @@ export default function ProfilePage() {
   }, [authApi, pinStatus, visiblePin])
 
   async function acknowledgePin() {
+    if (acknowledgementPending.current) return
+    acknowledgementPending.current = true
     setIsPinBusy(true)
     setPinError('')
 
     try {
-      await authApi.acknowledgePin()
+      if (!acknowledged.current) await authApi.acknowledgePin()
+      if (!active.current) return
+      acknowledged.current = true
       if (recoveryVerified) { setPinSuccess('Tu PIN se ha actualizado correctamente'); setRecoveryVerified(false); clearPinRecoveryOutcome() }
       setVisiblePin('')
       await refreshSession()
     } catch (error) {
-      setPinError(error?.payload?.message ?? 'No fue posible confirmar la recepcion del PIN.')
+      if (active.current) setPinError(error?.payload?.message ?? 'No fue posible confirmar la recepcion del PIN.')
     } finally {
-      setIsPinBusy(false)
+      acknowledgementPending.current = false
+      if (active.current) setIsPinBusy(false)
     }
   }
 
@@ -204,35 +220,17 @@ export default function ProfilePage() {
         description="Consulta el registro completo de movimientos de tu cuenta." />}
 
       {pinStatus === 'pending_acknowledgement' && (
-        <>
-          <div className="modal d-block" role="dialog" aria-modal="true" aria-labelledby="pin-delivery-title">
-            <div className="modal-dialog modal-dialog-centered">
-              <div className={`modal-content ${confirmationStyles.content}`}>
-                <div className="modal-header">
-                  <h2 className="modal-title fs-5" id="pin-delivery-title">Tu PIN personal</h2>
-                </div>
-                <div className="modal-body text-center">
-                  <p>Guardalo en un lugar seguro. Despues de aceptar no volvera a mostrarse.</p>
-                  <div className="display-5 fw-bold font-monospace" aria-live="polite">
-                    {visiblePin || (pinError ? 'PIN no disponible' : <LoadingIndicator scope="action" context="PIN operativo" />)}
-                  </div>
-                  {pinError && <div className="alert alert-danger mt-3 mb-0">{pinError}</div>}
-                </div>
-                <div className="modal-footer">
-                  <button
-                    className="btn btn-dark"
-                    disabled={!visiblePin || isPinBusy}
-                    onClick={acknowledgePin}
-                    type="button"
-                   aria-busy={isPinBusy}>
-                    <LoadingAction busy={isPinBusy} context="Aceptar">Aceptar</LoadingAction>
-                  </button>
-                </div>
-              </div>
-            </div>
+        <PinModal title="Tu PIN personal" canClose={false} busy={isPinBusy}
+          description="Guardalo en un lugar seguro. Despues de aceptar no volvera a mostrarse."
+          actions={<button className={pinStyles.primary} disabled={(!visiblePin && !acknowledged.current) || isPinBusy}
+            onClick={acknowledgePin} type="button" aria-busy={isPinBusy}>
+            <LoadingAction busy={isPinBusy} surface="light" context="Aceptar">{acknowledged.current ? 'Continuar' : 'Aceptar'}</LoadingAction>
+          </button>}>
+          <div className={pinStyles.secret}>
+            {visiblePin || (acknowledged.current ? 'PIN aceptado' : pinError ? 'PIN no disponible' : <LoadingIndicator scope="action" context="PIN operativo" />)}
           </div>
-          <div className="modal-backdrop show" />
-        </>
+          <PinError>{pinError}</PinError>
+        </PinModal>
       )}
 
       {recoveryOpen && (

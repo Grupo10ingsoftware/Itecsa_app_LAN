@@ -1,9 +1,9 @@
 import { useAuth } from "../../../hooks/useAuth";
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getRoleLabel, manageableRoles } from '../../../config/roles'
-import UserButton from './UserButton'
-import { useModalDialog } from '../hooks/useModalDialog'
-import styles from '../pages/UserManagementPage.module.css'
+import PinModal, { PinField, PinError } from '../../../shared/components/pin/PinModal'
+import pinStyles from '../../../shared/components/pin/PinModal.module.css'
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import editStyles from './UserEditModal.module.css'
 import { validatePersonName, validateEmail } from '../utils/userValidation.js'
 
@@ -19,7 +19,13 @@ function createFormState(user) {
   }
 }
 
-export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, onSave, onUnlink, onCredentials, user, readOnly = false }) {
+export default function UserEditModal(props) {
+  const { user: actor } = useAuth()
+  if (!props.isOpen || !props.user) return null
+  return <UserEditForm key={`${actor?.sub}:${props.user.idUsuarioAutenticacionExterna ?? props.user.id}`} {...props} />
+}
+
+function UserEditForm({ isCurrentUser = false, onClose, onSave, onUnlink, onCredentials, user, readOnly = false }) {
   const [values, setValues] = useState(() => (user ? createFormState(user) : null))
   const { user: actor, provider } = useAuth()
   const [pin, setPin] = useState('')
@@ -27,131 +33,64 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
   const [saveError, setSaveError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const firstInputRef = useRef(null)
-  const modalRef = useRef(null)
+  const pending = useRef(false)
+  const active = useRef(false)
+  useEffect(() => { active.current = true; return () => { active.current = false } }, [])
 
-  useModalDialog({
-    canClose: !isSubmitting,
-    containerRef: modalRef,
-    initialFocusRef: firstInputRef,
-    isOpen: Boolean(isOpen && user),
-    onClose,
-  })
-
-  useEffect(() => {
-    if (!isOpen || !user) {
-      return undefined
-    }
-
-    const resetTimer = window.setTimeout(() => { setPin(''); setPinError('') }, 0)
-    return () => {
-      window.clearTimeout(resetTimer)
-    }
-  }, [isOpen, user])
-
-  const canSubmit = useMemo(() => {
-    if (!values) {
-      return false
-    }
-
-    const currentRole = user?.rolUsuario ?? ''
-
-    return (
-      Object.values(values).every(value => String(value).trim().length > 0) &&
-      /^\d{6}$/.test(pin.trim()) &&
-      !(isCurrentUser && values.rolUsuario !== currentRole)
-    )
-  }, [isCurrentUser, pin, user?.rolUsuario, values])
-
-  if (!isOpen || !user || !values) {
-    return null
+  function close() {
+    if (pending.current) return
+    setPin('')
+    onClose()
   }
 
-  function handleChange(event) {
-    const { name, value } = event.target
-    setValues((currentValues) => ({
-      ...currentValues,
-      [name]: value,
-    }))
-  }
+  const canSubmit = Object.values(values).every(value => String(value).trim().length > 0)
+    && /^\d{6}$/.test(pin) && !(isCurrentUser && values.rolUsuario !== user.rolUsuario)
 
-  function handleBackdropMouseDown(event) {
-    if (event.target === event.currentTarget && !isSubmitting) {
-      onClose()
-    }
+  function handleChange({ target: { name, value } }) {
+    setValues(current => ({ ...current, [name]: value }))
   }
 
   async function handleSubmit(event) {
     event.preventDefault()
-    if (readOnly || isSubmitting) return
-
+    if (readOnly || pending.current) return
+    const trimmedPin = pin.trim()
+    setPin('')
     const errors = [...validatePersonName(values.nombreUsuario, 'El nombre'),
       ...validatePersonName(values.apellidoUsuario, 'El apellido'), ...validateEmail(values.correoUsuario)]
     if (!manageableRoles(actor?.rolUsuario).includes(values.rolUsuario)) errors.push('No puedes asignar ese rol.')
     if (errors.length) { setSaveError(errors[0]); return }
-
-    const trimmedPin = pin.trim()
-
-    if (!/^\d{6}$/.test(trimmedPin)) {
-      setPinError('Ingrese un PIN valido de 6 digitos.')
-      return
-    }
-
-    if (isCurrentUser && values.rolUsuario !== (user.rolUsuario ?? '')) {
-      return
-    }
-
+    if (!/^\d{6}$/.test(trimmedPin)) { setPinError('Ingrese un PIN valido de 6 digitos.'); return }
+    if (isCurrentUser && values.rolUsuario !== (user.rolUsuario ?? '')) return
+    pending.current = true
     setIsSubmitting(true)
     setSaveError('')
-
     try {
-      await onSave({
-        ...user,
-        nombreUsuario: values.nombreUsuario.trim(),
-        apellidoUsuario: values.apellidoUsuario.trim(),
-        correoUsuario: values.correoUsuario.trim().toLowerCase(),
-        rolUsuario: values.rolUsuario,
-        estadoUsuario: values.estadoUsuario,
-        pin: trimmedPin,
-      })
+      await onSave({ ...user, nombreUsuario: values.nombreUsuario.trim(), apellidoUsuario: values.apellidoUsuario.trim(),
+        correoUsuario: values.correoUsuario.trim().toLowerCase(), rolUsuario: values.rolUsuario,
+        estadoUsuario: values.estadoUsuario, pin: trimmedPin })
     } catch (error) {
-      setSaveError(error?.message || 'No fue posible guardar los cambios. Intenta nuevamente.')
+      if (active.current) setSaveError(error?.message || 'No fue posible guardar los cambios. Intenta nuevamente.')
     } finally {
-      setPin('')
-      setIsSubmitting(false)
+      pending.current = false
+      if (active.current) setIsSubmitting(false)
     }
   }
 
-  return (
-    <div className={styles.modalLayer} data-modal-layer="true" onMouseDown={handleBackdropMouseDown} role="presentation">
-      <form
-        aria-describedby="user-edit-modal-description"
-        aria-labelledby="user-edit-modal-title"
-        aria-modal="true"
-        className={editStyles.modal}
-        noValidate
-        onSubmit={handleSubmit}
-        ref={modalRef}
-        role="dialog"
-        tabIndex={-1}
-      >
-        <header className={editStyles.header}>
-          <div>
-            <span className={editStyles.kicker}>Usuario</span>
-            <h2 id="user-edit-modal-title">{readOnly ? 'Consultar usuario' : 'Editar usuario'}</h2>
-            <p id="user-edit-modal-description">{readOnly ? 'Consulta la identidad. La edicion y las acciones de cuenta aun no estan habilitadas.' : 'Modifica la informacion del usuario en el sistema.'}</p>
-          </div>
-          <button
-            aria-label="Cerrar modal de edicion"
-            className={editStyles.closeButton}
-            disabled={isSubmitting}
-            onClick={onClose}
-            type="button"
-          >
-            <i className="bi bi-x-lg" aria-hidden="true" />
-          </button>
-        </header>
-
-        <div className={editStyles.body}>
+  return <PinModal title={readOnly ? 'Consultar usuario' : 'Editar usuario'}
+    description={readOnly ? 'Consulta la identidad. La edicion y las acciones de cuenta aun no estan habilitadas.' : 'Modifica la informacion del usuario en el sistema.'}
+    busy={isSubmitting} onClose={close} onSubmit={handleSubmit} initialFocusRef={readOnly ? undefined : firstInputRef}
+    actions={<>
+      {!readOnly && provider === 'keycloak' && onCredentials && <button type="button" className={pinStyles.secondary}
+        disabled={isSubmitting || isCurrentUser || !['Activo', 'Vinculado', 'Pendiente'].includes(user.estadoUsuario)}
+        onClick={() => { setPin(''); onCredentials(user) }}>Establecer credenciales</button>}
+      {!readOnly && onUnlink && <button type="button" className={pinStyles.secondary}
+        disabled={isSubmitting || isCurrentUser || user.estadoUsuario === 'Desvinculado'}
+        onClick={() => { setPin(''); onUnlink(user) }}>Desvincular</button>}
+      <button type="button" className={pinStyles.secondary} disabled={isSubmitting} onClick={close}>{readOnly ? 'Cerrar' : 'Cancelar'}</button>
+      {!readOnly && <button className={pinStyles.primary} disabled={isSubmitting || !canSubmit} type="submit" aria-busy={isSubmitting}>
+        <LoadingAction busy={isSubmitting} surface="light" context="Guardar cambios">Guardar cambios</LoadingAction>
+      </button>}
+    </>}>
           <div className={editStyles.identityCard}>
             <span className={editStyles.identityAvatar} aria-hidden="true">
               <i className="bi bi-person-fill" />
@@ -256,66 +195,9 @@ export default function UserEditModal({ isCurrentUser = false, isOpen, onClose, 
               </span>
             </label>
 
-            {!readOnly && <label className={`${editStyles.field} ${editStyles.fieldWide}`} htmlFor="edit-user-pin">
-              <span className={editStyles.fieldLabel}>PIN de autorizacion</span>
-              <span className={`${editStyles.controlWrap} ${pinError ? editStyles.controlInvalid : ''}`}>
-                <i className="bi bi-lock" aria-hidden="true" />
-                <input
-                  aria-describedby={pinError ? 'edit-user-pin-error' : undefined}
-                  aria-invalid={Boolean(pinError)}
-                  autoComplete="off"
-                  disabled={isSubmitting}
-                  id="edit-user-pin"
-                  inputMode="numeric"
-                  maxLength={6}
-                  onChange={(event) => {
-                    setPin(event.target.value.replace(/\D/g, '').slice(0, 6))
-                    setPinError('')
-                  }}
-                  placeholder="000000"
-                  required
-                  type="password"
-                  value={pin}
-                />
-              </span>
-              {pinError && <small className={editStyles.fieldError} id="edit-user-pin-error">{pinError}</small>}
-            </label>}
           </div>
-        </div>
-
-        {saveError && (
-          <div className={`${styles.feedbackMessage} ${styles.feedbackdanger} ${editStyles.saveError}`} role="alert">
-            {saveError}
-          </div>
-        )}
-        <footer className={editStyles.actions}>
-          {!readOnly && provider === 'keycloak' && onCredentials && <UserButton disabled={isSubmitting || isCurrentUser || !['Activo', 'Vinculado', 'Pendiente'].includes(user.estadoUsuario)}
-            onClick={() => onCredentials(user)} variant="secondary">Establecer credenciales</UserButton>}
-          {!readOnly && onUnlink && <UserButton
-            className={`${editStyles.actionButton} ${editStyles.unlinkButton}`}
-            disabled={isSubmitting || isCurrentUser || user.estadoUsuario === 'Desvinculado'}
-            onClick={() => onUnlink(user)}
-            title={isCurrentUser ? 'No puedes desvincular tu propia cuenta.' : undefined}
-            variant="danger"
-          >
-            Desvincular
-          </UserButton>}
-          <div className={editStyles.primaryActions}>
-            <UserButton className={editStyles.actionButton} disabled={isSubmitting} onClick={onClose} variant="secondary">
-              {readOnly ? 'Cerrar' : 'Cancelar'}
-            </UserButton>
-            {!readOnly && <UserButton
-              busy={isSubmitting}
-              className={`${editStyles.actionButton} ${editStyles.saveButton}`}
-              disabled={isSubmitting || !canSubmit}
-              type="submit"
-              variant="primary"
-            >
-              Guardar cambios
-            </UserButton>}
-          </div>
-        </footer>
-      </form>
-    </div>
-  )
+          {!readOnly && <PinField label="PIN de autorizacion" value={pin} disabled={isSubmitting} error={pinError}
+            onChange={value => { setPin(value); setPinError('') }} />}
+          <PinError>{saveError}</PinError>
+    </PinModal>
 }

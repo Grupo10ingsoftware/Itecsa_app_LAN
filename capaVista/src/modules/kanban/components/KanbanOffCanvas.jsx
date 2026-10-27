@@ -16,7 +16,11 @@ import { useRef, useState } from 'react';
 import styles from '../styles/Kanban.module.css';
 import { useModalDialog } from '../../users/hooks/useModalDialog'
 
-export default function KanbanOffCanvas({
+export default function KanbanOffCanvas(props) {
+  return props.isOpen ? <KanbanOffCanvasContent key={props.order?.id ?? props.order?.salesNoteNumber ?? 'loading'} {...props} /> : null
+}
+
+function KanbanOffCanvasContent({
   canCancelProduction = false,
   canRollbackSubprocess = false,
   canCompleteSubprocess = false,
@@ -35,20 +39,15 @@ export default function KanbanOffCanvas({
   order,
 }) {
   const [authModal, setAuthModal] = useState(null)
-  const [operatorPin, setOperatorPin] = useState('')
-  const [operatorComment, setOperatorComment] = useState('')
   const [authError, setAuthError] = useState('')
   const [isCompletingSubprocess, setIsCompletingSubprocess] = useState(false)
   const [isCorrectionFormOpen, setIsCorrectionFormOpen] = useState(false)
   const [correctionText, setCorrectionText] = useState('')
   const [correctionError, setCorrectionError] = useState('')
   const [deconfirmationAuthOpen, setDeconfirmationAuthOpen] = useState(false)
-  const [deconfirmationPin, setDeconfirmationPin] = useState('')
   const [deconfirmationError, setDeconfirmationError] = useState('')
   const [isApprovingDeconfirmation, setIsApprovingDeconfirmation] = useState(false)
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
-  const [cancelPin, setCancelPin] = useState('')
-  const [cancelComment, setCancelComment] = useState('')
   const [cancelError, setCancelError] = useState('')
   const [isCancelling, setIsCancelling] = useState(false)
   const [isReevaluating, setIsReevaluating] = useState(false)
@@ -102,15 +101,11 @@ export default function KanbanOffCanvas({
     }
 
     setAuthModal({ item, process, action: 'complete' })
-    setOperatorPin('')
-    setOperatorComment('')
     setAuthError('')
   }
 
   function resetAuthModal() {
     setAuthModal(null)
-    setOperatorPin('')
-    setOperatorComment('')
     setAuthError('')
   }
   function closeAuthModal() {
@@ -119,22 +114,19 @@ export default function KanbanOffCanvas({
 
   function openRollbackModal(item, process) {
     setAuthModal({ item, process, action: 'rollback' })
-    setOperatorPin('')
-    setOperatorComment('')
     setAuthError('')
   }
 
-  async function completeSubProcess(event) {
-    event.preventDefault()
+  async function completeSubProcess({ pin, comment }) {
     if (operationPending.current) return
-    const trimmedPin = operatorPin.trim()
+    const trimmedPin = pin.trim()
 
     if (!/^\d{6}$/.test(trimmedPin)) {
       setAuthError('Ingrese un PIN valido de 6 digitos.')
       return
     }
 
-    const trimmedComment = operatorComment.trim()
+    const trimmedComment = comment.trim()
 
     if (authModal.action === 'rollback' && !trimmedComment) {
       setAuthError('Debe ingresar una observacion para retroceder.')
@@ -187,12 +179,9 @@ export default function KanbanOffCanvas({
     } finally { correctionPending.current = false; setIsSendingCorrection(false) }
   }
 
-  async function submitCancellation(event) {
-    event.preventDefault()
+  async function submitCancellation({ pin, comment }) {
     if (operationPending.current) return
 
-    const pin = cancelPin.trim()
-    const comment = cancelComment.trim()
     if (!/^\d{6}$/.test(pin)) {
       setCancelError('Ingrese un PIN valido de 6 digitos.')
       return
@@ -221,14 +210,12 @@ export default function KanbanOffCanvas({
     if (isApprovingDeconfirmation) return
 
     setDeconfirmationAuthOpen(false)
-    setDeconfirmationPin('')
     setDeconfirmationError('')
   }
 
-  async function approvePaymentDeconfirmation(event) {
-    event.preventDefault()
+  async function approvePaymentDeconfirmation({ pin }) {
     if (operationPending.current) return
-    const trimmedPin = deconfirmationPin.trim()
+    const trimmedPin = pin.trim()
 
     if (!/^\d{6}$/.test(trimmedPin)) {
       setDeconfirmationError('Ingrese un PIN valido de 6 digitos.')
@@ -248,7 +235,6 @@ export default function KanbanOffCanvas({
         return
       }
       setDeconfirmationAuthOpen(false)
-      setDeconfirmationPin('')
     } catch {
       setDeconfirmationError('No fue posible aprobar la desconfirmacion.')
     } finally {
@@ -412,11 +398,6 @@ export default function KanbanOffCanvas({
           authModal={authModal}
           isCompletingSubprocess={isCompletingSubprocess}
           closeAuthModal={closeAuthModal}
-          setOperatorPin={setOperatorPin}
-          setAuthError={setAuthError}
-          operatorPin={operatorPin}
-          setOperatorComment={setOperatorComment}
-          operatorComment={operatorComment}
           authError={authError}
         />
       )}
@@ -426,11 +407,6 @@ export default function KanbanOffCanvas({
           submitCancellation={submitCancellation}
           isCancelling={isCancelling}
           setIsCancelModalOpen={setIsCancelModalOpen}
-          setCancelPin={setCancelPin}
-          setCancelError={setCancelError}
-          cancelPin={cancelPin}
-          setCancelComment={setCancelComment}
-          cancelComment={cancelComment}
           cancelError={cancelError}
         />
       )}
@@ -441,9 +417,6 @@ export default function KanbanOffCanvas({
           isApprovingDeconfirmation={isApprovingDeconfirmation}
           closeDeconfirmationAuthModal={closeDeconfirmationAuthModal}
           order={order}
-          setDeconfirmationPin={setDeconfirmationPin}
-          setDeconfirmationError={setDeconfirmationError}
-          deconfirmationPin={deconfirmationPin}
           deconfirmationError={deconfirmationError}
         />
       )}

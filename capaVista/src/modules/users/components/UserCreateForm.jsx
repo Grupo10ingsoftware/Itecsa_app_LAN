@@ -1,7 +1,7 @@
 import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import PaymentCredentialsModal from '../../payments/components/PaymentCredentialsModal.jsx'
+import PinAuthorizationModal from '../../../shared/components/pin/PinAuthorizationModal'
 import TemporaryPasswordModal from './TemporaryPasswordModal.jsx'
 import { getRoleLabel, manageableRoles } from '../../../config/roles'
 import { API_ERROR_CODES } from '../../../services/api/apiClient'
@@ -33,7 +33,12 @@ function preparationMessage(result) {
       ? 'Usuario creado. Si no registraste la contraseña inicial, crea una nueva credencial temporal a través de Keycloak.'
       : 'Creación incompleta. No repitas el alta. Referencia: ' + result.operationId + '.' }
 }
-export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, onCreated } = {}) {
+export default function UserCreateForm(props) {
+  const { user } = useAuth()
+  return <UserCreateFormContent key={user?.sub ?? ''} {...props} />
+}
+
+function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreated } = {}) {
   const { loginWithRedirect, user: actor } = useAuth()
   const adminUsersApi = useAdminUsersApi()
   const [values, setValues] = useState(INITIAL_VALUES)
@@ -45,6 +50,8 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
   const [pinError, setPinError] = useState('')
   const [credential, setCredential] = useState(null)
   const submitting = useRef(false)
+  const active = useRef(false)
+  useEffect(() => { active.current = true; return () => { active.current = false } }, [])
   function handleFieldChange({ target: { name, value } }) {
     if (createdUser || pinAction || isSubmitting) return
     setValues(current => {
@@ -91,6 +98,7 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
         : await adminUsersApi.createUser({ nombreUsuario: values.nombreUsuario.trim(),
           apellidoUsuario: values.apellidoUsuario.trim(), correoUsuario: values.correoUsuario.trim().toLowerCase(),
           rutUsuario: values.rutUsuario.trim(), rolUsuario: values.rolUsuario, username: values.username, pin })
+      if (!active.current) return
       const { temporaryPassword, ...result } = response
       setCreatedUser(result)
       setFieldErrors(INITIAL_ERRORS)
@@ -103,10 +111,10 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
         onCreated?.(result)
       }
     } catch (error) {
-      setPinError(getErrorMessage(error).text)
+      if (active.current) setPinError(getErrorMessage(error).text)
     } finally {
       submitting.current = false
-      setIsSubmitting(false)
+      if (active.current) setIsSubmitting(false)
     }
   }
   function acceptCredential() {
@@ -295,11 +303,10 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
         </button>
       </footer>
     </form>
-    {pinAction && createPortal(<PaymentCredentialsModal
+    {pinAction && <PinAuthorizationModal contextKey={pinAction} disableUntilValid
       description="Ingrese su PIN personal para autorizar la creación del usuario."
-      kicker="Creación de usuario" manageFocus layerClassName={styles.credentialLayer}
       isSubmitting={isSubmitting} onCancel={cancelPin} onConfirm={confirmPin} errorMessage={pinError}
-    />, document.body)}
+    />}
     {credential && createPortal(<TemporaryPasswordModal initialCredential={credential} onClose={acceptCredential} />, document.body)}
     </>
   )
