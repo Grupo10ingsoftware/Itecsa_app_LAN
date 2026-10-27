@@ -1,5 +1,6 @@
-import { can } from "../../../../shared/authorization.js";
-import { useAuth0 } from '@auth0/auth0-react'
+import { authorizationForProvider } from '../../../../shared/identityAuthorization.js'
+import { useIdentity } from './identityContext.js'
+import { isValidVerifiedIdentity, isCurrentVerification } from './verifiedIdentity.js'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuthApi } from '../../modules/auth/hooks/useAuthApi'
 import { API_ERROR_CODES } from '../../services/api/apiClient'
@@ -15,6 +16,7 @@ const AUTH_STATUS = Object.freeze({
 })
 
 const VERIFY_SESSION_TIMEOUT_MS = 10000
+const defaultVerificationKey = () => 0
 
 function withTimeout(promise, timeoutMs) {
   return new Promise((resolve, reject) => {
@@ -38,36 +40,58 @@ function withTimeout(promise, timeoutMs) {
 export function AuthProvider({ children }) {
   const {
     error,
+    provider, sessionKey, getSessionKey, verificationKey = 0,
+    getVerificationKey = defaultVerificationKey,
     isAuthenticated,
     isLoading,
     loginWithRedirect,
-    logout: auth0Logout,
+    logout: identityLogout,
     user,
-  } = useAuth0()
+  } = useIdentity()
+  const subject = user?.sub
+  const policy = authorizationForProvider(provider)
   const authApi = useAuthApi()
   const [verifiedSession, setVerifiedSession] = useState({
     status: null,
     subject: null,
+    provider: null,
+    sessionKey: null,
     user: null,
     error: null,
   })
 
   const verifySession = useCallback(
-    () => withTimeout(authApi.verify(), VERIFY_SESSION_TIMEOUT_MS),
-    [authApi],
+    async () => {
+      const verified = await withTimeout(authApi.verify(), VERIFY_SESSION_TIMEOUT_MS)
+      if (getSessionKey() !== sessionKey || getVerificationKey() !== verificationKey ||
+        !isValidVerifiedIdentity(verified, { provider, subject })) {
+        throw Object.assign(Error('La identidad verificada no coincide con la sesion.'), { status: 401 })
+      }
+      return verified
+    },
+    [authApi, getSessionKey, sessionKey, subject, getVerificationKey, verificationKey, provider],
   )
 
   const refreshSession = useCallback(async () => {
-    const verifiedUser = await verifySession()
-    setVerifiedSession({
-      status: AUTH_STATUS.AUTHENTICATED,
-      subject: user?.sub ?? verifiedUser.sub ?? null,
-      user: verifiedUser,
-      error: null,
-    })
-
-    return verifiedUser
-  }, [user?.sub, verifySession])
+    try {
+      const verifiedUser = await verifySession()
+      setVerifiedSession({
+        status: AUTH_STATUS.AUTHENTICATED,
+        subject,
+        provider,
+        sessionKey,
+        verificationKey,
+        user: verifiedUser,
+        error: null,
+      })
+      return verifiedUser
+    } catch (verifyError) {
+      if (getSessionKey() === sessionKey && getVerificationKey() === verificationKey) setVerifiedSession({ subject, provider, sessionKey, verificationKey,
+        user: null, error: verifyError, status: verifyError?.status === 401 ? AUTH_STATUS.SESSION_INVALID
+          : verifyError?.status === 403 ? AUTH_STATUS.ACCESS_DENIED : AUTH_STATUS.ERROR })
+      throw verifyError
+    }
+  }, [subject, provider, sessionKey, getSessionKey, getVerificationKey, verificationKey, verifySession])
 
   useEffect(() => {
     let isCurrent = true
@@ -86,7 +110,10 @@ export function AuthProvider({ children }) {
 
         setVerifiedSession({
           status: AUTH_STATUS.AUTHENTICATED,
-          subject: user?.sub ?? verifiedUser.sub ?? null,
+          subject,
+          provider,
+          sessionKey,
+          verificationKey,
           user: verifiedUser,
           error: null,
         })
@@ -105,7 +132,10 @@ export function AuthProvider({ children }) {
 
         setVerifiedSession({
           status,
-          subject: user?.sub ?? null,
+          subject: subject ?? null,
+          provider,
+          sessionKey,
+          verificationKey,
           user: null,
           error: verifyError,
         })
@@ -114,17 +144,13 @@ export function AuthProvider({ children }) {
     return () => {
       isCurrent = false
     }
-  }, [isAuthenticated, isLoading, user?.sub, verifySession])
+  }, [isAuthenticated, isLoading, subject, provider, sessionKey, verificationKey, verifySession])
 
   const logout = useCallback(() => {
-    auth0Logout({
-      logoutParams: {
-        returnTo: window.location.origin,
-      },
-    })
-  }, [auth0Logout])
+    void identityLogout()
+  }, [identityLogout])
 
-  const hasCurrentVerification = verifiedSession.subject === (user?.sub ?? null)
+  const hasCurrentVerification = isCurrentVerification(verifiedSession, { subject, provider, sessionKey, verificationKey })
   const verifiedUser = isAuthenticated && hasCurrentVerification ? verifiedSession.user : null
   const verificationError =
     isAuthenticated && hasCurrentVerification ? verifiedSession.error : null
@@ -141,13 +167,13 @@ export function AuthProvider({ children }) {
       // Control visual de experiencia: la autorizacion efectiva siempre la valida el backend.
       const permissions = verifiedUser?.permissions
 
-      return can(verifiedUser?.rolUsuario, permissions, permission)
+      return policy?.can(verifiedUser?.rolUsuario, permissions, permission) === true
     },
-    [verifiedUser],
+    [verifiedUser, policy],
   )
 
   const authStatus = error
-    ? AUTH_STATUS.ERROR
+    ? error?.status === 401 ? AUTH_STATUS.SESSION_INVALID : AUTH_STATUS.ERROR
     : isLoading
       ? AUTH_STATUS.LOADING
       : !isAuthenticated
@@ -161,8 +187,9 @@ export function AuthProvider({ children }) {
   const value = useMemo(
     () => ({
       user: verifiedUser,
-      auth0User: user,
-      isAuthenticated: isAuthenticated && authStatus !== AUTH_STATUS.SESSION_INVALID,
+      identityUser: user,
+      provider,
+      isAuthenticated: isAuthenticated && authStatus === AUTH_STATUS.AUTHENTICATED,
       isLoading: isLoading || isVerifyingSession,
       isVerifyingSession,
       authStatus,
@@ -176,6 +203,7 @@ export function AuthProvider({ children }) {
     }),
     [
       verifiedUser,
+      provider,
       user,
       isAuthenticated,
       authStatus,

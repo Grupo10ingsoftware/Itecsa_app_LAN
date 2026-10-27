@@ -1,123 +1,44 @@
-import { useState } from 'react'
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import PinAuthorizationModal from '../../../shared/components/pin/PinAuthorizationModal'
+import TemporaryPasswordModal from './TemporaryPasswordModal.jsx'
 import { getRoleLabel, manageableRoles } from '../../../config/roles'
 import { API_ERROR_CODES } from '../../../services/api/apiClient'
 import { useAuth } from '../../../hooks/useAuth'
 import { useAdminUsersApi } from '../hooks/useAdminUsersApi'
 import { hasValidationErrors, validateUserCreateForm } from '../utils/userValidation'
-import { canRequestPasswordSetupEmail } from '../utils/userCreationOutcome'
 import styles from './UserCreateForm.module.css'
+import { generateUsername } from '../utils/generateUsername.js'
 
-const INITIAL_VALUES = Object.freeze({
-  nombreUsuario: '',
-  apellidoUsuario: '',
-  rutUsuario: '',
-  correoUsuario: '',
-  rolUsuario: '',
-})
-
-const INITIAL_ERRORS = Object.freeze({
-  nombreUsuario: [],
-  apellidoUsuario: [],
-  rutUsuario: [],
-  correoUsuario: [],
-  rolUsuario: [],
-})
-
-const MESSAGE_TYPES = Object.freeze({
-  SUCCESS: 'success',
-  WARNING: 'warning',
-  DANGER: 'danger',
-  INFO: 'info',
-})
+const INITIAL_VALUES = Object.freeze({ nombreUsuario: '', apellidoUsuario: '', rutUsuario: '', correoUsuario: '', rolUsuario: '', username: '' })
+const INITIAL_ERRORS = Object.freeze({ nombreUsuario: [], apellidoUsuario: [], rutUsuario: [], correoUsuario: [], rolUsuario: [], username: [] })
+const MESSAGE_TYPES = Object.freeze({ WARNING: 'warning', DANGER: 'danger', INFO: 'info' })
 
 function FieldErrors({ errors, id }) {
-  if (errors.length === 0) {
-    return null
-  }
-
-  return (
-    <div className={styles.fieldErrors} id={id}>
-      {errors.map((error) => (
-        <p key={error}>
-          {error}
-        </p>
-      ))}
-    </div>
-  )
+  return errors.length ? <div className={styles.fieldErrors} id={id}>{errors.map(error => <p key={error}>{error}</p>)}</div> : null
 }
-
 function getErrorMessage(error) {
+  if (error?.payload?.code?.startsWith('PIN_')) return { type: MESSAGE_TYPES.DANGER, text: error.payload.message }
   if (error?.code === API_ERROR_CODES.SESSION_INVALID || error?.status === 401) {
-    return {
-      type: MESSAGE_TYPES.WARNING,
-      text: 'La sesion no es valida o expiro. Vuelve a iniciar sesion para crear usuarios.',
-      requiresLogin: true,
-    }
+    return { type: MESSAGE_TYPES.WARNING, text: 'La sesion no es valida o expiro. Vuelve a iniciar sesion.', requiresLogin: true }
   }
-
-  if (error?.status === 403) {
-    return {
-      type: MESSAGE_TYPES.DANGER,
-      text: 'Acceso denegado. Tu usuario no tiene permisos para crear usuarios.',
-    }
-  }
-
-  if (error?.status === 409) {
-    return {
-      type: MESSAGE_TYPES.WARNING,
-      text: 'Ya existe un usuario con ese correo.',
-    }
-  }
-
-  if (error?.code === API_ERROR_CODES.NETWORK_ERROR) {
-    return {
-      type: MESSAGE_TYPES.DANGER,
-      text: 'No fue posible contactar la API. Revisa la conexion e intenta nuevamente.',
-    }
-  }
-
-  return {
-    type: MESSAGE_TYPES.DANGER,
-    text: 'No fue posible crear el usuario. Intenta nuevamente.',
-  }
+  if (error?.status === 403) return { type: MESSAGE_TYPES.DANGER, text: 'Acceso denegado. No tienes permisos para preparar esta cuenta.' }
+  if (error?.status === 409) return { type: MESSAGE_TYPES.WARNING, text: 'La cuenta o la operacion tiene un conflicto. Revisa su estado antes de repetir el alta.' }
+  return { type: MESSAGE_TYPES.DANGER, text: error?.payload?.message || 'No se pudo confirmar la preparacion. Revisa el estado antes de repetirla.' }
+}
+function preparationMessage(result) {
+  return { type: result.outcome === 'user_created' ? MESSAGE_TYPES.INFO : MESSAGE_TYPES.WARNING,
+    text: result.outcome === 'user_created'
+      ? 'Usuario creado. Si no registraste la contraseña inicial, crea una nueva credencial temporal a través de Keycloak.'
+      : 'Creación incompleta. No repitas el alta. Referencia: ' + result.operationId + '.' }
+}
+export default function UserCreateForm(props) {
+  const { user } = useAuth()
+  return <UserCreateFormContent key={user?.sub ?? ''} {...props} />
 }
 
-function buildCreatedUserMessage(user) {
-  if (user.outcome === 'completed') {
-    return {
-      type: MESSAGE_TYPES.SUCCESS,
-      text: 'Usuario creado correctamente. Auth0 solicitara el correo para establecer contraseña.',
-    }
-  }
-
-  if (user.internalUserPersisted === false) {
-    return {
-      type: MESSAGE_TYPES.WARNING,
-      text: 'La identidad fue creada en Auth0, pero falta registrarla en el sistema interno. No repitas el alta: requiere conciliacion administrativa.',
-    }
-  }
-
-  if (user.roleAssignmentCompleted === false) {
-    return {
-      type: MESSAGE_TYPES.WARNING,
-      text: 'La cuenta fue creada, pero no se pudo asignar el rol de acceso. Requiere gestion manual antes de solicitar el correo de contraseña.',
-    }
-  }
-
-  if (user.pinProvisioned === false) {
-    return {
-      type: MESSAGE_TYPES.WARNING,
-      text: 'La cuenta y el rol fueron creados, pero falta aprovisionar el PIN. No se solicito el correo de contraseña.',
-    }
-  }
-
-  return {
-    type: MESSAGE_TYPES.WARNING,
-    text: 'La cuenta fue creada, pero no se pudo solicitar el correo de establecimiento de contrasena.',
-  }
-}
-
-export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, onCreated } = {}) {
+function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreated } = {}) {
   const { loginWithRedirect, user: actor } = useAuth()
   const adminUsersApi = useAdminUsersApi()
   const [values, setValues] = useState(INITIAL_VALUES)
@@ -125,100 +46,83 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
   const [message, setMessage] = useState(null)
   const [createdUser, setCreatedUser] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isRequestingPasswordEmail, setIsRequestingPasswordEmail] = useState(false)
-
-  function clearResultState() {
-    setMessage(null)
-    setCreatedUser(null)
+  const [pinAction, setPinAction] = useState(null)
+  const [pinError, setPinError] = useState('')
+  const [credential, setCredential] = useState(null)
+  const submitting = useRef(false)
+  const active = useRef(false)
+  useEffect(() => { active.current = true; return () => { active.current = false } }, [])
+  function handleFieldChange({ target: { name, value } }) {
+    if (createdUser || pinAction || isSubmitting) return
+    setValues(current => {
+      const next = { ...current, [name]: value }
+      if (name === 'nombreUsuario' || name === 'apellidoUsuario') {
+        next.username = generateUsername(next.nombreUsuario, next.apellidoUsuario)
+      }
+      return next
+    })
+    if (!createdUser) setMessage(null)
   }
-
-  function handleFieldChange(event) {
-    const { name, value } = event.target
-
-    setValues((currentValues) => ({
-      ...currentValues,
-      [name]: value,
-    }))
-    clearResultState()
-  }
-
   async function handleSubmit(event) {
     event.preventDefault()
-
+    if (isSubmitting || createdUser || pinAction || credential) return
     const nextErrors = validateUserCreateForm(values)
+    nextErrors.username = values.username && values.username === values.username.trim().toLowerCase()
+      && values.username.length <= 255 && !/\s/u.test(values.username)
+      && [...values.username].every(char => char.codePointAt(0) > 32) ? [] : ['Ingresa un nombre de acceso en minusculas, sin espacios.']
+    if (!manageableRoles(actor?.rolUsuario).includes(values.rolUsuario)) nextErrors.rolUsuario = ['No puedes asignar ese rol.']
     setFieldErrors(nextErrors)
-    clearResultState()
-
-    if (hasValidationErrors(nextErrors)) {
-      return
-    }
-
-    const payload = {
-      nombreUsuario: values.nombreUsuario.trim(),
-      apellidoUsuario: values.apellidoUsuario.trim(),
-      rutUsuario: values.rutUsuario.trim().toUpperCase(),
-      correoUsuario: values.correoUsuario.trim().toLowerCase(),
-      rolUsuario: values.rolUsuario,
-    }
-
+    setMessage(null)
+    if (hasValidationErrors(nextErrors)) return
+    openPin('create')
+  }
+  function openPin(action) {
+    setPinError('')
+    setPinAction(action)
+    onBusyChange?.(true)
+  }
+  function cancelPin() {
+    if (submitting.current) return
+    setPinAction(null)
+    setPinError('')
+    onBusyChange?.(false)
+  }
+  async function confirmPin({ pin }) {
+    if (submitting.current) return
+    submitting.current = true
     setIsSubmitting(true)
-    onBusyChange?.(true)
-
+    setPinError('')
     try {
-      const user = await adminUsersApi.createUser(payload)
-      setCreatedUser(user)
-      setMessage(buildCreatedUserMessage(user))
-      setValues(INITIAL_VALUES)
+      const response = pinAction === 'reconcile'
+        ? await adminUsersApi.reconcile({ operationId: createdUser.operationId, pin })
+        : await adminUsersApi.createUser({ nombreUsuario: values.nombreUsuario.trim(),
+          apellidoUsuario: values.apellidoUsuario.trim(), correoUsuario: values.correoUsuario.trim().toLowerCase(),
+          rutUsuario: values.rutUsuario.trim(), rolUsuario: values.rolUsuario, username: values.username, pin })
+      if (!active.current) return
+      const { temporaryPassword, ...result } = response
+      setCreatedUser(result)
       setFieldErrors(INITIAL_ERRORS)
-      onCreated?.(user)
+      setPinAction(null)
+      setMessage(preparationMessage(result))
+      if (result.outcome === 'user_created' && result.mustChangePassword && typeof temporaryPassword === 'string' && temporaryPassword) {
+        setCredential({ username: values.username, temporaryPassword })
+      } else {
+        onBusyChange?.(false)
+        onCreated?.(result)
+      }
     } catch (error) {
-      setMessage(getErrorMessage(error))
+      if (active.current) setPinError(getErrorMessage(error).text)
     } finally {
-      setIsSubmitting(false)
-      onBusyChange?.(false)
+      submitting.current = false
+      if (active.current) setIsSubmitting(false)
     }
   }
-
-  async function handlePasswordSetupEmailRequest() {
-    if (!createdUser?.correoUsuario || createdUser.roleAssignmentCompleted === false) {
-      return
-    }
-
-    setIsRequestingPasswordEmail(true)
-    onBusyChange?.(true)
-
-    try {
-      const response = await adminUsersApi.requestPasswordSetupEmail({
-        correoUsuario: createdUser.correoUsuario,
-      })
-      setCreatedUser((currentUser) => ({
-        ...currentUser,
-        passwordSetupEmailRequested: response.passwordSetupEmailRequested,
-      }))
-      setMessage({
-        type: MESSAGE_TYPES.SUCCESS,
-        text: 'Correo de establecimiento de contraseña solicitado correctamente.',
-      })
-    } catch (error) {
-      const nextMessage = getErrorMessage(error)
-      const shouldKeepMappedMessage =
-        error?.code === API_ERROR_CODES.SESSION_INVALID ||
-        error?.status === 401 ||
-        error?.status === 403
-
-      setMessage({
-        ...nextMessage,
-        text: shouldKeepMappedMessage
-          ? nextMessage.text
-          : 'No fue posible solicitar el correo de establecimiento de contraseña. Intenta nuevamente.',
-      })
-    } finally {
-      setIsRequestingPasswordEmail(false)
-      onBusyChange?.(false)
-    }
+  function acceptCredential() {
+    setCredential(null)
+    setValues(INITIAL_VALUES)
+    onBusyChange?.(false)
+    onCreated?.(createdUser)
   }
-
-  const canRequestPasswordEmail = canRequestPasswordSetupEmail(createdUser)
   const isSessionInvalid = message?.requiresLogin === true
   const nombreUsuarioErrors = fieldErrors.nombreUsuario ?? []
   const apellidoUsuarioErrors = fieldErrors.apellidoUsuario ?? []
@@ -226,9 +130,10 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
   const correoUsuarioErrors = fieldErrors.correoUsuario ?? []
   const rolUsuarioErrors = fieldErrors.rolUsuario ?? []
   const isModalMode = mode === 'modal'
-  const isBusy = isSubmitting || isRequestingPasswordEmail
+  const isBusy = isSubmitting || Boolean(pinAction) || Boolean(credential)
 
   return (
+    <>
     <form
       className={`${styles.form} ${isModalMode ? styles.modalForm : ''}`}
       noValidate
@@ -245,40 +150,55 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
             )}
           </div>
         )}
-
-        <div className={`${styles.fieldCard} ${nombreUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
-          <div className={styles.fieldContent}>
-            <label htmlFor="user-first-name">Nombres <span>*</span></label>
-            <input
-              aria-describedby="user-first-name-errors"
-              aria-invalid={nombreUsuarioErrors.length > 0}
-              autoComplete="given-name"
-              id="user-first-name"
-              name="nombreUsuario"
-              onChange={handleFieldChange}
-              placeholder="Ingresa los nombres"
-              type="text"
-              value={values.nombreUsuario}
-            />
-            <FieldErrors errors={nombreUsuarioErrors} id="user-first-name-errors" />
+        <div className={styles.nameRow}>
+          <div className={`${styles.fieldCard} ${nombreUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
+            <div className={styles.fieldContent}>
+              <label htmlFor="user-first-name">Nombre <span>*</span></label>
+              <input
+                aria-describedby="user-first-name-errors"
+                aria-invalid={nombreUsuarioErrors.length > 0}
+                autoComplete="given-name"
+                required
+                maxLength={100}
+                id="user-first-name"
+                name="nombreUsuario"
+                onChange={handleFieldChange}
+                placeholder="Ingresa el nombre"
+                type="text"
+                value={values.nombreUsuario}
+              />
+              <FieldErrors errors={nombreUsuarioErrors} id="user-first-name-errors" />
+            </div>
           </div>
+
+          <div className={`${styles.fieldCard} ${apellidoUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
+            <div className={styles.fieldContent}>
+              <label htmlFor="user-last-name">Apellido <span>*</span></label>
+              <input
+                aria-describedby="user-last-name-errors"
+                aria-invalid={apellidoUsuarioErrors.length > 0}
+                autoComplete="family-name"
+                required
+                maxLength={100}
+                id="user-last-name"
+                name="apellidoUsuario"
+                onChange={handleFieldChange}
+                placeholder="Ingresa el apellido"
+                type="text"
+                value={values.apellidoUsuario}
+              />
+              <FieldErrors errors={apellidoUsuarioErrors} id="user-last-name-errors" />
+            </div>
+          </div>
+
         </div>
 
-        <div className={`${styles.fieldCard} ${apellidoUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
+        <div className={`${styles.fieldCard} ${styles.fieldCardWide}`}>
           <div className={styles.fieldContent}>
-            <label htmlFor="user-last-name">Apellidos <span>*</span></label>
-            <input
-              aria-describedby="user-last-name-errors"
-              aria-invalid={apellidoUsuarioErrors.length > 0}
-              autoComplete="family-name"
-              id="user-last-name"
-              name="apellidoUsuario"
-              onChange={handleFieldChange}
-              placeholder="Ingresa los apellidos"
-              type="text"
-              value={values.apellidoUsuario}
-            />
-            <FieldErrors errors={apellidoUsuarioErrors} id="user-last-name-errors" />
+            <label htmlFor="user-username">Nombre de acceso <span>*</span></label>
+            <input id="user-username" name="username" value={values.username} readOnly required
+              autoComplete="off" maxLength={255} disabled={Boolean(createdUser)} aria-invalid={Boolean(fieldErrors.username?.length)} aria-describedby="user-username-errors" />
+            <FieldErrors errors={fieldErrors.username ?? []} id="user-username-errors" />
           </div>
         </div>
 
@@ -289,6 +209,8 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
               aria-describedby="user-email-errors"
               aria-invalid={correoUsuarioErrors.length > 0}
               autoComplete="email"
+              required
+              maxLength={255}
               id="user-email"
               name="correoUsuario"
               onChange={handleFieldChange}
@@ -313,6 +235,8 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
               placeholder="Ej: 12.345.678-9"
               type="text"
               value={values.rutUsuario}
+              required
+              maxLength={12}
             />
             <FieldErrors errors={rutUsuarioErrors} id="user-rut-errors" />
           </div>
@@ -348,30 +272,15 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
               disabled
               id="user-password"
               name="password"
-              placeholder="Gestionada por Auth0"
+              placeholder="Generada automáticamente al crear el usuario"
               type="password"
             />
             <p className={styles.fieldHelp} id="user-password-help">
-              El usuario establecera su contraseña mediante un correo enviado por Auth0.
+              Se generará una contraseña temporal. El usuario deberá cambiarla al iniciar sesión.
             </p>
           </div>
         </div>
 
-        {createdUser && (
-          <section className={styles.creationResult}>
-            <h2>Resultado de creacion</h2>
-            <dl>
-              <div><dt>Nombre</dt><dd>{createdUser.nombreUsuario} {createdUser.apellidoUsuario}</dd></div>
-              <div><dt>RUT</dt><dd>{createdUser.rutUsuario}</dd></div>
-              <div><dt>Correo electronico</dt><dd>{createdUser.correoUsuario}</dd></div>
-              <div><dt>Rol</dt><dd>{getRoleLabel(createdUser.rolUsuario)}</dd></div>
-              <div>
-                <dt>Correo de contraseña</dt>
-                <dd>{createdUser.passwordSetupEmailRequested ? 'Solicitado' : 'Pendiente'}</dd>
-              </div>
-            </dl>
-          </section>
-        )}
       </div>
 
       <footer className={styles.actions}>
@@ -381,26 +290,24 @@ export default function UserCreateForm({ mode = 'page', onBusyChange, onCancel, 
           </button>
         )}
 
-        {canRequestPasswordEmail && (
-          <button
-            className={styles.secondaryButton}
-            disabled={isRequestingPasswordEmail}
-            onClick={handlePasswordSetupEmailRequest}
-            type="button"
-          >
-            {isRequestingPasswordEmail ? 'Solicitando correo...' : 'Solicitar correo'}
-          </button>
-        )}
+        {createdUser?.outcome === 'needs_reconciliation' && <button className={styles.secondaryButton}
+          type="button" disabled={isBusy} onClick={() => openPin('reconcile')}>Conciliar preparacion</button>}
 
         <button
           className={styles.submitButton}
-          disabled={isSubmitting || Boolean(createdUser)}
+          disabled={isBusy || Boolean(createdUser)}
           type="submit"
-        >
+         aria-busy={isSubmitting}>
           <i className="bi bi-plus-circle" aria-hidden="true" />
-          {isSubmitting ? 'Creando usuario...' : 'Crear usuario'}
+          <LoadingAction busy={isSubmitting} context="Crear usuario">Crear usuario</LoadingAction>
         </button>
       </footer>
     </form>
+    {pinAction && <PinAuthorizationModal contextKey={pinAction} disableUntilValid
+      description="Ingrese su PIN personal para autorizar la creación del usuario."
+      isSubmitting={isSubmitting} onCancel={cancelPin} onConfirm={confirmPin} errorMessage={pinError}
+    />}
+    {credential && createPortal(<TemporaryPasswordModal initialCredential={credential} onClose={acceptCredential} />, document.body)}
+    </>
   )
 }

@@ -1,3 +1,4 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { PaymentDeconfirmationModal } from './PaymentDeconfirmationModal.jsx';
 import { CancelProductionModal } from './CancelProductionModal.jsx';
 import { SubprocessAuthModal } from './SubprocessAuthModal.jsx';
@@ -11,10 +12,15 @@ import {
   KANBAN_LISTO_PRODUCCION_STEP,
   isLanyardPackagingBlocked,
 } from '../utils/kanbanDetail.js';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import styles from '../styles/Kanban.module.css';
+import { useModalDialog } from '../../users/hooks/useModalDialog'
 
-export default function KanbanOffCanvas({
+export default function KanbanOffCanvas(props) {
+  return props.isOpen ? <KanbanOffCanvasContent key={props.order?.id ?? props.order?.salesNoteNumber ?? 'loading'} {...props} /> : null
+}
+
+function KanbanOffCanvasContent({
   canCancelProduction = false,
   canRollbackSubprocess = false,
   canCompleteSubprocess = false,
@@ -33,23 +39,25 @@ export default function KanbanOffCanvas({
   order,
 }) {
   const [authModal, setAuthModal] = useState(null)
-  const [operatorPin, setOperatorPin] = useState('')
-  const [operatorComment, setOperatorComment] = useState('')
   const [authError, setAuthError] = useState('')
   const [isCompletingSubprocess, setIsCompletingSubprocess] = useState(false)
   const [isCorrectionFormOpen, setIsCorrectionFormOpen] = useState(false)
   const [correctionText, setCorrectionText] = useState('')
   const [correctionError, setCorrectionError] = useState('')
   const [deconfirmationAuthOpen, setDeconfirmationAuthOpen] = useState(false)
-  const [deconfirmationPin, setDeconfirmationPin] = useState('')
   const [deconfirmationError, setDeconfirmationError] = useState('')
   const [isApprovingDeconfirmation, setIsApprovingDeconfirmation] = useState(false)
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
-  const [cancelPin, setCancelPin] = useState('')
-  const [cancelComment, setCancelComment] = useState('')
   const [cancelError, setCancelError] = useState('')
   const [isCancelling, setIsCancelling] = useState(false)
   const [isReevaluating, setIsReevaluating] = useState(false)
+  const [actionError, setActionError] = useState('')
+  const [isSendingCorrection, setIsSendingCorrection] = useState(false)
+  const correctionPending = useRef(false)
+  const operationPending = useRef(false)
+  const panelRef = useRef(null)
+  const isMutating = isCompletingSubprocess || isCancelling || isReevaluating || isApprovingDeconfirmation || isSendingCorrection
+  useModalDialog({ containerRef: panelRef, isOpen: Boolean(isOpen && order && !authModal && !isCancelModalOpen && !deconfirmationAuthOpen), canClose: !isMutating, onClose })
 
   if (!isOpen || !order) {
     return null
@@ -58,13 +66,13 @@ export default function KanbanOffCanvas({
   if (isLoading || loadError) {
     return (
       <div className={styles.offcanvasLayer} role="presentation">
-        <aside aria-labelledby="kanban-detail-title" className={styles.offcanvasPanel} role="dialog">
+        <aside ref={panelRef} aria-labelledby="kanban-detail-title" className={styles.offcanvasPanel} role="dialog" tabIndex={-1}>
           <header className={styles.offcanvasHeader}>
             <div><span className={styles.offcanvasKicker}>{order.salesNoteNumber}</span><h2 id="kanban-detail-title">Detalle del pedido</h2></div>
             <button aria-label="Cerrar detalle" className={styles.offcanvasCloseButton} onClick={onClose} type="button"><i className="bi bi-x-lg" aria-hidden="true" /></button>
           </header>
-          <div className={styles.offcanvasBody} role={loadError ? 'alert' : 'status'}>
-            {loadError || 'Cargando detalle del pedido…'}
+          <div className={styles.offcanvasBody} role={loadError ? 'alert' : undefined}>
+            {loadError || <LoadingIndicator scope="dialog" context="Detalle del pedido" />}
           </div>
         </aside>
       </div>
@@ -93,60 +101,61 @@ export default function KanbanOffCanvas({
     }
 
     setAuthModal({ item, process, action: 'complete' })
-    setOperatorPin('')
-    setOperatorComment('')
     setAuthError('')
   }
 
-  function closeAuthModal() {
-    if (isCompletingSubprocess) return
+  function resetAuthModal() {
     setAuthModal(null)
-    setOperatorPin('')
-    setOperatorComment('')
     setAuthError('')
+  }
+  function closeAuthModal() {
+    if (!operationPending.current) resetAuthModal()
   }
 
   function openRollbackModal(item, process) {
     setAuthModal({ item, process, action: 'rollback' })
-    setOperatorPin('')
-    setOperatorComment('')
     setAuthError('')
   }
 
-  async function completeSubProcess(event) {
-    event.preventDefault()
-    if (isCompletingSubprocess) return
-    const trimmedPin = operatorPin.trim()
+  async function completeSubProcess({ pin, comment }) {
+    if (operationPending.current) return
+    const trimmedPin = pin.trim()
 
     if (!/^\d{6}$/.test(trimmedPin)) {
       setAuthError('Ingrese un PIN valido de 6 digitos.')
       return
     }
 
-    const trimmedComment = operatorComment.trim()
+    const trimmedComment = comment.trim()
 
     if (authModal.action === 'rollback' && !trimmedComment) {
       setAuthError('Debe ingresar una observacion para retroceder.')
       return
     }
 
+    operationPending.current = true
     setIsCompletingSubprocess(true)
     const action = authModal.action === 'rollback' ? onRollbackSubprocess : onCompleteSubprocess
-    const wasCompleted = await action?.(order, authModal.item, authModal.process, {
-      pin: trimmedPin,
-      comment: trimmedComment,
-    }).finally(() => setIsCompletingSubprocess(false))
+    try {
+      const wasCompleted = await action(order, authModal.item, authModal.process, {
+        pin: trimmedPin,
+        comment: trimmedComment,
+      })
 
-    if (wasCompleted === false) {
+      if (wasCompleted === false) {
+        setAuthError('No fue posible completar el subproceso.')
+        return
+      }
+
+      resetAuthModal()
+    } catch {
       setAuthError('No fue posible completar el subproceso.')
-      return
-    }
-
-    closeAuthModal()
+    } finally { operationPending.current = false; setIsCompletingSubprocess(false) }
   }
 
   async function submitCorrection(event) {
     event.preventDefault()
+    if (correctionPending.current) return
     const trimmedCorrection = correctionText.trim()
 
     if (!trimmedCorrection) {
@@ -154,22 +163,25 @@ export default function KanbanOffCanvas({
       return
     }
 
-    const wasSent = await onSendToReview?.(order, trimmedCorrection)
-    if (wasSent === false) {
+    correctionPending.current = true
+    setIsSendingCorrection(true)
+    try {
+      const wasSent = await onSendToReview?.(order, trimmedCorrection)
+      if (wasSent === false) {
+        setCorrectionError('No fue posible enviar el pedido a revisión.')
+        return
+      }
+      setCorrectionText('')
+      setCorrectionError('')
+      setIsCorrectionFormOpen(false)
+    } catch {
       setCorrectionError('No fue posible enviar el pedido a revisión.')
-      return
-    }
-    setCorrectionText('')
-    setCorrectionError('')
-    setIsCorrectionFormOpen(false)
+    } finally { correctionPending.current = false; setIsSendingCorrection(false) }
   }
 
-  async function submitCancellation(event) {
-    event.preventDefault()
-    if (isCancelling) return
+  async function submitCancellation({ pin, comment }) {
+    if (operationPending.current) return
 
-    const pin = cancelPin.trim()
-    const comment = cancelComment.trim()
     if (!/^\d{6}$/.test(pin)) {
       setCancelError('Ingrese un PIN valido de 6 digitos.')
       return
@@ -179,13 +191,17 @@ export default function KanbanOffCanvas({
       return
     }
 
+    operationPending.current = true
     setIsCancelling(true)
     try {
       const wasCancelled = await onCancelProduction?.(order, { pin, comment })
       if (wasCancelled === false) {
         setCancelError('No fue posible cancelar la produccion.')
       }
+    } catch {
+      setCancelError('No fue posible cancelar la produccion.')
     } finally {
+      operationPending.current = false
       setIsCancelling(false)
     }
   }
@@ -194,19 +210,19 @@ export default function KanbanOffCanvas({
     if (isApprovingDeconfirmation) return
 
     setDeconfirmationAuthOpen(false)
-    setDeconfirmationPin('')
     setDeconfirmationError('')
   }
 
-  async function approvePaymentDeconfirmation(event) {
-    event.preventDefault()
-    const trimmedPin = deconfirmationPin.trim()
+  async function approvePaymentDeconfirmation({ pin }) {
+    if (operationPending.current) return
+    const trimmedPin = pin.trim()
 
     if (!/^\d{6}$/.test(trimmedPin)) {
       setDeconfirmationError('Ingrese un PIN valido de 6 digitos.')
       return
     }
 
+    operationPending.current = true
     setIsApprovingDeconfirmation(true)
     setDeconfirmationError('')
 
@@ -219,26 +235,29 @@ export default function KanbanOffCanvas({
         return
       }
       setDeconfirmationAuthOpen(false)
-      setDeconfirmationPin('')
+    } catch {
+      setDeconfirmationError('No fue posible aprobar la desconfirmacion.')
     } finally {
+      operationPending.current = false
       setIsApprovingDeconfirmation(false)
     }
   }
 
   return (
     <div className={styles.offcanvasLayer} role="presentation">
-      <aside aria-labelledby="kanban-detail-title" className={styles.offcanvasPanel} role="dialog">
+      <aside ref={panelRef} aria-labelledby="kanban-detail-title" className={styles.offcanvasPanel} role="dialog" tabIndex={-1}>
         <header className={styles.offcanvasHeader}>
           <div>
             <span className={styles.offcanvasKicker}>{order.salesNoteNumber}</span>
             <h2 id="kanban-detail-title">Detalle del pedido</h2>
           </div>
-          <button aria-label="Cerrar detalle" className={styles.offcanvasCloseButton} onClick={onClose} type="button">
+          <button aria-label="Cerrar detalle" className={styles.offcanvasCloseButton} disabled={isMutating} onClick={onClose} type="button">
             <i className="bi bi-x-lg" aria-hidden="true" />
           </button>
         </header>
 
         <div className={styles.offcanvasBody}>
+          {actionError && <p className={styles.operatorModalError} role="alert">{actionError}</p>}
           <KanbanOrderSummary
             order={order}
             orderItems={orderItems}
@@ -276,6 +295,7 @@ export default function KanbanOffCanvas({
               )}
               <button
                 className={styles.correctionButton}
+                disabled={isMutating}
                 onClick={() => {
                   setIsCorrectionFormOpen((currentValue) => !currentValue)
                   setCorrectionError('')
@@ -303,6 +323,7 @@ export default function KanbanOffCanvas({
                   <div className={styles.correctionActions}>
                     <button
                       className={styles.resetFilterButton}
+                      disabled={isSendingCorrection}
                       onClick={() => {
                         setIsCorrectionFormOpen(false)
                         setCorrectionText('')
@@ -312,8 +333,8 @@ export default function KanbanOffCanvas({
                     >
                       Cancelar
                     </button>
-                    <button className={styles.orderCardButton} type="submit">
-                      Confirmar correccion
+                    <button className={styles.orderCardButton} disabled={isSendingCorrection} aria-busy={isSendingCorrection} type="submit">
+                      <LoadingAction busy={isSendingCorrection}>Confirmar correccion</LoadingAction>
                     </button>
                   </div>
                 </form>
@@ -350,12 +371,17 @@ export default function KanbanOffCanvas({
           {canReevaluate && (
             <section className={styles.detailSection}>
               <h3>Revision del pedido</h3>
-              <button className={styles.orderCardButton} disabled={isReevaluating} onClick={async () => {
+              <button className={styles.orderCardButton} disabled={isMutating} onClick={async () => {
+                if (operationPending.current) return
+                operationPending.current = true
                 setIsReevaluating(true)
-                try { await onReevaluate?.(order) } finally { setIsReevaluating(false) }
-              }} type="button">
+                setActionError('')
+                try { await onReevaluate?.(order) }
+                catch { setActionError('No fue posible reevaluar el pedido.') }
+                finally { operationPending.current = false; setIsReevaluating(false) }
+              }} type="button" aria-busy={isReevaluating}>
                 <i className="bi bi-arrow-repeat" aria-hidden="true" />
-                {isReevaluating ? 'Reevaluando...' : 'Reevaluar pedido'}
+                <LoadingAction busy={isReevaluating} context="Reevaluar pedido">Reevaluar pedido</LoadingAction>
               </button>
             </section>
           )}
@@ -372,11 +398,6 @@ export default function KanbanOffCanvas({
           authModal={authModal}
           isCompletingSubprocess={isCompletingSubprocess}
           closeAuthModal={closeAuthModal}
-          setOperatorPin={setOperatorPin}
-          setAuthError={setAuthError}
-          operatorPin={operatorPin}
-          setOperatorComment={setOperatorComment}
-          operatorComment={operatorComment}
           authError={authError}
         />
       )}
@@ -386,11 +407,6 @@ export default function KanbanOffCanvas({
           submitCancellation={submitCancellation}
           isCancelling={isCancelling}
           setIsCancelModalOpen={setIsCancelModalOpen}
-          setCancelPin={setCancelPin}
-          setCancelError={setCancelError}
-          cancelPin={cancelPin}
-          setCancelComment={setCancelComment}
-          cancelComment={cancelComment}
           cancelError={cancelError}
         />
       )}
@@ -401,9 +417,6 @@ export default function KanbanOffCanvas({
           isApprovingDeconfirmation={isApprovingDeconfirmation}
           closeDeconfirmationAuthModal={closeDeconfirmationAuthModal}
           order={order}
-          setDeconfirmationPin={setDeconfirmationPin}
-          setDeconfirmationError={setDeconfirmationError}
-          deconfirmationPin={deconfirmationPin}
           deconfirmationError={deconfirmationError}
         />
       )}

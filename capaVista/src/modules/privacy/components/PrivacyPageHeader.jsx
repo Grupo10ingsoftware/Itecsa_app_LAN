@@ -1,9 +1,5 @@
-import styles from '../pages/PrivacyPages.module.css'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 
-export default function PrivacyPageHeader({ eyebrow, title, children }) {
-  return <header className={styles.hero}>
-    <span className={styles.eyebrow}>{eyebrow}</span>
-    <h1>{title}</h1>
-    <div className={styles.introduction}>{children}</div>
-  </header>
+export default function PrivacyPageHeader({ title, children }) {
+  return <PageHeader title={title}>{children}</PageHeader>
 }

@@ -1,3 +1,4 @@
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../hooks/useAuth'
 import OrderCreateHeader from '../components/OrderCreateHeader'
@@ -7,10 +8,11 @@ import OrderNotice from '../components/OrderNotice'
 import SalesNoteStep from '../components/SalesNoteStep'
 import { ORDER_CREATE_VIEW_MODE, useOrderCreateFlow } from '../../../hooks/useOrderCreateFlow'
 import styles from './OrderCreatePage.module.css'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
 
 export default function OrderCreatePage() {
   const navigate = useNavigate()
-  const { auth0User, user } = useAuth()
+  const { identityUser, user } = useAuth()
   const flow = useOrderCreateFlow({ navigate })
   const { actions } = flow
   const responsibleUserName = [
@@ -19,24 +21,24 @@ export default function OrderCreatePage() {
   ].filter(Boolean).join(' ')
     || user?.correoUsuario
     || user?.email
-    || auth0User?.name
-    || auth0User?.email
+    || identityUser?.name
+    || identityUser?.email
     || 'Usuario no identificado'
 
   if (flow.viewMode === ORDER_CREATE_VIEW_MODE.SUCCESS && flow.registeredOrder) {
     return (
-      <main className={styles.page}>
+      <div className={`${styles.page} ${styles.successPage}`}>
         <OrderCreateSuccess
           onCreateAnother={actions.resetFlow}
           onGoKanban={actions.goToKanban}
         />
-      </main>
+      </div>
     )
   }
 
   return (
-    <main className={styles.page}>
-      <section className={styles.dashboardShell} inert={flow.showConfirmModal || undefined}>
+    <PageShell className={styles.page}>
+      <PageSurface className={styles.dashboardShell} inert={flow.showConfirmModal || undefined}>
         <OrderCreateHeader />
 
         <div className={styles.content}>
@@ -66,13 +68,13 @@ export default function OrderCreatePage() {
               disabled={!flow.salesNoteIsValid || flow.isRegistering}
               onClick={actions.handleOpenConfirmModal}
               type="button"
-            >
+             aria-busy={flow.isRegistering}>
               <i className="bi bi-plus-circle" aria-hidden="true" />
-              {flow.isRegistering ? 'Registrando...' : 'Registrar pedido'}
+              <LoadingAction busy={flow.isRegistering} context="Registrar pedido">Registrar pedido</LoadingAction>
             </button>
           </div>
         </div>
-      </section>
+      </PageSurface>
 
       {flow.showConfirmModal && (
         <OrderCreateConfirmModal
@@ -82,6 +84,6 @@ export default function OrderCreatePage() {
           onConfirm={actions.handleConfirmRegister}
         />
       )}
-    </main>
+    </PageShell>
   )
 }

@@ -1,6 +1,6 @@
+import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useNavigate } from 'react-router-dom'
 import { REQUEST_LIMITS, REQUEST_TYPES } from '../../../../../shared/privacyRequests'
-import { APP_ROUTES } from '../../../config/routes'
 import TextInput from '../../../shared/components/forms/TextInput'
 import SelectInput from '../../../shared/components/forms/SelectInput'
 import { useDataRequestForm } from '../hooks/useDataRequestForm'
@@ -35,10 +35,10 @@ export default function DataRequestForm({ email, sendRequest, enabled }) {
     </div>
     <small id="request-email-hint">El contacto corresponde al correo de tu cuenta autenticada.</small>
     <div className={styles.formActions}>
-      <button className={styles.cancelButton} disabled={busy} onClick={() => navigate(APP_ROUTES.KANBAN)} type="button">Cancelar</button>
-      <button className={styles.sendButton} disabled={busy || !enabled} type="submit">
-        {busy ? <span className="spinner-border spinner-border-sm" aria-hidden="true" /> : <i className="bi bi-send" aria-hidden="true" />}
-        {busy ? 'Enviando…' : 'Enviar solicitud'}
+      <button className={styles.cancelButton} disabled={busy} onClick={() => navigate('/')} type="button">Cancelar</button>
+      <button className={styles.sendButton} disabled={busy || !enabled} type="submit" aria-busy={busy}>
+        {!busy && <i className="bi bi-send" aria-hidden="true" />}
+        <LoadingAction busy={busy} context="Enviar solicitud">Enviar solicitud</LoadingAction>
       </button>
     </div>
   </form>

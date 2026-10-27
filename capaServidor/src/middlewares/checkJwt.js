@@ -2,20 +2,39 @@ import { auth } from "express-oauth2-jwt-bearer";
 
 import requireActiveIdentity from "./requireActiveIdentity.js";
 import { authenticatedRateLimit } from "./rateLimit.js";
-let jwtValidator;
+import { normalizeKeycloakClaims } from './keycloakClaims.js';
+import { resolveIdentityConfiguration } from '../config/identity.js';
 
-export default function checkJwt(req, res, next) {
-    if (!jwtValidator) {
-        // Valida solo access tokens emitidos por el tenant para esta API.
-        jwtValidator = auth({
-            audience: process.env.AUTH0_AUDIENCE,
-            issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}/`,
+export function createCheckJwt({ environment = process.env,
+    requireIdentity = requireActiveIdentity, rateLimit = authenticatedRateLimit } = {}) {
+    let jwtValidator;
+    let validatorConfiguration;
+    return function checkJwt(req, res, next) {
+        let configuration;
+        try {
+            configuration = resolveIdentityConfiguration(environment);
+            const key = JSON.stringify(configuration);
+            if (!jwtValidator || validatorConfiguration !== key) {
+                jwtValidator = auth({ audience: configuration.audience, issuer: configuration.issuer,
+                    jwksUri: configuration.jwksUri, tokenSigningAlg: 'RS256' });
+                validatorConfiguration = key;
+            }
+        } catch {
+            return res.status(503).json({ code: 'IDENTITY_CONFIGURATION_ERROR', message: 'No fue posible verificar el acceso.' });
+        }
+
+        return jwtValidator(req, res, (error) => {
+            if (error) return next(error);
+            if (configuration.provider === 'keycloak') {
+                const normalized = normalizeKeycloakClaims(req.auth?.payload, configuration.clientId, configuration.roleClientId);
+                if (!normalized) return res.status(403).json({ message: 'La sesion no tiene un cliente, rol o permisos validos.' });
+                req.auth.payload = normalized;
+            }
+            req.identityProvider = configuration.provider;
+            return requireIdentity(req, res,
+                (identityError) => identityError ? next(identityError) : rateLimit(req, res, next));
         });
-    }
-
-    return jwtValidator(req, res, (error) => error ? next(error) : requireActiveIdentity(
-        req,
-        res,
-        (identityError) => identityError ? next(identityError) : authenticatedRateLimit(req, res, next),
-    ));
+    };
 }
+
+export default createCheckJwt();

@@ -1,78 +1,44 @@
-import { USER_STATUS } from '../../../config/userLifecycle.js'
-
 function buildQueryString(params) {
-  const searchParams = new URLSearchParams()
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && String(value).trim() !== '') {
-      searchParams.set(key, String(value))
-    }
-  })
-
-  const queryString = searchParams.toString()
-  return queryString ? `?${queryString}` : ''
+  const query = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && String(value).trim() !== '') query.set(key, String(value))
+  }
+  return query.size ? '?' + query.toString() : ''
 }
 
 export function createAdminUsersApi(apiClient) {
-  // Deduplicate only simultaneous reads. Completed activity is never retained:
-  // each deliberate reopen must be authorized by the backend again.
+  const base = '/admin/identity/users'
+  const unavailable = async () => { throw Object.assign(new Error('Operacion no habilitada'), {
+    status: 503, payload: { code: 'IDENTITY_OPERATION_NOT_IMPLEMENTED', message: 'Esta operacion todavia no esta habilitada para Keycloak.' },
+  }) }
   const movementsInFlight = new Map()
-  function getMovements(userId, { page = 1, perPage = 10, search = '' } = {}) {
-    const key = JSON.stringify([userId, page, perPage, search])
-    const inFlight = movementsInFlight.get(key)
-    if (inFlight) return inFlight
-
-    const request = apiClient.get(
-      `/admin/users/${encodeURIComponent(userId)}/movements${buildQueryString({ page, perPage, search })}`,
-    ).finally(() => {
+  function getMovements(subject, { page = 1, perPage = 10, search = '' } = {}) {
+    const key = JSON.stringify([subject, page, perPage, search])
+    const current = movementsInFlight.get(key)
+    if (current) return current
+    const request = apiClient.get(base + '/' + encodeURIComponent(subject) + '/movements' +
+      buildQueryString({ page, perPage, search })).finally(() => {
       if (movementsInFlight.get(key) === request) movementsInFlight.delete(key)
     })
     movementsInFlight.set(key, request)
     return request
   }
-
   return {
     listUsers: ({ page = 1, perPage = 10, search = '', estadoUsuario = '', rolUsuario = '' } = {}) =>
-      apiClient.get(
-        `/admin/users${buildQueryString({
-          page,
-          perPage,
-          search,
-          estadoUsuario,
-          rolUsuario,
-        })}`,
-    ),
+      apiClient.get(base + buildQueryString({ page, perPage, search, estadoUsuario, rolUsuario })),
     getMovements,
-    getSummary: () => apiClient.get('/admin/users/summary'),
-    createUser: ({ nombreUsuario, apellidoUsuario, rutUsuario, correoUsuario, rolUsuario }) =>
-      apiClient.post('/admin/users', {
-        nombreUsuario,
-        apellidoUsuario,
-        rutUsuario,
-        correoUsuario,
-        rolUsuario,
-      }),
-    updateUser: ({
-      idUsuarioAutenticacionExterna,
-      nombreUsuario,
-      apellidoUsuario,
-      correoUsuario,
-      rolUsuario,
-      pin,
-    }) =>
-      apiClient.patch(`/admin/users/${encodeURIComponent(idUsuarioAutenticacionExterna)}`, {
-        nombreUsuario,
-        apellidoUsuario,
-        correoUsuario,
-        rolUsuario,
-        pin,
-      }),
-    unlinkUser: ({ idUsuarioAutenticacionExterna, pin }) =>
-      apiClient.patch(`/admin/users/${encodeURIComponent(idUsuarioAutenticacionExterna)}/status`, {
-        estadoUsuario: USER_STATUS.UNLINKED,
-        pin,
-      }),
-    requestPasswordSetupEmail: ({ correoUsuario }) =>
-      apiClient.post('/admin/users/password-setup-email', { correoUsuario }),
+    getSummary: () => apiClient.get(base + '/summary'),
+    inspectUser: subject => apiClient.get('/admin/identity/identities/' + encodeURIComponent(subject)),
+    reconcile: ({ operationId, pin }) => apiClient.post('/admin/identity/operations/' + encodeURIComponent(operationId) + '/reconcile', { pin }),
+    createUser: ({ username, nombreUsuario, apellidoUsuario, correoUsuario, rutUsuario, rolUsuario, pin }) =>
+      apiClient.post('/admin/identity/identities/prepare', { pin, identity: {
+        username, firstName: nombreUsuario, lastName: apellidoUsuario, email: correoUsuario, rut: rutUsuario, role: rolUsuario,
+      } }),
+    setTemporaryPassword: unavailable,
+    updateUser: ({ idUsuarioAutenticacionExterna, nombreUsuario, apellidoUsuario, correoUsuario, rolUsuario, estadoUsuario, pin }) =>
+      apiClient.patch('/admin/identity/identities/' + encodeURIComponent(idUsuarioAutenticacionExterna), { pin, identity: {
+        firstName: nombreUsuario, lastName: apellidoUsuario, email: correoUsuario, role: rolUsuario, state: estadoUsuario,
+      } }),
+    unlinkUser: unavailable,
   }
 }

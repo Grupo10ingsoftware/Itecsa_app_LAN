@@ -1,22 +1,40 @@
-import { useEffect, useMemo, useState } from 'react'
-import { ROLES } from '../../../config/roles'
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { beginPinRecovery, getPinRecoveryOutcome, clearPinRecoveryOutcome } from '../../auth/pinRecoveryBrowser'
 import { useAuth } from '../../../hooks/useAuth'
 import { useAuthApi } from '../../auth/hooks/useAuthApi'
 import RoleBadge from '../../../shared/components/data/RoleBadge'
 import styles from './ProfilePage.module.css'
+import PageShell from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 import { formatProfileDate } from '../utils/profileFormatters'
 import { displayUserStatus, isActiveUserStatus } from '../../../config/userLifecycle'
 import UserMovementsModal from '../../users/components/UserMovementsModal'
 import UserMovementsTable from '../../users/components/UserMovementsTable'
 import confirmationStyles from '../../../shared/styles/ConfirmationModal.module.css'
+import PinModal, { PinError } from '../../../shared/components/pin/PinModal'
+import pinStyles from '../../../shared/components/pin/PinModal.module.css'
 
 function getDisplayValue(value, fallback = 'No informado') {
   return String(value ?? '').trim() || fallback
 }
 
 export default function ProfilePage() {
-  const { auth0User, pinStatus, refreshSession, user } = useAuth()
+  const { user } = useAuth()
+  return <ProfileContent key={user?.sub ?? ''} />
+}
+
+function ProfileContent() {
+  const { identityUser, pinStatus, refreshSession, user, provider } = useAuth()
   const authApi = useAuthApi()
+  const recoveryTask = useRef(null)
+  const acknowledgementPending = useRef(false)
+  const acknowledged = useRef(false)
+  const active = useRef(false)
+  useEffect(() => { active.current = true; return () => { active.current = false } }, [])
+  const [recoveryVerified, setRecoveryVerified] = useState(() => getPinRecoveryOutcome(user?.sub)?.recovered ?? false)
+  const [pinSuccess, setPinSuccess] = useState('')
+  useEffect(() => () => { recoveryTask.current?.cancel(); recoveryTask.current = null }, [user?.sub])
   const [historyOpen, setHistoryOpen] = useState(false)
   const historyApi = useMemo(() => ({ getMovements: (_subject, query) => authApi.getProfileMovements(query) }), [authApi])
   const historyUser = { idUsuarioAutenticacionExterna: user?.sub }
@@ -36,15 +54,13 @@ export default function ProfilePage() {
   const loadedProfile = profileCurrent ? profileData?.data : null
   const profileError = profileCurrent ? profileData?.error : ''
   const [visiblePin, setVisiblePin] = useState('')
-  const [pinError, setPinError] = useState('')
+  const [pinError, setPinError] = useState(() => getPinRecoveryOutcome(user?.sub)?.message ?? '')
   const [isPinBusy, setIsPinBusy] = useState(false)
   const [recoveryOpen, setRecoveryOpen] = useState(false)
-  const [recoveryRequested, setRecoveryRequested] = useState(false)
-  const [recoveryCode, setRecoveryCode] = useState('')
   const profile = useMemo(() => {
     const firstName = loadedProfile?.primerNombre ?? user?.primerNombre
     const lastName = loadedProfile?.apellidoPaterno ?? user?.apellidoPaterno
-    const email = loadedProfile?.email ?? user?.email
+    const email = loadedProfile ? loadedProfile.email : user?.email
     const role = loadedProfile?.rolUsuario ?? user?.rolUsuario
     const status = loadedProfile?.estadoUsuario ?? user?.estadoUsuario
 
@@ -55,12 +71,12 @@ export default function ProfilePage() {
       role,
       status,
       rut: loadedProfile?.rutUsuario ?? user?.rutUsuario,
-      picture: auth0User?.picture,
+      picture: identityUser?.picture,
     }
-  }, [auth0User, user, loadedProfile])
+  }, [identityUser, user, loadedProfile])
 
   useEffect(() => {
-    if (pinStatus !== 'pending_acknowledgement' || visiblePin) return
+    if (pinStatus !== 'pending_acknowledgement' || visiblePin || acknowledged.current) return
 
     let current = true
     authApi.revealPin()
@@ -77,94 +93,51 @@ export default function ProfilePage() {
   }, [authApi, pinStatus, visiblePin])
 
   async function acknowledgePin() {
+    if (acknowledgementPending.current) return
+    acknowledgementPending.current = true
     setIsPinBusy(true)
     setPinError('')
 
     try {
-      await authApi.acknowledgePin()
+      if (!acknowledged.current) await authApi.acknowledgePin()
+      if (!active.current) return
+      acknowledged.current = true
+      if (recoveryVerified) { setPinSuccess('Tu PIN se ha actualizado correctamente'); setRecoveryVerified(false); clearPinRecoveryOutcome() }
       setVisiblePin('')
       await refreshSession()
     } catch (error) {
-      setPinError(error?.payload?.message ?? 'No fue posible confirmar la recepcion del PIN.')
+      if (active.current) setPinError(error?.payload?.message ?? 'No fue posible confirmar la recepcion del PIN.')
     } finally {
-      setIsPinBusy(false)
+      acknowledgementPending.current = false
+      if (active.current) setIsPinBusy(false)
     }
   }
 
-  async function debugResetPin() {
-    setIsPinBusy(true)
+  async function recoverPin() {
+    if (recoveryTask.current || isPinBusy) return
     setPinError('')
-    setVisiblePin('')
+    setPinSuccess('')
+    setIsPinBusy(true)
+    setRecoveryOpen(true)
+    const task = beginPinRecovery(authApi)
+    recoveryTask.current = task
     try {
-      await authApi.debugResetPin()
-      await refreshSession()
+      await task.result
     } catch (error) {
-      setPinError(error?.payload?.message ?? 'No fue posible generar el PIN.')
+      if (recoveryTask.current === task) setPinError(error?.payload?.message ?? error.message ?? 'No fue posible recuperar el PIN.')
     } finally {
-      setIsPinBusy(false)
-    }
-  }
-
-  function resetRecovery() {
-    setRecoveryRequested(false)
-    setRecoveryCode('')
-    setPinError('')
-  }
-
-  function closeRecovery() {
-    setRecoveryOpen(false)
-    resetRecovery()
-  }
-
-  async function requestRecovery() {
-    setIsPinBusy(true)
-    setPinError('')
-
-    try {
-      await authApi.requestPinRecovery()
-      setRecoveryCode('')
-      setRecoveryRequested(true)
-    } catch (error) {
-      setPinError(error?.payload?.message ?? 'No fue posible enviar el codigo de recuperacion.')
-    } finally {
-      setIsPinBusy(false)
-    }
-  }
-
-  async function confirmRecovery(event) {
-    event.preventDefault()
-    setIsPinBusy(true)
-    setPinError('')
-
-    try {
-      await authApi.confirmPinRecovery(recoveryCode)
-      const { pin } = await authApi.revealPin()
-      setVisiblePin(pin)
-      setRecoveryOpen(false)
-      setRecoveryRequested(false)
-      setRecoveryCode('')
-      await refreshSession()
-    } catch (error) {
-      if (['PIN_RECOVERY_CODE_EXPIRED', 'PIN_RECOVERY_ATTEMPTS_EXHAUSTED'].includes(error?.payload?.code)) {
-        setRecoveryRequested(false)
-        setRecoveryCode('')
+      if (recoveryTask.current === task) {
+        recoveryTask.current = null
+        setRecoveryOpen(false)
+        setIsPinBusy(false)
       }
-      setPinError(error?.payload?.message ?? 'No fue posible validar el codigo.')
-    } finally {
-      setIsPinBusy(false)
     }
   }
 
   return (
-    <main className={`container-fluid ${styles.page}`} aria-labelledby="profile-title">
+    <PageShell className={styles.page} maxWidth="90rem" aria-labelledby="profile-title">
       <section className={styles.shell}>
-        <header className={styles.header}>
-          <span className={styles.sectionLabel}>Usuario</span>
-          <h1 className={styles.pageTitle} id="profile-title">
-            Mi perfil
-          </h1>
-          <p>Revisa tu información personal y la actividad reciente de tu cuenta.</p>
-        </header>
+        <PageHeader title="Mi perfil" titleId="profile-title" />
 
         {profileError && (
           <div className="alert alert-danger" role="alert">
@@ -185,7 +158,7 @@ export default function ProfilePage() {
             <div className={styles.roleBlock}>
               <div className={styles.roleContent}>
               <span className={styles.cardIcon}><i className="bi bi-briefcase" aria-hidden="true" /></span>
-              <div><h3>Rol del usuario</h3><RoleBadge role={profile.role} /></div>
+              <div><h3>Rol del usuario</h3><RoleBadge role={profile.role} provider={provider} /></div>
               </div>
             </div>
           </aside>
@@ -193,7 +166,7 @@ export default function ProfilePage() {
           <section className={styles.infoPanel} aria-labelledby="personal-information-title">
             <header className={styles.cardHeader}>
               <span className={styles.cardIcon}><i className="bi bi-person" aria-hidden="true" /></span>
-              <div><h2 id="personal-information-title">Información personal</h2><p>Estos son los datos asociados a tu cuenta en ItecsaApp.</p></div>
+              <div><h2 id="personal-information-title">Información personal</h2></div>
             </header>
             <dl className={styles.infoList}>
               <div><dt>Primer nombre</dt><dd>{getDisplayValue(profile.firstName)}</dd></div>
@@ -210,7 +183,7 @@ export default function ProfilePage() {
           <section className={styles.pinPanel} aria-labelledby="personal-pin-title">
             <header className={styles.cardHeader}>
               <span className={styles.cardIcon}><i className="bi bi-shield" aria-hidden="true" /></span>
-              <div><h2 id="personal-pin-title">PIN personal</h2><p>Utiliza tu PIN para confirmar acciones sensibles en la plataforma.</p></div>
+              <div><h2 id="personal-pin-title">PIN personal</h2></div>
             </header>
             <div className={styles.pinState}>
               <span className={`${styles.pinIcon} ${pinStatus === 'active' ? styles.accepted : styles.pending}`}><i className={`bi ${pinStatus === 'active' ? 'bi-lock' : 'bi-shield-lock'}`} aria-hidden="true" /></span>
@@ -219,15 +192,12 @@ export default function ProfilePage() {
               </span>
             </div>
             {pinStatus === 'active' && <button className={styles.outlineButton} disabled={isPinBusy} type="button"
-              onClick={() => { resetRecovery(); setRecoveryOpen(true) }}><i className="bi bi-arrow-clockwise" aria-hidden="true" />Recuperar PIN</button>}
-            {import.meta.env.DEV && import.meta.env.VITE_ENABLE_DEMO_ROUTES === 'true' && profile.role === ROLES.SOPORTE && pinStatus === 'active' && <div>
-              <button className={styles.outlineButton} type="button" disabled={isPinBusy} onClick={debugResetPin}>
-                {isPinBusy ? 'Generando...' : 'Generar nuevo PIN (debug)'}
-              </button><p className={styles.debugHint}>El PIN anterior dejará de funcionar.</p>
-            </div>}
+              onClick={recoverPin}><i className="bi bi-arrow-clockwise" aria-hidden="true" />Recuperar PIN</button>}
+
           </section>
         </section>
 
+        {pinSuccess && <div className="alert alert-success" role="status">{pinSuccess}</div>}
         {pinError && pinStatus === 'active' && !recoveryOpen && <div className="alert alert-danger" role="alert">{pinError}</div>}
 
         <section className={styles.movementsPanel} aria-labelledby="movements-title">
@@ -239,7 +209,7 @@ export default function ProfilePage() {
             <button className={styles.outlineButton} type="button" disabled={!loadedProfile || pinStatus !== 'active'}
               onClick={() => setHistoryOpen(true)}><i className="bi bi-calendar3" aria-hidden="true" />Ver historial completo</button>
           </header>
-          {!loadedProfile ? <p role="status">{profileError ? 'Actividad no disponible.' : 'Cargando actividad…'}</p>
+          {!loadedProfile ? <>{profileError ? <p role="status">Actividad no disponible.</p> : <LoadingIndicator context="Actividad reciente" />}</>
             : !loadedProfile.records?.length ? <p role="status">Aún no tienes registros asociados.</p>
               : <UserMovementsTable records={loadedProfile.records} label="Actividad reciente del usuario" />}
         </section>
@@ -250,29 +220,31 @@ export default function ProfilePage() {
         description="Consulta el registro completo de movimientos de tu cuenta." />}
 
       {pinStatus === 'pending_acknowledgement' && (
+        <PinModal title="Tu PIN personal" canClose={false} busy={isPinBusy}
+          description="Guardalo en un lugar seguro. Despues de aceptar no volvera a mostrarse."
+          actions={<button className={pinStyles.primary} disabled={(!visiblePin && !acknowledged.current) || isPinBusy}
+            onClick={acknowledgePin} type="button" aria-busy={isPinBusy}>
+            <LoadingAction busy={isPinBusy} surface="light" context="Aceptar">{acknowledged.current ? 'Continuar' : 'Aceptar'}</LoadingAction>
+          </button>}>
+          <div className={pinStyles.secret}>
+            {visiblePin || (acknowledged.current ? 'PIN aceptado' : pinError ? 'PIN no disponible' : <LoadingIndicator scope="action" context="PIN operativo" />)}
+          </div>
+          <PinError>{pinError}</PinError>
+        </PinModal>
+      )}
+
+      {recoveryOpen && (
         <>
-          <div className="modal d-block" role="dialog" aria-modal="true" aria-labelledby="pin-delivery-title">
+          <div className="modal d-block" role="dialog" aria-modal="true" aria-labelledby="pin-recovery-title">
             <div className="modal-dialog modal-dialog-centered">
               <div className={`modal-content ${confirmationStyles.content}`}>
-                <div className="modal-header">
-                  <h2 className="modal-title fs-5" id="pin-delivery-title">Tu PIN personal</h2>
-                </div>
-                <div className="modal-body text-center">
-                  <p>Guardalo en un lugar seguro. Despues de aceptar no volvera a mostrarse.</p>
-                  <div className="display-5 fw-bold font-monospace" aria-live="polite">
-                    {visiblePin || '------'}
-                  </div>
-                  {pinError && <div className="alert alert-danger mt-3 mb-0">{pinError}</div>}
+                <div className="modal-body" aria-live="polite">
+                  <h2 className="fs-5" id="pin-recovery-title">Para recuperar tu PIN, debes autenticarte nuevamente</h2>
+                  <p>Redirigiendo al inicio de sesión seguro...</p>
+                  <LoadingIndicator scope="action" context="Recuperación de PIN" />
                 </div>
                 <div className="modal-footer">
-                  <button
-                    className="btn btn-dark"
-                    disabled={!visiblePin || isPinBusy}
-                    onClick={acknowledgePin}
-                    type="button"
-                  >
-                    {isPinBusy ? 'Guardando...' : 'Aceptar'}
-                  </button>
+                  <button className="btn btn-outline-secondary" onClick={() => recoveryTask.current?.cancel()} type="button">Cancelar</button>
                 </div>
               </div>
             </div>
@@ -280,71 +252,6 @@ export default function ProfilePage() {
           <div className="modal-backdrop show" />
         </>
       )}
-
-      {recoveryOpen && pinStatus === 'active' && (
-        <>
-          <div className="modal d-block" role="dialog" aria-modal="true" aria-labelledby="pin-recovery-title">
-            <div className="modal-dialog modal-dialog-centered">
-              <form className={`modal-content ${confirmationStyles.content}`} onSubmit={confirmRecovery}>
-                <div className="modal-header">
-                  <h2 className="modal-title fs-5" id="pin-recovery-title">Recuperar PIN</h2>
-                  <button
-                    aria-label="Cerrar"
-                    className="btn-close"
-                    disabled={isPinBusy}
-                    onClick={closeRecovery}
-                    type="button"
-                  />
-                </div>
-                <div className="modal-body">
-                  {!recoveryRequested ? (
-                    <p>
-                      Solicita un codigo de verificacion en tu correo para generar un nuevo PIN.
-                    </p>
-                  ) : (
-                    <label className="form-label w-100">
-                      Codigo de verificacion
-                      <input
-                        className="form-control font-monospace"
-                        inputMode="numeric"
-                        maxLength={6}
-                        onChange={(event) => setRecoveryCode(event.target.value.replace(/\D/g, ''))}
-                        required
-                        value={recoveryCode}
-                      />
-                    </label>
-                  )}
-                  {pinError && <div className="alert alert-danger mb-0">{pinError}</div>}
-                </div>
-                <div className="modal-footer">
-                  <button className="btn btn-outline-secondary" disabled={isPinBusy} onClick={closeRecovery} type="button">
-                    Cancelar
-                  </button>
-                  {!recoveryRequested ? (
-                    <button
-                      className="btn btn-dark"
-                      disabled={isPinBusy}
-                      onClick={requestRecovery}
-                      type="button"
-                    >
-                      Generar codigo
-                    </button>
-                  ) : (
-                    <button
-                      className="btn btn-dark"
-                      disabled={isPinBusy || recoveryCode.length !== 6}
-                      type="submit"
-                    >
-                      Validar codigo
-                    </button>
-                  )}
-                </div>
-              </form>
-            </div>
-          </div>
-          <div className="modal-backdrop show" />
-        </>
-      )}
-    </main>
+    </PageShell>
   )
 }

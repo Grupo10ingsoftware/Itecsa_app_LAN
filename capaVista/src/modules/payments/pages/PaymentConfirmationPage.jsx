@@ -1,3 +1,4 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { PERMISSIONS } from '@/config/permissions'
 import { PAYMENT_STATUS } from '@/config/status'
@@ -15,6 +16,8 @@ import {
   normalizePaymentOrders,
 } from '../utils/paymentOrders'
 import styles from './PaymentConfirmationPage.module.css'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 
 const FILTERS = [
   { key: PAYMENT_STATUS.PENDIENTE, label: 'Pendientes' },
@@ -67,6 +70,7 @@ export default function PaymentConfirmationPage() {
   const loadPaymentData = useCallback(async () => {
     const requestId = ++loadRequestId.current
     setIsLoading(true)
+    setLoadingMore(false)
     setLoadError(null)
     setUpdateError(null)
 
@@ -95,7 +99,7 @@ export default function PaymentConfirmationPage() {
   }, [activeFilter, dateFrom, dateTo, paymentsApi, searchTerm])
 
   async function loadMorePayments() {
-    if (!pageInfo.hasMore || !pageInfo.nextCursor || loadingMore) return
+    if (!pageInfo.hasMore || !pageInfo.nextCursor || loadingMore || isLoading) return
     const requestId = loadRequestId.current
     setLoadingMore(true)
     try {
@@ -106,16 +110,17 @@ export default function PaymentConfirmationPage() {
     } catch (error) {
       if (requestId === loadRequestId.current) setLoadError(error?.payload?.message ?? 'No fue posible cargar más pedidos de pago.')
     } finally {
-      setLoadingMore(false)
+      if (requestId === loadRequestId.current) setLoadingMore(false)
     }
   }
 
   useEffect(() => {
+    const requests = loadRequestId
     const loadTimer = window.setTimeout(() => {
       loadPaymentData()
     }, 0)
 
-    return () => window.clearTimeout(loadTimer)
+    return () => { window.clearTimeout(loadTimer); requests.current++ }
   }, [loadPaymentData])
 
   const filteredOrders = orders
@@ -158,7 +163,6 @@ export default function PaymentConfirmationPage() {
       setEditingStatus((prev) => ({ ...prev, [orderId]: false }))
       return true
     } catch (error) {
-      console.error('Error actualizando estado de pago:', error)
       setUpdateError(
         error?.payload?.message ??
           'No fue posible actualizar el estado de pago.',
@@ -400,18 +404,13 @@ export default function PaymentConfirmationPage() {
   }, [])
 
   return (
-    <main className={`container-fluid ${styles.page}`}>
-      <section className={styles.dashboardShell}>
-        <header
-          className={`${styles.hero} d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between gap-3`}
-        >
-          <div>
-            <span className={styles.sectionLabel}>Cobranzas</span>
-            <h1 className={styles.pageTitle}>Confirmacion de pago</h1>
-          </div>
-        </header>
+    <PageShell className={styles.page}>
+      <PageSurface className={styles.dashboardShell}>
+        <PageHeader title="Confirmacion de pago" />
 
-        <PaymentSummaryCards counters={counters} />
+        <div className={styles.summaryBoundary}>
+          <PaymentSummaryCards counters={counters} />
+        </div>
 
         <PaymentFilters
           activeFilter={activeFilter}
@@ -447,7 +446,7 @@ export default function PaymentConfirmationPage() {
         )}
 
         {isLoading ? (
-          <div className={styles.loadingState}>Cargando pedidos de pago...</div>
+          <LoadingIndicator context="pedidos de pago" />
         ) : (
           <>
             <PaymentOrdersTable
@@ -473,10 +472,10 @@ export default function PaymentConfirmationPage() {
               onViewDetail={openPaymentDetail}
               orders={filteredOrders}
             />
-            {pageInfo.hasMore && <button disabled={loadingMore} onClick={loadMorePayments} type="button">{loadingMore ? 'Cargando…' : 'Cargar más pedidos'}</button>}
+            {pageInfo.hasMore && <button disabled={loadingMore} onClick={loadMorePayments} type="button" aria-busy={loadingMore}><LoadingAction surface="light" busy={loadingMore} context="Cargar más pedidos">Cargar más pedidos</LoadingAction></button>}
           </>
         )}
-      </section>
+      </PageSurface>
 
       <PaymentActionConfirmModal
         detailsError={previewDetailsError}
@@ -501,12 +500,13 @@ export default function PaymentConfirmationPage() {
         <PaymentCredentialsModal
           key={`${credentialsTransition.order.id}:${credentialsTransition.targetStatus}`}
           isSubmitting={isUpdatingPaymentStatus}
+          errorMessage={updateError}
           onCancel={closeCredentialsValidation}
           onConfirm={completeCredentialsValidation}
           order={credentialsTransition.order}
           targetStatus={credentialsTransition.targetStatus}
         />
       )}
-    </main>
+    </PageShell>
   )
 }

@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import KanbanColumn from '../components/KanbanColumn'
 import KanbanFilters from '../components/KanbanFilters'
 import styles from './KanbanBoardPage.module.css'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 import { useAuth } from '../../../hooks/useAuth'
 import { PERMISSIONS } from '../../../config/permissions'
 import { useKanbanApi } from '../hooks/useKanbanApi'
@@ -54,6 +57,9 @@ export default function KanbanBoardPage() {
   const [isCapacityOpen, setIsCapacityOpen] = useState(false)
   const [capacityError, setCapacityError] = useState('')
   const [isSavingCapacity, setIsSavingCapacity] = useState(false)
+  const capacityPending = useRef(false)
+  const [loadedCapacityApi, setLoadedCapacityApi] = useState(null)
+  const isLoadingCapacity = loadedCapacityApi !== api
   const [appliedFilters, setAppliedFilters] = useState({})
   const [kanbanRefreshKey, setKanbanRefreshKey] = useState(0)
   const [operationalLoad, setOperationalLoad] = useState({
@@ -97,6 +103,7 @@ export default function KanbanBoardPage() {
           setCapacityError(error?.payload?.message ?? 'No fue posible cargar la carga operativa.')
         }
       })
+      .finally(() => { if (isMounted) setLoadedCapacityApi(api) })
 
     return () => {
       isMounted = false
@@ -112,6 +119,8 @@ export default function KanbanBoardPage() {
 
   async function saveProductionLoad(event) {
     event.preventDefault()
+    if (capacityPending.current || isLoadingCapacity) return
+    capacityPending.current = true
     setIsSavingCapacity(true)
     try {
       const entries = draftDetails.filter(hasDailyLoadChange).map((detail) => {
@@ -138,29 +147,23 @@ export default function KanbanBoardPage() {
     } catch (error) {
       setCapacityError(error?.payload?.message ?? error?.message ?? 'No fue posible guardar la carga operativa.')
     } finally {
+      capacityPending.current = false
       setIsSavingCapacity(false)
     }
   }
 
   return (
-    <main className={`container-fluid ${styles.page}`}>
-      <section className={styles.dashboardShell}>
-        <header className={styles.hero}>
-          <div>
-            <span className={styles.sectionLabel}>Produccion</span>
-            <h1 className={styles.pageTitle}>Kanban</h1>
-            <p className={styles.pageSubtitle}>
-              Vista principal de seguimiento de produccion con arrastre de ordenes entre estados.
-            </p>
-          </div>
+    <PageShell className={styles.page}>
+      <PageSurface className={styles.dashboardShell}>
+        <PageHeader title="Kanban" actions={
           <div className={styles.heroActions}>
             <aside className={`${styles.capacityMeter} ${styles[loadLevel]}`} aria-label="Carga Operativa">
               <div className={styles.capacityHeader}>
                 <span>Carga Operativa</span>
                 <div className={styles.capacityHeaderActions}>
-                  <strong>{operationalLoad.percentage}%</strong>
+                  <strong>{isLoadingCapacity ? <LoadingIndicator scope="action" surface="dark" context="Carga operativa" /> : `${operationalLoad.percentage}%`}</strong>
                   {canManageProductionLoad && (
-                    <button aria-label="Configurar carga operativa" onClick={() => setIsCapacityOpen(true)} title="Configurar carga operativa" type="button">
+                    <button aria-label="Configurar carga operativa" disabled={isLoadingCapacity} onClick={() => setIsCapacityOpen(true)} title="Configurar carga operativa" type="button">
                       <i className="bi bi-sliders" aria-hidden="true" />
                     </button>
                   )}
@@ -176,7 +179,7 @@ export default function KanbanBoardPage() {
               <p>Solo pedidos lanyard en En produccion.</p>
             </aside>
           </div>
-        </header>
+        } />
 
         <div className={styles.content}>
           <KanbanFilters
@@ -185,7 +188,7 @@ export default function KanbanBoardPage() {
           />
           <KanbanColumn filters={appliedFilters} refreshKey={kanbanRefreshKey} />
         </div>
-      </section>
+      </PageSurface>
       {isCapacityOpen && (
         <div className={styles.modalLayer} role="presentation">
           <form className={styles.capacityModal} onSubmit={saveProductionLoad} role="dialog" aria-modal="true" aria-labelledby="capacity-title">
@@ -254,13 +257,13 @@ export default function KanbanBoardPage() {
             </div>
             <footer>
               <button disabled={isSavingCapacity} onClick={() => setIsCapacityOpen(false)} type="button">Cancelar</button>
-              <button disabled={isSavingCapacity || draftDetails.length === 0} type="submit">
-                {isSavingCapacity ? 'Guardando...' : 'Confirmar carga'}
+              <button disabled={isSavingCapacity || draftDetails.length === 0} type="submit" aria-busy={isSavingCapacity}>
+                <LoadingAction busy={isSavingCapacity} context="Confirmar carga">Confirmar carga</LoadingAction>
               </button>
             </footer>
           </form>
         </div>
       )}
-    </main>
+    </PageShell>
   )
 }

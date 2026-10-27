@@ -44,7 +44,6 @@ export function getPaymentActionMeta(targetStatus) {
     return {
       modalTitle: 'Confirmar pago',
       holdLabel: 'Validar cambio',
-      completedLabel: 'Validando cambio...',
     }
   }
 
@@ -52,13 +51,11 @@ export function getPaymentActionMeta(targetStatus) {
     return {
       modalTitle: 'Rechazar pago',
       holdLabel: 'Validar cambio',
-      completedLabel: 'Confirmando cambio...',
     }
   }
 
   return {
     modalTitle: 'Marcar como pendiente',
     holdLabel: 'Validar cambio',
-    completedLabel: 'Confirmando cambio...',
   }
 }

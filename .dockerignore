@@ -11,8 +11,8 @@
 .agents
 .codex
 .github
-docs
-data
+docs/**
 mockups-muestras
 *.md
+**/*.md
 **/certs

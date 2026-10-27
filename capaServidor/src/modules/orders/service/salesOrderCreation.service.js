@@ -1,12 +1,18 @@
 import { createLineSnapshots } from "./salesOrder.snapshot.js";
 import { SalesOrderError } from "./salesOrder.errors.js";
 import { validateCreateSalesOrder, validateSalesNoteSource } from "./salesOrder.validator.js";
+import { isUniqueConstraint } from '../../../database/uniqueConstraint.js';
 
 export const DUPLICATE_SALES_NOTE_MESSAGE =
   "Esta Nota de Venta ya fue registrada en el sistema y no puede volver a ingresarse.";
 
+export const PRIORITY_LABEL = Object.freeze({
+  URGENT: "Urgencia",
+  CONTRACT: "Prioridad por contrato",
+});
+
 function normalizePriorityLabels(priority) {
-  return priority === "urgent" ? ["Urgencia"] : priority === "contract" ? ["Prioridad por contrato"] : [];
+  return priority === "urgent" ? [PRIORITY_LABEL.URGENT] : priority === "contract" ? [PRIORITY_LABEL.CONTRACT] : [];
 }
 
 export default class SalesOrderCreationService {
@@ -20,8 +26,8 @@ export default class SalesOrderCreationService {
     const editable = validateCreateSalesOrder(input);
     let resolvedUserId = options.actorId;
     if (!Number.isSafeInteger(resolvedUserId) || resolvedUserId <= 0) {
-      if (!options.auth0UserId) throw new SalesOrderError("El usuario autenticado es obligatorio.", 403);
-      const user = await this.userRepo.findByAuth0Id(options.auth0UserId);
+      if (!options.identitySubject) throw new SalesOrderError("El usuario autenticado es obligatorio.", 403);
+      const user = await this.userRepo.findBySubject(options.identitySubject);
       resolvedUserId = user?.idUsuario;
       if (!Number.isSafeInteger(resolvedUserId) || resolvedUserId <= 0) {
         throw new SalesOrderError("No existe un usuario interno vinculado a la sesion.", 403);
@@ -176,10 +182,7 @@ export default class SalesOrderCreationService {
         itemsSinSeguimientoProductivo: createdUntrackedItems,
       };
     }).catch((error) => {
-      const target = error?.meta?.target;
-      if (error?.code === "P2002" && (target === "Pedidos_numero_nota_venta_UNIQUE"
-        || target === "numero_nota_venta"
-        || (Array.isArray(target) && target.length === 1 && target[0] === "numero_nota_venta"))) {
+      if (isUniqueConstraint(error, { model: 'Pedidos', index: 'Pedidos_numero_nota_venta_UNIQUE', field: 'numero_nota_venta' })) {
         throw new SalesOrderError(DUPLICATE_SALES_NOTE_MESSAGE, 409);
       }
       throw error;

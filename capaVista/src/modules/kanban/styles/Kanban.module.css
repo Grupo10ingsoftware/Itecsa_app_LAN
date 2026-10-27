@@ -521,6 +521,12 @@
   outline: none;
 }
 
+.orderCardButton:disabled[aria-busy="true"] {
+  background: var(--page-header-black, #000);
+  border-color: var(--page-header-black, #000);
+  color: var(--page-white, #fff);
+}
+
 .orderCardCorrection {
   background: #fffbeb;
   border-color: rgba(202, 138, 4, 0.45);
@@ -1237,86 +1243,6 @@
   opacity: 0.82;
 }
 
-.operatorModalLayer {
-  align-items: center;
-  background: rgba(15, 23, 42, 0.55);
-  display: flex;
-  inset: 0;
-  justify-content: center;
-  padding: 1rem;
-  position: fixed;
-  z-index: 1070;
-}
-
-.operatorModal {
-  background: #fff;
-  border-radius: 0.75rem;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
-  display: grid;
-  max-width: min(100%, 28rem);
-  overflow: hidden;
-  width: 28rem;
-}
-
-.operatorModalHeader,
-.operatorModalFooter {
-  align-items: center;
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-  padding: 1rem;
-}
-
-.operatorModalHeader {
-  border-bottom: 1px solid var(--kanban-border);
-}
-
-.operatorModalHeader h3 {
-  color: var(--kanban-text);
-  font-size: 1.08rem;
-  margin: 0.2rem 0 0;
-}
-
-.operatorModalBody {
-  display: grid;
-  gap: 0.85rem;
-  padding: 1rem;
-}
-
-.operatorModalText {
-  color: var(--kanban-muted);
-  line-height: 1.45;
-  margin: 0;
-}
-
-.operatorModalBody label {
-  color: var(--kanban-muted);
-  display: grid;
-  font-size: 0.78rem;
-  font-weight: 850;
-  gap: 0.4rem;
-  letter-spacing: 0.045em;
-  text-transform: uppercase;
-}
-
-.operatorModalBody input,
-.operatorModalBody textarea {
-  border: 1px solid #d7dee8;
-  border-radius: 0.55rem;
-  color: var(--kanban-text);
-  min-height: 2.75rem;
-  padding: 0.55rem 0.7rem;
-  resize: vertical;
-  text-transform: none;
-}
-
-.operatorModalBody input:focus,
-.operatorModalBody textarea:focus {
-  border-color: var(--kanban-orange);
-  box-shadow: 0 0 0 0.22rem rgba(var(--kanban-orange-rgb), 0.18);
-  outline: none;
-}
-
 .operatorModalError {
   background: #fff1f0;
   border: 1px solid #f1b5b5;
@@ -1326,15 +1252,6 @@
   font-weight: 750;
   margin: 0;
   padding: 0.65rem 0.75rem;
-}
-
-.operatorModalFooter {
-  border-top: 1px solid var(--kanban-border);
-}
-
-.operatorModalFooter .orderCardButton {
-  margin: 0;
-  width: auto;
 }
 
 .commentForm {

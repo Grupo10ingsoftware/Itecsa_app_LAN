@@ -1,4 +1,5 @@
 import { getRoleLabel } from '../../../config/roles'
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import UserButton from './UserButton'
 import UserManagementMobileList from './UserManagementMobileList'
 import UserStatusBadge from './UserStatusBadge'
@@ -32,12 +33,14 @@ function buildNearbyPages(currentPage, totalPages) {
 export default function UserManagementTable({
   currentPage,
   isLoading,
+  inspectingId,
   onEditUser,
   onViewMovements,
   onPageChange,
   totalPages,
   totalUsers,
   users,
+  readOnly = false,
 }) {
   const pageItems = buildNearbyPages(currentPage, totalPages)
   const canGoPrevious = currentPage > 1 && !isLoading
@@ -46,7 +49,7 @@ export default function UserManagementTable({
   return (
     <div className={styles.tableCard}>
       <div className={styles.tableResponsive}>
-        <table className={styles.usersTable}>
+        <table className={styles.usersTable} aria-busy={isLoading}>
           <thead>
             <tr>
               {TABLE_COLUMNS.map((column) => (
@@ -60,7 +63,7 @@ export default function UserManagementTable({
             {isLoading && (
               <tr>
                 <td className={styles.tableStateCell} colSpan={TABLE_COLUMNS.length}>
-                  Cargando usuarios...
+                  <LoadingIndicator context="Usuarios" />
                 </td>
               </tr>
             )}
@@ -74,9 +77,10 @@ export default function UserManagementTable({
             {!isLoading &&
               users.map((user) => (
                 <tr key={user.id}>
-                  <td className={styles.nameCell}>{user.nombreListado}</td>
+                  <td className={styles.nameCell}>{user.nombreListado}{user.username && <small className="d-block">{user.username}</small>}
+                    {user.identityBindingConflict && <small className="d-block">Vinculo pendiente de conciliacion</small>}</td>
                   <td>{user.rutUsuario}</td>
-                  <td className={styles.emailCell}>{user.correoUsuario}</td>
+                  <td className={styles.emailCell}>{user.correoUsuario || 'Sin correo'}</td>
                   <td>{getRoleLabel(user.rolUsuario)}</td>
                   <td>
                     <UserStatusBadge status={user.estadoUsuario} />
@@ -86,14 +90,17 @@ export default function UserManagementTable({
                     <UserButton
                       className={styles.actionButton}
                       icon="bi-pencil-fill"
+                      disabled={!user.idUsuarioAutenticacionExterna}
                       onClick={() => onEditUser(user)}
+                      busy={inspectingId === user.id}
                       variant="secondary"
                     >
-                      Editar
+                      {readOnly ? 'Consultar' : 'Editar'}
                     </UserButton>
                     <UserButton
                       className={styles.actionButton}
                       icon="bi-clock-history"
+                      disabled={!user.idUsuarioAutenticacionExterna}
                       onClick={() => onViewMovements(user)}
                       variant="secondary"
                     >
@@ -109,9 +116,11 @@ export default function UserManagementTable({
 
       <UserManagementMobileList
         isLoading={isLoading}
+        inspectingId={inspectingId}
         onEditUser={onEditUser}
         onViewMovements={onViewMovements}
         users={users}
+        readOnly={readOnly}
       />
 
       <footer className={styles.paginationFooter} aria-label="Resumen y paginacion de usuarios">

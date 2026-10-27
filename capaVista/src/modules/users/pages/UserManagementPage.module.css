@@ -7,53 +7,13 @@
   --users-soft: #f4f4f5;
   --users-text: #111827;
   --users-muted: #64748b;
-
-  background: #f4f4f5;
   color: var(--users-text);
-  margin: 0 auto;
-  max-width: 1760px;
-  padding: 1.25rem;
 }
 
 .dashboardShell {
   display: grid;
   gap: 1rem;
   padding: 0 0 1rem;
-}
-
-.hero {
-  background: #000;
-  border-radius: 0.9rem;
-  color: #fff;
-  display: grid;
-  gap: 0.35rem;
-  min-height: 8rem;
-  padding: 1.45rem 2.5rem;
-}
-
-.sectionLabel {
-  align-self: end;
-  color: var(--users-orange);
-  font-size: 0.82rem;
-  font-weight: 850;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.pageTitle {
-  color: #fff;
-  font-size: clamp(2rem, 3vw, 2.75rem);
-  font-weight: 850;
-  letter-spacing: 0.08em;
-  line-height: 1;
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.pageSubtitle {
-  color: rgba(255, 255, 255, 0.86);
-  font-size: 0.98rem;
-  margin: 0;
 }
 
 .summaryGrid {
@@ -762,13 +722,6 @@
 }
 
 @media (max-width: 1199.98px) {
-  .page {
-    padding: 1rem;
-  }
-
-  .hero {
-    padding: 1.35rem 1.5rem;
-  }
 
   .summaryCard {
     min-height: 6.5rem;
@@ -918,33 +871,9 @@
 }
 
 @media (max-width: 575.98px) {
-  .page {
-    padding: 0.65rem;
-  }
 
   .dashboardShell {
     gap: 0.8rem;
-  }
-
-  .hero {
-    border-radius: 0.75rem;
-    min-height: auto;
-    padding: 1.15rem;
-  }
-
-  .sectionLabel {
-    font-size: 0.72rem;
-  }
-
-  .pageTitle {
-    font-size: 1.45rem;
-    letter-spacing: 0.06em;
-    line-height: 1.1;
-  }
-
-  .pageSubtitle {
-    font-size: 0.86rem;
-    line-height: 1.4;
   }
 
   .summaryCard {

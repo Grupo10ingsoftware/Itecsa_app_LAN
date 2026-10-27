@@ -1,26 +1,9 @@
 .page {
   color: var(--itexsa-text);
-  margin: 0 auto;
-  max-width: 1760px;
-  padding: 1.25rem;
 }
 
 .dashboardShell {
-  background: #fff;
-  border: 1px solid var(--itexsa-border);
-  border-radius: 1rem;
-  box-shadow: var(--itexsa-shadow);
   overflow: hidden;
-}
-
-.hero {
-  align-items: center;
-  background: #000;
-  color: #fff;
-  display: flex;
-  gap: 2rem;
-  justify-content: space-between;
-  padding: 2rem 2.25rem;
 }
 
 .generateButton {
@@ -51,26 +34,12 @@
   transform: translateY(-1px);
 }
 
-.sectionLabel,
 .panelEyebrow {
   color: var(--itexsa-orange);
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.pageTitle {
-  color: #fff;
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  line-height: 1;
-  margin: 0.35rem 0 0.75rem;
-  text-transform: uppercase;
-}
-
-.pageSubtitle {
-  color: #cbd5e1;
-  margin: 0;
 }
 
 .content {
@@ -80,19 +49,6 @@
 }
 
 @media (max-width: 620px) {
-  .page {
-    padding: 0.65rem;
-  }
-
-  .dashboardShell {
-    border-radius: 0.75rem;
-  }
-
-  .hero {
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 1.35rem;
-  }
 
   .content {
     padding: 0.85rem;

@@ -1,7 +1,6 @@
 import getPrismaClient from "../../../database/prisma.js";
 import { safeLogger } from "../../../shared/safeLogger.js";
 import { purgeExpiredSalesNoteCaches } from "../../orders/service/salesNoteSource.service.js";
-import { cleanupExpiredPinRecoveries, readPinRecoveryRetentionConfig } from './pinRecoveryCleanup.service.js';
 import { cleanupBusinessRetention, readBusinessRetentionConfig } from './businessRetention.service.js';
 
 export class TemporaryDataCleanupService {
@@ -18,7 +17,6 @@ export class TemporaryDataCleanupService {
     }
 
     async run() {
-        const retention = readPinRecoveryRetentionConfig(this.env);
         const businessRetention = readBusinessRetentionConfig(this.env);
         const now = this.now();
         const throttles = await this.client.securityThrottle.deleteMany({
@@ -27,11 +25,6 @@ export class TemporaryDataCleanupService {
         this.salesNotes?.clearExpired?.();
         purgeExpiredSalesNoteCaches();
         const result = { throttles: throttles.count };
-        if (retention.mode !== 'disabled') {
-            result.pinRecoveries = await cleanupExpiredPinRecoveries({
-                client: this.client, env: this.env, now, logger: this.logger,
-            });
-        }
         if (businessRetention.mode !== 'disabled') {
             result.businessRetention = await cleanupBusinessRetention({
                 client: this.client, env: this.env, now, logger: this.logger,

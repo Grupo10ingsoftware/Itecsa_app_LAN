@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useMemo, useState } from 'react'
 import { useMetricsApi } from '../hooks/useMetricsApi'
 import ProductionPerformance from '../components/ProductionPerformance'
@@ -9,6 +10,8 @@ import {
   subscribeMetricsSummary,
 } from '../utils/metricsPage'
 import styles from './MetricsPage.module.css'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 import { escapeReportHtml, spreadsheetCell } from '../utils/reportFormatting'
 
 const PRODUCT_COLORS = ['#f97316', '#2563eb', '#248f55']
@@ -110,9 +113,9 @@ export default function MetricsPage() {
     URL.revokeObjectURL(link.href)
   }
 
-  return <main className={`container-fluid ${styles.page}`}>
-    <section className={styles.dashboardShell}>
-      <header className={styles.hero}><div><span className={styles.sectionLabel}>Producción</span><h1 className={styles.pageTitle}>Métricas</h1><p className={styles.pageSubtitle}>Indicadores calculados sobre el periodo seleccionado.</p></div></header>
+  return <PageShell className={styles.page}>
+    <PageSurface className={styles.dashboardShell}>
+      <PageHeader title="Métricas" />
       <div className={styles.content}>
         <section className={styles.periodFilters} aria-label="Periodo de métricas">
           <div className={styles.periodModes}>
@@ -124,7 +127,7 @@ export default function MetricsPage() {
 
         {canQuery && <ProductionPerformance key={queryKey} api={api} period={{ from: queryFrom, to: queryTo }} />}
 
-        {!canQuery ? <div className={styles.emptyState} role="status">{validationMessage}</div> : loading ? <div className={styles.emptyState}>Cargando métricas...</div> : error ? <div className={styles.emptyState} role="alert">{error}</div> : <>
+        {!canQuery ? <div className={styles.emptyState} role="status">{validationMessage}</div> : loading ? <LoadingIndicator context="métricas" /> : error ? <div className={styles.emptyState} role="alert">{error}</div> : <>
           <section className={styles.productionSection} aria-labelledby="production-title">
             <header className={styles.productionHeader}><div><span className={styles.panelEyebrow}></span><h2 id="production-title">Cantidad de producción generada</h2><p>Unidades producidas agrupadas por tipo de producto.</p></div></header>
             <div className={styles.productionChart}><div aria-label={`Producción total: ${chart.total} unidades`} className={styles.pieChart} role="img" style={{ '--pie-gradient': pieGradient }}><div className={styles.pieChartCenter}><strong>{chart.total.toLocaleString('es-CL')}</strong><span>unidades</span></div></div><div className={styles.chartLegend}>{chart.segments.length === 0 ? <p className={styles.emptyState}>No hay producción registrada.</p> : chart.segments.map((item) => <div className={styles.legendItem} key={item.productType}><span className={styles.legendColor} style={{ background: item.color }} /><div><strong>{item.productType}</strong><span>{Number(item.quantity).toLocaleString('es-CL')} unidades · {Math.round(item.percentage)}%</span></div></div>)}</div></div>
@@ -181,6 +184,6 @@ export default function MetricsPage() {
 
         </>}
       </div>
-    </section>
-  </main>
+    </PageSurface>
+  </PageShell>
 }

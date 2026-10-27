@@ -1,13 +1,14 @@
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import { getRoleLabel } from '../../../config/roles'
 import UserButton from './UserButton'
 import UserStatusBadge from './UserStatusBadge'
 import styles from '../pages/UserManagementPage.module.css'
 
-export default function UserManagementMobileList({ isLoading, onEditUser, onViewMovements, users }) {
+export default function UserManagementMobileList({ isLoading, inspectingId, onEditUser, onViewMovements, users, readOnly = false }) {
   if (isLoading) {
     return (
       <div className={styles.mobileList}>
-        <p className={styles.mobileState} role="status">Cargando usuarios...</p>
+        <LoadingIndicator context="usuarios" />
       </div>
     )
   }
@@ -26,6 +27,8 @@ export default function UserManagementMobileList({ isLoading, onEditUser, onView
         <article className={styles.mobileUserCard} key={user.id}>
           <header>
             <strong>{user.nombreListado}</strong>
+            {user.username && <small>{user.username}</small>}
+            {user.identityBindingConflict && <small>Vinculo pendiente de conciliacion</small>}
             <UserStatusBadge status={user.estadoUsuario} />
           </header>
           <dl>
@@ -35,7 +38,7 @@ export default function UserManagementMobileList({ isLoading, onEditUser, onView
             </div>
             <div>
               <dt>Correo</dt>
-              <dd>{user.correoUsuario}</dd>
+              <dd>{user.correoUsuario || 'Sin correo'}</dd>
             </div>
             <div>
               <dt>Rol</dt>
@@ -43,12 +46,14 @@ export default function UserManagementMobileList({ isLoading, onEditUser, onView
             </div>
           </dl>
           <footer className={styles.userActions}>
-            <UserButton icon="bi-pencil-fill" onClick={() => onEditUser(user)} variant="secondary">
-              Editar
+            <UserButton icon="bi-pencil-fill" busy={inspectingId === user.id} disabled={!user.idUsuarioAutenticacionExterna}
+                      onClick={() => onEditUser(user)} variant="secondary">
+              {readOnly ? 'Consultar' : 'Editar'}
             </UserButton>
             <UserButton
               icon="bi-clock-history"
-              onClick={() => onViewMovements(user)}
+              disabled={!user.idUsuarioAutenticacionExterna}
+                      onClick={() => onViewMovements(user)}
               variant="secondary"
             >
               Movimientos

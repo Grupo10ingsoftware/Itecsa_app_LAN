@@ -1,0 +1,5 @@
+[mysqld]
+ssl_ca=/run/mysql-tls/ca.pem
+ssl_cert=/run/mysql-tls/server-cert.pem
+ssl_key=/run/mysql-tls/server-key.pem
+require_secure_transport=ON

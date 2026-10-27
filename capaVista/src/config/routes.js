@@ -1,5 +1,4 @@
 import { PERMISSIONS } from './permissions'
-import { ADMINISTRATIVE_ROLES, ROLES } from './roles'
 
 export const APP_ROUTES = Object.freeze({
   LOGIN: '/login',
@@ -57,7 +56,6 @@ export const MAIN_NAVIGATION_ROUTES = Object.freeze([
     label: 'Gestion de usuarios',
     path: APP_ROUTES.ADMIN_USERS,
     permission: PERMISSIONS.MANAGE_USERS_VISUALLY,
-    requiredRoles: ADMINISTRATIVE_ROLES,
     requirementIds: Object.freeze(['UR 1.4', 'UR 1.12', 'UR 1.13']),
   },
   {
@@ -82,7 +80,6 @@ export const MAIN_NAVIGATION_ROUTES = Object.freeze([
     label: 'Reportes y estadísticas',
     path: APP_ROUTES.METRICS,
     permission: PERMISSIONS.VIEW_METRICS,
-    requiredRoles: [ROLES.ADMINISTRADOR,ROLES.GERENCIA,ROLES.SOPORTE],
     requirementIds: Object.freeze(['RF70', 'RF71']),
   }
 ])

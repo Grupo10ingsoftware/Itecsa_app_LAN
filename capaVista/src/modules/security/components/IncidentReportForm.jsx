@@ -1,6 +1,6 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useNavigate } from 'react-router-dom'
 import { INCIDENT_LIMITS, INCIDENT_MODULES } from '../../../../../shared/incidentReports'
-import { APP_ROUTES } from '../../../config/routes'
 import TextInput from '../../../shared/components/forms/TextInput'
 import SelectInput from '../../../shared/components/forms/SelectInput'
 import { useIncidentReportForm } from '../hooks/useIncidentReportForm'
@@ -23,7 +23,7 @@ export default function IncidentReportForm({ email, sendReport, enabled, checkin
       {feedback.reference && <p className={`mb-0 ${common.reference}`}>Identificador: <strong>{feedback.reference}</strong></p>}
       {feedback.receivedAt && <small>Recepción: {new Date(feedback.receivedAt).toLocaleString('es-CL', { timeZone: 'America/Santiago' })}</small>}
     </div>}
-    {checking && <p role="status">Comprobando disponibilidad del canal… Puedes completar tu reporte mientras esperamos la confirmación.</p>}
+    {checking && <LoadingIndicator context="Comprobando disponibilidad del canal… Puedes completar tu reporte mientras esperamos la confirmación" />}
     {configurationError && <div className="alert alert-danger" role="alert">{configurationError} <button className="btn btn-outline-dark btn-sm" onClick={retryConfiguration} type="button">Reintentar</button></div>}
     {!checking && !configurationError && !enabled && <div className="alert alert-secondary" role="status">El canal de reportes está pendiente de configuración por Itecsa.</div>}
     <div className="mb-3">
@@ -41,10 +41,10 @@ export default function IncidentReportForm({ email, sendReport, enabled, checkin
     <TextInput id="incident-email" name="email" type="email" label={<>Correo de contacto <span className={common.required}>*</span></>} value={email} placeholder={checking ? 'Comprobando correo de contacto…' : undefined} readOnly required error={errors.email} autoComplete="email" describedBy="incident-email-hint" />
     <small id="incident-email-hint">Te contactaremos si necesitamos más información sobre este reporte.</small>
     <div className={common.formActions}>
-      <button className={common.cancelButton} type="button" disabled={busy} onClick={() => navigate(APP_ROUTES.KANBAN)}>Cancelar</button>
-      <button className={`${common.sendButton} ${styles.sendButton}`} type="submit" disabled={busy || !enabled}>
-        {busy ? <span className="spinner-border spinner-border-sm" aria-hidden="true" /> : <i className="bi bi-shield-fill" aria-hidden="true" />}
-        {busy ? 'Enviando…' : 'Enviar reporte'}
+      <button className={common.cancelButton} type="button" disabled={busy} onClick={() => navigate('/')}>Cancelar</button>
+      <button className={`${common.sendButton} ${styles.sendButton}`} type="submit" disabled={busy || !enabled} aria-busy={busy}>
+        {!busy && <i className="bi bi-shield-fill" aria-hidden="true" />}
+        <LoadingAction busy={busy} context="Enviar reporte">Enviar reporte</LoadingAction>
       </button>
     </div>
   </form>

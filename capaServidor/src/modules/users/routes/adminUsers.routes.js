@@ -1,75 +1,14 @@
-import { Router } from "express";
-import checkJwt from "../../../middlewares/checkJwt.js";
-import requireAdministrativeRole from "../../../middlewares/requireAdministrativeRole.js";
-import requirePin from "../../../middlewares/requirePin.js";
-import pinService from "../../auth/service/pin.service.js";
-import {
-    createAdminUserHandler,
-    createAdminUserMovementsHandler,
-    createAdminUsersSummaryHandler,
-    createListAdminUsersHandler,
-    createPasswordSetupEmailHandler,
-    createUpdateAdminUserHandler,
-    createUpdateAdminUserStatusHandler,
-} from "../controller/adminUsers.controller.js";
+import { Router } from 'express';
+import checkJwt from '../../../middlewares/checkJwt.js';
+import requireAdministrativeRole from '../../../middlewares/requireAdministrativeRole.js';
 
-export function createAdminUsersRouter({
-    authenticate = checkJwt,
-    authorize = requireAdministrativeRole,
-    createUser,
-    requestPasswordEmail,
-    updateUser,
-    updateStatus,
-    users,
-    pins = pinService,
-    validatePin = requirePin,
-} = {}) {
-    const router = Router();
-    router.get(
-        "/users",
-        authenticate,
-        authorize,
-        createListAdminUsersHandler({ users }),
-    );
-    router.get(
-        "/users/summary",
-        authenticate,
-        authorize,
-        createAdminUsersSummaryHandler({ users }),
-    );
-    router.get(
-        "/users/:userId/movements",
-        authenticate,
-        authorize,
-        createAdminUserMovementsHandler({ users }),
-    );
-    router.post(
-        "/users",
-        authenticate,
-        authorize,
-        createAdminUserHandler({ createUser, requestPasswordEmail, users, pins }),
-    );
-    router.post(
-        "/users/password-setup-email",
-        authenticate,
-        authorize,
-        createPasswordSetupEmailHandler({ requestPasswordEmail, users }),
-    );
-    router.patch(
-        "/users/:userId",
-        authenticate,
-        authorize,
-        validatePin,
-        createUpdateAdminUserHandler({ updateUser, users }),
-    );
-    router.patch(
-        "/users/:userId/status",
-        authenticate,
-        authorize,
-        validatePin,
-        createUpdateAdminUserStatusHandler({ updateStatus, users, pins }),
-    );
-    return router;
+// Reserved contracts remain closed until their Keycloak workflows are complete.
+export function createAdminUsersRouter({ authenticate = checkJwt, authorize = requireAdministrativeRole } = {}) {
+  const router = Router();
+  router.use('/users', authenticate, authorize, (_req, res) => res.status(503).json({
+    code: 'IDENTITY_OPERATION_NOT_IMPLEMENTED',
+    message: 'Utiliza la administracion de identidad habilitada; esta operacion aun no esta disponible.',
+  }));
+  return router;
 }
-
 export default createAdminUsersRouter();

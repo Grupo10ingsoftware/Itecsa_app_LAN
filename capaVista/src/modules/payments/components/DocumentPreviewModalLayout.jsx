@@ -34,6 +34,7 @@ export default function DocumentPreviewModalLayout({
   footer,
   kicker,
   onClose,
+  busy = false,
   title,
   titleId,
   variant = 'salesNote',
@@ -43,7 +44,7 @@ export default function DocumentPreviewModalLayout({
   return (
     <div
       className={`${modalClasses.backdrop} d-flex align-items-center justify-content-center position-fixed`}
-      onMouseDown={onClose}
+      onMouseDown={busy ? undefined : onClose}
       role="presentation"
     >
       <section
@@ -65,6 +66,7 @@ export default function DocumentPreviewModalLayout({
           </div>
 
           <button
+            disabled={busy}
             aria-label={closeAriaLabel}
             className={modalClasses.closeButton}
             onClick={onClose}

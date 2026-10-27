@@ -1,3 +1,4 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { createPortal } from 'react-dom'
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -16,6 +17,14 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
   const rootRef = useRef(null)
   const latestIdRef = useRef(null)
   const loadingRef = useRef(false)
+  const actionRef = useRef(false)
+  const [action, setAction] = useState(null)
+  const activity = useRef({ active: true, version: 0 })
+  useEffect(() => {
+    const tracker = activity.current
+    tracker.active = true
+    return () => { tracker.active = false; tracker.version++ }
+  }, [api])
   const [popupQueue, setPopupQueue] = useState([])
   const dismissPopup = useCallback(() => setPopupQueue((queue) => queue.slice(1)), [])
   const [isOpen, setIsOpen] = useState(false)
@@ -25,12 +34,14 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
   const [error, setError] = useState('')
 
   const loadNotifications = useCallback(async ({ quiet = false } = {}) => {
-    if (loadingRef.current) return
+    if (loadingRef.current || actionRef.current) return
+    const version = activity.current.version
     loadingRef.current = true
     if (!quiet) setIsLoading(true)
 
     try {
       const result = await api.getNotifications(50)
+      if (!activity.current.active || version !== activity.current.version) return
       const incoming = result.notifications ?? []
       const { latestId, messages } = collectNewNotifications(incoming, latestIdRef.current)
       latestIdRef.current = latestId
@@ -39,10 +50,10 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
       setUnreadCount(result.unreadCount ?? 0)
       setError('')
     } catch {
-      setError('No fue posible cargar las notificaciones.')
+      if (activity.current.active && version === activity.current.version) setError('No fue posible cargar las notificaciones.')
     } finally {
       loadingRef.current = false
-      if (!quiet) setIsLoading(false)
+      if (!quiet && activity.current.active) setIsLoading(false)
     }
   }, [api])
 
@@ -78,38 +89,62 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
   }, [])
 
   async function handleOpenMessage(message) {
+    if (actionRef.current) return
+    actionRef.current = true
+    activity.current.version++
+    setAction({ kind: 'open', id: message.id_mensaje })
     try {
       await api.markAsRead(message.id_mensaje)
+      if (!activity.current.active) return
       notifyMessagesChanged()
       setIsOpen(false)
       navigate(APP_ROUTES.MESSAGE_DETAIL.replace(':messageId', message.id_mensaje))
     } catch {
-      setError('No fue posible abrir la notificación.')
+      if (activity.current.active) setError('No fue posible abrir la notificación.')
+    } finally {
+      actionRef.current = false
+      if (activity.current.active) setAction(null)
     }
   }
 
   async function handleHide(event, messageId) {
     event.stopPropagation()
+    if (actionRef.current) return
+    actionRef.current = true
+    activity.current.version++
+    setAction({ kind: 'hide', id: messageId })
 
     try {
       await api.hideNotification(messageId)
+      if (!activity.current.active) return
       setNotifications((current) => current.filter((item) => item.id_mensaje !== messageId))
       setUnreadCount((current) => Math.max(0, current - 1))
       notifyMessagesChanged()
     } catch {
-      setError('No fue posible limpiar la notificación.')
+      if (activity.current.active) setError('No fue posible limpiar la notificación.')
+    } finally {
+      actionRef.current = false
+      if (activity.current.active) setAction(null)
     }
   }
 
   async function handleClearAll() {
+    if (actionRef.current) return
+    actionRef.current = true
+    activity.current.version++
+    setAction({ kind: 'clear' })
     try {
       await api.clearNotifications()
+      if (!activity.current.active) return
       setNotifications([])
       setUnreadCount(0)
       setError('')
       notifyMessagesChanged()
     } catch {
-      setError('No fue posible limpiar las notificaciones.')
+      if (activity.current.active) setError('No fue posible limpiar las notificaciones.')
+    } finally {
+      actionRef.current = false
+      if (activity.current.active) setAction(null)
     }
   }
 
@@ -141,14 +176,14 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
               <p className={styles.eyebrow}>Actividad reciente</p>
               <h2>Notificaciones</h2>
             </div>
-            <button className={styles.clearButton} disabled={notifications.length === 0} onClick={handleClearAll} type="button">
+            <button className={styles.clearButton} disabled={notifications.length === 0 || Boolean(action)} aria-busy={action?.kind === 'clear'} onClick={handleClearAll} type="button">
               <i className="bi bi-trash3" aria-hidden="true" />
-              Limpiar
+              <LoadingAction surface="light" busy={action?.kind === 'clear'}>Limpiar</LoadingAction>
             </button>
           </header>
 
           <div className={styles.body}>
-            {isLoading && <div className={styles.state}>Cargando notificaciones…</div>}
+            {isLoading && <LoadingIndicator context="notificaciones" />}
             {!isLoading && error && <div className={styles.error} role="alert">{error}</div>}
             {!isLoading && !error && notifications.length === 0 && (
               <div className={styles.emptyState}>
@@ -159,7 +194,8 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
             )}
             {!isLoading && notifications.map((notification) => (
               <article className={styles.notification} key={notification.id_mensaje}>
-                <button className={styles.notificationMain} onClick={() => handleOpenMessage(notification)} type="button">
+                <button className={styles.notificationMain} disabled={Boolean(action)} aria-busy={action?.kind === 'open' && action.id === notification.id_mensaje} onClick={() => handleOpenMessage(notification)} type="button">
+                  {action?.kind === 'open' && action.id === notification.id_mensaje && <LoadingIndicator scope="action" context="Abrir notificación" />}
                   <span className={styles.unreadDot} aria-label="Sin leer" />
                   <span className={styles.notificationCopy}>
                     <strong>{notification.Asunto}</strong>
@@ -167,8 +203,8 @@ export default function NotificationBell({ popupContainer, buttonClassName }) {
                     <small>{formatMessageDate(notification.fecha_publicacion)}</small>
                   </span>
                 </button>
-                <button aria-label={`Limpiar ${notification.Asunto}`} className={styles.itemTrash} onClick={(event) => handleHide(event, notification.id_mensaje)} type="button">
-                  <i className="bi bi-trash3" aria-hidden="true" />
+                <button aria-label={`Limpiar ${notification.Asunto}`} className={styles.itemTrash} disabled={Boolean(action)} aria-busy={action?.kind === 'hide' && action.id === notification.id_mensaje} onClick={(event) => handleHide(event, notification.id_mensaje)} type="button">
+                  {action?.kind === 'hide' && action.id === notification.id_mensaje ? <LoadingIndicator scope="action" size="small" context="Limpiar notificación" /> : <i className="bi bi-trash3" aria-hidden="true" />}
                 </button>
               </article>
             ))}

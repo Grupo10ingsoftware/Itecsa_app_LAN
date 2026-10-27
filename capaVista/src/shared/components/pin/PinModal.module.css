@@ -1,0 +1,76 @@
+.layer {
+  --pin-black: #000000;
+  --pin-orange: #FE5A00;
+  --pin-orange-hover: #FF7426;
+  --pin-orange-active: #D64B00;
+  --pin-white: #FFFFFF;
+  --pin-secondary-hover: #F3F4F6;
+  --pin-secondary-active: #E5E7EB;
+  --pin-border: #D1D5DB;
+  --pin-error: #DC2626;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 45%);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--pin-black);
+}
+.dialog {
+  box-sizing: border-box;
+  width: min(34rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--pin-border);
+  border-radius: .5rem;
+  background: var(--pin-white);
+  box-shadow: 0 .75rem 2rem rgb(0 0 0 / 25%);
+  overflow: hidden;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .5rem .75rem .5rem 1.25rem;
+  background: var(--pin-black);
+  color: var(--pin-white);
+  border-bottom: 3px solid var(--pin-orange);
+  flex-shrink: 0;
+}
+.header h2 { margin: 0; font: 700 1.25rem/1.4 Inter, system-ui, sans-serif; overflow-wrap: anywhere; }
+.close { background: transparent; color: inherit; border: 1px solid transparent; min-width: 44px; min-height: 44px; font-size: 1.5rem; border-radius: .25rem; }
+.body { padding: 1.25rem; overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
+.description { font-size: .95rem; font-weight: 400; margin: 0 0 1rem; line-height: 1.5; }
+.field { display: flex; flex-direction: column; gap: .375rem; margin: 0 0 1rem; font-size: .875rem; font-weight: 700; }
+.field:last-child { margin-bottom: 0; }
+.inputWrap { position: relative; display: block; }
+.input, .textarea {
+  box-sizing: border-box; width: 100%; min-height: 48px; border: 1px solid rgb(0 0 0 / 55%);
+  border-radius: .25rem; background: var(--pin-white); color: var(--pin-black);
+  padding: .65rem .75rem; font-family: inherit; line-height: 1.5;
+}
+.input { font-size: 1rem; font-weight: 500; padding-right: 3rem; }
+.eye { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.textarea { font-size: .95rem; font-weight: 400; resize: vertical; }
+.counter { text-align: right; font-size: .75rem; font-weight: 400; }
+.error { color: var(--pin-error); font-size: .875rem; font-weight: 500; margin: .375rem 0 1rem; line-height: 1.5; overflow-wrap: anywhere; }
+.footer { display: flex; flex-wrap: wrap; gap: .75rem; padding: .875rem 1.25rem; border-top: 1px solid var(--pin-border); flex-shrink: 0; }
+.primary, .secondary { flex: 1 1 0; min-height: 48px; border-radius: .25rem; padding: .6rem .75rem; font: 700 .95rem/1.4 Inter, system-ui, sans-serif; color: var(--pin-black); }
+.primary { background: var(--pin-orange); border: 1px solid var(--pin-black); }
+.primary:hover:not(:disabled) { background: var(--pin-orange-hover); }
+.primary:active:not(:disabled) { background: var(--pin-orange-active); }
+.secondary { background: var(--pin-white); border: 1px solid rgb(0 0 0 / 55%); }
+.secondary:hover:not(:disabled) { background: var(--pin-secondary-hover); }
+.secondary:active:not(:disabled) { background: var(--pin-secondary-active); }
+.layer :is(button, input, textarea):focus-visible { outline: 3px solid var(--pin-black); outline-offset: 3px; }
+.header .close:focus-visible { outline-color: var(--pin-white); }
+.layer button:disabled { cursor: not-allowed; opacity: .65; }
+.layer :is(input, textarea):disabled { background: var(--pin-secondary-hover); }
+.secret { font: 700 2rem/1.5 ui-monospace, monospace; text-align: center; overflow-wrap: anywhere; }
+@media (max-height: 360px) { .header { padding-block: 0; } .body { padding-block: .5rem; } .footer { padding-block: .5rem; } }

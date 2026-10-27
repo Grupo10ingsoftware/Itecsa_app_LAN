@@ -19,7 +19,7 @@ export default class ProductionLoadController {
       return res.status(200).json(await this.service.saveDailyLoad({
         date: req.body?.date,
         entries: req.body?.entries,
-        auth0UserId: req.auth?.payload?.sub,
+        identitySubject: req.auth?.payload?.sub,
       }));
     } catch (error) {
         return respondError(error, req, res);

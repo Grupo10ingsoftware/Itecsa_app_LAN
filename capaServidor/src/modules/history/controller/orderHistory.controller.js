@@ -1,10 +1,12 @@
 import { respondError } from "../../../errors/httpErrors.js";
 import OrderHistoryService from "../service/orderHistory.service.js";
-import { can, PERMISSIONS, roleFromPayload } from "../../../../../shared/authorization.js";
+import { PERMISSIONS } from "../../../../../shared/authorization.js";
+import { authorizationForProvider } from '../../../../../shared/identityAuthorization.js';
 
 function mayReadPayments(req) {
     const payload = req.auth?.payload;
-    return can(roleFromPayload(payload), payload?.permissions, PERMISSIONS.READ_PAYMENTS);
+    const policy = authorizationForProvider(req.identityProvider);
+    return policy?.can(policy.roleFromPayload(payload), payload?.permissions, PERMISSIONS.READ_PAYMENTS) === true;
 }
 
 export default class OrderHistoryController {

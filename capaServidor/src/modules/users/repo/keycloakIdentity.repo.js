@@ -1,0 +1,163 @@
+import { identityUserWhere } from '../../../database/identityBinding.js';
+import { randomUUID } from 'node:crypto';
+import getPrismaClient from '../../../database/prisma.js';
+import { isActiveUserStatus, ACTIVE_USER_STATUSES, USER_STATUS } from '../../../config/userLifecycle.js';
+import { ADMIN_ROLES, ASSIGNABLE_ROLES } from '../../../../../shared/keycloakAuthorization.js';
+import { USER_RESPONSE_SELECT, UserRepository } from './users.repo.js';
+
+// Explicit external bindings preserve local keys and actor ownership.
+export class KeycloakIdentityRepository {
+  constructor({ prisma } = {}) { this.prisma = prisma; }
+  get client() { return this.prisma ?? getPrismaClient(); }
+  userScope(issuer, { search = '', estadoUsuario = '', rolUsuario = '' } = {}) {
+    const where = { rol_usuario: { in: [...ASSIGNABLE_ROLES] }, ExternalIdentity: { is: { provider: 'keycloak', issuer } } };
+    if (rolUsuario) where.rol_usuario = { equals: rolUsuario, in: [...ASSIGNABLE_ROLES] };
+    if (estadoUsuario) where.estado_usuario = ACTIVE_USER_STATUSES.includes(estadoUsuario)
+      ? { in: [...ACTIVE_USER_STATUSES] } : estadoUsuario;
+    if (search) where.OR = ['nombre_usuario', 'apellido_usuario', 'correo_usuario', 'rut_usuario'].map(field => ({ [field]: { contains: search } }))
+      .concat({ ExternalIdentity: { is: { username: { contains: search } } } });
+    return where;
+  }
+  async list(issuer, { page, perPage, ...filters }) {
+    const where = this.userScope(issuer, filters);
+    const [rows, total] = await Promise.all([
+      this.client.usuario.findMany({ where, skip: (page - 1) * perPage, take: perPage, orderBy: { id_usuario: 'desc' },
+        select: { ...USER_RESPONSE_SELECT, ExternalIdentity: { select: { subject: true, username: true } } } }),
+      this.client.usuario.count({ where }),
+    ]);
+    return { usuarios: rows.map(row => {
+      const identityBindingConflict = typeof row.ExternalIdentity?.subject !== 'string' || !row.ExternalIdentity.subject;
+      return { idUsuario: row.id_usuario, idUsuarioAutenticacionExterna: identityBindingConflict ? null : row.ExternalIdentity.subject,
+        identityBindingConflict,
+        username: row.ExternalIdentity.username, nombreUsuario: row.nombre_usuario, apellidoUsuario: row.apellido_usuario,
+        rutUsuario: row.rut_usuario, correoUsuario: row.correo_usuario, rolUsuario: row.rol_usuario,
+        estadoUsuario: row.estado_usuario?.startsWith('Actualizando:') ? 'Actualizando' : row.estado_usuario };
+    }), total, page, perPage };
+  }
+  async summary(issuer) {
+    const groups = await this.client.usuario.groupBy({ by: ['estado_usuario'], where: this.userScope(issuer), _count: { _all: true } });
+    const counts = new Map(groups.map(group => [group.estado_usuario, group._count._all]));
+    return { totalUsuarios: groups.reduce((sum, group) => sum + group._count._all, 0),
+      vinculados: ACTIVE_USER_STATUSES.reduce((sum, status) => sum + (counts.get(status) ?? 0), 0),
+      desvinculados: counts.get(USER_STATUS.UNLINKED) ?? 0, pendientes: counts.get(USER_STATUS.PENDING_FIRST_LOGIN) ?? 0,
+      pendientesRol: counts.get(USER_STATUS.PENDING_ROLE) ?? 0 };
+  }
+  movements(userId, filters) { return new UserRepository({ prisma: this.client }).listMovements(userId, filters); }
+  actor(subject) {
+    return this.client.usuario.findFirst({ where: identityUserWhere(subject),
+      select: { id_usuario: true, rol_usuario: true, estado_usuario: true } });
+  }
+  async claim({ issuer, input, digest, actorId }) {
+    try {
+      return await this.client.identityProvisionOperation.create({ data: { id: randomUUID(), issuer,
+        username: input.username, input, payload_digest: digest, state: 'pending', actor_user_id: actorId } });
+    } catch (error) {
+      if (error?.code !== 'P2002') throw error;
+      const existing = await this.client.identityProvisionOperation.findUnique({ where: { issuer_username: { issuer, username: input.username } } });
+      if (!existing) throw error;
+      return existing;
+    }
+  }
+  operation(id) { return this.client.identityProvisionOperation.findUnique({ where: { id } }); }
+  async acquire(operation, reconcile) {
+    const result = await this.client.identityProvisionOperation.updateMany({
+      where: { id: operation.id, revision: operation.revision, state: reconcile ? 'needs_reconciliation' : 'pending' },
+      data: { state: 'running', revision: { increment: 1 }, last_error: null },
+    });
+    return result.count === 1 ? this.operation(operation.id) : null;
+  }
+  async checkpoint(operation, subject) {
+    const result = await this.client.identityProvisionOperation.updateMany({
+      where: { id: operation.id, state: 'running', revision: operation.revision },
+      data: { external_subject: subject },
+    });
+    if (result.count !== 1) throw Error('IDENTITY_OPERATION_CONFLICT');
+  }
+  async fail(operation, code, { terminal = false, actorId } = {}) {
+    return this.client.$transaction(async tx => {
+      const result = await tx.identityProvisionOperation.updateMany({
+        where: { id: operation.id, state: 'running', revision: operation.revision },
+        data: { state: terminal ? 'failed' : 'needs_reconciliation', last_error: code },
+      });
+      if (result.count !== 1) throw Error('IDENTITY_OPERATION_CONFLICT');
+      await tx.securityAuditEvent.create({ data: { event_type: 'identity.preparation', actor_user_id: actorId,
+        action: 'prepare', resource_type: 'identity_operation', resource_id: operation.id, request_id: operation.id,
+        outcome: terminal ? 'rejected' : 'pending', reason_code: code } });
+    });
+  }
+  async complete(operation, subject, actorId, actorSubject, actorRole) {
+    return this.client.$transaction(async tx => {
+      const actors = await tx.$queryRaw`SELECT u.rol_usuario, u.estado_usuario, e.subject, e.issuer, e.provider FROM Usuario u JOIN ExternalIdentity e ON e.user_id = u.id_usuario WHERE u.id_usuario=${actorId} FOR UPDATE`;
+      if (actors[0]?.subject !== actorSubject || actors[0]?.provider !== 'keycloak' || actors[0]?.issuer !== operation.issuer || actors[0]?.rol_usuario !== actorRole
+        || !ADMIN_ROLES.includes(actorRole) || !isActiveUserStatus(actors[0]?.estado_usuario)) {
+        throw Object.assign(Error('El actor cambio durante la preparacion.'), { code: 'IDENTITY_ACTOR_CHANGED' });
+      }
+      const input = operation.input;
+      const user = operation.local_user_id
+        ? await tx.usuario.findFirst({ where: { id_usuario: operation.local_user_id, id_keycloak: subject,
+          ExternalIdentity: { is: { provider: 'keycloak', issuer: operation.issuer, subject } } } })
+        : await tx.usuario.create({ data: { id_keycloak: subject, correo_usuario: input.email, rut_usuario: input.rut ?? null,
+        nombre_usuario: input.firstName, apellido_usuario: input.lastName, rol_usuario: input.role, estado_usuario: 'Pendiente' } });
+      if (!user) throw Error('IDENTITY_BINDING_CONFLICT');
+      if (!operation.local_user_id) await tx.externalIdentity.create({ data: { provider: 'keycloak', issuer: operation.issuer, subject,
+        username: input.username, user_id: user.id_usuario } });
+      await tx.securityAuditEvent.create({ data: { event_type: 'identity.preparation', actor_user_id: actorId,
+        action: 'prepare', resource_type: 'identity_operation', resource_id: operation.id, request_id: operation.id,
+        outcome: 'prepared' } });
+      const result = await tx.identityProvisionOperation.updateMany({
+        where: { id: operation.id, revision: operation.revision, state: 'running' },
+        data: { external_subject: subject, local_user_id: user.id_usuario },
+      });
+      if (result.count !== 1) throw Error('IDENTITY_OPERATION_CONFLICT');
+      return this.operationUsing(tx, operation.id);
+    });
+  }
+  async finish(operation) {
+    return this.client.$transaction(async tx => {
+      const updated = await tx.identityProvisionOperation.updateMany({
+        where: { id: operation.id, state: 'running', revision: operation.revision,
+          external_subject: operation.external_subject, local_user_id: operation.local_user_id },
+        data: { state: 'created' },
+      });
+      if (updated.count !== 1) throw Error('IDENTITY_OPERATION_CONFLICT');
+      return this.operationUsing(tx, operation.id);
+    });
+  }
+  operationUsing(client, id) { return client.identityProvisionOperation.findUnique({ where: { id } }); }
+  async beginUpdate(issuer, subject, actorId, actorRole) {
+    return this.client.$transaction(async tx => {
+      const actors = await tx.usuario.findFirst({ where: { id_usuario: actorId, rol_usuario: actorRole,
+        estado_usuario: { in: [...ACTIVE_USER_STATUSES] } }, select: { id_usuario: true } });
+      if (!actors) throw Object.assign(Error('Actor no autorizado'), { code: 'IDENTITY_ACTOR_CHANGED' });
+      await tx.$queryRaw`SELECT u.id_usuario FROM Usuario u JOIN ExternalIdentity e ON e.user_id = u.id_usuario WHERE e.provider='keycloak' AND e.issuer=${issuer} AND e.subject=${subject} FOR UPDATE`;
+      const binding = await tx.externalIdentity.findUnique({
+        where: { provider_issuer_subject: { provider: 'keycloak', issuer, subject } },
+        include: { Usuario: { select: { id_usuario: true, rol_usuario: true, estado_usuario: true,
+          correo_usuario: true, nombre_usuario: true, apellido_usuario: true } } },
+      });
+      if (!binding || !ASSIGNABLE_ROLES.includes(binding.Usuario.rol_usuario) || binding.user_id === actorId) {
+        throw Object.assign(Error('Usuario no editable'), { code: 'IDENTITY_TARGET_FORBIDDEN' });
+      }
+      if (binding.Usuario.estado_usuario?.startsWith('Actualizando:')) {
+        throw Object.assign(Error('Actualizacion en curso'), { code: 'IDENTITY_UPDATE_BUSY' });
+      }
+      const updateState = 'Actualizando:' + randomUUID().replaceAll('-', '').slice(0, 16);
+      await tx.usuario.update({ where: { id_usuario: binding.user_id }, data: { estado_usuario: updateState } });
+      return { ...binding, updateState };
+    });
+  }
+  async finishUpdate(binding, data, actorId, outcome = 'updated') {
+    return this.client.$transaction(async tx => {
+      const updated = await tx.usuario.updateMany({ where: { id_usuario: binding.user_id, estado_usuario: binding.updateState,
+        ExternalIdentity: { is: { provider: 'keycloak', issuer: binding.issuer, subject: binding.subject } } }, data });
+      if (updated.count !== 1) throw Object.assign(Error('La cuenta cambio'), { code: 'IDENTITY_UPDATE_CONFLICT' });
+      await tx.securityAuditEvent.create({ data: { event_type: 'identity.update', actor_user_id: actorId,
+        action: 'update', resource_type: 'user', resource_id: String(binding.user_id), outcome } });
+    });
+  }
+  binding(issuer, subject) {
+    return this.client.externalIdentity.findUnique({ where: { provider_issuer_subject: { provider: 'keycloak', issuer, subject } },
+      include: { Usuario: { select: { id_usuario: true, rol_usuario: true, estado_usuario: true, correo_usuario: true,
+        nombre_usuario: true, apellido_usuario: true } } } });
+  }
+}

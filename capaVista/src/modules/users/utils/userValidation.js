@@ -1,4 +1,4 @@
-import { OFFICIAL_ROLES } from '../../../config/roles'
+import { OFFICIAL_ROLES } from '../../../config/roles.js'
 
 const LETTERS_AND_SPACES_PATTERN = /^[A-Za-z\u00c1\u00c9\u00cd\u00d3\u00da\u00e1\u00e9\u00ed\u00f3\u00fa\u00d1\u00f1\u00dc\u00fc\s]+$/
 const RUT_PATTERN = /^(\d{1,2}\.?\d{3}\.?\d{3}-[\dkK])$/
@@ -63,12 +63,12 @@ export function validateRut(value) {
   return errors
 }
 
-export function validateUserCreateForm(values) {
+export function validateUserCreateForm(values, { optionalEmail = false, requireRut = true } = {}) {
   return {
     nombreUsuario: validatePersonName(values.nombreUsuario, 'El nombre'),
     apellidoUsuario: validatePersonName(values.apellidoUsuario, 'El apellido'),
-    rutUsuario: validateRut(values.rutUsuario),
-    correoUsuario: validateEmail(values.correoUsuario),
+    rutUsuario: requireRut ? validateRut(values.rutUsuario) : [],
+    correoUsuario: optionalEmail && !values.correoUsuario.trim() ? [] : validateEmail(values.correoUsuario),
     rolUsuario: validateRole(values.rolUsuario),
   }
 }

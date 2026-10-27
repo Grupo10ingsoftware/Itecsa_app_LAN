@@ -3,7 +3,11 @@
   gap: 0.65rem;
   overflow: auto;
   padding: 0.75rem;
+  min-width: 0;
 }
+
+.calendarGridStack[aria-busy="true"] { grid-template-columns: minmax(0, 1fr); }
+.calendarGridStack[aria-busy="true"] .calendarToolbarSlot { min-width: 0; }
 
 .calendarToolbarSlot {
   min-width: 70rem;
@@ -432,24 +436,6 @@
   margin: 0;
 }
 
-.credentialsLabel {
-  color: var(--calendar-muted);
-  display: grid;
-  font-size: 0.74rem;
-  font-weight: 850;
-  gap: 0.38rem;
-  letter-spacing: 0.045em;
-  text-transform: uppercase;
-}
-
-.credentialsLabel input {
-  border: 1px solid #d7dee8;
-  border-radius: 0.55rem;
-  color: var(--calendar-text);
-  min-height: 2.75rem;
-  padding: 0.55rem 0.7rem;
-}
-
 .modalError {
   background: #fef2f2;
   border: 1px solid #fecaca;
@@ -490,6 +476,12 @@
   border-color: var(--calendar-orange);
   color: #111827;
   outline: none;
+}
+
+.primaryButton:disabled[aria-busy="true"] {
+  background: var(--page-header-black, #000);
+  border-color: var(--page-header-black, #000);
+  color: var(--page-white, #fff);
 }
 
 .secondaryButton {

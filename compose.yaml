@@ -10,12 +10,15 @@ services:
       NODE_ENV: development
       SALES_NOTE_SOURCE: ${SALES_NOTE_SOURCE:-fixture}
       PORT: 3000
-      FRONTEND_ORIGIN: http://localhost:5173
-      DB_SSL_CA_PATH: /run/secrets/aiven-ca.pem
+      FRONTEND_ORIGIN: http://127.0.0.1:5173
+      # Only the API container uses the host gateway; the token issuer stays public.
+      KEYCLOAK_JWKS_URI: http://host.docker.internal:18080/realms/itecsa/protocol/openid-connect/certs
+      KEYCLOAK_ADMIN_TRANSPORT_ORIGIN: http://host.docker.internal:18080
+      KEYCLOAK_PIN_RECOVERY_TRANSPORT_ORIGIN: http://host.docker.internal:18080
       TRUST_PROXY: 0
     secrets:
       - source: database_ca
-        target: aiven-ca.pem
+        target: /app/capaServidor/certs/aiven-ca.pem
     ports:
       - "127.0.0.1:3000:3000"
     init: true
@@ -47,6 +50,7 @@ services:
         - {action: sync, path: ./shared, target: /app/shared, initial_sync: true}
         - {action: rebuild, path: ./capaVista/index.html}
         - {action: rebuild, path: ./capaVista/vite.config.js}
+        - {action: rebuild, path: ./capaVista/dev}
         - {action: rebuild, path: ./capaVista/package.json}
         - {action: rebuild, path: ./capaVista/package-lock.json}
 secrets:

@@ -1,3 +1,4 @@
+import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useRef, useState } from 'react'
 import styles from '../pages/MetricsPage.module.css'
 
@@ -48,10 +49,10 @@ export default function ProductionPerformance({ api, period }) {
       <i className={`bi ${open ? 'bi-chevron-up' : 'bi-chevron-down'}`} aria-hidden="true" />
     </button>
     <div id="performance-content" hidden={!open} className={styles.sellerContent}>
-      <button type="button" className={styles.generateButton} disabled={loading || !period.from || !period.to || period.from > period.to} onClick={generate}>
-        {loading ? 'Generando reporte…' : 'Generar reporte'}
+      <button type="button" className={styles.generateButton} disabled={loading || !period.from || !period.to || period.from > period.to} onClick={generate} aria-busy={loading}>
+        <LoadingAction busy={loading} announce={false} context="Generar reporte">Generar reporte</LoadingAction>
       </button>
-      {loading && <p role="status">Procesando pedidos…</p>}
+      {loading && <LoadingIndicator context="Procesando pedidos" />}
       {error && <p role="alert">{error}</p>}
       {report && <PerformanceResult report={report} />}
     </div>

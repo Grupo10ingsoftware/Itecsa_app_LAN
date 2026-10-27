@@ -1,15 +1,21 @@
 import { getCalendarOrderItems, formatScheduleState, displayValue, getManufacturingDetails, isLanyardItem } from '../utils/calendarPresentation.js';
 import styles from './ProductionCalendarGrid.module.css';
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
+import { useRef } from 'react'
+import { useModalDialog } from '../../users/hooks/useModalDialog'
 
-export function OrderDetailModal({ order, onClose }) {
+export function OrderDetailModal({ order, onClose, isLoading = false, error }) {
+  const modalRef = useRef(null)
+  useModalDialog({ containerRef: modalRef, isOpen: Boolean(order), onClose })
   if (!order) return null
 
   const orderItems = getCalendarOrderItems(order)
 
   return (
-    <div className={styles.modalLayer} onMouseDown={onClose} role="presentation">
+    <div className={styles.modalLayer} onMouseDown={onClose} data-modal-layer="true" role="presentation">
       <section
         aria-labelledby="calendar-order-detail-title"
+        ref={modalRef}
         aria-modal="true"
         className={styles.orderDetailModal}
         onMouseDown={(event) => event.stopPropagation()}
@@ -25,7 +31,8 @@ export function OrderDetailModal({ order, onClose }) {
           </button>
         </header>
 
-        <div className={styles.orderDetailBody}>
+        <div className={styles.orderDetailBody} aria-busy={isLoading}>
+          {isLoading ? <LoadingIndicator scope="dialog" context="Detalle del pedido" /> : error ? <p role="alert">{error}</p> : <>
           <section className={styles.orderOverview} aria-label="Resumen del pedido">
             <div>
               <dt>Cliente</dt>
@@ -108,6 +115,7 @@ export function OrderDetailModal({ order, onClose }) {
               )
             })}
           </section>
+          </>}
         </div>
       </section>
     </div>

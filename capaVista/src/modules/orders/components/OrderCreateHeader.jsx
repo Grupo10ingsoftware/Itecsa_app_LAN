@@ -1,12 +1,5 @@
-import styles from './OrderCreateHeader.module.css'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 
 export default function OrderCreateHeader({ title = 'REGISTRO DE PEDIDO' }) {
-  return (
-    <header className={styles.hero}>
-      <div className={styles.heroInner}>
-        <span className={styles.sectionLabel}>Ventas</span>
-        <h1 className={styles.pageTitle}>{title}</h1>
-      </div>
-    </header>
-  )
+  return <PageHeader title={title} />
 }

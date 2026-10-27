@@ -10,26 +10,18 @@ import {
 } from "node:crypto";
 import { promisify } from "node:util";
 
+import { identityKey, identityUserWhere } from '../../../database/identityBinding.js';
 import getPrismaClient from "../../../database/prisma.js";
 import {
-    PinDeliveryUnavailableError,
-    createPinRecoveryDelivery,
-} from "./pinDelivery.service.js";
-import { currentAppEnvironment } from "../../../config/environment.js";
-import {
-    ACTIVE_USER_STATUSES,
     isActiveUserStatus,
 } from "../../../config/userLifecycle.js";
 
-import { ROLES, roleFromPayload, can, PERMISSIONS } from "../../../../../shared/authorization.js";
 
 const scrypt = promisify(scryptCallback);
 const PIN_PATTERN = /^\d{6}$/;
-const RECOVERY_CODE_PATTERN = /^\d{6}$/;
 const MAX_ATTEMPTS = 5;
 const LOCK_MS = 15 * 60 * 1000;
 const PIN_HASH_PREFIX = 'scrypt$v2$N=32768,r=8,p=3$';
-const RECOVERY_TTL_MS = 15 * 60 * 1000;
 
 export class PinServiceError extends Error {
     constructor(code, message, { status = 400, details } = {}) {
@@ -119,25 +111,11 @@ export class PinService {
     constructor({
         prisma,
         secret,
-        delivery,
-        deliveryEnvironment = process.env,
-        logger = console,
         now = () => new Date(),
     } = {}) {
         this.prisma = prisma;
         this.secretValue = secret;
-        this.testDelivery = delivery;
-        this.deliveryEnvironment = deliveryEnvironment;
-        this.logger = logger;
         this.now = now;
-    }
-
-    get delivery() {
-        // Resolve after dotenv/startup configuration; no import-time environment fallback.
-        return createPinRecoveryDelivery({
-            env: this.deliveryEnvironment,
-            testDelivery: this.testDelivery,
-        });
     }
 
     get client() {
@@ -215,22 +193,22 @@ export class PinService {
         };
     }
 
-    async findUser(auth0UserId) {
-        return this.client.usuario.findUnique({
-            where: { id_auth0: auth0UserId },
+    async findUser(identitySubject) {
+        return this.client.usuario.findFirst({
+            where: identityUserWhere(identitySubject),
         });
     }
 
-    async findUserForUpdate(transaction, auth0UserId) {
+    async findUserForUpdate(transaction, identitySubject) {
+        const key = identityKey(identitySubject);
         const users = await transaction.$queryRaw`
-            SELECT id_usuario, id_auth0, correo_usuario, nombre_usuario,
-                apellido_usuario, estado_usuario, pin_hash, pin_salt,
-                pin_accepted_at, pin_failed_attempts, pin_locked_until
-            FROM \`Usuario\`
-            WHERE id_auth0 = ${auth0UserId}
+            SELECT u.id_usuario, u.correo_usuario, u.nombre_usuario,
+                u.apellido_usuario, u.estado_usuario, u.pin_hash, u.pin_salt,
+                u.pin_accepted_at, u.pin_failed_attempts, u.pin_locked_until
+            FROM Usuario u JOIN ExternalIdentity e ON e.user_id = u.id_usuario
+            WHERE e.provider = ${key.provider} AND e.issuer = ${key.issuer} AND e.subject = ${key.subject}
             FOR UPDATE
         `;
-
         return users[0] ?? null;
     }
 
@@ -263,20 +241,20 @@ export class PinService {
         );
     }
 
-    async ensureProvisioned(auth0UserId) {
-        let user = await this.findUser(auth0UserId);
+    async ensureProvisioned(identitySubject) {
+        let user = await this.findUser(identitySubject);
         assertActiveUser(user);
 
         if (!user.pin_hash) {
             await this.provisionByUserId(user.id_usuario);
-            user = await this.findUser(auth0UserId);
+            user = await this.findUser(identitySubject);
         }
 
         return pinStatus(user);
     }
 
-    async reveal(auth0UserId) {
-        const user = await this.findUser(auth0UserId);
+    async reveal(identitySubject) {
+        const user = await this.findUser(identitySubject);
         assertActiveUser(user);
 
         if (
@@ -295,8 +273,8 @@ export class PinService {
         return this.decrypt(user);
     }
 
-    async acknowledge(auth0UserId) {
-        const user = await this.findUser(auth0UserId);
+    async acknowledge(identitySubject) {
+        const user = await this.findUser(identitySubject);
         assertActiveUser(user);
 
         if (!user.pin_hash) {
@@ -320,7 +298,7 @@ export class PinService {
         });
     }
 
-    async validate(auth0UserId, pin) {
+    async validate(identitySubject, pin) {
         if (!PIN_PATTERN.test(String(pin ?? ""))) {
             throw new PinServiceError(
                 "PIN_FORMAT_INVALID",
@@ -329,7 +307,7 @@ export class PinService {
         }
 
         const result = await this.client.$transaction(async (transaction) => {
-            const user = await this.findUserForUpdate(transaction, auth0UserId);
+            const user = await this.findUserForUpdate(transaction, identitySubject);
             assertActiveUser(user);
 
             if (!user.pin_hash || !user.pin_accepted_at) {
@@ -407,255 +385,30 @@ export class PinService {
         return result.user;
     }
 
-    async debugReset(payload) {
-        if (currentAppEnvironment() !== "development") {
-            throw new PinServiceError("PIN_DEBUG_DISABLED", "La generacion debug solo esta disponible en desarrollo.", { status: 403 });
-        }
-        if (!payload?.sub || roleFromPayload(payload) !== ROLES.SOPORTE ||
-            !can(ROLES.SOPORTE, payload.permissions, PERMISSIONS.MANAGE_PIN)) {
-            throw new PinServiceError("PIN_DEBUG_FORBIDDEN", "Esta accion requiere el rol Soporte.", { status: 403 });
-        }
-        const user = await this.findUser(payload.sub);
+    async rotateAfterRecovery(identitySubject, authorize) {
+        const user = await this.findUser(identitySubject);
         assertActiveUser(user);
-        if (user.rol_usuario !== ROLES.SOPORTE) {
-            throw new PinServiceError("PIN_DEBUG_FORBIDDEN", "Renueva tu sesion para verificar tu rol.", { status: 403 });
-        }
         for (let attempt = 0; attempt < 20; attempt += 1) {
             const credential = await this.buildCredential();
-            if (await matchesHash(credential.pin, user.pin_hash, user.pin_salt)) continue;
             try {
-                await this.client.$transaction(async (tx) => {
-                    const result = await tx.usuario.updateMany({
-                        where: {
-                            id_usuario: user.id_usuario,
-                            rol_usuario: ROLES.SOPORTE,
-                            estado_usuario: { in: [...ACTIVE_USER_STATUSES] },
-                            pin_hash: user.pin_hash,
-                        },
-                        data: credential.data,
-                    });
-                    if (result.count !== 1) {
-                        throw new PinServiceError("PIN_DEBUG_CONFLICT", "La cuenta cambio. Actualiza tu sesion e intenta nuevamente.", { status: 409 });
-                    }
-                    await tx.pinRecoveryChallenge.updateMany({
-                        where: { id_usuario: user.id_usuario, used_at: null },
-                        data: { used_at: this.now() },
-                    });
+                const changed = await this.client.$transaction(async (transaction) => {
+                    const current = await this.findUserForUpdate(transaction, identitySubject);
+                    assertActiveUser(current);
+                    if (await matchesHash(credential.pin, current.pin_hash, current.pin_salt)) return false;
+                    authorize();
+                    await transaction.usuario.update({ where: { id_usuario: current.id_usuario }, data: credential.data });
+                    return true;
                 });
-                return "pending_acknowledgement";
+                if (changed) return 'pending_acknowledgement';
             } catch (error) {
-                if (error?.code !== "P2002") throw error;
+                if (error?.code !== 'P2002') throw error;
             }
         }
-        throw new PinServiceError("PIN_GENERATION_FAILED", "No fue posible generar un PIN unico.", { status: 500 });
+        throw new PinServiceError('PIN_GENERATION_FAILED', 'No fue posible generar un PIN unico.', { status: 500 });
     }
 
-    async requestRecovery(auth0UserId) {
-        const code = sixDigits();
-        const hashed = await hashValue(code);
-        const { user, challenge } = await this.client.$transaction(async (transaction) => {
-            const user = await this.findUserForUpdate(transaction, auth0UserId);
-            assertActiveUser(user);
-            const now = this.now();
-
-            await transaction.pinRecoveryChallenge.updateMany({
-                where: { id_usuario: user.id_usuario, used_at: null },
-                data: { used_at: now },
-            });
-
-            return {
-                user,
-                challenge: await transaction.pinRecoveryChallenge.create({
-                    data: {
-                        id_usuario: user.id_usuario,
-                        code_hash: hashed.hash,
-                        code_salt: hashed.salt,
-                        expires_at: new Date(now.getTime() + RECOVERY_TTL_MS),
-                        delivery_status: "pending",
-                    },
-                }),
-            };
-        });
-
-        try {
-            await this.delivery.sendCode({
-                to: user.correo_usuario,
-                code,
-                expiresAt: challenge.expires_at,
-            });
-            await this.client.pinRecoveryChallenge.updateMany({
-                where: {
-                    id_pin_recovery_challenge:
-                        challenge.id_pin_recovery_challenge,
-                    used_at: null,
-                },
-                data: { delivery_status: "delivered" },
-            });
-        } catch (error) {
-            this.logger.error?.("pin_recovery_delivery_failure");
-            try {
-                await this.client.pinRecoveryChallenge.updateMany({
-                    where: {
-                        id_pin_recovery_challenge:
-                            challenge.id_pin_recovery_challenge,
-                    },
-                    data: { delivery_status: "failed", used_at: this.now() },
-                });
-            } catch {
-                // Do not expose persistence errors; confirmation only selects delivered challenges.
-                this.logger.error?.("pin_recovery_delivery_status_failed");
-            }
-
-            if (error instanceof PinDeliveryUnavailableError) throw new PinDeliveryUnavailableError();
-
-            throw new PinServiceError(
-                "PIN_RECOVERY_DELIVERY_FAILED",
-                "No fue posible enviar el codigo de recuperacion.",
-                { status: 503 },
-            );
-        }
-    }
-
-    async confirmRecovery(auth0UserId, code) {
-        if (!RECOVERY_CODE_PATTERN.test(String(code ?? ""))) {
-            throw new PinServiceError(
-                "PIN_RECOVERY_CODE_FORMAT_INVALID",
-                "El codigo debe contener seis digitos.",
-            );
-        }
-
-        const user = await this.findUser(auth0UserId);
-        assertActiveUser(user);
-
-        const challenge = await this.client.pinRecoveryChallenge.findFirst({
-            where: {
-                id_usuario: user.id_usuario,
-                used_at: null,
-                delivery_status: "delivered",
-            },
-            orderBy: { created_at: "desc" },
-        });
-
-        if (!challenge || challenge.expires_at <= this.now()) {
-            throw new PinServiceError(
-                "PIN_RECOVERY_CODE_EXPIRED",
-                "El codigo expiro o no existe.",
-                { status: 410 },
-            );
-        }
-
-        if (challenge.failed_attempts >= MAX_ATTEMPTS) {
-            throw new PinServiceError(
-                "PIN_RECOVERY_ATTEMPTS_EXHAUSTED",
-                "Se agotaron los intentos del codigo.",
-                { status: 429 },
-            );
-        }
-
-        if (!(await matchesHash(code, challenge.code_hash, challenge.code_salt))) {
-            const activeChallenge = {
-                id_pin_recovery_challenge:
-                    challenge.id_pin_recovery_challenge,
-                used_at: null,
-                delivery_status: "delivered",
-                expires_at: { gt: this.now() },
-            };
-            const failedAttempt = await this.client.pinRecoveryChallenge.updateMany({
-                where: {
-                    ...activeChallenge,
-                    failed_attempts: { lt: MAX_ATTEMPTS - 1 },
-                },
-                data: { failed_attempts: { increment: 1 } },
-            });
-
-            if (failedAttempt.count === 0) {
-                await this.client.pinRecoveryChallenge.updateMany({
-                    where: {
-                        ...activeChallenge,
-                        failed_attempts: MAX_ATTEMPTS - 1,
-                    },
-                    data: {
-                        failed_attempts: { increment: 1 },
-                        used_at: this.now(),
-                    },
-                });
-            }
-
-            throw new PinServiceError(
-                "PIN_RECOVERY_CODE_INVALID",
-                "El codigo ingresado no es valido.",
-            );
-        }
-
-        for (let attempt = 0; attempt < 20; attempt += 1) {
-            const credential = await this.buildCredential();
-            if (await matchesHash(credential.pin, user.pin_hash, user.pin_salt)) continue;
-
-            try {
-                const result = await this.client.$transaction(async (transaction) => {
-                    const currentUser = await this.findUserForUpdate(
-                        transaction,
-                        auth0UserId,
-                    );
-                    assertActiveUser(currentUser);
-                    // A queued transaction may acquire the lock after the code expires.
-                    const now = this.now();
-
-                    const consumed =
-                        await transaction.pinRecoveryChallenge.updateMany({
-                            where: {
-                                id_pin_recovery_challenge:
-                                    challenge.id_pin_recovery_challenge,
-                                id_usuario: currentUser.id_usuario,
-                                used_at: null,
-                                delivery_status: "delivered",
-                                expires_at: { gt: now },
-                                failed_attempts: { lt: MAX_ATTEMPTS },
-                            },
-                            data: { used_at: now },
-                        });
-
-                    if (consumed.count !== 1) {
-                        return {
-                            error: new PinServiceError(
-                                "PIN_RECOVERY_CODE_EXPIRED",
-                                "El codigo expiro o no existe.",
-                                { status: 410 },
-                            ),
-                        };
-                    }
-
-                    await transaction.usuario.update({
-                        where: { id_usuario: currentUser.id_usuario },
-                        data: credential.data,
-                    });
-                    await transaction.pinRecoveryChallenge.updateMany({
-                        where: {
-                            id_usuario: currentUser.id_usuario,
-                            used_at: null,
-                        },
-                        data: { used_at: now },
-                    });
-
-                    return { success: true };
-                });
-
-                if (result.error) throw result.error;
-                return "pending_acknowledgement";
-            } catch (error) {
-                if (error?.code !== "P2002") throw error;
-            }
-        }
-
-        throw new PinServiceError(
-            "PIN_GENERATION_FAILED",
-            "No fue posible generar un PIN unico.",
-            { status: 500 },
-        );
-    }
-
-    async invalidateByAuth0Id(auth0UserId) {
-        const user = await this.findUser(auth0UserId);
+    async invalidateBySubject(identitySubject) {
+        const user = await this.findUser(identitySubject);
         if (!user) return;
 
         await this.client.$transaction([
@@ -672,10 +425,6 @@ export class PinService {
                     pin_failed_attempts: 0,
                     pin_locked_until: null,
                 },
-            }),
-            this.client.pinRecoveryChallenge.updateMany({
-                where: { id_usuario: user.id_usuario, used_at: null },
-                data: { used_at: this.now() },
             }),
         ]);
     }

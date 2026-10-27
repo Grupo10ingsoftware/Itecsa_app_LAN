@@ -1,0 +1,13 @@
+# Usar solo junto con compose.mysql.lab.yaml para pruebas desde el computador.
+services:
+  mysql:
+    ports:
+      - "127.0.0.1:${MYSQL_HOST_PORT:-33307}:3306"
+    networks:
+      - mysql_private
+      - mysql_host
+
+networks:
+  mysql_host:
+    name: itecsa-mysql-lab-host
+    driver: bridge

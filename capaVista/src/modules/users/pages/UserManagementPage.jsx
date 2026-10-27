@@ -7,13 +7,13 @@ import UserCreateModal from '../components/UserCreateModal'
 import UserEditModal from '../components/UserEditModal'
 import UserManagementFilters from '../components/UserManagementFilters'
 import UserManagementTable from '../components/UserManagementTable'
-import UserUnlinkConfirmModal from '../components/UserUnlinkConfirmModal'
 import UserMovementsModal from '../components/UserMovementsModal'
 import UserSummaryCards from '../components/UserSummaryCards'
 import { createLatestRequestTracker } from '../utils/latestRequestTracker'
-import { isCompletedUserCreation } from '../utils/userCreationOutcome'
 import { displayUserStatus } from '../../../config/userLifecycle.js'
 import styles from './UserManagementPage.module.css'
+import PageShell from '../../../shared/components/layout/PageShell'
+import PageHeader from '../../../shared/components/layout/PageHeader'
 
 const EMPTY_SUMMARY = Object.freeze({
   totalUsuarios: 0,
@@ -39,9 +39,9 @@ function mapApiUser(user) {
     `${firstWord(nombreUsuario)} ${firstWord(apellidoUsuario)}`.trim() || nombreCompleto
 
   return {
-    id: user.idUsuarioAutenticacionExterna ?? user.idAuth0 ?? user.idUsuario,
+    id: user.idUsuarioAutenticacionExterna ?? user.idUsuario,
     idUsuario: user.idUsuario,
-    idUsuarioAutenticacionExterna: user.idUsuarioAutenticacionExterna ?? user.idAuth0,
+    idUsuarioAutenticacionExterna: user.idUsuarioAutenticacionExterna,
     nombreUsuario,
     apellidoUsuario,
     nombreCompleto,
@@ -50,10 +50,16 @@ function mapApiUser(user) {
     correoUsuario: user.correoUsuario ?? '',
     rolUsuario: user.rolUsuario ?? 'Sin rol asignado',
     estadoUsuario: displayUserStatus(user.estadoUsuario ?? 'Vinculado'),
+    username: user.username,
+    identityBindingConflict: user.identityBindingConflict === true,
   }
 }
 
 function getErrorText(error) {
+  if (['USER_UPDATE_PENDING_RECONCILIATION', 'USER_STATUS_PENDING_RECONCILIATION', 'CREDENTIAL_SETUP_PENDING_RECONCILIATION'].includes(error?.payload?.code)) {
+    return 'La operacion quedo pendiente de conciliacion. Revisa el estado de la cuenta antes de continuar.'
+  }
+  if (error?.payload?.code === 'SECURE_TRANSPORT_REQUIRED') return 'Este procedimiento requiere una conexion HTTPS.'
   if (error?.code === API_ERROR_CODES.SESSION_INVALID || error?.status === 401) {
     return 'La sesion no es valida o expiro. Vuelve a iniciar sesion para gestionar usuarios.'
   }
@@ -64,18 +70,6 @@ function getErrorText(error) {
 
   if (error?.code === API_ERROR_CODES.NETWORK_ERROR) {
     return 'No fue posible contactar la API. Revisa la conexion e intenta nuevamente.'
-  }
-
-  if (error?.payload?.code === 'AUTH0_CONFIGURATION_ERROR') {
-    return 'La configuracion Auth0 Management del backend esta incompleta.'
-  }
-
-  if (error?.payload?.code === 'AUTH0_INSUFFICIENT_SCOPE') {
-    const requiredScopes = Array.isArray(error.payload.requiredScopes)
-      ? error.payload.requiredScopes.join(', ')
-      : 'read:users, create:users, update:users, read:roles'
-
-    return `La aplicacion M2M no tiene los permisos Auth0 Management requeridos: ${requiredScopes}.`
   }
 
   if (error?.payload?.message) {
@@ -90,7 +84,7 @@ function getErrorText(error) {
 }
 
 export default function UserManagementPage() {
-  const { auth0User, loginWithRedirect } = useAuth()
+  const { identityUser, loginWithRedirect } = useAuth()
   const adminUsersApi = useAdminUsersApi()
   const latestRequestRef = useRef(0)
   const latestSummaryRequestRef = useRef(createLatestRequestTracker())
@@ -113,8 +107,13 @@ export default function UserManagementPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [movementsUser, setMovementsUser] = useState(null)
   const [editingUser, setEditingUser] = useState(null)
-  const [unlinkingUser, setUnlinkingUser] = useState(null)
-  const currentAuth0UserId = auth0User?.sub ?? null
+  const [inspectingId, setInspectingId] = useState(null)
+  const inspection = useRef({ busy: false, version: 0 })
+  useEffect(() => {
+    const tracker = inspection.current
+    return () => { tracker.version++ }
+  }, [adminUsersApi])
+  const currentExternalUserId = identityUser?.sub ?? null
 
   useEffect(() => {
     const debounceTimer = window.setTimeout(() => {
@@ -155,8 +154,8 @@ export default function UserManagementPage() {
             return {
               ...mappedUser,
               isCurrentUser: Boolean(
-                currentAuth0UserId &&
-                  mappedUser.idUsuarioAutenticacionExterna === currentAuth0UserId,
+                currentExternalUserId &&
+                  mappedUser.idUsuarioAutenticacionExterna === currentExternalUserId,
               ),
             }
           }),
@@ -176,7 +175,7 @@ export default function UserManagementPage() {
         }
       }
     },
-    [activeRole, activeStatus, adminUsersApi, currentAuth0UserId, debouncedSearchTerm, page],
+    [activeRole, activeStatus, adminUsersApi, currentExternalUserId, debouncedSearchTerm, page],
   )
 
   const loadSummary = useCallback(async () => {
@@ -194,6 +193,7 @@ export default function UserManagementPage() {
         vinculados: response.vinculados ?? 0,
         desvinculados: response.desvinculados ?? 0,
         pendientes: response.pendientes ?? 0,
+        pendientesRol: response.pendientesRol ?? 0,
       })
       setSummaryState({ error: '', hasData: true, isLoading: false })
     } catch (error) {
@@ -265,41 +265,37 @@ export default function UserManagementPage() {
     }
   }
 
-  async function handleUnlinkUser(user) {
+  async function handleCreatedUser(user) {
+    if (user.outcome === 'user_created') setIsCreateModalOpen(false)
+    setPage(1)
+    await refreshAfterMutation({ type: user.outcome === 'user_created' ? 'info' : 'warning',
+      text: user.outcome === 'user_created'
+        ? 'Usuario creado. Deberá cambiar su contraseña temporal al iniciar sesión.'
+        : 'Preparacion incompleta. No repitas el alta con otro nombre. Referencia: ' + user.operationId + '.' })
+  }
+  async function handleInspectUser(user) {
+    if (inspection.current.busy) return
+    const version = inspection.current.version
+    inspection.current.busy = true
+    setInspectingId(user.id)
     try {
-      await adminUsersApi.unlinkUser({
-        idUsuarioAutenticacionExterna: user.idUsuarioAutenticacionExterna,
-        pin: user.pin,
-      })
-      setUnlinkingUser(null)
-      await refreshAfterMutation({ type: 'success', text: 'Usuario desvinculado correctamente.' })
+      const detail = await adminUsersApi.inspectUser(user.idUsuarioAutenticacionExterna)
+      if (version !== inspection.current.version) return
+      setEditingUser({ ...user, username: detail.username, enabled: detail.enabled,
+        nombreUsuario: detail.firstName, apellidoUsuario: detail.lastName, correoUsuario: detail.email,
+        rolUsuario: detail.role, estadoUsuario: detail.localState })
     } catch (error) {
-      setActionMessage({ type: 'danger', text: getErrorText(error), requiresLogin: error?.status === 401 })
+      if (version === inspection.current.version) setActionMessage({ type: 'danger', text: getErrorText(error) })
+    } finally {
+      inspection.current.busy = false
+      if (version === inspection.current.version) setInspectingId(null)
     }
   }
 
-  async function handleCreatedUser(user) {
-    const completed = isCompletedUserCreation(user)
-    if (completed) setIsCreateModalOpen(false)
-    setPage(1)
-    await refreshAfterMutation({
-      type: completed ? 'success' : 'warning',
-      text: completed
-        ? 'Usuario creado correctamente.'
-        : 'El alta quedo incompleta y requiere conciliacion. Revisa el detalle antes de cerrar.',
-    })
-  }
-
   return (
-    <main className={`container-fluid ${styles.page}`} aria-labelledby="user-management-title">
+    <PageShell className={styles.page} aria-labelledby="user-management-title">
       <section className={styles.dashboardShell}>
-        <header className={styles.hero}>
-          <span className={styles.sectionLabel}>Administracion</span>
-          <h1 className={styles.pageTitle} id="user-management-title">
-            Gestion de usuarios
-          </h1>
-          <p className={styles.pageSubtitle}>Administra usuarios, roles y estado de vinculacion del sistema.</p>
-        </header>
+        <PageHeader title="Gestion de usuarios" titleId="user-management-title" />
 
         <UserSummaryCards
           isLoading={summaryState.isLoading}
@@ -316,6 +312,7 @@ export default function UserManagementPage() {
         )}
 
         <div className={styles.content}>
+          <p className="mb-0 text-secondary" role="status">Puedes crear usuarios y editar sus datos, rol y estado con tu PIN de autorizacion.</p>
           {actionMessage && (
             <div className={`${styles.feedbackMessage} ${styles[`feedback${actionMessage.type}`]}`} role="status">
               <span>{actionMessage.text}</span>
@@ -342,9 +339,10 @@ export default function UserManagementPage() {
           />
 
           <UserManagementTable
+            inspectingId={inspectingId}
             currentPage={page}
             isLoading={isLoading}
-            onEditUser={setEditingUser}
+            onEditUser={handleInspectUser}
             onViewMovements={setMovementsUser}
             onPageChange={setPage}
             totalPages={totalPages}
@@ -372,19 +370,9 @@ export default function UserManagementPage() {
         isOpen={Boolean(editingUser)}
         onClose={() => setEditingUser(null)}
         onSave={handleSaveUser}
-        onUnlink={(user) => {
-          setEditingUser(null)
-          setUnlinkingUser(user)
-        }}
         isCurrentUser={Boolean(editingUser?.isCurrentUser)}
         user={editingUser}
       />
-      <UserUnlinkConfirmModal
-        isOpen={Boolean(unlinkingUser)}
-        onClose={() => setUnlinkingUser(null)}
-        onConfirm={handleUnlinkUser}
-        user={unlinkingUser}
-      />
-    </main>
+    </PageShell>
   )
 }
