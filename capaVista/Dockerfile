@@ -17,7 +17,8 @@ FROM dependencies AS build
 ARG APP_VERSION=development
 COPY capaVista/ ./
 COPY shared /app/shared
-RUN npm run build && node -e "require('fs').writeFileSync('dist/version.json',JSON.stringify({version:process.argv[1]}))" "$APP_VERSION"
+# The web image does not package Keycloak themes; run Vite without the npm prebuild theme sync.
+RUN ./node_modules/.bin/vite build && node -e "require('fs').writeFileSync('dist/version.json',JSON.stringify({version:process.argv[1]}))" "$APP_VERSION"
 
 FROM nginxinc/nginx-unprivileged:stable-alpine AS production
 ARG APP_VERSION=development
