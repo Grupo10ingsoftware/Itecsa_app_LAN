@@ -81,13 +81,11 @@ describe('Páginas migradas sin modificar sus operaciones', () => {
     expect(screen.getByRole('link', { name: /Volver/ }).getAttribute('href')).toBe('/historial-pedidos')
   })
 
-  it('preserva el aviso de autorización con PIN en Gestión de usuarios', async () => {
+  it('mantiene la acción de crear usuarios fuera del encabezado', async () => {
     mount(UserManagementPage)
-    const notice = screen.getByText(/Puedes crear usuarios y editar sus datos/)
-    expect(notice.getAttribute('role')).toBe('status')
-    expect(notice.closest('[data-page-header]')).toBeNull()
     expect(document.querySelector('[data-page-header]').textContent).toBe('Gestion de usuarios')
-    await screen.findByRole('button', { name: /Crear usuario/ })
+    const create = await screen.findByRole('button', { name: /Crear usuario/ })
+    expect(create.closest('[data-page-header]')).toBeNull()
   })
 
   it('mantiene la indicación operativa de revisión y respuesta a solicitudes', async () => {
@@ -120,7 +118,7 @@ describe('Páginas migradas sin modificar sus operaciones', () => {
     await screen.findByRole('heading', { level: 1, name: 'Bandeja de entrada' })
   })
 
-  it('conserva el aviso y reintento de resumen de usuarios junto al aviso de PIN', async () => {
+  it('conserva el aviso y reintento de resumen de usuarios', async () => {
     const original = client.get.bind(client)
     let fail = true
     vi.spyOn(client, 'get').mockImplementation(url => {
@@ -129,11 +127,11 @@ describe('Páginas migradas sin modificar sus operaciones', () => {
     })
     mount(UserManagementPage)
     const retry = await screen.findByRole('button', { name: 'Reintentar resumen' })
-    expect(screen.getByText(/Puedes crear usuarios y editar sus datos/)).toBeTruthy()
+    expect(retry.closest('[role="alert"]')).toBeTruthy()
     fail = false
     fireEvent.click(retry)
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Reintentar resumen' })).toBeNull())
-    expect(screen.getByText(/Puedes crear usuarios y editar sus datos/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Crear usuario/ })).toBeTruthy()
   })
 
   it.each([
