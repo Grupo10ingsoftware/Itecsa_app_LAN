@@ -129,8 +129,12 @@ test("el Compose autonomo no incluye Aiven ni publica MySQL", () => {
   assert.doesNotMatch(compose, /aiven/i);
   const mysqlBlock = compose.slice(compose.indexOf("  mysql:"), compose.indexOf("  api:"));
   assert.doesNotMatch(mysqlBlock, /\n    ports:/);
+  assert.match(compose, /APP_ENV: \${APP_RUNTIME_ENV:-production}/);
+  assert.match(compose, /NODE_ENV: \${APP_RUNTIME_ENV:-production}/);
   assert.match(mysqlBlock, /mysql_tls:\/run\/mysql-tls:ro/);
   assert.doesNotMatch(mysqlBlock, /MYSQL_CERTS_DIR/);
   assert.match(compose, /install -o 999 -g 999 -m 0600 \/input\/server-key\.pem/);
+  assert.match(compose, /chown 1000:1000 \/run\/mysql-state\/instance\.env/);
+  assert.match(compose, /chmod 0600 \/run\/mysql-state\/instance\.env/);
   assert.ok(compose.includes("mysql_private:\n    internal: true"));
 });
