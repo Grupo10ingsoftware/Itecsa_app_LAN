@@ -62,8 +62,8 @@ services:
         APP_VERSION: ${APP_VERSION:?Definir APP_VERSION}
     env_file: ${API_ENV_FILE:-./capaServidor/.env.mysql.docker}
     environment:
-      APP_ENV: production
-      NODE_ENV: production
+      APP_ENV: ${APP_RUNTIME_ENV:-production}
+      NODE_ENV: ${APP_RUNTIME_ENV:-production}
       APP_VERSION: ${APP_VERSION}
       PORT: "3000"
       DB_TARGET: mysql-docker
@@ -157,7 +157,13 @@ services:
     volumes:
       - mysql_socket:/var/run/mysqld
       - mysql_state:/run/mysql-state
-    command: ["npm", "run", "mysql:bootstrap-accounts"]
+    command:
+      - sh
+      - -ec
+      - |
+        npm run mysql:bootstrap-accounts
+        chown 1000:1000 /run/mysql-state/instance.env
+        chmod 0600 /run/mysql-state/instance.env
 
   maintenance:
     <<: *db-tools

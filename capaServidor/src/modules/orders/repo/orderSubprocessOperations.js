@@ -8,7 +8,7 @@ export async function lockProductionOrderOperation(repository, orderId) {
     `;
 }
 
-export async function completeSubprocessOperation(repository, { orderId, detailId, subprocessId, userId, comment }) {
+export async function completeSubprocessOperation(repository, { orderId, detailId, subprocessId, userId, comment, hydrate = true }) {
   await repository.lockProductionOrder(orderId);
   const detail = await repository.client.detalle_pedido.findFirst({
     ...snapshotOmit(await supportsOrderSnapshots(repository.client)),
@@ -30,7 +30,7 @@ export async function completeSubprocessOperation(repository, { orderId, detailI
 
   if (!detail) return null;
 
-  const order = await repository.get(orderId);
+  const order = await repository.getTransitionState(orderId);
 
   if (!order) return null;
 
@@ -152,10 +152,10 @@ export async function completeSubprocessOperation(repository, { orderId, detailI
       id_estado_subproceso: Number(subprocessId),
     },
   });
-  return repository.get(orderId);
+  return hydrate ? repository.get(orderId) : { id_pedido: Number(orderId) };
 }
 
-export async function rollbackSubprocessOperation(repository, { orderId, detailId, subprocessId, userId, comment }) {
+export async function rollbackSubprocessOperation(repository, { orderId, detailId, subprocessId, userId, comment, hydrate = true }) {
   await repository.lockProductionOrder(orderId);
   const detail = await repository.client.detalle_pedido.findFirst({
     ...snapshotOmit(await supportsOrderSnapshots(repository.client)),
@@ -203,5 +203,5 @@ export async function rollbackSubprocessOperation(repository, { orderId, detailI
     id_detalle_pedido: Number(detailId),
     id_estado_subproceso: Number(subprocessId),
   } });
-  return repository.get(orderId);
+  return hydrate ? repository.get(orderId) : { id_pedido: Number(orderId) };
 }

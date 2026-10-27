@@ -1,4 +1,4 @@
-import { readSelect } from './orderReadSelect.js';
+import { listKanbanRows, getKanbanRow } from './kanbanRead.repo.js';
 import { toOrderSummaryDTO } from './orderMapping.js';
 import { stripLanyardProgressObservation } from './orderProductionRules.js';
 
@@ -110,46 +110,9 @@ function mapKanbanCommentGroups(row) {
   return { source, system, subprocesses, all: [...source, ...system, ...subprocesses] };
 }
 
-async function kanbanDetailSelect(repository) {
-  const select = await readSelect(repository.client);
-  return {
-    ...select,
-    usuario_manager_origen: true,
-    observacion_origen: true,
-    observacion_interna: true,
-    Registros: {
-      where: { registro_subprocesos: { isNot: null } },
-      orderBy: [{ FECHA_HORA: 'asc' }, { ID_REGISTRO: 'asc' }],
-      select: {
-        ID_REGISTRO: true,
-        FECHA_HORA: true,
-        observacion: true,
-        registro_subprocesos: {
-          select: {
-            id_detalle_pedido: true,
-            Estado_Subprocesos: { select: { nombre_estado: true } },
-          },
-        },
-      },
-    },
-    Detalle_pedido: {
-      ...select.Detalle_pedido,
-      select: {
-        ...select.Detalle_pedido.select,
-        Comentario_Produccion: {
-          orderBy: [{ fecha_comentario: 'asc' }, { id_comentario_produccion: 'asc' }],
-          select: {
-            id_comentario_produccion: true,
-            comentario: true,
-            fecha_comentario: true,
-          },
-        },
-      },
-    },
-  };
-}
-
 export async function listOrderViewsOperation(repository, { view, limit, cursor, status, search, productType, from, to, unscheduled = false }) {
+  if (view === 'kanban') return (await listKanbanRows(repository.client,
+    { limit, cursor, status, search, productType, from, to })).map(mapKanbanSummary);
   const where = {
     ...(cursor ? { id_pedido: { lt: cursor.id } } : {}),
     ...(view === 'kanban'
@@ -176,10 +139,10 @@ export async function listOrderViewsOperation(repository, { view, limit, cursor,
 }
 
 export async function getOrderViewOperation(repository, id, view) {
-  const row = await repository.client.pedidos.findUnique({
+  const row = view === 'calendar' ? await repository.client.pedidos.findUnique({
     where: { id_pedido: Number(id) },
-    select: view === 'calendar' ? calendarDetailSelect : await kanbanDetailSelect(repository),
-  });
+    select: calendarDetailSelect,
+  }) : await getKanbanRow(repository.client, id, { precheck: view === 'kanban-precheck' });
   if (!row) return null;
   if (view === 'calendar') return { ...mapCalendarSummary(row), seller: row.usuario_manager_origen ?? null };
   const completion = [3, 4].includes(Number(row.Estado_Pedido?.orden_kanban))

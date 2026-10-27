@@ -149,12 +149,15 @@ test('concurrent completion attempts only persist one transition and history ent
 });
 
 test('active Kanban keeps ready-for-delivery and excludes terminal orders; calendar stays available', async () => {
-  let query;
-  const repo = { client: { pedidos: { findMany: async args => { query = args; return []; } } } };
+  let query, sql;
+  const repo = { client: {
+    $queryRaw: async statement => { sql = statement.sql; return []; },
+    pedidos: { findMany: async args => { query = args; return []; } },
+  } };
   await listOrderViewsOperation(repo, { view: 'kanban', limit: 50 });
-  assert.equal(query.where.Estado_Pedido.is.orden_kanban.not, 4);
-  assert.ok(!query.where.Estado_Pedido.is.nombre_etapa.notIn.includes('Listo para entrega'));
-  assert.ok(query.where.Estado_Pedido.is.nombre_etapa.notIn.includes('Terminado'));
+  assert.match(sql, /ep\.orden_kanban <> 4/);
+  assert.ok(!sql.includes('Listo para entrega'));
+  assert.match(sql, /ep\.nombre_etapa NOT IN \('Terminado', 'Cancelado'\)/);
   await listOrderViewsOperation(repo, { view: 'calendar', limit: 50 });
   assert.equal(query.where.Estado_Pedido, undefined);
 });

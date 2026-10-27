@@ -20,7 +20,10 @@ acceso a los registros de paquetes durante el build.
    `capaVista/.env`. No deben quedar valores entre `<...>`.
 3. Mantener estable `COMPOSE_PROJECT_NAME`: identifica la instalación y
    determina sus volúmenes.
-4. Elegir `DEPLOY_IMAGE_MODE`:
+4. Mantener `APP_RUNTIME_ENV=production` para instalaciones reales. Un laboratorio
+   local que use deliberadamente Keycloak por HTTP puede seleccionar
+   `APP_RUNTIME_ENV=development`; el modo `production` seguirá rechazando HTTP.
+5. Elegir `DEPLOY_IMAGE_MODE`:
    - `build`: construye API, web y database-tools desde el clon.
    - `pull`: descarga las referencias configuradas.
    - `preloaded`: exige que todas las imágenes ya estén cargadas.

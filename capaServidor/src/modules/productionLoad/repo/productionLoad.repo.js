@@ -18,21 +18,8 @@ function isLanyardName(value) {
   return normalizeText(value).includes("lanyard");
 }
 
-function toDateKey(value) {
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(date.getUTCDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
 function toDateOnly(dateKey) {
   return new Date(`${dateKey}T00:00:00.000Z`);
-}
-
-function latestProgress(records = []) {
-  return records[0] ?? null;
 }
 
 function deduplicateEntries(entries = []) {
@@ -63,32 +50,6 @@ function firstProgressByDetail(records = []) {
   return progressByDetail;
 }
 
-function mapDetail(detail, dateKey) {
-  const todayProgress = detail.Avance_Lanyard.find((item) => toDateKey(item.fecha_produccion) === dateKey) ?? null;
-  const currentProgress = latestProgress(detail.Avance_Lanyard);
-  const quantity = Number(detail.cantidad ?? 0);
-  const accumulated = Number(currentProgress?.cantidad_acumulada ?? 0);
-  const percentage = Number(currentProgress?.porcentaje_acumulado ?? 0);
-
-  return {
-    detailId: detail.id_detalle_pedido,
-    orderId: detail.id_pedido,
-    salesNoteNumber: detail.Pedidos?.numero_nota_venta ?? null,
-    clientName: detail.Pedidos?.Cliente?.nombre_cliente ?? detail.Pedidos?.Cliente?.razon_social ?? null,
-    productType: detail.Tipo_Producto?.nombre_producto ?? null,
-    quantity,
-    dueDate: detail.fecha_estimada_termino ?? detail.Pedidos?.fecha_estimada_termino ?? null,
-    orderStatus: detail.Pedidos?.Estado_Pedido?.nombre_etapa ?? null,
-    generalStepId: detail.Pedidos?.Estado_Pedido?.orden_kanban ?? null,
-    dailyQuantity: Number(todayProgress?.cantidad_dia ?? 0),
-    accumulatedQuantity: accumulated,
-    remainingQuantity: Math.max(0, quantity - accumulated),
-    progressPercentage: percentage,
-    todayProgressId: todayProgress?.id_avance_lanyard ?? null,
-    latestProgressId: currentProgress?.id_avance_lanyard ?? null,
-  };
-}
-
 export default class ProductionLoadRepository {
   constructor({ prisma } = {}) {
     this.prisma = prisma;
@@ -105,35 +66,28 @@ export default class ProductionLoadRepository {
 
   async listLanyardDetails(dateKey) {
     const date = toDateOnly(dateKey);
-    const details = await this.client.detalle_pedido.findMany({
-      ...snapshotOmit(await supportsOrderSnapshots(this.client)),
-      where: {
-        Tipo_Producto: { nombre_producto: { contains: "Lanyard" } },
-        Pedidos: { Estado_Pedido: { orden_kanban: KANBAN_EN_PRODUCCION_STEP } },
-      },
-      include: {
-        Tipo_Producto: true,
-        Pedidos: {
-          include: {
-            Cliente: true,
-            Estado_Pedido: true,
-          },
-        },
-        Avance_Lanyard: {
-          where: { fecha_produccion: { lte: date } },
-          orderBy: [
-            { fecha_produccion: "desc" },
-            { id_avance_lanyard: "desc" },
-          ],
-        },
-      },
-      orderBy: [
-        { id_pedido: "asc" },
-        { id_detalle_pedido: "asc" },
-      ],
-    });
-
-    return details.map((detail) => mapDetail(detail, dateKey));
+    const rows = await this.client.$queryRaw`SELECT d.id_detalle_pedido, d.id_pedido, d.cantidad,
+      COALESCE(d.fecha_estimada_termino,p.fecha_estimada_termino) AS dueDate,
+      p.numero_nota_venta, c.nombre_cliente, c.razon_social, t.nombre_producto, ep.nombre_etapa, ep.orden_kanban,
+      latest.id_avance_lanyard AS latestId, latest.cantidad_acumulada, latest.porcentaje_acumulado,
+      today.id_avance_lanyard AS todayId, today.cantidad_dia
+      FROM Detalle_pedido d JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto
+      JOIN Pedidos p ON p.id_pedido=d.id_pedido JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido
+      LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente
+      LEFT JOIN Avance_Lanyard latest ON latest.id_avance_lanyard=(SELECT a.id_avance_lanyard FROM Avance_Lanyard a
+        WHERE a.id_detalle_pedido=d.id_detalle_pedido AND a.fecha_produccion<=${date}
+        ORDER BY a.fecha_produccion DESC,a.id_avance_lanyard DESC LIMIT 1)
+      LEFT JOIN Avance_Lanyard today ON today.id_detalle_pedido=d.id_detalle_pedido AND today.fecha_produccion=${date}
+      WHERE t.nombre_producto LIKE ${'%Lanyard%'} AND ep.orden_kanban=${KANBAN_EN_PRODUCCION_STEP}
+      ORDER BY d.id_pedido ASC,d.id_detalle_pedido ASC`;
+    return rows.map(row => ({ detailId: row.id_detalle_pedido, orderId: row.id_pedido,
+      salesNoteNumber: row.numero_nota_venta ?? null, clientName: row.nombre_cliente ?? row.razon_social ?? null,
+      productType: row.nombre_producto ?? null, quantity: Number(row.cantidad ?? 0), dueDate: row.dueDate ?? null,
+      orderStatus: row.nombre_etapa ?? null, generalStepId: row.orden_kanban ?? null,
+      dailyQuantity: Number(row.cantidad_dia ?? 0), accumulatedQuantity: Number(row.cantidad_acumulada ?? 0),
+      remainingQuantity: Math.max(0, Number(row.cantidad ?? 0) - Number(row.cantidad_acumulada ?? 0)),
+      progressPercentage: Number(row.porcentaje_acumulado ?? 0), todayProgressId: row.todayId ?? null, latestProgressId: row.latestId ?? null,
+    }));
   }
 
   async updateDailyLoads({ dateKey, entries, userId, capacity }) {

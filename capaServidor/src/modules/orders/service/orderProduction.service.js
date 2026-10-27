@@ -116,7 +116,7 @@ export async function updGeneralStepOperation(service, orderId, stepId, options 
   ));
 }
 
-export async function sendToReviewOperation(service, orderId, comment, { identitySubject } = {}) {
+export async function sendToReviewOperation(service, orderId, comment, { identitySubject, response } = {}) {
   const normalizedComment = typeof comment === "string" ? comment.trim() : "";
   if (!normalizedComment) {
     const error = new AppError(400, "El comentario de revision es obligatorio.");
@@ -128,7 +128,7 @@ export async function sendToReviewOperation(service, orderId, comment, { identit
     throw error;
   }
 
-  const currentOrder = await service.repo.get(orderId);
+  const currentOrder = await service.repo.getTransitionState(orderId);
   if (!currentOrder) {
     const error = new AppError(404, "Pedido no encontrado.", "ORDER_NOT_FOUND");
     throw error;
@@ -144,6 +144,7 @@ export async function sendToReviewOperation(service, orderId, comment, { identit
     const updatedOrder = await repo.sendToReview(orderId, {
       userId,
       comment: normalizedComment,
+      compact: response === 'receipt',
     });
     if (!updatedOrder) {
       const error = new AppError(404, "Pedido o estado En revisión no encontrado.");
@@ -153,7 +154,7 @@ export async function sendToReviewOperation(service, orderId, comment, { identit
   });
 }
 
-export async function cancelProductionOperation(service, orderId, comment, { actor } = {}) {
+export async function cancelProductionOperation(service, orderId, comment, { actor, response } = {}) {
   const normalizedComment = typeof comment === "string" ? comment.trim() : "";
   if (!normalizedComment) {
     const error = new AppError(400, "La observacion de cancelacion es obligatoria.");
@@ -170,7 +171,7 @@ export async function cancelProductionOperation(service, orderId, comment, { act
     throw error;
   }
 
-  const currentOrder = await service.repo.get(orderId);
+  const currentOrder = await service.repo.getTransitionState(orderId);
   if (!currentOrder) {
     const error = new AppError(404, "Pedido no encontrado.", "ORDER_NOT_FOUND");
     throw error;
@@ -185,6 +186,7 @@ export async function cancelProductionOperation(service, orderId, comment, { act
     const updatedOrder = await repo.cancelProduction(orderId, {
       userId: actor.idUsuario,
       comment: normalizedComment,
+      compact: response === 'receipt',
     });
     if (!updatedOrder) {
       const error = new AppError(404, "Pedido o estado Cancelado no encontrado.");
@@ -236,7 +238,7 @@ export async function updateDeliveryDateOperation(service, orderId, dueDate, { a
   return updatedOrder;
 }
 
-export async function completeSubprocessOperation(service, orderId, detailId, subprocessId, { actor, comment } = {}) {
+export async function completeSubprocessOperation(service, orderId, detailId, subprocessId, { actor, comment, response } = {}) {
   if (!orderId || !detailId || !subprocessId) {
     const error = new AppError(400, "Faltan IDs obligatorios para completar el subproceso.");
     throw error;
@@ -254,6 +256,7 @@ export async function completeSubprocessOperation(service, orderId, detailId, su
       subprocessId,
       userId: actor.idUsuario,
       comment,
+      hydrate: response !== 'receipt',
     });
 
     if (!updatedOrder) {
@@ -265,7 +268,7 @@ export async function completeSubprocessOperation(service, orderId, detailId, su
   });
 }
 
-export async function rollbackSubprocessOperation(service, orderId, detailId, subprocessId, { actor, comment } = {}) {
+export async function rollbackSubprocessOperation(service, orderId, detailId, subprocessId, { actor, comment, response } = {}) {
   const observation = typeof comment === "string" ? comment.trim() : "";
   if (!actor?.idUsuario) {
     const error = new AppError(403, "El usuario validado por PIN es obligatorio.");
@@ -282,7 +285,7 @@ export async function rollbackSubprocessOperation(service, orderId, detailId, su
 
   return service.runInTransaction(async ({ repo }) => {
     const result = await repo.rollbackSubprocess({
-      orderId, detailId, subprocessId, userId: actor.idUsuario, comment: observation,
+      orderId, detailId, subprocessId, userId: actor.idUsuario, comment: observation, hydrate: response !== 'receipt',
     });
     if (!result) {
       const error = new AppError(404, "Pedido o subproceso no encontrado.");

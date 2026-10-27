@@ -35,6 +35,11 @@ class OrderController {
     catch (error) { return respondError(error, req, res); }
   };
 
+  getKanbanPrecheck = async (req = request, res = response) => {
+    try { return res.status(200).json(toKanbanOrderDetailDTO(await this.service.getOrderViewById(req.params.orderId, "kanban-precheck"))); }
+    catch (error) { return respondError(error, req, res); }
+  };
+
   getCalendarDetail = async (req = request, res = response) => {
     try { return res.status(200).json(toCalendarOrderDetailDTO(await this.service.getOrderViewById(req.params.orderId, "calendar"))); }
     catch (error) { return respondError(error, req, res); }
@@ -121,7 +126,7 @@ class OrderController {
 
   sendToReview = async (req = request, res = response) => {
     try {
-      await this.service.sendToReview(req.params.orderId, req.body?.comment, { identitySubject: req.auth?.payload?.sub });
+      await this.service.sendToReview(req.params.orderId, req.body?.comment, { identitySubject: req.auth?.payload?.sub, response: 'receipt' });
       return res.status(200).json(toKanbanOrderDetailDTO(await this.service.getOrderViewById(req.params.orderId, "kanban")));
     }
     catch (error) { return respondError(error, req, res); }
@@ -129,7 +134,7 @@ class OrderController {
 
   cancelProduction = async (req = request, res = response) => {
     try {
-      await this.service.cancelProduction(req.params.orderId, req.body?.comment, { actor: req.pinActor });
+      await this.service.cancelProduction(req.params.orderId, req.body?.comment, { actor: req.pinActor, response: 'receipt' });
       return res.status(200).json(toKanbanOrderDetailDTO(await this.service.getOrderViewById(req.params.orderId, "kanban")));
     }
     catch (error) { return respondError(error, req, res); }
@@ -137,7 +142,7 @@ class OrderController {
 
   reevaluate = async (req = request, res = response) => {
     try {
-      await this.service.reevaluateOrder(req.params.orderId, { identitySubject: req.auth?.payload?.sub });
+      await this.service.reevaluateOrder(req.params.orderId, { identitySubject: req.auth?.payload?.sub, response: 'receipt' });
       return res.status(200).json(toKanbanOrderDetailDTO(await this.service.getOrderViewById(req.params.orderId, "kanban")));
     }
     catch (error) { return respondError(error, req, res); }
@@ -159,7 +164,7 @@ class OrderController {
   completeSubprocess = async (req = request, res = response) => {
     try {
       const { orderId, detailId, subprocessId } = req.params;
-      await this.service.completeSubprocess(orderId, detailId, subprocessId, { actor: req.pinActor, comment: req.body?.comment });
+      await this.service.completeSubprocess(orderId, detailId, subprocessId, { actor: req.pinActor, comment: req.body?.comment, response: 'receipt' });
       return res.status(200).json(toKanbanOrderDetailDTO(await this.service.getOrderViewById(orderId, "kanban")));
     } catch (error) { return respondError(error, req, res); }
   };
@@ -167,7 +172,7 @@ class OrderController {
   rollbackSubprocess = async (req = request, res = response) => {
     try {
       const { orderId, detailId, subprocessId } = req.params;
-      await this.service.rollbackSubprocess(orderId, detailId, subprocessId, { actor: req.pinActor, comment: req.body?.comment });
+      await this.service.rollbackSubprocess(orderId, detailId, subprocessId, { actor: req.pinActor, comment: req.body?.comment, response: 'receipt' });
       return res.status(200).json(toKanbanOrderDetailDTO(await this.service.getOrderViewById(orderId, "kanban")));
     } catch (error) { return respondError(error, req, res); }
   };

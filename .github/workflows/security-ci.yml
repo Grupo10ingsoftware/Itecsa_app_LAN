@@ -42,7 +42,7 @@ jobs:
           npm audit --omit=dev --audit-level=high --prefix capaVista
           npm audit --audit-level=critical --prefix tooling/prisma
       - name: Reject protected data artifacts
-        run: scripts/verify-data-artifacts.sh
+        run: bash scripts/verify-data-artifacts.sh
 
   secrets:
     runs-on: ubuntu-latest

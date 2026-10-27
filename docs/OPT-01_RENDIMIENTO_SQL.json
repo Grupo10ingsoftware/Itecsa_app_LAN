@@ -1,0 +1,2047 @@
+{
+  "reference": "e7c65e3",
+  "capturedAt": "2026-10-27T17:19:37.243Z",
+  "node": "v22.23.4",
+  "environment": "isolated diagnostic container / existing development MySQL / strict TLS / pool 10 / warm SELECTs",
+  "methodology": "10 sequential samples per series; 250ms pause outside clock; no p95 from n=10; no real mutations",
+  "samples": {
+    "summary_before": {
+      "n": 10,
+      "minMs": 1980.861,
+      "medianMs": 1985.202,
+      "meanMs": 1985.718,
+      "maxMs": 1994.813,
+      "values": [
+        {
+          "ms": 1982.061,
+          "selects": 8,
+          "bytes": 17648
+        },
+        {
+          "ms": 1987.894,
+          "selects": 8,
+          "bytes": 17648
+        },
+        {
+          "ms": 1987.375,
+          "selects": 8,
+          "bytes": 17648
+        },
+        {
+          "ms": 1983.319,
+          "selects": 8,
+          "bytes": 17648
+        },
+        {
+          "ms": 1980.861,
+          "selects": 8,
+          "bytes": 17648
+        },
+        {
+          "ms": 1986.086,
+          "selects": 8,
+          "bytes": 17648
+        },
+        {
+          "ms": 1984.736,
+          "selects": 8,
+          "bytes": 17648
+        },
+        {
+          "ms": 1985.668,
+          "selects": 8,
+          "bytes": 17648
+        },
+        {
+          "ms": 1994.813,
+          "selects": 8,
+          "bytes": 17648
+        },
+        {
+          "ms": 1984.372,
+          "selects": 8,
+          "bytes": 17648
+        }
+      ]
+    },
+    "summary_after": {
+      "n": 10,
+      "minMs": 581.774,
+      "medianMs": 665.243,
+      "meanMs": 656.881,
+      "maxMs": 669.685,
+      "values": [
+        {
+          "ms": 668.949,
+          "selects": 1,
+          "bytes": 17648
+        },
+        {
+          "ms": 666.22,
+          "selects": 1,
+          "bytes": 17648
+        },
+        {
+          "ms": 581.774,
+          "selects": 1,
+          "bytes": 17648
+        },
+        {
+          "ms": 652.911,
+          "selects": 1,
+          "bytes": 17648
+        },
+        {
+          "ms": 663.285,
+          "selects": 1,
+          "bytes": 17648
+        },
+        {
+          "ms": 668.867,
+          "selects": 1,
+          "bytes": 17648
+        },
+        {
+          "ms": 668.682,
+          "selects": 1,
+          "bytes": 17648
+        },
+        {
+          "ms": 664.266,
+          "selects": 1,
+          "bytes": 17648
+        },
+        {
+          "ms": 669.685,
+          "selects": 1,
+          "bytes": 17648
+        },
+        {
+          "ms": 664.175,
+          "selects": 1,
+          "bytes": 17648
+        }
+      ]
+    },
+    "detail_before": {
+      "n": 10,
+      "minMs": 3292.331,
+      "medianMs": 3294.61,
+      "meanMs": 3294.801,
+      "maxMs": 3297.823,
+      "values": [
+        {
+          "ms": 3295.036,
+          "selects": 17,
+          "bytes": 1332
+        },
+        {
+          "ms": 3293.863,
+          "selects": 17,
+          "bytes": 1332
+        },
+        {
+          "ms": 3293.277,
+          "selects": 17,
+          "bytes": 1332
+        },
+        {
+          "ms": 3296.731,
+          "selects": 17,
+          "bytes": 1332
+        },
+        {
+          "ms": 3292.477,
+          "selects": 17,
+          "bytes": 1332
+        },
+        {
+          "ms": 3295.103,
+          "selects": 17,
+          "bytes": 1332
+        },
+        {
+          "ms": 3294.184,
+          "selects": 17,
+          "bytes": 1332
+        },
+        {
+          "ms": 3297.182,
+          "selects": 17,
+          "bytes": 1332
+        },
+        {
+          "ms": 3292.331,
+          "selects": 17,
+          "bytes": 1332
+        },
+        {
+          "ms": 3297.823,
+          "selects": 17,
+          "bytes": 1332
+        }
+      ]
+    },
+    "detail_after": {
+      "n": 10,
+      "minMs": 662.093,
+      "medianMs": 665.35,
+      "meanMs": 667.539,
+      "maxMs": 675.203,
+      "values": [
+        {
+          "ms": 664.939,
+          "selects": 4,
+          "bytes": 1332
+        },
+        {
+          "ms": 665.761,
+          "selects": 4,
+          "bytes": 1332
+        },
+        {
+          "ms": 675.203,
+          "selects": 4,
+          "bytes": 1332
+        },
+        {
+          "ms": 675.124,
+          "selects": 4,
+          "bytes": 1332
+        },
+        {
+          "ms": 672.94,
+          "selects": 4,
+          "bytes": 1332
+        },
+        {
+          "ms": 669.169,
+          "selects": 4,
+          "bytes": 1332
+        },
+        {
+          "ms": 662.093,
+          "selects": 4,
+          "bytes": 1332
+        },
+        {
+          "ms": 663.555,
+          "selects": 4,
+          "bytes": 1332
+        },
+        {
+          "ms": 663.937,
+          "selects": 4,
+          "bytes": 1332
+        },
+        {
+          "ms": 662.671,
+          "selects": 4,
+          "bytes": 1332
+        }
+      ]
+    },
+    "load_before": {
+      "n": 10,
+      "minMs": 1894.348,
+      "medianMs": 1973.083,
+      "meanMs": 1953.775,
+      "maxMs": 1984.295,
+      "values": [
+        {
+          "ms": 1970.19,
+          "selects": 6,
+          "bytes": 2096
+        },
+        {
+          "ms": 1982.961,
+          "selects": 6,
+          "bytes": 2096
+        },
+        {
+          "ms": 1900.012,
+          "selects": 6,
+          "bytes": 2096
+        },
+        {
+          "ms": 1984.295,
+          "selects": 6,
+          "bytes": 2096
+        },
+        {
+          "ms": 1972.847,
+          "selects": 6,
+          "bytes": 2096
+        },
+        {
+          "ms": 1894.348,
+          "selects": 6,
+          "bytes": 2096
+        },
+        {
+          "ms": 1983.34,
+          "selects": 6,
+          "bytes": 2096
+        },
+        {
+          "ms": 1973.319,
+          "selects": 6,
+          "bytes": 2096
+        },
+        {
+          "ms": 1897.776,
+          "selects": 6,
+          "bytes": 2096
+        },
+        {
+          "ms": 1978.659,
+          "selects": 6,
+          "bytes": 2096
+        }
+      ]
+    },
+    "load_after": {
+      "n": 10,
+      "minMs": 577.432,
+      "medianMs": 663.75,
+      "meanMs": 654.794,
+      "maxMs": 668.177,
+      "values": [
+        {
+          "ms": 665.689,
+          "selects": 1,
+          "bytes": 2096
+        },
+        {
+          "ms": 651.749,
+          "selects": 1,
+          "bytes": 2096
+        },
+        {
+          "ms": 668.177,
+          "selects": 1,
+          "bytes": 2096
+        },
+        {
+          "ms": 661.241,
+          "selects": 1,
+          "bytes": 2096
+        },
+        {
+          "ms": 662.506,
+          "selects": 1,
+          "bytes": 2096
+        },
+        {
+          "ms": 664.63,
+          "selects": 1,
+          "bytes": 2096
+        },
+        {
+          "ms": 666.7,
+          "selects": 1,
+          "bytes": 2096
+        },
+        {
+          "ms": 577.432,
+          "selects": 1,
+          "bytes": 2096
+        },
+        {
+          "ms": 666.949,
+          "selects": 1,
+          "bytes": 2096
+        },
+        {
+          "ms": 662.869,
+          "selects": 1,
+          "bytes": 2096
+        }
+      ]
+    },
+    "precheck_after": {
+      "n": 10,
+      "minMs": 660.658,
+      "medianMs": 663.392,
+      "meanMs": 664.021,
+      "maxMs": 667.854,
+      "values": [
+        {
+          "ms": 662.496,
+          "selects": 2,
+          "bytes": 1332
+        },
+        {
+          "ms": 663.007,
+          "selects": 2,
+          "bytes": 1332
+        },
+        {
+          "ms": 666.548,
+          "selects": 2,
+          "bytes": 1332
+        },
+        {
+          "ms": 663.747,
+          "selects": 2,
+          "bytes": 1332
+        },
+        {
+          "ms": 667.854,
+          "selects": 2,
+          "bytes": 1332
+        },
+        {
+          "ms": 664.631,
+          "selects": 2,
+          "bytes": 1332
+        },
+        {
+          "ms": 660.658,
+          "selects": 2,
+          "bytes": 1332
+        },
+        {
+          "ms": 665.874,
+          "selects": 2,
+          "bytes": 1332
+        },
+        {
+          "ms": 662.354,
+          "selects": 2,
+          "bytes": 1332
+        },
+        {
+          "ms": 663.038,
+          "selects": 2,
+          "bytes": 1332
+        }
+      ]
+    }
+  },
+  "sql": {
+    "summary_before": [
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_estimada_termino`, `Pedidos`.`id_cliente`, `Pedidos`.`id_estado_pedido`, `Pedidos`.`id_estado_pago`, `Pedidos`.`fecha_creacion` FROM `Pedidos` LEFT JOIN `Estado_Pedido` AS `j0` ON (`j0`.`id_estado_pedido`) = (`Pedidos`.`id_estado_pedido`) WHERE (`j0`.`nombre_etapa` NOT IN (?,?) AND (`j0`.`id_estado_pedido` IS NOT NULL)) ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "SELECT `Estado_Pedido`.`id_estado_pedido`, `Estado_Pedido`.`orden_kanban`, `Estado_Pedido`.`nombre_etapa` FROM `Estado_Pedido` WHERE `Estado_Pedido`.`id_estado_pedido` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Detalle_pedido`.`id_detalle_pedido`, `Detalle_pedido`.`cantidad`, `Detalle_pedido`.`fecha_estimada_termino`, `Detalle_pedido`.`id_tipo_producto`, `Detalle_pedido`.`id_pedido` FROM `Detalle_pedido` WHERE `Detalle_pedido`.`id_pedido` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Estado_Pago`.`id_estado_pago`, `Estado_Pago`.`nombre_estado_pago` FROM `Estado_Pago` WHERE `Estado_Pago`.`id_estado_pago` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Pedido_Etiqueta`.`id_pedido`, `Pedido_Etiqueta`.`id_etiqueta` FROM `Pedido_Etiqueta` WHERE `Pedido_Etiqueta`.`id_pedido` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Tipo_Producto`.`id_tipo_producto`, `Tipo_Producto`.`nombre_producto` FROM `Tipo_Producto` WHERE `Tipo_Producto`.`id_tipo_producto` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `etiqueta`.`id_etiqueta`, `etiqueta`.`nombre_etiqueta` FROM `etiqueta` WHERE `etiqueta`.`id_etiqueta` IN (?,?,?,?,?,?,?,?,?,?,?,?)"
+    ],
+    "summary_after": [
+      "WITH page AS (\n    SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino,\n  p.id_estado_pago, c.nombre_cliente, c.razon_social, ep.orden_kanban, ep.nombre_etapa,\n  pay.nombre_estado_pago,\n  COALESCE((SELECT JSON_ARRAYAGG(JSON_OBJECT('id_etiqueta', t.id_etiqueta, 'nombre_etiqueta', t.nombre_etiqueta))\n    FROM Pedido_Etiqueta pe JOIN etiqueta t ON t.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=p.id_pedido), JSON_ARRAY()) AS labels FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n  LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n  LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago\n    WHERE ep.nombre_etapa NOT IN ('Terminado', 'Cancelado') ORDER BY p.id_pedido DESC LIMIT ?\n  ) SELECT page.*, d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino AS detailDueDate, t.nombre_producto\n    FROM page LEFT JOIN Detalle_pedido d ON d.id_pedido=page.id_pedido\n    LEFT JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n    ORDER BY page.id_pedido DESC, d.id_detalle_pedido ASC"
+    ],
+    "detail_before": [
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`id_estado_pedido`, `Pedidos`.`id_estado_pago`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`fecha_estimada_termino`, `Pedidos`.`id_cliente`, `Pedidos`.`usuario_manager_origen`, `Pedidos`.`observacion_origen`, `Pedidos`.`observacion_interna` FROM `Pedidos` WHERE (`Pedidos`.`id_pedido` = ? AND 1=1) LIMIT ? OFFSET ?",
+      "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social` FROM `Cliente` WHERE `Cliente`.`id_cliente` = ?",
+      "SELECT `Detalle_pedido`.`id_detalle_pedido`, `Detalle_pedido`.`id_tipo_producto`, `Detalle_pedido`.`cantidad`, `Detalle_pedido`.`fecha_estimada_termino`, `Detalle_pedido`.`fecha_real_termino`, `Detalle_pedido`.`id_estado_subproceso`, `Detalle_pedido`.`id_pedido` FROM `Detalle_pedido` WHERE `Detalle_pedido`.`id_pedido` = ?",
+      "SELECT `Estado_Pago`.`id_estado_pago`, `Estado_Pago`.`nombre_estado_pago` FROM `Estado_Pago` WHERE `Estado_Pago`.`id_estado_pago` = ?",
+      "SELECT `Estado_Pedido`.`id_estado_pedido`, `Estado_Pedido`.`orden_kanban`, `Estado_Pedido`.`nombre_etapa` FROM `Estado_Pedido` WHERE `Estado_Pedido`.`id_estado_pedido` = ?",
+      "SELECT `Pedido_Etiqueta`.`id_pedido`, `Pedido_Etiqueta`.`id_etiqueta` FROM `Pedido_Etiqueta` WHERE `Pedido_Etiqueta`.`id_pedido` = ?",
+      "SELECT `Registros`.`ID_REGISTRO`, `Registros`.`FECHA_HORA`, `Registros`.`observacion`, `Registros`.`id_pedido` FROM `Registros` LEFT JOIN `registro_subprocesos` AS `j0` ON (`j0`.`id_registro`) = (`Registros`.`ID_REGISTRO`) WHERE ((NOT (`j0`.`id_registro` IS NULL)) AND `Registros`.`id_pedido` = ?) ORDER BY `Registros`.`FECHA_HORA` ASC, `Registros`.`ID_REGISTRO` ASC",
+      "SELECT `Pedido_Item_Sin_Seguimiento`.`id_item_sin_seguimiento`, `Pedido_Item_Sin_Seguimiento`.`codigo`, `Pedido_Item_Sin_Seguimiento`.`producto`, `Pedido_Item_Sin_Seguimiento`.`cantidad`, `Pedido_Item_Sin_Seguimiento`.`subfamilia`, `Pedido_Item_Sin_Seguimiento`.`id_pedido` FROM `Pedido_Item_Sin_Seguimiento` WHERE `Pedido_Item_Sin_Seguimiento`.`id_pedido` = ?",
+      "SELECT `Comentario_Produccion`.`id_comentario_produccion`, `Comentario_Produccion`.`comentario`, `Comentario_Produccion`.`fecha_comentario`, `Comentario_Produccion`.`id_detalle_pedido` FROM `Comentario_Produccion` WHERE `Comentario_Produccion`.`id_detalle_pedido` IN (?) ORDER BY `Comentario_Produccion`.`fecha_comentario` ASC, `Comentario_Produccion`.`id_comentario_produccion` ASC",
+      "SELECT `etiqueta`.`id_etiqueta`, `etiqueta`.`nombre_etiqueta` FROM `etiqueta` WHERE `etiqueta`.`id_etiqueta` IN (?,?)",
+      "SELECT `registro_subprocesos`.`id_registro`, `registro_subprocesos`.`id_detalle_pedido`, `registro_subprocesos`.`id_estado_subproceso` FROM `registro_subprocesos` WHERE `registro_subprocesos`.`id_registro` IN (NULL)",
+      "SELECT `Tipo_Producto`.`id_tipo_producto`, `Tipo_Producto`.`nombre_producto`, `Tipo_Producto`.`descripcion_producto` FROM `Tipo_Producto` WHERE `Tipo_Producto`.`id_tipo_producto` IN (?)",
+      "SELECT `Estado_Subprocesos`.`id_estado_subproceso`, `Estado_Subprocesos`.`nombre_estado` FROM `Estado_Subprocesos` WHERE `Estado_Subprocesos`.`id_estado_subproceso` IN (?)",
+      "SELECT `Avance_Lanyard`.`id_avance_lanyard`, `Avance_Lanyard`.`cantidad_acumulada`, `Avance_Lanyard`.`porcentaje_acumulado`, `Avance_Lanyard`.`fecha_actualizacion`, `Avance_Lanyard`.`fecha_produccion`, `Avance_Lanyard`.`id_detalle_pedido` FROM `Avance_Lanyard` WHERE `Avance_Lanyard`.`id_detalle_pedido` IN (?) ORDER BY `Avance_Lanyard`.`fecha_produccion` DESC, `Avance_Lanyard`.`id_avance_lanyard` DESC",
+      "SELECT `Estado_Subprocesos`.`id_estado_subproceso`, `Estado_Subprocesos`.`nombre_estado` FROM `Estado_Subprocesos` WHERE `Estado_Subprocesos`.`id_estado_subproceso` IN (NULL)",
+      "SELECT `Producto_Subproceso`.`id_tipo_producto`, `Producto_Subproceso`.`id_estado_subproceso`, `Producto_Subproceso`.`orden_flujo` FROM `Producto_Subproceso` WHERE `Producto_Subproceso`.`id_tipo_producto` IN (?) ORDER BY `Producto_Subproceso`.`orden_flujo` ASC",
+      "SELECT `Estado_Subprocesos`.`id_estado_subproceso`, `Estado_Subprocesos`.`nombre_estado` FROM `Estado_Subprocesos` WHERE `Estado_Subprocesos`.`id_estado_subproceso` IN (?,?,?,?,?)"
+    ],
+    "detail_after": [
+      "SELECT cp.id_comentario_produccion, cp.comentario, cp.fecha_comentario, cp.id_detalle_pedido\n      FROM Comentario_Produccion cp JOIN Detalle_pedido d ON d.id_detalle_pedido=cp.id_detalle_pedido\n      WHERE d.id_pedido=? ORDER BY cp.id_detalle_pedido ASC, cp.fecha_comentario ASC, cp.id_comentario_produccion ASC",
+      "SELECT d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino, d.fecha_real_termino,\n      d.id_estado_subproceso, t.nombre_producto, f.id_estado_subproceso AS flowId, f.orden_flujo, s.nombre_estado,\n      a.id_avance_lanyard, a.cantidad_acumulada, a.porcentaje_acumulado, a.fecha_actualizacion, a.fecha_produccion\n      FROM Detalle_pedido d LEFT JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n      LEFT JOIN Producto_Subproceso f ON f.id_tipo_producto=t.id_tipo_producto\n      LEFT JOIN Estado_Subprocesos s ON s.id_estado_subproceso=f.id_estado_subproceso\n      LEFT JOIN Avance_Lanyard a ON a.id_avance_lanyard=(SELECT latest.id_avance_lanyard FROM Avance_Lanyard latest\n        WHERE latest.id_detalle_pedido=d.id_detalle_pedido ORDER BY latest.fecha_produccion DESC, latest.id_avance_lanyard DESC LIMIT 1)\n      WHERE d.id_pedido=? ORDER BY d.id_detalle_pedido ASC, f.orden_flujo ASC",
+      "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino,\n  p.id_estado_pago, c.nombre_cliente, c.razon_social, ep.orden_kanban, ep.nombre_etapa,\n  pay.nombre_estado_pago,\n  COALESCE((SELECT JSON_ARRAYAGG(JSON_OBJECT('id_etiqueta', t.id_etiqueta, 'nombre_etiqueta', t.nombre_etiqueta))\n    FROM Pedido_Etiqueta pe JOIN etiqueta t ON t.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=p.id_pedido), JSON_ARRAY()) AS labels, p.usuario_manager_origen, p.observacion_origen, p.observacion_interna\n      FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n  LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n  LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago WHERE p.id_pedido=? LIMIT 1",
+      "SELECT r.ID_REGISTRO, r.FECHA_HORA, r.observacion, s.id_detalle_pedido, es.nombre_estado\n      FROM Registros r JOIN registro_subprocesos s ON s.id_registro=r.ID_REGISTRO\n      LEFT JOIN Estado_Subprocesos es ON es.id_estado_subproceso=s.id_estado_subproceso\n      WHERE r.id_pedido=? ORDER BY r.FECHA_HORA ASC, r.ID_REGISTRO ASC"
+    ],
+    "load_before": [
+      "SELECT `Detalle_pedido`.`id_detalle_pedido`, `Detalle_pedido`.`cantidad`, `Detalle_pedido`.`fecha_estimada_termino`, `Detalle_pedido`.`fecha_real_termino`, `Detalle_pedido`.`id_pedido`, `Detalle_pedido`.`id_tipo_producto`, `Detalle_pedido`.`id_estado_subproceso` FROM `Detalle_pedido` LEFT JOIN `Tipo_Producto` AS `j0` ON (`j0`.`id_tipo_producto`) = (`Detalle_pedido`.`id_tipo_producto`) LEFT JOIN `Pedidos` AS `j1` ON (`j1`.`id_pedido`) = (`Detalle_pedido`.`id_pedido`) LEFT JOIN `Estado_Pedido` AS `j2` ON (`j2`.`id_estado_pedido`) = (`j1`.`id_estado_pedido`) WHERE ((`j0`.`nombre_producto` LIKE CONCAT('%', ?, '%') AND (`j0`.`id_tipo_producto` IS NOT NULL)) AND (`j2`.`orden_kanban` = ? AND (`j2`.`id_estado_pedido` IS NOT NULL) AND (`j1`.`id_pedido` IS NOT NULL))) ORDER BY `Detalle_pedido`.`id_pedido` ASC, `Detalle_pedido`.`id_detalle_pedido` ASC",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`fecha_creacion`, `Pedidos`.`fecha_estimada_termino`, `Pedidos`.`id_usuario`, `Pedidos`.`id_estado_pedido`, `Pedidos`.`id_estado_pago`, `Pedidos`.`id_cliente`, `Pedidos`.`id_etiqueta`, `Pedidos`.`observacion`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`usuario_manager_origen`, `Pedidos`.`observacion_origen`, `Pedidos`.`observacion_interna` FROM `Pedidos` WHERE `Pedidos`.`id_pedido` IN (?,?,?,?,?,?)",
+      "SELECT `Tipo_Producto`.`id_tipo_producto`, `Tipo_Producto`.`nombre_producto`, `Tipo_Producto`.`descripcion_producto`, `Tipo_Producto`.`capacidad_diaria` FROM `Tipo_Producto` WHERE `Tipo_Producto`.`id_tipo_producto` IN (?,?,?,?,?,?)",
+      "SELECT `Avance_Lanyard`.`id_avance_lanyard`, `Avance_Lanyard`.`id_detalle_pedido`, `Avance_Lanyard`.`fecha_produccion`, `Avance_Lanyard`.`cantidad_dia`, `Avance_Lanyard`.`cantidad_acumulada`, `Avance_Lanyard`.`porcentaje_acumulado`, `Avance_Lanyard`.`capacidad_diaria_referencia`, `Avance_Lanyard`.`id_usuario_registra`, `Avance_Lanyard`.`id_registro_subproceso`, `Avance_Lanyard`.`observacion`, `Avance_Lanyard`.`fecha_registro`, `Avance_Lanyard`.`fecha_actualizacion` FROM `Avance_Lanyard` WHERE (`Avance_Lanyard`.`fecha_produccion` <= ? AND `Avance_Lanyard`.`id_detalle_pedido` IN (?,?,?,?,?,?)) ORDER BY `Avance_Lanyard`.`fecha_produccion` DESC, `Avance_Lanyard`.`id_avance_lanyard` DESC",
+      "SELECT `Cliente`.`id_cliente`, `Cliente`.`rut_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social`, `Cliente`.`estado_cliente` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?,?,?,?,?)",
+      "SELECT `Estado_Pedido`.`id_estado_pedido`, `Estado_Pedido`.`nombre_etapa`, `Estado_Pedido`.`orden_kanban`, `Estado_Pedido`.`descripcion_estado` FROM `Estado_Pedido` WHERE `Estado_Pedido`.`id_estado_pedido` IN (?,?,?,?,?,?)"
+    ],
+    "load_after": [
+      "SELECT d.id_detalle_pedido, d.id_pedido, d.cantidad,\n      COALESCE(d.fecha_estimada_termino,p.fecha_estimada_termino) AS dueDate,\n      p.numero_nota_venta, c.nombre_cliente, c.razon_social, t.nombre_producto, ep.nombre_etapa, ep.orden_kanban,\n      latest.id_avance_lanyard AS latestId, latest.cantidad_acumulada, latest.porcentaje_acumulado,\n      today.id_avance_lanyard AS todayId, today.cantidad_dia\n      FROM Detalle_pedido d JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n      JOIN Pedidos p ON p.id_pedido=d.id_pedido JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n      LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n      LEFT JOIN Avance_Lanyard latest ON latest.id_avance_lanyard=(SELECT a.id_avance_lanyard FROM Avance_Lanyard a\n        WHERE a.id_detalle_pedido=d.id_detalle_pedido AND a.fecha_produccion<=?\n        ORDER BY a.fecha_produccion DESC,a.id_avance_lanyard DESC LIMIT 1)\n      LEFT JOIN Avance_Lanyard today ON today.id_detalle_pedido=d.id_detalle_pedido AND today.fecha_produccion=?\n      WHERE t.nombre_producto LIKE ? AND ep.orden_kanban=?\n      ORDER BY d.id_pedido ASC,d.id_detalle_pedido ASC"
+    ],
+    "precheck_after": [
+      "SELECT d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino, d.fecha_real_termino,\n      d.id_estado_subproceso, t.nombre_producto, f.id_estado_subproceso AS flowId, f.orden_flujo, s.nombre_estado,\n      a.id_avance_lanyard, a.cantidad_acumulada, a.porcentaje_acumulado, a.fecha_actualizacion, a.fecha_produccion\n      FROM Detalle_pedido d LEFT JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n      LEFT JOIN Producto_Subproceso f ON f.id_tipo_producto=t.id_tipo_producto\n      LEFT JOIN Estado_Subprocesos s ON s.id_estado_subproceso=f.id_estado_subproceso\n      LEFT JOIN Avance_Lanyard a ON a.id_avance_lanyard=(SELECT latest.id_avance_lanyard FROM Avance_Lanyard latest\n        WHERE latest.id_detalle_pedido=d.id_detalle_pedido ORDER BY latest.fecha_produccion DESC, latest.id_avance_lanyard DESC LIMIT 1)\n      WHERE d.id_pedido=? ORDER BY d.id_detalle_pedido ASC, f.orden_flujo ASC",
+      "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino,\n  p.id_estado_pago, c.nombre_cliente, c.razon_social, ep.orden_kanban, ep.nombre_etapa,\n  pay.nombre_estado_pago,\n  COALESCE((SELECT JSON_ARRAYAGG(JSON_OBJECT('id_etiqueta', t.id_etiqueta, 'nombre_etiqueta', t.nombre_etiqueta))\n    FROM Pedido_Etiqueta pe JOIN etiqueta t ON t.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=p.id_pedido), JSON_ARRAY()) AS labels, p.usuario_manager_origen, p.observacion_origen, p.observacion_interna\n      FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n  LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n  LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago WHERE p.id_pedido=? LIMIT 1"
+    ]
+  },
+  "equivalence": [
+    "summary_0",
+    "summary_1",
+    "summary_2",
+    "summary_3",
+    "summary_4",
+    "summary_5",
+    "summary_6",
+    "summary_7",
+    "summary_8",
+    "summary_9",
+    "summary_10",
+    "summary_11",
+    "summary_12",
+    "detail_and_precheck_0",
+    "detail_and_precheck_1",
+    "detail_and_precheck_2",
+    "detail_and_precheck_3",
+    "missing_detail",
+    "daily_load_date",
+    "daily_load_date",
+    "daily_load_date"
+  ],
+  "errors": 0,
+  "publicPayloadBytes": {
+    "summary": 18596,
+    "detail": 1236,
+    "precheck": 1236
+  },
+  "explain": [
+    {
+      "sql": "WITH page AS (\n    SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino,\n  p.id_estado_pago, c.nombre_cliente, c.razon_social, ep.orden_kanban, ep.nombre_etapa,\n  pay.nombre_estado_pago,\n  COALESCE((SELECT JSON_ARRAYAGG(JSON_OBJECT('id_etiqueta', t.id_etiqueta, 'nombre_etiqueta', t.nombre_etiqueta))\n    FROM Pedido_Etiqueta pe JOIN etiqueta t ON t.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=p.id_pedido), JSON_ARRAY()) AS labels FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n  LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n  LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago\n    WHERE ep.nombre_etapa NOT IN ('Terminado', 'Cancelado') ORDER BY p.id_pedido DESC LIMIT ?\n  ) SELECT page.*, d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino AS detailDueDate, t.nombre_producto\n    FROM page LEFT JOIN Detalle_pedido d ON d.id_pedido=page.id_pedido\n    LEFT JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n    ORDER BY page.id_pedido DESC, d.id_detalle_pedido ASC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "<derived2>",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "51",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "d",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "page.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "p",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "id_estado_pedido_idx",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 71.42857360839844,
+          "Extra": "Using where"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "pay",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "pe",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Pedido_Etiqueta_Etiqueta_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index"
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.pe.id_etiqueta",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "WITH page AS (\n    SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino,\n  p.id_estado_pago, c.nombre_cliente, c.razon_social, ep.orden_kanban, ep.nombre_etapa,\n  pay.nombre_estado_pago,\n  COALESCE((SELECT JSON_ARRAYAGG(JSON_OBJECT('id_etiqueta', t.id_etiqueta, 'nombre_etiqueta', t.nombre_etiqueta))\n    FROM Pedido_Etiqueta pe JOIN etiqueta t ON t.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=p.id_pedido), JSON_ARRAY()) AS labels FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n  LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n  LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago\n    WHERE ep.nombre_etapa NOT IN ('Terminado', 'Cancelado') AND p.id_pedido < ? ORDER BY p.id_pedido DESC LIMIT ?\n  ) SELECT page.*, d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino AS detailDueDate, t.nombre_producto\n    FROM page LEFT JOIN Detalle_pedido d ON d.id_pedido=page.id_pedido\n    LEFT JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n    ORDER BY page.id_pedido DESC, d.id_detalle_pedido ASC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "<derived2>",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "51",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "d",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "page.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "p",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY,id_estado_pedido_idx,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 71.42857360839844,
+          "Extra": "Using where"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "pay",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "pe",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Pedido_Etiqueta_Etiqueta_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index"
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.pe.id_etiqueta",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "WITH page AS (\n    SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino,\n  p.id_estado_pago, c.nombre_cliente, c.razon_social, ep.orden_kanban, ep.nombre_etapa,\n  pay.nombre_estado_pago,\n  COALESCE((SELECT JSON_ARRAYAGG(JSON_OBJECT('id_etiqueta', t.id_etiqueta, 'nombre_etiqueta', t.nombre_etiqueta))\n    FROM Pedido_Etiqueta pe JOIN etiqueta t ON t.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=p.id_pedido), JSON_ARRAY()) AS labels FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n  LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n  LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago\n    WHERE ep.nombre_etapa NOT IN ('Terminado', 'Cancelado') AND ep.nombre_etapa = ? ORDER BY p.id_pedido DESC LIMIT ?\n  ) SELECT page.*, d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino AS detailDueDate, t.nombre_producto\n    FROM page LEFT JOIN Detalle_pedido d ON d.id_pedido=page.id_pedido\n    LEFT JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n    ORDER BY page.id_pedido DESC, d.id_detalle_pedido ASC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "<derived2>",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "29",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "d",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "page.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "ep",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "7",
+          "filtered": 14.285713195800781,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "p",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_estado_pedido_idx",
+          "key": "id_estado_pedido_idx",
+          "key_len": "5",
+          "ref": "mydb.ep.id_estado_pedido",
+          "rows": "9",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "pay",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "pe",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Pedido_Etiqueta_Etiqueta_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index"
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.pe.id_etiqueta",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "WITH page AS (\n    SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino,\n  p.id_estado_pago, c.nombre_cliente, c.razon_social, ep.orden_kanban, ep.nombre_etapa,\n  pay.nombre_estado_pago,\n  COALESCE((SELECT JSON_ARRAYAGG(JSON_OBJECT('id_etiqueta', t.id_etiqueta, 'nombre_etiqueta', t.nombre_etiqueta))\n    FROM Pedido_Etiqueta pe JOIN etiqueta t ON t.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=p.id_pedido), JSON_ARRAY()) AS labels FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n  LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n  LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago\n    WHERE ep.nombre_etapa NOT IN ('Terminado', 'Cancelado') AND (p.numero_nota_venta LIKE ? OR c.nombre_cliente LIKE ? OR c.razon_social LIKE ?) ORDER BY p.id_pedido DESC LIMIT ?\n  ) SELECT page.*, d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino AS detailDueDate, t.nombre_producto\n    FROM page LEFT JOIN Detalle_pedido d ON d.id_pedido=page.id_pedido\n    LEFT JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n    ORDER BY page.id_pedido DESC, d.id_detalle_pedido ASC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "<derived2>",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "51",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "d",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "page.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "p",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "id_estado_pedido_idx",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 71.42857360839844,
+          "Extra": "Using where"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 99.99999237060547,
+          "Extra": "Using where"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "pay",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "pe",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Pedido_Etiqueta_Etiqueta_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index"
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.pe.id_etiqueta",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "WITH page AS (\n    SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino,\n  p.id_estado_pago, c.nombre_cliente, c.razon_social, ep.orden_kanban, ep.nombre_etapa,\n  pay.nombre_estado_pago,\n  COALESCE((SELECT JSON_ARRAYAGG(JSON_OBJECT('id_etiqueta', t.id_etiqueta, 'nombre_etiqueta', t.nombre_etiqueta))\n    FROM Pedido_Etiqueta pe JOIN etiqueta t ON t.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=p.id_pedido), JSON_ARRAY()) AS labels FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n  LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n  LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago\n    WHERE ep.nombre_etapa NOT IN ('Terminado', 'Cancelado') AND EXISTS (SELECT 1 FROM Detalle_pedido fd\n    JOIN Tipo_Producto ft ON ft.id_tipo_producto=fd.id_tipo_producto\n    WHERE fd.id_pedido=p.id_pedido AND ft.nombre_producto LIKE ?) ORDER BY p.id_pedido DESC LIMIT ?\n  ) SELECT page.*, d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino AS detailDueDate, t.nombre_producto\n    FROM page LEFT JOIN Detalle_pedido d ON d.id_pedido=page.id_pedido\n    LEFT JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n    ORDER BY page.id_pedido DESC, d.id_detalle_pedido ASC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "<derived2>",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "2",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "d",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "page.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "<subquery4>",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": null,
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "p",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,id_estado_pedido_idx,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "<subquery4>.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "ep",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "7",
+          "filtered": 14.285713195800781,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "pay",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "4",
+          "select_type": "MATERIALIZED",
+          "table": "ft",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "5",
+          "filtered": 20,
+          "Extra": "Using where"
+        },
+        {
+          "id": "4",
+          "select_type": "MATERIALIZED",
+          "table": "fd",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_tipo_producto_idx,id_pedido_idx",
+          "key": "id_tipo_producto_idx",
+          "key_len": "5",
+          "ref": "mydb.ft.id_tipo_producto",
+          "rows": "23",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "pe",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Pedido_Etiqueta_Etiqueta_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index"
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.pe.id_etiqueta",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "WITH page AS (\n    SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino,\n  p.id_estado_pago, c.nombre_cliente, c.razon_social, ep.orden_kanban, ep.nombre_etapa,\n  pay.nombre_estado_pago,\n  COALESCE((SELECT JSON_ARRAYAGG(JSON_OBJECT('id_etiqueta', t.id_etiqueta, 'nombre_etiqueta', t.nombre_etiqueta))\n    FROM Pedido_Etiqueta pe JOIN etiqueta t ON t.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=p.id_pedido), JSON_ARRAY()) AS labels FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n  LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n  LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago\n    WHERE ep.nombre_etapa NOT IN ('Terminado', 'Cancelado') AND (p.numero_nota_venta LIKE ? OR c.nombre_cliente LIKE ? OR c.razon_social LIKE ?) AND EXISTS (SELECT 1 FROM Detalle_pedido fd\n    JOIN Tipo_Producto ft ON ft.id_tipo_producto=fd.id_tipo_producto\n    WHERE fd.id_pedido=p.id_pedido AND ft.nombre_producto LIKE ?) ORDER BY p.id_pedido DESC LIMIT ?\n  ) SELECT page.*, d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino AS detailDueDate, t.nombre_producto\n    FROM page LEFT JOIN Detalle_pedido d ON d.id_pedido=page.id_pedido\n    LEFT JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n    ORDER BY page.id_pedido DESC, d.id_detalle_pedido ASC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "<derived2>",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "2",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "d",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "page.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "<subquery4>",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": null,
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "p",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,id_estado_pedido_idx,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "<subquery4>.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "ep",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "7",
+          "filtered": 14.285713195800781,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "pay",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 99.99999237060547,
+          "Extra": "Using where"
+        },
+        {
+          "id": "4",
+          "select_type": "MATERIALIZED",
+          "table": "ft",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "5",
+          "filtered": 20,
+          "Extra": "Using where"
+        },
+        {
+          "id": "4",
+          "select_type": "MATERIALIZED",
+          "table": "fd",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_tipo_producto_idx,id_pedido_idx",
+          "key": "id_tipo_producto_idx",
+          "key_len": "5",
+          "ref": "mydb.ft.id_tipo_producto",
+          "rows": "23",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "pe",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Pedido_Etiqueta_Etiqueta_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index"
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.pe.id_etiqueta",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "WITH page AS (\n    SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino,\n  p.id_estado_pago, c.nombre_cliente, c.razon_social, ep.orden_kanban, ep.nombre_etapa,\n  pay.nombre_estado_pago,\n  COALESCE((SELECT JSON_ARRAYAGG(JSON_OBJECT('id_etiqueta', t.id_etiqueta, 'nombre_etiqueta', t.nombre_etiqueta))\n    FROM Pedido_Etiqueta pe JOIN etiqueta t ON t.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=p.id_pedido), JSON_ARRAY()) AS labels FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n  LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n  LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago\n    WHERE ep.nombre_etapa NOT IN ('Terminado', 'Cancelado') AND p.fecha_estimada_termino >= ? AND p.fecha_estimada_termino < ? ORDER BY p.id_pedido DESC LIMIT ?\n  ) SELECT page.*, d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino AS detailDueDate, t.nombre_producto\n    FROM page LEFT JOIN Detalle_pedido d ON d.id_pedido=page.id_pedido\n    LEFT JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n    ORDER BY page.id_pedido DESC, d.id_detalle_pedido ASC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "<derived2>",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "d",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "page.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "p",
+          "partitions": null,
+          "type": "index",
+          "possible_keys": "id_estado_pedido_idx",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 11.108888626098633,
+          "Extra": "Using where; Backward index scan"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 71.42857360839844,
+          "Extra": "Using where"
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "pay",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pago",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DERIVED",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "pe",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Pedido_Etiqueta_Etiqueta_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index"
+        },
+        {
+          "id": "3",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.pe.id_etiqueta",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion, p.fecha_estimada_termino,\n  p.id_estado_pago, c.nombre_cliente, c.razon_social, ep.orden_kanban, ep.nombre_etapa,\n  pay.nombre_estado_pago,\n  COALESCE((SELECT JSON_ARRAYAGG(JSON_OBJECT('id_etiqueta', t.id_etiqueta, 'nombre_etiqueta', t.nombre_etiqueta))\n    FROM Pedido_Etiqueta pe JOIN etiqueta t ON t.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=p.id_pedido), JSON_ARRAY()) AS labels, p.usuario_manager_origen, p.observacion_origen, p.observacion_interna\n      FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n  LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n  LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago WHERE p.id_pedido=? LIMIT 1",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "p",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "c",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "ep",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "pay",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "pe",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Pedido_Etiqueta_Etiqueta_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "2",
+          "filtered": 100,
+          "Extra": "Using index"
+        },
+        {
+          "id": "2",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "t",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "2",
+          "filtered": 50,
+          "Extra": "Using where; Using join buffer (hash join)"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino, d.fecha_real_termino,\n      d.id_estado_subproceso, t.nombre_producto, f.id_estado_subproceso AS flowId, f.orden_flujo, s.nombre_estado,\n      a.id_avance_lanyard, a.cantidad_acumulada, a.porcentaje_acumulado, a.fecha_actualizacion, a.fecha_produccion\n      FROM Detalle_pedido d LEFT JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n      LEFT JOIN Producto_Subproceso f ON f.id_tipo_producto=t.id_tipo_producto\n      LEFT JOIN Estado_Subprocesos s ON s.id_estado_subproceso=f.id_estado_subproceso\n      LEFT JOIN Avance_Lanyard a ON a.id_avance_lanyard=(SELECT latest.id_avance_lanyard FROM Avance_Lanyard latest\n        WHERE latest.id_detalle_pedido=d.id_detalle_pedido ORDER BY latest.fecha_produccion DESC, latest.id_avance_lanyard DESC LIMIT 1)\n      WHERE d.id_pedido=? ORDER BY d.id_detalle_pedido ASC, f.orden_flujo ASC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "d",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "t",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "f",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.t.id_tipo_producto",
+          "rows": "4",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "s",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.f.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "a",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "func",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using where"
+        },
+        {
+          "id": "2",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "latest",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "uq_avance_lanyard_detalle_fecha",
+          "key": "uq_avance_lanyard_detalle_fecha",
+          "key_len": "4",
+          "ref": "mydb.d.id_detalle_pedido",
+          "rows": "2",
+          "filtered": 100,
+          "Extra": "Using index; Using filesort"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT r.ID_REGISTRO, r.FECHA_HORA, r.observacion, s.id_detalle_pedido, es.nombre_estado\n      FROM Registros r JOIN registro_subprocesos s ON s.id_registro=r.ID_REGISTRO\n      LEFT JOIN Estado_Subprocesos es ON es.id_estado_subproceso=s.id_estado_subproceso\n      WHERE r.id_pedido=? ORDER BY r.FECHA_HORA ASC, r.ID_REGISTRO ASC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "r",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Registros_Pedidos_FK,idx_records_order_cursor",
+          "key": "Registros_Pedidos_FK",
+          "key_len": "5",
+          "ref": "const",
+          "rows": "7",
+          "filtered": 100,
+          "Extra": "Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "s",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "es",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.s.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT cp.id_comentario_produccion, cp.comentario, cp.fecha_comentario, cp.id_detalle_pedido\n      FROM Comentario_Produccion cp JOIN Detalle_pedido d ON d.id_detalle_pedido=cp.id_detalle_pedido\n      WHERE d.id_pedido=? ORDER BY cp.id_detalle_pedido ASC, cp.fecha_comentario ASC, cp.id_comentario_produccion ASC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "cp",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "id_detalle_pedido_idx",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using where; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "d",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,id_pedido_idx",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.cp.id_detalle_pedido",
+          "rows": "1",
+          "filtered": 5,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT d.id_detalle_pedido, d.id_pedido, d.cantidad,\n      COALESCE(d.fecha_estimada_termino,p.fecha_estimada_termino) AS dueDate,\n      p.numero_nota_venta, c.nombre_cliente, c.razon_social, t.nombre_producto, ep.nombre_etapa, ep.orden_kanban,\n      latest.id_avance_lanyard AS latestId, latest.cantidad_acumulada, latest.porcentaje_acumulado,\n      today.id_avance_lanyard AS todayId, today.cantidad_dia\n      FROM Detalle_pedido d JOIN Tipo_Producto t ON t.id_tipo_producto=d.id_tipo_producto\n      JOIN Pedidos p ON p.id_pedido=d.id_pedido JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n      LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n      LEFT JOIN Avance_Lanyard latest ON latest.id_avance_lanyard=(SELECT a.id_avance_lanyard FROM Avance_Lanyard a\n        WHERE a.id_detalle_pedido=d.id_detalle_pedido AND a.fecha_produccion<=?\n        ORDER BY a.fecha_produccion DESC,a.id_avance_lanyard DESC LIMIT 1)\n      LEFT JOIN Avance_Lanyard today ON today.id_detalle_pedido=d.id_detalle_pedido AND today.fecha_produccion=?\n      WHERE t.nombre_producto LIKE ? AND ep.orden_kanban=?\n      ORDER BY d.id_pedido ASC,d.id_detalle_pedido ASC",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "ep",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "7",
+          "filtered": 14.285713195800781,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "t",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "5",
+          "filtered": 20,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "p",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,id_estado_pedido_idx,idx_orders_cursor",
+          "key": "id_estado_pedido_idx",
+          "key_len": "5",
+          "ref": "mydb.ep.id_estado_pedido",
+          "rows": "9",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "d",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_tipo_producto_idx,id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "mydb.p.id_pedido",
+          "rows": "1",
+          "filtered": 33.33333206176758,
+          "Extra": "Using where"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "latest",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "func",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using where"
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "today",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "uq_avance_lanyard_detalle_fecha,idx_avance_lanyard_fecha",
+          "key": "uq_avance_lanyard_detalle_fecha",
+          "key_len": "7",
+          "ref": "mydb.d.id_detalle_pedido,const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index condition"
+        },
+        {
+          "id": "2",
+          "select_type": "DEPENDENT SUBQUERY",
+          "table": "a",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "uq_avance_lanyard_detalle_fecha,idx_avance_lanyard_fecha",
+          "key": "uq_avance_lanyard_detalle_fecha",
+          "key_len": "4",
+          "ref": "mydb.d.id_detalle_pedido",
+          "rows": "2",
+          "filtered": 100,
+          "Extra": "Using where; Using index; Using filesort"
+        }
+      ]
+    }
+  ],
+  "indexes": [
+    {
+      "TABLE_NAME": "Avance_Lanyard",
+      "INDEX_NAME": "idx_avance_lanyard_fecha",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "fecha_produccion"
+    },
+    {
+      "TABLE_NAME": "Avance_Lanyard",
+      "INDEX_NAME": "idx_avance_lanyard_registro_subproceso",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_registro_subproceso"
+    },
+    {
+      "TABLE_NAME": "Avance_Lanyard",
+      "INDEX_NAME": "idx_avance_lanyard_usuario",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_usuario_registra"
+    },
+    {
+      "TABLE_NAME": "Avance_Lanyard",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_avance_lanyard"
+    },
+    {
+      "TABLE_NAME": "Avance_Lanyard",
+      "INDEX_NAME": "uq_avance_lanyard_detalle_fecha",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_detalle_pedido"
+    },
+    {
+      "TABLE_NAME": "Avance_Lanyard",
+      "INDEX_NAME": "uq_avance_lanyard_detalle_fecha",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "2",
+      "COLUMN_NAME": "fecha_produccion"
+    },
+    {
+      "TABLE_NAME": "Comentario_Produccion",
+      "INDEX_NAME": "id_detalle_pedido_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_detalle_pedido"
+    },
+    {
+      "TABLE_NAME": "Comentario_Produccion",
+      "INDEX_NAME": "id_usuario_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_usuario"
+    },
+    {
+      "TABLE_NAME": "Comentario_Produccion",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_comentario_produccion"
+    },
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "Detalle_pedido_Estado_Subprocesos_FK",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_estado_subproceso"
+    },
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "id_pedido_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_pedido"
+    },
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "id_tipo_producto_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_tipo_producto"
+    },
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_detalle_pedido"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_cliente_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_cliente"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_estado_pago_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_estado_pago"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_estado_pedido_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_estado_pedido"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_etiqueta_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_etiqueta"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_usuario_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_usuario"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "idx_orders_cursor",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_pedido"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_pedido"
+    },
+    {
+      "TABLE_NAME": "Producto_Subproceso",
+      "INDEX_NAME": "id_estado_subproceso_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_estado_subproceso"
+    },
+    {
+      "TABLE_NAME": "Producto_Subproceso",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_tipo_producto"
+    },
+    {
+      "TABLE_NAME": "Producto_Subproceso",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "2",
+      "COLUMN_NAME": "id_estado_subproceso"
+    }
+  ]
+}

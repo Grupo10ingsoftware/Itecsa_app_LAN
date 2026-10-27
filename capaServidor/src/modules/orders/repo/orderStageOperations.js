@@ -140,6 +140,7 @@ export async function sendToReviewOperation(repository, id, audit = {}) {
     userId: audit.userId,
     comment: audit.comment,
     now: audit.now,
+    compact: audit.compact,
   });
 
   if (!updatedOrder) return updatedOrder;
@@ -147,7 +148,7 @@ export async function sendToReviewOperation(repository, id, audit = {}) {
   // intentionally omit internal user IDs and cannot identify the recipient.
   const responsibleOrder = await repository.client.pedidos.findUnique({
     where: { id_pedido: Number(id) },
-    select: { id_usuario: true },
+    select: { id_usuario: true, numero_nota_venta: true },
   });
   const responsibleUserId = Number(responsibleOrder?.id_usuario);
   if (!updatedOrder || !Number.isInteger(responsibleUserId) || responsibleUserId <= 0) {
@@ -160,7 +161,7 @@ export async function sendToReviewOperation(repository, id, audit = {}) {
       fecha_publicacion: audit.now ?? new Date(),
       Asunto: "Pedido enviado a revisión",
       contenido: [
-        `El pedido ${updatedOrder.numero_nota_venta ?? `#${id}`} fue enviado a revisión por Producción.`,
+        `El pedido ${responsibleOrder?.numero_nota_venta ?? updatedOrder.numero_nota_venta ?? `#${id}`} fue enviado a revisión por Producción.`,
         audit.comment ? `Observación: ${audit.comment}` : null,
       ].filter(Boolean).join("\n"),
     },
@@ -185,5 +186,6 @@ export async function cancelProductionOperation(repository, id, audit = {}) {
     userId: audit.userId,
     comment: audit.comment,
     now: audit.now,
+    compact: audit.compact,
   });
 }
