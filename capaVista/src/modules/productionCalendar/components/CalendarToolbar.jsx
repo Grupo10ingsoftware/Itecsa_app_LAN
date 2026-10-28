@@ -5,11 +5,10 @@ export default function CalendarToolbar({
   monthDate,
   onNextMonth,
   onPreviousMonth,
+  onToday,
 }) {
   return (
     <section className={styles.toolbar} aria-label="Controles del calendario">
-      <div aria-hidden="true" className={styles.toolbarSpacer} />
-
       <div className={styles.monthNavigation}>
         <button onClick={onPreviousMonth} title="Mes anterior" type="button">
           <i className="bi bi-chevron-left" aria-hidden="true" />
@@ -24,7 +23,7 @@ export default function CalendarToolbar({
         </button>
       </div>
 
-      <div aria-hidden="true" className={styles.toolbarSpacer} />
+      <button className={styles.todayButton} onClick={onToday} type="button">Hoy</button>
     </section>
   )
 }

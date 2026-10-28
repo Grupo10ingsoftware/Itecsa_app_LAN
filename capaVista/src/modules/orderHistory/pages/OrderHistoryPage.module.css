@@ -1,5 +1,4 @@
 .page { color: #111827; }
-.resultCount { background: var(--page-brand-orange); border-radius: 999px; color: #111827; padding: .65rem 1rem; }
 .panel { border-radius: 0 0 var(--page-radius) var(--page-radius); overflow: hidden; }
 .statusFilters { display: flex; flex-wrap: wrap; gap: .5rem; padding: 1rem 1.25rem .25rem; }
 .statusFilters button { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 999px; color: #475569; font-size: .82rem; font-weight: 800; padding: .48rem .8rem; }

@@ -39,6 +39,6 @@ export function DeliveryChangeCredentialsModal({ change, onCancel, onConfirm }) 
   if (!change) return null
   return <PinAuthorizationModal contextKey={`${change.item.id ?? change.item.orderNumber}:${change.fromDate}:${change.toDate}`}
     title="Confirmar cambio" description={`Ingrese su PIN para hacer efectivo el cambio de fecha de ${change.item.orderNumber}.`}
-    onConfirm={({ pin }) => onConfirm({ pin })} onCancel={onCancel}
+    onConfirm={({ pin }) => onConfirm({ pin })} onCancel={onCancel} feedbackMode="toast"
     failureMessage="No fue posible cambiar la fecha de entrega." />
 }

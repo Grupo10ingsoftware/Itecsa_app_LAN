@@ -32,7 +32,7 @@ export function OrderDetailModal({ order, onClose, isLoading = false, error }) {
         </header>
 
         <div className={styles.orderDetailBody} aria-busy={isLoading}>
-          {isLoading ? <LoadingIndicator scope="dialog" context="Detalle del pedido" /> : error ? <p role="alert">{error}</p> : <>
+          {isLoading ? <LoadingIndicator scope="dialog" context="Detalle del pedido" /> : !error && <>
           <section className={styles.orderOverview} aria-label="Resumen del pedido">
             <div>
               <dt>Cliente</dt>

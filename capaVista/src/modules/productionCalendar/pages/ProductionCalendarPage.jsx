@@ -8,6 +8,7 @@ import { useOrdersCalendarApi } from '../hooks/useOrdersCalendarApi'
 import { loadCalendarMonth, loadUnscheduledOrders } from '../api/ordersCalendarApi'
 import { getCalendarOrderQuantity, getCalendarOrderStatus } from '../utils/calendarOrder'
 import styles from './ProductionCalendarPage.module.css'
+import { useToast } from '../../../shared/notifications/useToast'
 
 const DEFAULT_FILTERS = Object.freeze({
   search: '',
@@ -71,6 +72,7 @@ function normalizeCalendarOrder(order) {
 }
 
 export default function ProductionCalendarPage() {
+  const notify = useToast()
   const ordersCalendarApi = useOrdersCalendarApi()
   const [calendarItems, setCalendarItems] = useState([])
   const [unscheduledItems, setUnscheduledItems] = useState([])
@@ -81,7 +83,6 @@ export default function ProductionCalendarPage() {
   })
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
-  const [loadError, setLoadError] = useState(null)
   const [draggedItemId, setDraggedItemId] = useState(null)
   const [loadedMonth, setLoadedMonth] = useState(null)
   const [loadedPendingApi, setLoadedPendingApi] = useState(null)
@@ -92,7 +93,6 @@ export default function ProductionCalendarPage() {
 
     async function loadOrders() {
       try {
-        setLoadError(null)
         const orders = await loadCalendarMonth(ordersCalendarApi, monthRange(monthDate), () => isMounted)
 
         if (isMounted) {
@@ -104,7 +104,7 @@ export default function ProductionCalendarPage() {
         }
       } catch {
         if (isMounted) {
-          setLoadError('No fue posible cargar los pedidos compartidos del calendario.')
+          notify.error('No fue posible cargar los pedidos compartidos del calendario.')
         }
       } finally {
         if (isMounted) setLoadedMonth(monthDate)
@@ -116,7 +116,7 @@ export default function ProductionCalendarPage() {
     return () => {
       isMounted = false
     }
-  }, [monthDate, ordersCalendarApi])
+  }, [monthDate, ordersCalendarApi, notify])
 
   useEffect(() => {
     let isMounted = true
@@ -125,11 +125,11 @@ export default function ProductionCalendarPage() {
         if (isMounted) setUnscheduledItems(orders.filter((order) => order?.salesNoteNumber).map(normalizeCalendarOrder))
       })
       .catch(() => {
-        if (isMounted) setLoadError('No fue posible cargar los pedidos pendientes de fecha.')
+        if (isMounted) notify.error('No fue posible cargar los pedidos pendientes de fecha.')
       })
       .finally(() => { if (isMounted) setLoadedPendingApi(ordersCalendarApi) })
     return () => { isMounted = false }
-  }, [ordersCalendarApi])
+  }, [ordersCalendarApi, notify])
 
   useEffect(() => {
     if (!draggedItemId) return undefined
@@ -208,8 +208,6 @@ export default function ProductionCalendarPage() {
             />
           )}
 
-          {loadError && <div className="alert alert-warning mb-0">{loadError}</div>}
-
           <section className={styles.calendarPanel}>
             <ProductionCalendarGrid
               isLoading={isLoading}
@@ -221,7 +219,10 @@ export default function ProductionCalendarPage() {
               onChangeDeliveryDate={updateItemDeliveryDate}
               onDragEnd={() => setDraggedItemId(null)}
               onDragStart={setDraggedItemId}
-              toolbar={<CalendarToolbar monthDate={monthDate} onNextMonth={() => changeMonth(1)} onPreviousMonth={() => changeMonth(-1)} />}
+              toolbar={<CalendarToolbar monthDate={monthDate} onNextMonth={() => changeMonth(1)} onPreviousMonth={() => changeMonth(-1)} onToday={() => {
+                const today = new Date()
+                setMonthDate(new Date(today.getFullYear(), today.getMonth(), 1))
+              }} />}
             />
           </section>
         </div>

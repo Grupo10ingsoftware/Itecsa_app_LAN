@@ -1,3 +1,4 @@
+import { getOrderStageAccent } from '../../../shared/orderStagePresentation.js'
 import { toDateKey, getDeliveryDelayStatus, isOrderDelayed, isOrderUrgent } from './kanbanDates.js'
 import { isLanyardItem, hasOrderLabel } from './kanbanOrderRules.js'
 import { baseColumns } from './kanbanColumns.js'
@@ -67,6 +68,6 @@ export function normalizeOrder(order) {
 
 export function normalizeStatus(status) {
   const order = Number(status.orden_kanban)
-  const column = baseColumns[order] ?? { accent: '#2563eb', icon: 'bi-kanban' }
+  const column = baseColumns.find(column => column.generalStepId === order) ?? { accent: getOrderStageAccent(order), icon: 'bi-kanban' }
   return { id: String(status.id_estado_pedido), title: status.nombre_etapa, generalStepId: order, order, accent: column.accent, icon: column.icon }
 }
