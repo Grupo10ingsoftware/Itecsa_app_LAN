@@ -39,10 +39,10 @@ export const performanceQuery = ({ start, end }) => Prisma.sql`
  AND e.fecha_hora_entrada>=${start} AND e.fecha_hora_entrada<${new Date(end.getTime()+86400000)})
  ORDER BY p.id_pedido`;
 
-export async function readReportOrders(client, { start, end }) {
+export function reportOrdersQuery({ start, end }) {
  // Disjoint rows avoid both detail x event fan-out and unbounded IN parameters.
- // One statement retains every detail and matching event, including null dates.
- const rows=await client.$queryRaw(Prisma.sql`
+ // The flow indicator needs the first exact ready event, even with a null entry.
+ return Prisma.sql`
  WITH selected_orders AS (SELECT id_pedido,numero_nota_venta,fecha_creacion,fecha_estimada_termino,id_usuario
  FROM Pedidos WHERE fecha_creacion>=${start} AND fecha_creacion<${end})
  SELECT 0 AS kind,p.id_pedido,p.numero_nota_venta,p.fecha_creacion,p.fecha_estimada_termino,
@@ -58,11 +58,20 @@ export async function readReportOrders(client, { start, end }) {
  UNION ALL
  SELECT 2,r.id_pedido,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
  e.fecha_hora_entrada,s.nombre_etapa,r.FECHA_HORA,r.ID_REGISTRO
- FROM selected_orders p JOIN Registros r ON r.id_pedido=p.id_pedido
+ FROM selected_orders p JOIN Registros r ON r.ID_REGISTRO=(
+ SELECT first_r.ID_REGISTRO FROM Registros first_r
+ JOIN Registro_Etapas first_e ON first_e.id_registro=first_r.ID_REGISTRO
+ JOIN Estado_Pedido first_s ON first_s.id_estado_pedido=first_e.id_estado_pedido
+ WHERE first_r.id_pedido=p.id_pedido
+ AND CAST(first_s.nombre_etapa AS BINARY)=CAST(${ORDER_STATUS.LISTO_ENTREGA} AS BINARY)
+ ORDER BY first_r.FECHA_HORA,first_r.ID_REGISTRO LIMIT 1)
  JOIN Registro_Etapas e ON e.id_registro=r.ID_REGISTRO
  JOIN Estado_Pedido s ON s.id_estado_pedido=e.id_estado_pedido
- WHERE s.nombre_etapa=${ORDER_STATUS.LISTO_ENTREGA}
- ORDER BY kind,sortDate,sortId`);
+ ORDER BY kind,sortDate,sortId`;
+}
+
+export async function readReportOrders(client, range) {
+ const rows=await client.$queryRaw(reportOrdersQuery(range));
  const orders=rows.filter(r=>Number(r.kind)===0);
  const byId=new Map(orders.map(o=>[o.id_pedido,{
   id_pedido:o.id_pedido,numero_nota_venta:o.numero_nota_venta,fecha_creacion:o.fecha_creacion,

@@ -32,8 +32,9 @@ export default function MetricsPage() {
 
 function MetricsContent({ api }) {
   const [period, setPeriod] = useState(createInitialPeriod)
+  const [requestVersion, setRequestVersion] = useState(0)
   const [requestResult, setRequestResult] = useState({
-    queryKey: '',
+    requestKey: '',
     summary: EMPTY_METRICS_SUMMARY,
     error: '',
   })
@@ -49,9 +50,10 @@ function MetricsContent({ api }) {
     validationMessage,
   } = periodQuery
   const canQuery = Boolean(queryKey)
-  const loading = canQuery && requestResult.queryKey !== queryKey
-  const error = requestResult.queryKey === queryKey ? requestResult.error : ''
-  const summary = requestResult.queryKey === queryKey
+  const requestKey = `${queryKey}|${requestVersion}`
+  const loading = canQuery && requestResult.requestKey !== requestKey
+  const error = requestResult.requestKey === requestKey ? requestResult.error : ''
+  const summary = requestResult.requestKey === requestKey
     ? requestResult.summary
     : EMPTY_METRICS_SUMMARY
 
@@ -62,14 +64,14 @@ function MetricsContent({ api }) {
       api,
       from: queryFrom,
       to: queryTo,
-      onSuccess: (result) => setRequestResult({ queryKey, summary: result, error: '' }),
+      onSuccess: (result) => setRequestResult({ requestKey, summary: result, error: '' }),
       onError: (requestError) => setRequestResult({
-        queryKey,
+        requestKey,
         summary: EMPTY_METRICS_SUMMARY,
         error: requestError?.payload?.message ?? 'No fue posible cargar las métricas.',
       }),
     })
-  }, [api, canQuery, queryFrom, queryKey, queryTo])
+  }, [api, canQuery, queryFrom, requestKey, queryTo])
 
   const chart = useMemo(
     () => buildProductionChart(summary.production, PRODUCT_COLORS),
@@ -91,7 +93,9 @@ function MetricsContent({ api }) {
 
   function updatePeriod(name, value) {
     setSelectedSubprocessProduct('all')
-    setPeriod((current) => ({ ...current, [name]: value }))
+    const nextPeriod = { ...period, [name]: value }
+    if (getPeriodQuery(nextPeriod).queryKey !== queryKey) setRequestVersion((current) => current + 1)
+    setPeriod(nextPeriod)
   }
 
   function exportReport(format) {
@@ -127,7 +131,7 @@ function MetricsContent({ api }) {
 
         {canQuery && <ProductionPerformance key={queryKey} api={api} period={{ from: queryFrom, to: queryTo }} />}
 
-        {!canQuery ? <div className={styles.emptyState} role="status">{validationMessage}</div> : loading ? <LoadingIndicator context="métricas" /> : error ? <div className={styles.emptyState} role="alert">{error}</div> : <>
+        {!canQuery ? <div className={styles.emptyState} role="status">{validationMessage}</div> : loading ? <LoadingIndicator context="métricas" /> : error ? <div className={styles.emptyState} role="alert"><p>{error}</p><button className={styles.generateButton} onClick={() => setRequestVersion((current) => current + 1)} type="button">Reintentar</button></div> : <>
           <section className={styles.productionSection} aria-labelledby="production-title">
             <header className={styles.productionHeader}><div><span className={styles.panelEyebrow}></span><h2 id="production-title">Cantidad de producción generada</h2><p>Unidades producidas agrupadas por tipo de producto.</p></div></header>
             <div className={styles.productionChart}><div aria-label={`Producción total: ${chart.total} unidades`} className={styles.pieChart} role="img" style={{ '--pie-gradient': pieGradient }}><div className={styles.pieChartCenter}><strong>{chart.total.toLocaleString('es-CL')}</strong><span>unidades</span></div></div><div className={styles.chartLegend}>{chart.segments.length === 0 ? <p className={styles.emptyState}>No hay producción registrada.</p> : chart.segments.map((item) => <div className={styles.legendItem} key={item.productType}><span className={styles.legendColor} style={{ background: item.color }} /><div><strong>{item.productType}</strong><span>{Number(item.quantity).toLocaleString('es-CL')} unidades · {Math.round(item.percentage)}%</span></div></div>)}</div></div>

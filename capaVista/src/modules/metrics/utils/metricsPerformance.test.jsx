@@ -74,12 +74,72 @@ it('API/session change removes summary and export data immediately and aborts ol
  await act(async () => request.resolve(summary('Otra sesión'))); expect(screen.getByText('Otra sesión')).toBeTruthy()
 })
 
+it('returning to a loaded period hides its previous data and exports until the fresh read finishes', async () => {
+ const next = deferred(), refresh = deferred()
+ session.api = { getSummary: vi.fn().mockResolvedValueOnce(summary('Anterior')).mockReturnValueOnce(next.promise).mockReturnValueOnce(refresh.promise) }
+ render(<MetricsPage />); await screen.findByText('Anterior')
+ const initial = screen.getByLabelText('Mes').value
+ fireEvent.click(screen.getByRole('button', { name: 'Generar lista' }))
+ expect(screen.getByRole('button', { name: 'Exportar' })).toBeTruthy()
+ fireEvent.change(screen.getByLabelText('Mes'), { target: { value: initial === '2024-09' ? '2024-10' : '2024-09' } })
+ await waitFor(() => expect(session.api.getSummary).toHaveBeenCalledTimes(2))
+ fireEvent.change(screen.getByLabelText('Mes'), { target: { value: initial } })
+ expect(screen.queryByText('Anterior')).toBeNull()
+ expect(screen.queryByRole('button', { name: 'Exportar' })).toBeNull()
+ await waitFor(() => expect(session.api.getSummary).toHaveBeenCalledTimes(3))
+ expect(session.api.getSummary.mock.calls[1][0].signal.aborted).toBe(true)
+ await act(async () => next.resolve(summary('Otro período obsoleto')))
+ expect(screen.queryByText('Otro período obsoleto')).toBeNull()
+ await act(async () => refresh.resolve(summary('Actualizado')))
+ expect(screen.getByText('Actualizado')).toBeTruthy()
+ fireEvent.click(screen.getByRole('button', { name: 'Mes específico' }))
+ expect(screen.getByText('Actualizado')).toBeTruthy()
+ expect(session.api.getSummary).toHaveBeenCalledTimes(3)
+})
+
 it('summary errors stay visible and returning to a period performs a fresh read', async () => {
  session.api = { getSummary: vi.fn().mockRejectedValueOnce({ payload: { message: 'Error de red' } }).mockResolvedValue(summary()) }
- render(<MetricsPage />); expect(await screen.findByRole('alert')).toHaveProperty('textContent', 'Error de red')
+ render(<MetricsPage />); expect((await screen.findByRole('alert')).textContent).toContain('Error de red')
  const initial = screen.getByLabelText('Mes').value
  fireEvent.change(screen.getByLabelText('Mes'), { target: { value: '2024-09' } }); await screen.findByText('Lanyard')
  fireEvent.change(screen.getByLabelText('Mes'), { target: { value: initial } }); await waitFor(() => expect(session.api.getSummary).toHaveBeenCalledTimes(3))
+})
+
+it('retries a failed summary once without changing period, then ignores it after a period change', async () => {
+ const retry = deferred()
+ session.api = { getSummary: vi.fn().mockRejectedValueOnce(Error('network')).mockReturnValueOnce(retry.promise).mockResolvedValue(summary('Nuevo período')), getProductionPerformance: vi.fn() }
+ render(<StrictMode><MetricsPage /></StrictMode>)
+ const button = await screen.findByRole('button', { name: 'Reintentar' })
+ const initial = screen.getByLabelText('Mes').value
+ fireEvent.click(button); fireEvent.click(button)
+ await waitFor(() => expect(session.api.getSummary).toHaveBeenCalledTimes(2))
+ expect(screen.getByLabelText('Mes').value).toBe(initial)
+ expect(session.api.getSummary.mock.calls[1][0].from).toBe(session.api.getSummary.mock.calls[0][0].from)
+ expect(screen.queryByRole('alert')).toBeNull()
+ expect(screen.queryByRole('button', { name: 'Reintentar' })).toBeNull()
+ fireEvent.change(screen.getByLabelText('Mes'), { target: { value: initial === '2024-09' ? '2024-10' : '2024-09' } })
+ await screen.findByText('Nuevo período')
+ expect(session.api.getSummary.mock.calls[1][0].signal.aborted).toBe(true)
+ await act(async () => retry.resolve(summary('Reintento obsoleto')))
+ expect(screen.queryByText('Reintento obsoleto')).toBeNull()
+ expect(session.api.getSummary).toHaveBeenCalledTimes(3)
+ expect(session.api.getProductionPerformance).not.toHaveBeenCalled()
+})
+
+it('validates the existing inclusive 366-day limit locally and allows its boundary', async () => {
+ session.api = { getSummary: vi.fn().mockResolvedValue(summary()) }
+ render(<MetricsPage />); await screen.findByText('Lanyard')
+ fireEvent.click(screen.getByRole('button', { name: 'Rango de fechas' }))
+ fireEvent.change(screen.getByLabelText('Desde'), { target: { value: '2023-01-01' } })
+ fireEvent.change(screen.getByLabelText('Hasta'), { target: { value: '2024-01-02' } })
+ expect(screen.getByRole('status').textContent).toContain('366 días')
+ expect(session.api.getSummary).toHaveBeenCalledTimes(1)
+ expect(screen.queryByRole('button', { name: /Rendimiento de producción/ })).toBeNull()
+ fireEvent.change(screen.getByLabelText('Hasta'), { target: { value: '2024-01-01' } })
+ await screen.findByText('Lanyard')
+ expect(session.api.getSummary).toHaveBeenCalledTimes(2)
+ for (const [from, to] of [['2024-01-01', '2024-12-31'], ['2023-01-01', '2024-01-01']]) expect(getPeriodQuery({ mode: 'range', from, to }).queryKey).toBe(`${from}|${to}`)
+ expect(getPeriodQuery({ mode: 'range', from: '2024-01-01', to: '2025-01-01' }).queryKey).toBe('')
 })
 
 it('manual report stays single-flight, cancels on period/API change, and ignores old data', async () => {

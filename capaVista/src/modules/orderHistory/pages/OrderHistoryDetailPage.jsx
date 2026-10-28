@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { APP_ROUTES } from '../../../config/routes'
 import { useOrderHistoryApi } from '../hooks/useOrderHistoryApi'
-import { formatDate, formatDateTime, formatDuration } from '../utils/orderHistoryFormatters'
+import { formatDate } from '../utils/orderHistoryFormatters'
+import HistoryEvent from '../components/HistoryEvent'
+import { historyScope, subscribeHistoryRead, appendHistoryEvents } from '../utils/historyReads'
 import styles from './OrderHistoryDetailPage.module.css'
 import PageShell from '../../../shared/components/layout/PageShell'
 import PageHeader from '../../../shared/components/layout/PageHeader'
@@ -20,6 +22,10 @@ const EVENT_TYPES = [
 export default function OrderHistoryDetailPage() {
   const { orderId } = useParams()
   const api = useOrderHistoryApi()
+  return <OrderHistoryDetail key={`${historyScope(api)}|${orderId}`} api={api} orderId={orderId} />
+}
+
+function OrderHistoryDetail({ api, orderId }) {
   const [type, setType] = useState('all')
   const [order, setOrder] = useState(null)
   const [cursor, setCursor] = useState(null)
@@ -27,40 +33,42 @@ export default function OrderHistoryDetailPage() {
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState('')
+  const [attempt, setAttempt] = useState(0)
   const summaryOrderId = useRef(null)
+  const pendingMore = useRef(false)
 
   useEffect(() => {
-    let active = true
     const hasSummary = summaryOrderId.current === orderId
-    const request = hasSummary
-      ? api.listOrderEvents(orderId, { type, cursor, limit: 50 })
-      : api.getOrderHistory(orderId, { type, cursor, limit: 50 })
-    request
-      .then((result) => {
-        if (!active) return
+    return subscribeHistoryRead({ api, orderId, method: hasSummary ? 'listOrderEvents' : 'getOrderHistory', params: { type, cursor, limit: 50 },
+      onSuccess: (result) => {
         if (!hasSummary) summaryOrderId.current = orderId
         setOrder((current) => hasSummary && current
           ? {
               ...current,
               events: cursor
-                ? [...current.events, ...(result.events ?? [])]
+                ? appendHistoryEvents(current.events, result.events ?? [])
                 : (result.events ?? []),
             }
           : result)
         setPageInfo(result.pageInfo ?? { nextCursor: null, hasMore: false })
-      })
-      .catch((requestError) => active && setError(requestError?.payload?.message ?? 'No fue posible cargar el historial.'))
-      .finally(() => {
-        if (!active) return
+        pendingMore.current = false
         setLoading(false)
         setLoadingMore(false)
-      })
-    return () => { active = false }
-  }, [api, cursor, orderId, type])
+      },
+      onError: (requestError) => {
+        setError(requestError?.payload?.message ?? 'No fue posible cargar el historial.')
+        pendingMore.current = false
+        setLoading(false)
+        setLoadingMore(false)
+      },
+    })
+  }, [api, cursor, orderId, type, attempt])
 
   function selectType(nextType) {
     if (nextType === type) return
     setLoading(true)
+    pendingMore.current = false
+    setLoadingMore(false)
     setError('')
     setCursor(null)
     setPageInfo({ nextCursor: null, hasMore: false })
@@ -69,14 +77,24 @@ export default function OrderHistoryDetailPage() {
   }
 
   function loadMore() {
-    if (!pageInfo.hasMore || !pageInfo.nextCursor || loadingMore) return
+    if (!pageInfo.hasMore || !pageInfo.nextCursor || pendingMore.current || loading) return
+    pendingMore.current = true
     setLoadingMore(true)
     setError('')
+    // Retrying a failed continuation uses the same cursor, with a new attempt.
+    if (cursor === pageInfo.nextCursor) setAttempt(current => current + 1)
     setCursor(pageInfo.nextCursor)
   }
 
+  function retry() {
+    setError('')
+    if (cursor && order) { pendingMore.current = true; setLoadingMore(true) }
+    else setLoading(true)
+    setAttempt(current => current + 1)
+  }
+
   if (loading && !order) return <LoadingIndicator context="historial" />
-  if (error && !order) return <div className={styles.state}><p>{error}</p><Link to={APP_ROUTES.ORDER_HISTORY}>Volver al historial</Link></div>
+  if (error && !order) return <div className={styles.state} role="alert"><p>{error}</p><button onClick={retry} type="button">Reintentar</button><Link to={APP_ROUTES.ORDER_HISTORY}>Volver al historial</Link></div>
 
   return (
     <PageShell className={styles.page}>
@@ -86,7 +104,7 @@ export default function OrderHistoryDetailPage() {
         <p>{order?.client.name ?? 'Cliente no disponible'}</p>
       </PageHeader>
 
-      {error && <div className={styles.error}>{error}</div>}
+      {error && <div className={styles.error} role="alert"><p>{error}</p><button onClick={retry} type="button">Reintentar</button></div>}
       {order && (
         <>
           <section className={styles.summary} aria-label="Información del pedido">
@@ -112,34 +130,7 @@ export default function OrderHistoryDetailPage() {
               </select>
             </header>
             {loading ? <LoadingIndicator context="Actualizando eventos" /> : order.events.length === 0 ? <div className={styles.empty}>No existen registros para este filtro.</div> : (
-              <ol className={styles.timeline}>{order.events.map((event) => (
-                <li key={event.id}>
-                  <div className={styles.marker}><i className="bi bi-clock-history" aria-hidden="true" /></div>
-                  <article>
-                    <span className={styles.type}>{event.typeLabel}</span>
-                    <h3>{event.title}</h3>
-                    <time>{formatDateTime(event.occurredAt)}</time>
-                    <p>Responsable: {event.responsible ?? 'No disponible'}</p>
-                    {event.description && <p>{event.description}</p>}
-                    {event.productType && <p>Producto: {event.productType}</p>}
-                    {event.lanyardProgress && (
-                      <p>
-                        Avance producido: {event.lanyardProgress.accumulatedQuantity ?? 0}
-                        {event.lanyardProgress.totalQuantity ? ` / ${event.lanyardProgress.totalQuantity}` : ''}
-                        {' '}lanyards ({event.lanyardProgress.percentage}%)
-                      </p>
-                    )}
-                    {event.type === 'payment' && (
-                      <p>{event.previousStatus ?? 'Estado anterior desconocido'} → {event.nextStatus ?? 'Sin estado'}</p>
-                    )}
-                    {formatDuration(event.durationSeconds) && (
-                      <strong>
-                        Tiempo transcurrido{event.isOngoing ? ' (en curso)' : ''}: {formatDuration(event.durationSeconds)}
-                      </strong>
-                    )}
-                  </article>
-                </li>
-              ))}</ol>
+              <ol className={styles.timeline}>{order.events.map(event => <HistoryEvent key={event.id} event={event} />)}</ol>
             )}
             {pageInfo.hasMore && (
               <button className={styles.loadMore} disabled={loadingMore} onClick={loadMore} type="button" aria-busy={loadingMore}>

@@ -1,0 +1,2035 @@
+{
+  "reference": "d9e67ac (history unchanged; pending OPT-07 preserved)",
+  "capturedAt": "2026-10-28T04:11:08.371Z",
+  "methodology": "Five warm samples, strict TLS/pool10; no writes. Driver includes network/adapter. Engine CPU and E2E not measured. No reliable p95 from five samples.",
+  "samples": {
+    "http_list_before": {
+      "minMs": 1912.782,
+      "meanMs": 2139.5072,
+      "medianMs": 2152.099,
+      "maxMs": 2419.842,
+      "samples": [
+        {
+          "ms": 2152.099,
+          "selects": 4,
+          "resultBytes": 6821,
+          "cpuMs": 109,
+          "heapDeltaBytes": 1528176,
+          "driverMs": [
+            909.4411,
+            576.5751999999993,
+            657.2497999999996,
+            657.6460000000006
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 13047,
+              "ms": 1236.321
+            }
+          ]
+        },
+        {
+          "ms": 1912.782,
+          "selects": 4,
+          "resultBytes": 6821,
+          "cpuMs": 47,
+          "heapDeltaBytes": 1399992,
+          "driverMs": [
+            658.7803000000004,
+            576.2386000000006,
+            657.3078999999998,
+            657.1823999999997
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 13047,
+              "ms": 1235.254
+            }
+          ]
+        },
+        {
+          "ms": 2419.842,
+          "selects": 4,
+          "resultBytes": 6821,
+          "cpuMs": 94,
+          "heapDeltaBytes": -3146104,
+          "driverMs": [
+            916.2423999999992,
+            577.0864999999994,
+            656.5493000000006,
+            910.3204999999998
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 13047,
+              "ms": 1488.774
+            }
+          ]
+        },
+        {
+          "ms": 1981.495,
+          "selects": 4,
+          "resultBytes": 6821,
+          "cpuMs": 31,
+          "heapDeltaBytes": 738864,
+          "driverMs": [
+            658.3107,
+            655.7572999999993,
+            577.1454000000012,
+            656.072299999998
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 13047,
+              "ms": 1313.277
+            }
+          ]
+        },
+        {
+          "ms": 2231.318,
+          "selects": 4,
+          "resultBytes": 6821,
+          "cpuMs": 31,
+          "heapDeltaBytes": 156928,
+          "driverMs": [
+            658.0800999999992,
+            911.0596000000005,
+            655.7989999999991,
+            656.6360000000022
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 13047,
+              "ms": 1569.274
+            }
+          ]
+        }
+      ]
+    },
+    "http_list_after": {
+      "minMs": 1252.415,
+      "meanMs": 1368.6154000000001,
+      "medianMs": 1330.83,
+      "maxMs": 1594.541,
+      "samples": [
+        {
+          "ms": 1330.092,
+          "selects": 2,
+          "resultBytes": 6821,
+          "cpuMs": 0,
+          "heapDeltaBytes": -161304,
+          "driverMs": [
+            657.704099999999,
+            657.7856000000029
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 12497,
+              "ms": 658.462
+            }
+          ]
+        },
+        {
+          "ms": 1335.199,
+          "selects": 2,
+          "resultBytes": 6821,
+          "cpuMs": 15,
+          "heapDeltaBytes": 1222776,
+          "driverMs": [
+            657.8008000000009,
+            657.1288000000022
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 12497,
+              "ms": 657.956
+            }
+          ]
+        },
+        {
+          "ms": 1330.83,
+          "selects": 2,
+          "resultBytes": 6821,
+          "cpuMs": 0,
+          "heapDeltaBytes": -11024,
+          "driverMs": [
+            658.2037999999993,
+            658.4995999999992
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 12497,
+              "ms": 659.496
+            }
+          ]
+        },
+        {
+          "ms": 1252.415,
+          "selects": 2,
+          "resultBytes": 6821,
+          "cpuMs": 0,
+          "heapDeltaBytes": 97120,
+          "driverMs": [
+            574.8558999999987,
+            657.4311000000016
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 12497,
+              "ms": 658.054
+            }
+          ]
+        },
+        {
+          "ms": 1594.541,
+          "selects": 2,
+          "resultBytes": 6821,
+          "cpuMs": 0,
+          "heapDeltaBytes": 802456,
+          "driverMs": [
+            657.9326000000001,
+            919.428100000001
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 12497,
+              "ms": 919.891
+            }
+          ]
+        }
+      ]
+    },
+    "http_search_before": {
+      "minMs": 1914.113,
+      "meanMs": 1967.25,
+      "medianMs": 1975.68,
+      "maxMs": 1992.473,
+      "samples": [
+        {
+          "ms": 1914.113,
+          "selects": 4,
+          "resultBytes": 319,
+          "cpuMs": 47,
+          "heapDeltaBytes": -156280,
+          "driverMs": [
+            658.7380999999987,
+            577.219000000001,
+            657.5267000000022,
+            657.5481
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 497,
+              "ms": 1236.248
+            }
+          ]
+        },
+        {
+          "ms": 1992.473,
+          "selects": 4,
+          "resultBytes": 319,
+          "cpuMs": 32,
+          "heapDeltaBytes": 388704,
+          "driverMs": [
+            658.1313000000009,
+            657.4997000000003,
+            642.2131000000008,
+            661.2652999999991
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 497,
+              "ms": 1319.515
+            }
+          ]
+        },
+        {
+          "ms": 1984.446,
+          "selects": 4,
+          "resultBytes": 319,
+          "cpuMs": 0,
+          "heapDeltaBytes": -254496,
+          "driverMs": [
+            655.6160999999993,
+            657.5463000000018,
+            575.4734000000026,
+            657.6520999999993
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 497,
+              "ms": 1315.944
+            }
+          ]
+        },
+        {
+          "ms": 1975.68,
+          "selects": 4,
+          "resultBytes": 319,
+          "cpuMs": 46,
+          "heapDeltaBytes": 375472,
+          "driverMs": [
+            656.3032999999996,
+            657.210500000001,
+            656.4923999999955,
+            656.5097000000023
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 497,
+              "ms": 1314.575
+            }
+          ]
+        },
+        {
+          "ms": 1969.538,
+          "selects": 4,
+          "resultBytes": 319,
+          "cpuMs": 0,
+          "heapDeltaBytes": -246672,
+          "driverMs": [
+            642.7574999999997,
+            661.9138000000021,
+            655.4138000000021,
+            655.6570999999967
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 497,
+              "ms": 1318.639
+            }
+          ]
+        }
+      ]
+    },
+    "http_search_after": {
+      "minMs": 1246.795,
+      "meanMs": 1309.6224000000002,
+      "medianMs": 1322.159,
+      "maxMs": 1331.761,
+      "samples": [
+        {
+          "ms": 1322.159,
+          "selects": 2,
+          "resultBytes": 319,
+          "cpuMs": 0,
+          "heapDeltaBytes": 268832,
+          "driverMs": [
+            656.795100000003,
+            656.8928000000014
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 475,
+              "ms": 657.299
+            }
+          ]
+        },
+        {
+          "ms": 1328.798,
+          "selects": 2,
+          "resultBytes": 319,
+          "cpuMs": 32,
+          "heapDeltaBytes": -378152,
+          "driverMs": [
+            657.2039000000004,
+            658.181700000001
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 475,
+              "ms": 658.627
+            }
+          ]
+        },
+        {
+          "ms": 1318.599,
+          "selects": 2,
+          "resultBytes": 319,
+          "cpuMs": 15,
+          "heapDeltaBytes": 276056,
+          "driverMs": [
+            643.5115000000005,
+            662.2313999999969
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 475,
+              "ms": 663.015
+            }
+          ]
+        },
+        {
+          "ms": 1331.761,
+          "selects": 2,
+          "resultBytes": 319,
+          "cpuMs": 0,
+          "heapDeltaBytes": 263808,
+          "driverMs": [
+            656.7428999999975,
+            658.0183999999936
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 475,
+              "ms": 658.564
+            }
+          ]
+        },
+        {
+          "ms": 1246.795,
+          "selects": 2,
+          "resultBytes": 319,
+          "cpuMs": 0,
+          "heapDeltaBytes": -340200,
+          "driverMs": [
+            576.1466,
+            658.8931999999986
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 475,
+              "ms": 659.252
+            }
+          ]
+        }
+      ]
+    },
+    "http_status_before": {
+      "minMs": 1906.05,
+      "meanMs": 1968.9974000000002,
+      "medianMs": 1985.756,
+      "maxMs": 1987.003,
+      "samples": [
+        {
+          "ms": 1979.955,
+          "selects": 4,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": -62104,
+          "driverMs": [
+            643.0967000000019,
+            662.2999000000054,
+            656.0744999999952,
+            656.3482000000004
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2783,
+              "ms": 1319.659
+            }
+          ]
+        },
+        {
+          "ms": 1906.05,
+          "selects": 4,
+          "resultBytes": 1471,
+          "cpuMs": 16,
+          "heapDeltaBytes": -144568,
+          "driverMs": [
+            575.0810999999958,
+            657.5492999999988,
+            655.8390999999974,
+            656.2041000000027
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2783,
+              "ms": 1314.968
+            }
+          ]
+        },
+        {
+          "ms": 1986.223,
+          "selects": 4,
+          "resultBytes": 1471,
+          "cpuMs": 15,
+          "heapDeltaBytes": -4180840,
+          "driverMs": [
+            657.8911999999982,
+            657.2814999999973,
+            642.2068999999974,
+            662.1064999999944
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2783,
+              "ms": 1320.517
+            }
+          ]
+        },
+        {
+          "ms": 1987.003,
+          "selects": 4,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": 553464,
+          "driverMs": [
+            656.5878000000012,
+            657.0273000000016,
+            578.0649000000049,
+            667.9580999999962
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2783,
+              "ms": 1326.181
+            }
+          ]
+        },
+        {
+          "ms": 1985.756,
+          "selects": 4,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": -167680,
+          "driverMs": [
+            663.7387999999992,
+            660.9232999999949,
+            656.9611000000004,
+            657.7347000000009
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2783,
+              "ms": 1319.408
+            }
+          ]
+        }
+      ]
+    },
+    "http_status_after": {
+      "minMs": 1243.571,
+      "meanMs": 1307.28,
+      "medianMs": 1319.781,
+      "maxMs": 1333.866,
+      "samples": [
+        {
+          "ms": 1333.866,
+          "selects": 2,
+          "resultBytes": 1471,
+          "cpuMs": 16,
+          "heapDeltaBytes": -224624,
+          "driverMs": [
+            656.806700000001,
+            657.5714999999982
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2662,
+              "ms": 657.947
+            }
+          ]
+        },
+        {
+          "ms": 1243.571,
+          "selects": 2,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": 353808,
+          "driverMs": [
+            577.0487999999968,
+            660.4256000000023
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2662,
+              "ms": 660.788
+            }
+          ]
+        },
+        {
+          "ms": 1320.099,
+          "selects": 2,
+          "resultBytes": 1471,
+          "cpuMs": 16,
+          "heapDeltaBytes": 347232,
+          "driverMs": [
+            656.6579999999958,
+            657.1172000000006
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2662,
+              "ms": 657.66
+            }
+          ]
+        },
+        {
+          "ms": 1319.083,
+          "selects": 2,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": -239600,
+          "driverMs": [
+            656.8784999999989,
+            657.7644999999975
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2662,
+              "ms": 658.202
+            }
+          ]
+        },
+        {
+          "ms": 1319.781,
+          "selects": 2,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": 367536,
+          "driverMs": [
+            643.3960000000079,
+            662.2618000000075
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2662,
+              "ms": 662.809
+            }
+          ]
+        }
+      ]
+    },
+    "http_dates_before": {
+      "minMs": 1910.699,
+      "meanMs": 1967.0900000000001,
+      "medianMs": 1977.699,
+      "maxMs": 1993.355,
+      "samples": [
+        {
+          "ms": 1978.022,
+          "selects": 4,
+          "resultBytes": 1305,
+          "cpuMs": 15,
+          "heapDeltaBytes": 495224,
+          "driverMs": [
+            656.9003999999986,
+            658.2814000000071,
+            656.9786000000022,
+            656.9116999999969
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2371,
+              "ms": 1316.282
+            }
+          ]
+        },
+        {
+          "ms": 1975.675,
+          "selects": 4,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": -121728,
+          "driverMs": [
+            642.8231999999989,
+            661.8044999999984,
+            655.7013000000006,
+            655.898000000001
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2371,
+              "ms": 1318.792
+            }
+          ]
+        },
+        {
+          "ms": 1910.699,
+          "selects": 4,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": -114424,
+          "driverMs": [
+            576.0962999999902,
+            657.8190000000031,
+            656.3165000000008,
+            657.1604999999981
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2371,
+              "ms": 1315.867
+            }
+          ]
+        },
+        {
+          "ms": 1993.355,
+          "selects": 4,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": 516560,
+          "driverMs": [
+            656.6122000000032,
+            657.0381000000052,
+            642.468000000008,
+            661.142399999997
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2371,
+              "ms": 1319.171
+            }
+          ]
+        },
+        {
+          "ms": 1977.699,
+          "selects": 4,
+          "resultBytes": 1305,
+          "cpuMs": 16,
+          "heapDeltaBytes": -169240,
+          "driverMs": [
+            656.3907999999938,
+            657.3369999999995,
+            576.2638999999908,
+            658.7317000000039
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2371,
+              "ms": 1316.949
+            }
+          ]
+        }
+      ]
+    },
+    "http_dates_after": {
+      "minMs": 1243.901,
+      "meanMs": 1309.5801999999999,
+      "medianMs": 1320.984,
+      "maxMs": 1342.919,
+      "samples": [
+        {
+          "ms": 1342.919,
+          "selects": 2,
+          "resultBytes": 1305,
+          "cpuMs": 15,
+          "heapDeltaBytes": -245976,
+          "driverMs": [
+            655.3963999999978,
+            672.5985999999975
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2272,
+              "ms": 672.925
+            }
+          ]
+        },
+        {
+          "ms": 1317.982,
+          "selects": 2,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": 333040,
+          "driverMs": [
+            641.7623999999923,
+            661.8610999999946
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2272,
+              "ms": 662.18
+            }
+          ]
+        },
+        {
+          "ms": 1320.984,
+          "selects": 2,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": 354336,
+          "driverMs": [
+            656.3527000000031,
+            658.8717000000033
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2272,
+              "ms": 659.359
+            }
+          ]
+        },
+        {
+          "ms": 1243.901,
+          "selects": 2,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": -245408,
+          "driverMs": [
+            575.4627000000037,
+            659.0558000000019
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2272,
+              "ms": 659.442
+            }
+          ]
+        },
+        {
+          "ms": 1322.115,
+          "selects": 2,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": 334944,
+          "driverMs": [
+            656.693100000004,
+            658.8851999999897
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2272,
+              "ms": 659.536
+            }
+          ]
+        }
+      ]
+    },
+    "http_next_before": {
+      "minMs": 1896.03,
+      "meanMs": 1964.551,
+      "medianMs": 1976.579,
+      "maxMs": 1993.614,
+      "samples": [
+        {
+          "ms": 1975.716,
+          "selects": 4,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": -92648,
+          "driverMs": [
+            656.327099999995,
+            656.9071000000113,
+            576.2109000000055,
+            658.1839000000036
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2872,
+              "ms": 1316.248
+            }
+          ]
+        },
+        {
+          "ms": 1980.816,
+          "selects": 4,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": 517920,
+          "driverMs": [
+            656.5639999999985,
+            654.9073000000062,
+            658.1101999999955,
+            658.6168999999936
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2872,
+              "ms": 1314.411
+            }
+          ]
+        },
+        {
+          "ms": 1976.579,
+          "selects": 4,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": -84408,
+          "driverMs": [
+            640.5915000000095,
+            661.7283000000025,
+            656.1860000000015,
+            656.1670999999915
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2872,
+              "ms": 1318.994
+            }
+          ]
+        },
+        {
+          "ms": 1896.03,
+          "selects": 4,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": 521720,
+          "driverMs": [
+            575.9712,
+            657.2738000000099,
+            657.0255000000034,
+            657.4498000000021
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2872,
+              "ms": 1315.37
+            }
+          ]
+        },
+        {
+          "ms": 1993.614,
+          "selects": 4,
+          "resultBytes": 1479,
+          "cpuMs": 16,
+          "heapDeltaBytes": -107304,
+          "driverMs": [
+            658.0829999999987,
+            657.0611999999965,
+            641.4101000000082,
+            662.1453000000038
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2872,
+              "ms": 1320.071
+            }
+          ]
+        }
+      ]
+    },
+    "http_next_after": {
+      "minMs": 1247.668,
+      "meanMs": 1310.4605999999999,
+      "medianMs": 1322.584,
+      "maxMs": 1336.795,
+      "samples": [
+        {
+          "ms": 1247.668,
+          "selects": 2,
+          "resultBytes": 1479,
+          "cpuMs": 31,
+          "heapDeltaBytes": -262200,
+          "driverMs": [
+            575.767399999997,
+            657.2376000000077
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2751,
+              "ms": 657.638
+            }
+          ]
+        },
+        {
+          "ms": 1324.604,
+          "selects": 2,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": 777416,
+          "driverMs": [
+            657.0170999999973,
+            656.4544000000024
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2751,
+              "ms": 656.784
+            }
+          ]
+        },
+        {
+          "ms": 1336.795,
+          "selects": 2,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": -689328,
+          "driverMs": [
+            659.0929999999935,
+            667.3057999999874
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2751,
+              "ms": 667.869
+            }
+          ]
+        },
+        {
+          "ms": 1320.652,
+          "selects": 2,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": 351488,
+          "driverMs": [
+            644.0443999999989,
+            661.6594000000041
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2751,
+              "ms": 662.09
+            }
+          ]
+        },
+        {
+          "ms": 1322.584,
+          "selects": 2,
+          "resultBytes": 1479,
+          "cpuMs": 15,
+          "heapDeltaBytes": 355544,
+          "driverMs": [
+            655.8837000000058,
+            658.545100000003
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2751,
+              "ms": 658.93
+            }
+          ]
+        }
+      ]
+    },
+    "http_previous_before": {
+      "minMs": 1916.411,
+      "meanMs": 1966.7404,
+      "medianMs": 1977.237,
+      "maxMs": 1988.706,
+      "samples": [
+        {
+          "ms": 1988.706,
+          "selects": 4,
+          "resultBytes": 1499,
+          "cpuMs": 0,
+          "heapDeltaBytes": -144680,
+          "driverMs": [
+            657.0346999999892,
+            655.636400000003,
+            643.6478999999963,
+            666.0837999999931
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2905,
+              "ms": 1323.077
+            }
+          ]
+        },
+        {
+          "ms": 1977.237,
+          "selects": 4,
+          "resultBytes": 1499,
+          "cpuMs": 16,
+          "heapDeltaBytes": 520224,
+          "driverMs": [
+            657.1438999999955,
+            656.680600000007,
+            574.4419000000053,
+            658.1928000000044
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2905,
+              "ms": 1316.073
+            }
+          ]
+        },
+        {
+          "ms": 1979.78,
+          "selects": 4,
+          "resultBytes": 1499,
+          "cpuMs": 0,
+          "heapDeltaBytes": -108600,
+          "driverMs": [
+            656.5168999999878,
+            657.3135000000038,
+            657.1820000000007,
+            657.1919000000053
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2905,
+              "ms": 1315.631
+            }
+          ]
+        },
+        {
+          "ms": 1971.568,
+          "selects": 4,
+          "resultBytes": 1499,
+          "cpuMs": 15,
+          "heapDeltaBytes": 511200,
+          "driverMs": [
+            641.4055999999982,
+            662.5265000000072,
+            656.9706999999908,
+            657.2963000000018
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2905,
+              "ms": 1320.663
+            }
+          ]
+        },
+        {
+          "ms": 1916.411,
+          "selects": 4,
+          "resultBytes": 1499,
+          "cpuMs": 31,
+          "heapDeltaBytes": -95344,
+          "driverMs": [
+            576.9104999999981,
+            659.5688999999984,
+            661.9637999999977,
+            662.0310999999929
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2905,
+              "ms": 1322.528
+            }
+          ]
+        }
+      ]
+    },
+    "http_previous_after": {
+      "minMs": 1239.356,
+      "meanMs": 1306.7472000000002,
+      "medianMs": 1320.275,
+      "maxMs": 1333.287,
+      "samples": [
+        {
+          "ms": 1312.623,
+          "selects": 2,
+          "resultBytes": 1499,
+          "cpuMs": 16,
+          "heapDeltaBytes": -263736,
+          "driverMs": [
+            643.3708000000042,
+            660.6149000000005
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2784,
+              "ms": 661.241
+            }
+          ]
+        },
+        {
+          "ms": 1328.195,
+          "selects": 2,
+          "resultBytes": 1499,
+          "cpuMs": 31,
+          "heapDeltaBytes": 342488,
+          "driverMs": [
+            659.4780000000028,
+            657.4611000000004
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2784,
+              "ms": 657.989
+            }
+          ]
+        },
+        {
+          "ms": 1239.356,
+          "selects": 2,
+          "resultBytes": 1499,
+          "cpuMs": 0,
+          "heapDeltaBytes": -282544,
+          "driverMs": [
+            576.1257000000041,
+            658.0616999999911
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2784,
+              "ms": 658.417
+            }
+          ]
+        },
+        {
+          "ms": 1333.287,
+          "selects": 2,
+          "resultBytes": 1499,
+          "cpuMs": 0,
+          "heapDeltaBytes": 360272,
+          "driverMs": [
+            661.5760000000009,
+            657.9771999999939
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2784,
+              "ms": 658.47
+            }
+          ]
+        },
+        {
+          "ms": 1320.275,
+          "selects": 2,
+          "resultBytes": 1499,
+          "cpuMs": 15,
+          "heapDeltaBytes": 343448,
+          "driverMs": [
+            659.6886999999988,
+            656.4635000000126
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2784,
+              "ms": 656.842
+            }
+          ]
+        }
+      ]
+    },
+    "http_detail_before": {
+      "minMs": 1317.37,
+      "meanMs": 1321.6824,
+      "medianMs": 1322.731,
+      "maxMs": 1325.634,
+      "samples": [
+        {
+          "ms": 1319.432,
+          "selects": 6,
+          "resultBytes": 11864,
+          "cpuMs": 16,
+          "heapDeltaBytes": -6976520,
+          "driverMs": [
+            656.3148000000074,
+            578.0587999999989,
+            643.0519000000058,
+            656.5444999999891,
+            657.1426999999967,
+            658.4732999999978
+          ],
+          "reads": [
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 579.305
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 643.822
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 657.24
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 657.611
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 659.089
+            }
+          ]
+        },
+        {
+          "ms": 1322.731,
+          "selects": 6,
+          "resultBytes": 11864,
+          "cpuMs": 15,
+          "heapDeltaBytes": -99552,
+          "driverMs": [
+            656.3550000000105,
+            577.4671000000089,
+            655.9875000000029,
+            656.7847000000038,
+            657.2795999999944,
+            660.7589000000007
+          ],
+          "reads": [
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 579.36
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 657.174
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 657.44
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 658.148
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 661.774
+            }
+          ]
+        },
+        {
+          "ms": 1317.37,
+          "selects": 6,
+          "resultBytes": 11864,
+          "cpuMs": 31,
+          "heapDeltaBytes": 103768,
+          "driverMs": [
+            642.5015999999887,
+            576.355899999995,
+            653.9510999999911,
+            655.7828000000009,
+            656.1235000000015,
+            656.7553999999946
+          ],
+          "reads": [
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 577.686
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 654.758
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 656.277
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 656.684
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 657.393
+            }
+          ]
+        },
+        {
+          "ms": 1325.634,
+          "selects": 6,
+          "resultBytes": 11864,
+          "cpuMs": 16,
+          "heapDeltaBytes": 118888,
+          "driverMs": [
+            656.7193000000116,
+            577.3490000000165,
+            642.6794999999984,
+            656.3999999999942,
+            656.8491000000213,
+            659.9914999999746
+          ],
+          "reads": [
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 578.471
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 643.407
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 656.976
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 657.38
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 660.587
+            }
+          ]
+        },
+        {
+          "ms": 1323.245,
+          "selects": 6,
+          "resultBytes": 11864,
+          "cpuMs": 78,
+          "heapDeltaBytes": 128096,
+          "driverMs": [
+            656.4659000000102,
+            578.8622000000032,
+            655.9597000000067,
+            655.914300000004,
+            656.3288999999932,
+            656.4498000000021
+          ],
+          "reads": [
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 580.474
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 656.677
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 656.891
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 657.166
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 657.305
+            }
+          ]
+        }
+      ]
+    },
+    "http_detail_after": {
+      "minMs": 1324.924,
+      "meanMs": 1332.0942,
+      "medianMs": 1332.929,
+      "maxMs": 1344.289,
+      "samples": [
+        {
+          "ms": 1332.929,
+          "selects": 4,
+          "resultBytes": 11864,
+          "cpuMs": 0,
+          "heapDeltaBytes": 133896,
+          "driverMs": [
+            656.832000000024,
+            576.2078000000038,
+            658.9826999999932,
+            660.9837000000116
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 576.887
+            },
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 659.815
+            },
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 662.409
+            }
+          ]
+        },
+        {
+          "ms": 1344.289,
+          "selects": 4,
+          "resultBytes": 11864,
+          "cpuMs": 0,
+          "heapDeltaBytes": 1493480,
+          "driverMs": [
+            656.8551999999909,
+            643.2970000000205,
+            657.704299999983,
+            667.0881999999983
+          ],
+          "reads": [
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 644.017
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 658.277
+            },
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 668.607
+            }
+          ]
+        },
+        {
+          "ms": 1325.076,
+          "selects": 4,
+          "resultBytes": 11864,
+          "cpuMs": 16,
+          "heapDeltaBytes": 102696,
+          "driverMs": [
+            658.062099999981,
+            577.2939999999944,
+            658.2473000000173,
+            662.0384000000195
+          ],
+          "reads": [
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 578.561
+            },
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 659.093
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 662.752
+            }
+          ]
+        },
+        {
+          "ms": 1333.253,
+          "selects": 4,
+          "resultBytes": 11864,
+          "cpuMs": 0,
+          "heapDeltaBytes": 1490400,
+          "driverMs": [
+            657.547499999986,
+            645.415399999998,
+            656.6208000000042,
+            656.7812999999733
+          ],
+          "reads": [
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 646.501
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 657.204
+            },
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 657.459
+            }
+          ]
+        },
+        {
+          "ms": 1324.924,
+          "selects": 4,
+          "resultBytes": 11864,
+          "cpuMs": 16,
+          "heapDeltaBytes": -2069520,
+          "driverMs": [
+            656.8809000000183,
+            578.4292000000132,
+            656.3398000000161,
+            657.4157999999879
+          ],
+          "reads": [
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 579.537
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 657.005
+            },
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 658.165
+            }
+          ]
+        }
+      ]
+    },
+    "http_events_before": {
+      "minMs": 1241.02,
+      "meanMs": 1307.4676000000002,
+      "medianMs": 1327.801,
+      "maxMs": 1334.555,
+      "samples": [
+        {
+          "ms": 1303.905,
+          "selects": 2,
+          "resultBytes": 641,
+          "cpuMs": 15,
+          "heapDeltaBytes": 318408,
+          "driverMs": [
+            656.9049999999988,
+            643.8961000000127
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 644.499
+            }
+          ]
+        },
+        {
+          "ms": 1327.801,
+          "selects": 2,
+          "resultBytes": 641,
+          "cpuMs": 31,
+          "heapDeltaBytes": -211272,
+          "driverMs": [
+            655.9704999999958,
+            657.9679000000178
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 658.383
+            }
+          ]
+        },
+        {
+          "ms": 1241.02,
+          "selects": 2,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 305376,
+          "driverMs": [
+            657.9750000000058,
+            574.4496000000217
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 574.885
+            }
+          ]
+        },
+        {
+          "ms": 1330.057,
+          "selects": 2,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 302544,
+          "driverMs": [
+            655.9831000000122,
+            659.6693000000087
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 660
+            }
+          ]
+        },
+        {
+          "ms": 1334.555,
+          "selects": 2,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": -238768,
+          "driverMs": [
+            656.232399999979,
+            662.71179999999
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 663.107
+            }
+          ]
+        }
+      ]
+    },
+    "http_events_after": {
+      "minMs": 1240.549,
+      "meanMs": 1307.8272,
+      "medianMs": 1322.77,
+      "maxMs": 1338.048,
+      "samples": [
+        {
+          "ms": 1322.77,
+          "selects": 2,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": -102600,
+          "driverMs": [
+            656.0215999999782,
+            657.8190999999933
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 658.23
+            }
+          ]
+        },
+        {
+          "ms": 1240.549,
+          "selects": 2,
+          "resultBytes": 641,
+          "cpuMs": 16,
+          "heapDeltaBytes": 306024,
+          "driverMs": [
+            659.472299999994,
+            575.9631999999983
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 576.468
+            }
+          ]
+        },
+        {
+          "ms": 1331.037,
+          "selects": 2,
+          "resultBytes": 641,
+          "cpuMs": 15,
+          "heapDeltaBytes": -246024,
+          "driverMs": [
+            658.9065000000119,
+            658.9668999999994
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 659.325
+            }
+          ]
+        },
+        {
+          "ms": 1338.048,
+          "selects": 2,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 300336,
+          "driverMs": [
+            656.118599999987,
+            663.2939999999944
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 663.595
+            }
+          ]
+        },
+        {
+          "ms": 1306.732,
+          "selects": 2,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 311144,
+          "driverMs": [
+            657.4162000000069,
+            642.8951000000234
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 643.206
+            }
+          ]
+        }
+      ]
+    },
+    "http_more_before": {
+      "minMs": 1245.05,
+      "meanMs": 1307.4448,
+      "medianMs": 1320.475,
+      "maxMs": 1332.956,
+      "samples": [
+        {
+          "ms": 1245.05,
+          "selects": 2,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": -190104,
+          "driverMs": [
+            658.0243000000191,
+            577.3795999999857
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 577.802
+            }
+          ]
+        },
+        {
+          "ms": 1320.475,
+          "selects": 2,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": 383584,
+          "driverMs": [
+            657.9048000000184,
+            658.8641000000061
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 659.176
+            }
+          ]
+        },
+        {
+          "ms": 1332.956,
+          "selects": 2,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": -243128,
+          "driverMs": [
+            655.5597999999882,
+            663.5289000000048
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 663.873
+            }
+          ]
+        },
+        {
+          "ms": 1315.5,
+          "selects": 2,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": 386680,
+          "driverMs": [
+            656.925200000027,
+            643.8262999999861
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 644.273
+            }
+          ]
+        },
+        {
+          "ms": 1323.243,
+          "selects": 2,
+          "resultBytes": 1218,
+          "cpuMs": 47,
+          "heapDeltaBytes": -230608,
+          "driverMs": [
+            655.4849000000104,
+            657.7355999999854
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 658.09
+            }
+          ]
+        }
+      ]
+    },
+    "http_more_after": {
+      "minMs": 1243.007,
+      "meanMs": 1306.5593999999999,
+      "medianMs": 1324.498,
+      "maxMs": 1333.838,
+      "samples": [
+        {
+          "ms": 1333.838,
+          "selects": 2,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": -233760,
+          "driverMs": [
+            658.0007999999798,
+            660.8798999999999
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 661.383
+            }
+          ]
+        },
+        {
+          "ms": 1324.498,
+          "selects": 2,
+          "resultBytes": 1218,
+          "cpuMs": 16,
+          "heapDeltaBytes": 407136,
+          "driverMs": [
+            657.0479999999807,
+            664.4010000000126
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 664.825
+            }
+          ]
+        },
+        {
+          "ms": 1306.071,
+          "selects": 2,
+          "resultBytes": 1218,
+          "cpuMs": 31,
+          "heapDeltaBytes": -257984,
+          "driverMs": [
+            656.5975000000035,
+            643.1563000000024
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 643.621
+            }
+          ]
+        },
+        {
+          "ms": 1325.383,
+          "selects": 2,
+          "resultBytes": 1218,
+          "cpuMs": 31,
+          "heapDeltaBytes": 388768,
+          "driverMs": [
+            656.5639999999839,
+            657.5499000000127
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 658.142
+            }
+          ]
+        },
+        {
+          "ms": 1243.007,
+          "selects": 2,
+          "resultBytes": 1218,
+          "cpuMs": 16,
+          "heapDeltaBytes": -247096,
+          "driverMs": [
+            658.2833000000101,
+            577.0142000000051
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 577.307
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "equivalence": [],
+  "explain": [],
+  "scenario": {
+    "ordersInFirstPage": 50,
+    "defaultLimit": 50,
+    "deepPageLimit": 10,
+    "eventPageLimit": 5,
+    "hasNextPage": true,
+    "hasMoreEvents": true
+  },
+  "httpHarness": {
+    "includes": [
+      "real router/controller/JWT signature",
+      "fresh active DB identity and capabilities",
+      "strict TLS MySQL"
+    ],
+    "excludes": [
+      "real Keycloak session",
+      "browser/render",
+      "global audit and SQL quota writes"
+    ],
+    "quota": "memory 200/minute",
+    "financialCapability": false
+  }
+}

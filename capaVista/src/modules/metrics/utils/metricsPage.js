@@ -71,6 +71,16 @@ export function getPeriodQuery(period) {
     }
   }
 
+  const days = (new Date(`${to}T00:00:00.000Z`) - new Date(`${from}T00:00:00.000Z`)) / 86400000 + 1
+  if (days > 366) {
+    return {
+      from: '',
+      to: '',
+      queryKey: '',
+      validationMessage: 'El intervalo de métricas no puede superar 366 días.',
+    }
+  }
+
   return { from, to, queryKey: `${from}|${to}`, validationMessage: '' }
 }
 
