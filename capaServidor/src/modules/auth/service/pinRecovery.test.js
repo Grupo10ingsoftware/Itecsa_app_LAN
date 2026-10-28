@@ -222,3 +222,50 @@ test('cancellation under PIN-generation delay is checked again at commit boundar
     await assert.rejects(result, rejected);
     assert.equal(writes, 0);
 });
+
+for (const failure of ['hash', 'sql']) {
+    test(`OPT08: ${failure} failure leaves prior credential and consumes recovery without success`, async t => {
+        let user = { id_usuario: 1, estado_usuario: 'Activo', pin_hash: null, pin_salt: null };
+        const original = { ...user }; let updates = 0;
+        const pins = new PinService({ secret: Buffer.alloc(32, 4).toString('base64'), prisma: {
+            $transaction: async fn => {
+                const snapshot = { ...user };
+                try { return await fn({ usuario: { update: async ({ data }) => {
+                    updates++; user = { ...user, ...data }; throw Error('Synthetic SQL failure');
+                } } }); } catch (error) { user = snapshot; throw error; }
+            },
+        } });
+        pins.findUser = async () => user;
+        pins.findUserForUpdate = async () => user;
+        if (failure === 'hash') pins.buildCredential = async () => { throw Error('Synthetic hash failure'); };
+        const f = fixture(t, { pins });
+        await assert.rejects(f.finish(), rejected);
+        assert.deepEqual(user, original); assert.equal(updates, failure === 'hash' ? 0 : 1);
+        await assert.rejects(f.finish(), rejected);
+        assert(!JSON.stringify(f.logs).includes('completed'));
+    });
+}
+
+test('OPT08: finish waits for transaction commit; cancellation/replay cannot replace an in-progress commit', async t => {
+    let enterCommit, releaseCommit;
+    const entered = new Promise(r => { enterCommit = r });
+    const commit = new Promise(r => { releaseCommit = r });
+    let user = { id_usuario: 1, estado_usuario: 'Activo', pin_hash: null, pin_salt: null }, writes = 0;
+    const pins = new PinService({ secret: Buffer.alloc(32, 5).toString('base64'), prisma: {
+        $transaction: async fn => {
+            let staged;
+            const result = await fn({ usuario: { update: async ({ data }) => { staged = data; writes++; } } });
+            enterCommit(); await commit; user = { ...user, ...staged }; return result;
+        },
+    } });
+    pins.findUser = async () => user;
+    pins.findUserForUpdate = async () => user;
+    const f = fixture(t, { pins }); let settled = false;
+    const result = f.finish().then(value => { settled = true; return value; });
+    await entered;
+    assert.equal(settled, false); assert.equal(user.pin_hash, null);
+    assert.throws(() => f.service.cancel(actor, f.flow.state), rejected);
+    await assert.rejects(f.finish(), rejected); assert.equal(writes, 1);
+    releaseCommit(); assert.deepEqual(await result, { pinStatus: 'pending_acknowledgement' });
+    assert(user.pin_hash.startsWith('scrypt$v2$N=32768,r=8,p=3$')); assert.equal(user.pin_accepted_at, null);
+});

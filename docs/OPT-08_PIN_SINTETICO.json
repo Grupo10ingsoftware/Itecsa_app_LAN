@@ -1,0 +1,223 @@
+{
+    "reference":  "b71fd33",
+    "capturedAt":  "2026-10-28T04:47:23.810Z",
+    "methodology":  "Five synthetic samples per operation; crypto is exercised by setup, but no separate warmup for each function. Actual AES/HKDF/scrypt and RS256 JWT verification; injected provider/transaction doubles, no network/SQL or true DB commit/rollback. No real E2E or reliable p95.",
+    "samples":  {
+                    "reveal_before":  {
+                                          "n":  5,
+                                          "minMs":  0.209,
+                                          "meanMs":  0.5118,
+                                          "medianMs":  0.278,
+                                          "maxMs":  1.291,
+                                          "samples":  [
+                                                          1.291,
+                                                          0.278,
+                                                          0.209,
+                                                          0.243,
+                                                          0.538
+                                                      ]
+                                      },
+                    "acknowledge_before":  {
+                                               "n":  5,
+                                               "minMs":  0.044,
+                                               "meanMs":  0.0958,
+                                               "medianMs":  0.064,
+                                               "maxMs":  0.183,
+                                               "samples":  [
+                                                               0.183,
+                                                               0.059,
+                                                               0.129,
+                                                               0.064,
+                                                               0.044
+                                                           ]
+                                           },
+                    "buildCredential_before":  {
+                                                   "n":  5,
+                                                   "minMs":  207.271,
+                                                   "meanMs":  218.35859999999997,
+                                                   "medianMs":  219.312,
+                                                   "maxMs":  223.314,
+                                                   "samples":  [
+                                                                   219.312,
+                                                                   223.314,
+                                                                   222.926,
+                                                                   207.271,
+                                                                   218.97
+                                                               ]
+                                               },
+                    "start_before":  {
+                                         "n":  5,
+                                         "minMs":  0.185,
+                                         "meanMs":  0.9001999999999999,
+                                         "medianMs":  0.286,
+                                         "maxMs":  3.462,
+                                         "samples":  [
+                                                         3.462,
+                                                         0.35,
+                                                         0.218,
+                                                         0.286,
+                                                         0.185
+                                                     ]
+                                     },
+                    "resume_before":  {
+                                          "n":  5,
+                                          "minMs":  0.937,
+                                          "meanMs":  1.8146,
+                                          "medianMs":  1.054,
+                                          "maxMs":  4.882,
+                                          "samples":  [
+                                                          4.882,
+                                                          1.036,
+                                                          1.054,
+                                                          0.937,
+                                                          1.164
+                                                      ]
+                                      },
+                    "finish_before":  {
+                                          "n":  5,
+                                          "minMs":  428.705,
+                                          "meanMs":  438.8914,
+                                          "medianMs":  439.763,
+                                          "maxMs":  448.471,
+                                          "samples":  [
+                                                          448.471,
+                                                          439.763,
+                                                          432.707,
+                                                          444.811,
+                                                          428.705
+                                                      ]
+                                      },
+                    "cancel_before":  {
+                                          "n":  5,
+                                          "minMs":  0.016,
+                                          "meanMs":  0.034,
+                                          "medianMs":  0.03,
+                                          "maxMs":  0.055,
+                                          "samples":  [
+                                                          0.055,
+                                                          0.029,
+                                                          0.016,
+                                                          0.04,
+                                                          0.03
+                                                      ]
+                                      },
+                    "reveal_after":  {
+                                         "n":  5,
+                                         "minMs":  0.109,
+                                         "meanMs":  0.161,
+                                         "medianMs":  0.127,
+                                         "maxMs":  0.313,
+                                         "samples":  [
+                                                         0.313,
+                                                         0.127,
+                                                         0.116,
+                                                         0.109,
+                                                         0.14
+                                                     ]
+                                     },
+                    "acknowledge_after":  {
+                                              "n":  5,
+                                              "minMs":  0.043,
+                                              "meanMs":  0.0812,
+                                              "medianMs":  0.049,
+                                              "maxMs":  0.198,
+                                              "samples":  [
+                                                              0.198,
+                                                              0.043,
+                                                              0.047,
+                                                              0.049,
+                                                              0.069
+                                                          ]
+                                          },
+                    "buildCredential_after":  {
+                                                  "n":  5,
+                                                  "minMs":  208.204,
+                                                  "meanMs":  215.6366,
+                                                  "medianMs":  217.121,
+                                                  "maxMs":  221.775,
+                                                  "samples":  [
+                                                                  221.775,
+                                                                  217.121,
+                                                                  208.204,
+                                                                  211.717,
+                                                                  219.366
+                                                              ]
+                                              },
+                    "start_after":  {
+                                        "n":  5,
+                                        "minMs":  0.057,
+                                        "meanMs":  0.07980000000000001,
+                                        "medianMs":  0.068,
+                                        "maxMs":  0.138,
+                                        "samples":  [
+                                                        0.138,
+                                                        0.068,
+                                                        0.057,
+                                                        0.06,
+                                                        0.076
+                                                    ]
+                                    },
+                    "resume_after":  {
+                                         "n":  5,
+                                         "minMs":  1.062,
+                                         "meanMs":  1.2772,
+                                         "medianMs":  1.257,
+                                         "maxMs":  1.478,
+                                         "samples":  [
+                                                         1.478,
+                                                         1.062,
+                                                         1.122,
+                                                         1.467,
+                                                         1.257
+                                                     ]
+                                     },
+                    "finish_after":  {
+                                         "n":  5,
+                                         "minMs":  438.518,
+                                         "meanMs":  440.13779999999997,
+                                         "medianMs":  439.579,
+                                         "maxMs":  442.326,
+                                         "samples":  [
+                                                         439.579,
+                                                         439.547,
+                                                         440.719,
+                                                         442.326,
+                                                         438.518
+                                                     ]
+                                     },
+                    "cancel_after":  {
+                                         "n":  5,
+                                         "minMs":  0.015,
+                                         "meanMs":  0.0194,
+                                         "medianMs":  0.018,
+                                         "maxMs":  0.024,
+                                         "samples":  [
+                                                         0.017,
+                                                         0.015,
+                                                         0.024,
+                                                         0.018,
+                                                         0.023
+                                                     ]
+                                     }
+                },
+    "checks":  {
+                   "revealColumns_before":  16,
+                   "acknowledgeColumns_before":  16,
+                   "before":  {
+                                  "receiptDurableInDouble":  true,
+                                  "replayDenied":  true,
+                                  "cancelDenied":  true,
+                                  "rotationLock":  true,
+                                  "note":  "Double proves control flow, not MySQL isolation. Existing concurrency/fault suites run separately."
+                              },
+                   "revealColumns_after":  5,
+                   "acknowledgeColumns_after":  4,
+                   "after":  {
+                                 "receiptDurableInDouble":  true,
+                                 "replayDenied":  true,
+                                 "cancelDenied":  true,
+                                 "rotationLock":  true,
+                                 "note":  "Double proves control flow, not MySQL isolation. Existing concurrency/fault suites run separately."
+                             }
+               }
+}

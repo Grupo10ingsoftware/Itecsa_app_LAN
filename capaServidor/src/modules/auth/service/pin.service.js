@@ -193,9 +193,10 @@ export class PinService {
         };
     }
 
-    async findUser(identitySubject) {
+    async findUser(identitySubject, select) {
         return this.client.usuario.findFirst({
             where: identityUserWhere(identitySubject),
+            ...(select ? { select } : {}),
         });
     }
 
@@ -242,19 +243,23 @@ export class PinService {
     }
 
     async ensureProvisioned(identitySubject) {
-        let user = await this.findUser(identitySubject);
+        const select = { id_usuario: true, estado_usuario: true, pin_hash: true, pin_accepted_at: true };
+        let user = await this.findUser(identitySubject, select);
         assertActiveUser(user);
 
         if (!user.pin_hash) {
             await this.provisionByUserId(user.id_usuario);
-            user = await this.findUser(identitySubject);
+            user = await this.findUser(identitySubject, select);
         }
 
         return pinStatus(user);
     }
 
     async reveal(identitySubject) {
-        const user = await this.findUser(identitySubject);
+        const user = await this.findUser(identitySubject, {
+            estado_usuario: true, pin_accepted_at: true,
+            pin_pending_ciphertext: true, pin_pending_iv: true, pin_pending_tag: true,
+        });
         assertActiveUser(user);
 
         if (
@@ -274,7 +279,9 @@ export class PinService {
     }
 
     async acknowledge(identitySubject) {
-        const user = await this.findUser(identitySubject);
+        const user = await this.findUser(identitySubject, {
+            id_usuario: true, estado_usuario: true, pin_hash: true, pin_accepted_at: true,
+        });
         assertActiveUser(user);
 
         if (!user.pin_hash) {
@@ -386,7 +393,7 @@ export class PinService {
     }
 
     async rotateAfterRecovery(identitySubject, authorize) {
-        const user = await this.findUser(identitySubject);
+        const user = await this.findUser(identitySubject, { estado_usuario: true });
         assertActiveUser(user);
         for (let attempt = 0; attempt < 20; attempt += 1) {
             const credential = await this.buildCredential();
