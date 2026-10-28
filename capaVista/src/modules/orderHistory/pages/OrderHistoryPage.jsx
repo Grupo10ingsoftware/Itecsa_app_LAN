@@ -36,7 +36,7 @@ export default function OrderHistoryPage() {
   useEffect(() => {
     let active = true
     const cursor = cursorStack.at(-1)
-    api.listOrders({ status, search, from: dateRange.from, to: dateRange.to, cursor, limit: 50 })
+    api.listOrders({ status, search, from: dateRange.from, to: dateRange.to, cursor, limit: 10 })
       .then((result) => {
         if (!active) return
         setOrders(result.items ?? [])
@@ -92,9 +92,7 @@ export default function OrderHistoryPage() {
   return (
     <PageShell className={styles.page}>
       <PageSurface>
-      <PageHeader title="Historial de pedidos" actions={
-        <strong className={styles.resultCount}>{orders.length} resultados en esta página</strong>
-      } />
+      <PageHeader title="Historial de pedidos" />
 
       <section className={styles.panel}>
         <div className={styles.statusFilters} aria-label="Filtros por estado">

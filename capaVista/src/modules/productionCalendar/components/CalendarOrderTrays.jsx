@@ -1,3 +1,4 @@
+import { getOrderStagePresentation } from '../../../shared/orderStagePresentation.js'
 import { getOrderToneClass, getProductSummary, formatScheduleState, displayValue } from '../utils/calendarPresentation.js';
 import { useAuth } from '../../../hooks/useAuth';
 import styles from './ProductionCalendarGrid.module.css';
@@ -34,6 +35,7 @@ export function PendingOrdersTray({ draggedItemId, items, onDragEnd, onDragStart
             ]
               .filter(Boolean)
               .join(' ')}
+            data-stage={getOrderStagePresentation(formatScheduleState(item)).token}
             draggable={hasPermission(PERMISSIONS.UPDATE_DELIVERY_DATE)}
             key={item.id}
             onDragEnd={onDragEnd}
@@ -41,6 +43,7 @@ export function PendingOrdersTray({ draggedItemId, items, onDragEnd, onDragStart
             onDragStart={(event) => handleDragStart(event, item.id)}
             title="Doble click para ver detalle. Arrastrar a un dia habil del calendario"
           >
+            {hasPermission(PERMISSIONS.UPDATE_DELIVERY_DATE) && <i className={`bi bi-grip-vertical ${styles.dragHandle}`} aria-hidden="true" />}
             <span className={styles.eventLine}>
               <b>Pedido N°:</b>
               <strong>{item.orderNumber}</strong>
@@ -55,7 +58,7 @@ export function PendingOrdersTray({ draggedItemId, items, onDragEnd, onDragStart
             </span>
             <span className={styles.eventLine}>
               <b>Etapa:</b>
-              <small>{formatScheduleState(item)}</small>
+              <small className={styles.stageBadge}><span className={styles.stageFull}>{formatScheduleState(item)}</span><span className={styles.stageShort} aria-hidden="true">{getOrderStagePresentation(formatScheduleState(item)).short}</span></small>
             </span>
           </article>
         ))}
@@ -99,8 +102,8 @@ export function TransferOrdersTray({ draggedItemId, items, onDragEnd, onDragStar
       aria-label="Bandeja temporal para mover pedidos de mes"
     >
       <header className={styles.transferTrayHeader}>
+        <i className="bi bi-box-seam" aria-hidden="true" />
         <div>
-          <span>Produccion</span>
           <h2>Bandeja para mover pedidos</h2>
         </div>
         <strong>{items.length}</strong>
@@ -108,7 +111,7 @@ export function TransferOrdersTray({ draggedItemId, items, onDragEnd, onDragStar
 
       <div className={styles.transferTrayBody}>
         {items.length === 0 ? (
-          <p className={styles.emptyTransferState}>Arrastra aqui los pedidos que quieras mover a otro mes.</p>
+          <p className={styles.emptyTransferState}><i className="bi bi-arrows-move" aria-hidden="true" />Arrastra aquí los pedidos que quieras mover a otro mes.</p>
         ) : items.map((item) => (
           <article
             className={[
@@ -118,6 +121,7 @@ export function TransferOrdersTray({ draggedItemId, items, onDragEnd, onDragStar
             ]
               .filter(Boolean)
               .join(' ')}
+            data-stage={getOrderStagePresentation(formatScheduleState(item)).token}
             draggable={canReceiveTransfer}
             key={item.id}
             onDragEnd={onDragEnd}
@@ -126,7 +130,7 @@ export function TransferOrdersTray({ draggedItemId, items, onDragEnd, onDragStar
             title="Arrastrar a un dia habil del calendario"
           >
             <span className={styles.eventLine}>
-              <b>Pedido NÂ°:</b>
+              <b>Pedido N.º</b>
               <strong>{item.orderNumber}</strong>
             </span>
             <span className={styles.eventLine}>
@@ -136,6 +140,10 @@ export function TransferOrdersTray({ draggedItemId, items, onDragEnd, onDragStar
             <span className={styles.eventLine}>
               <b>Productos:</b>
               <em>{getProductSummary(item)}</em>
+            </span>
+            <span className={styles.eventLine}>
+              <b>Etapa:</b>
+              <small className={styles.stageBadge}><span className={styles.stageFull}>{formatScheduleState(item)}</span><span className={styles.stageShort} aria-hidden="true">{getOrderStagePresentation(formatScheduleState(item)).short}</span></small>
             </span>
             <span className={styles.eventLine}>
               <b>Fecha actual:</b>

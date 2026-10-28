@@ -1,4 +1,22 @@
 :root {
+  --stage-payment-accent: #ca8a04;
+  --stage-payment-text: #713f12;
+  --stage-payment-bg: #fef9c3;
+  --stage-ready-accent: var(--page-brand-orange);
+  --stage-ready-text: #9a3412;
+  --stage-ready-bg: #fff7ed;
+  --stage-production-accent: #2563eb;
+  --stage-production-text: #1e40af;
+  --stage-production-bg: #eff6ff;
+  --stage-delivery-accent: var(--itexsa-green);
+  --stage-delivery-text: #166534;
+  --stage-delivery-bg: #f0fdf4;
+  --stage-review-accent: #dc2626;
+  --stage-review-text: #b91c1c;
+  --stage-review-bg: #fef2f2;
+  --stage-unknown-accent: var(--itexsa-muted);
+  --stage-unknown-text: var(--itexsa-text);
+  --stage-unknown-bg: var(--page-background);
   --layer-pin-dialog: 2000;
   /* PIN dialogs are the highest existing layer; the host only captures card clicks. */
   --layer-toast: 2010;

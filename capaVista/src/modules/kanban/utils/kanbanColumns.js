@@ -1,3 +1,4 @@
+import { getOrderStageAccent } from '../../../shared/orderStagePresentation.js'
 
 
 export const MOVE_TO_PRODUCTION_PERMISSION_MESSAGE = 'Solo un administrador puede mover pedidos a En produccion.'
@@ -17,31 +18,31 @@ export const baseColumns = [
     id: 'confirmacion-pago',
     title: 'Confirmacion de pago',
     generalStepId: 0,
-    accent: '#f97316',
+    accent: getOrderStageAccent(0),
     icon: 'bi-cash-coin',
   },
   {
     id: 'listo-produccion',
     title: 'Listo para produccion',
     generalStepId: 1,
-    accent: '#2563eb',
+    accent: getOrderStageAccent(1),
     icon: 'bi-clipboard-check',
   },
   {
     id: 'en-produccion',
     title: 'En produccion',
     generalStepId: 2,
-    accent: '#d97706',
+    accent: getOrderStageAccent(2),
     icon: 'bi-gear-wide-connected',
   },
   {
     id: 'listo-entrega',
     title: 'Listo para entrega',
     generalStepId: 3,
-    accent: '#248f55',
+    accent: getOrderStageAccent(3),
     icon: 'bi-check2-circle',
   },
-  { id: 'en-revision', title: 'En revision', generalStepId: KANBAN_REVISION_STEP, accent: '#dc2626', icon: 'bi-search' },
+  { id: 'en-revision', title: 'En revision', generalStepId: KANBAN_REVISION_STEP, accent: getOrderStageAccent(6), icon: 'bi-search' },
 ]
 
 export function getColumnTitleByStepId(stepId) {

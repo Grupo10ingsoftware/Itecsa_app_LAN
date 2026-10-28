@@ -31,7 +31,7 @@ describe('operaciones de calendario protegidas por PIN', () => {
     fireEvent.submit(screen.getByRole('dialog'))
     await waitFor(() => expect(screen.queryByRole('status')).toBeNull())
     const issue = screen.getByText(/No fue posible cambiar la fecha de entrega\./)
-    expect(issue.closest('[role="dialog"]')).toBeTruthy()
+    expect(issue.closest('[data-toast-viewport]')).toBeTruthy()
     expect(issue.textContent).toContain('Comprueba el resultado antes de repetir')
     expect(screen.getByRole('button', { name: 'Confirmar' }).disabled).toBe(false)
     vi.restoreAllMocks()

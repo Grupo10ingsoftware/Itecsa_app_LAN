@@ -1,4 +1,4 @@
-import { isBusinessDateKey } from './calendarUtils';
+import { getCalendarOrderStatus } from './calendarOrder';
 import styles from '../components/ProductionCalendarGrid.module.css';
 
 export function formatDayTitle(dateKey) {
@@ -12,10 +12,7 @@ export function formatDayTitle(dateKey) {
 }
 
 export function formatScheduleState(item) {
-  if (!item.dueDate) return 'Sin fecha programada'
-  if (!isBusinessDateKey(item.dueDate)) return 'Fecha no habil'
-
-  return item.status
+  return getCalendarOrderStatus({ ...item, orderStatus: item.orderStatus || item.status })
 }
 
 export function displayValue(value, fallback = 'No definido') {

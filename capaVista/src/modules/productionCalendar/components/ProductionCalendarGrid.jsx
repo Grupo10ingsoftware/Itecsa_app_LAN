@@ -69,7 +69,10 @@ export default function ProductionCalendarGrid({
       const detail = await getOrderDetail(item.id)
       if (id === detailRequest.current) setSelectedDetailOrder(detail)
     } catch {
-      if (id === detailRequest.current) setDetailError('No fue posible cargar el detalle del pedido.')
+      if (id === detailRequest.current) {
+        setDetailError('No fue posible cargar el detalle del pedido.')
+        notify.error('No fue posible cargar el detalle del pedido.')
+      }
     } finally { if (id === detailRequest.current) setDetailLoading(false) }
   }
 
@@ -146,10 +149,11 @@ export default function ProductionCalendarGrid({
           onOpenDetail={openDetail}
         />}
 
-        {toolbar && <div className={styles.calendarToolbarSlot}>{toolbar}</div>}
-
-        {isLoading ? <LoadingIndicator context="Calendario de producción" /> : <section className={styles.calendarShell} aria-label="Calendario mensual de produccion">
           <div className={styles.calendarLayout}>
+            <section className={styles.calendarShell} aria-label="Calendario mensual de produccion">
+            {toolbar && <div className={styles.calendarToolbarSlot}>{toolbar}</div>}
+            <div className={styles.calendarScroll}>
+            {isLoading ? <LoadingIndicator context="Calendario de producción" /> :
             <div className={styles.businessCalendar}>
               <div className={styles.weekHeader}>
                 {WEEK_DAYS.map((day) => (
@@ -174,17 +178,18 @@ export default function ProductionCalendarGrid({
                   />
                 ))}
               </div>
+            </div>}
             </div>
+            </section>
 
-            <PendingOrdersTray
+            {!isLoading && <PendingOrdersTray
               draggedItemId={draggedItemId}
               items={pendingItems}
               onDragEnd={handleDragEnd}
               onDragStart={onDragStart}
               onOpenDetail={openDetail}
-            />
+            />}
           </div>
-        </section>}
       </div>
 
       <DayOrdersModal
