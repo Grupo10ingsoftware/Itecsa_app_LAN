@@ -15,6 +15,7 @@ export default class OrderHistoryController {
     }
 
     listOrders = async (req, res) => {
+        res.setHeader('Cache-Control', 'no-store');
         try {
             return res.status(200).json(await this.service.listOrders(req.query));
         } catch (error) {
@@ -23,6 +24,7 @@ export default class OrderHistoryController {
     };
 
     getOrderHistory = async (req, res) => {
+        res.setHeader('Cache-Control', 'no-store');
         try {
             return res.status(200).json(
                 await this.service.getOrderHistory(req.params.orderId, req.query, {
@@ -35,6 +37,7 @@ export default class OrderHistoryController {
     };
 
     listOrderEvents = async (req, res) => {
+        res.setHeader('Cache-Control', 'no-store');
         try {
             return res.status(200).json(
                 await this.service.listOrderEvents(req.params.orderId, req.query, {

@@ -132,6 +132,7 @@ export function createResumePinSessionHandler({ navigation }) {
 
 export function createGetProfileHandler({ users = userRepository } = {}) {
     return async function getProfileHandler(req, res) {
+        res.set('Cache-Control', 'no-store');
         const user = req.currentUser;
         if (!user || user.identitySubject !== req.auth?.payload?.sub) {
             return res.status(401).json({ message: "Sesión no válida." });
@@ -155,6 +156,7 @@ export function createGetProfileHandler({ users = userRepository } = {}) {
 
 export function createGetProfileMovementsHandler({ users = userRepository } = {}) {
     return async function getProfileMovementsHandler(req, res) {
+        res.set('Cache-Control', 'no-store');
         const user = req.currentUser;
         if (!user || typeof req.auth?.payload?.sub !== 'string' || user.identitySubject !== req.auth.payload.sub) {
             return res.status(401).json({ message: "Sesión no válida." });

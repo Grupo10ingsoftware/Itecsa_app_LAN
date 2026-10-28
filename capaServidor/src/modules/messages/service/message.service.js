@@ -2,6 +2,7 @@ import { AppError } from "../../../errors/AppError.js";
 import MessageRepository from "../repo/message.repo.js";
 import { UserRepository } from "../../users/repo/users.repo.js";
 import { isActiveUserStatus } from '../../../config/userLifecycle.js';
+import { createHash } from 'node:crypto';
 
 const VALID_STATUSES = new Set(["all", "read", "unread"]);
 const VALID_SORTS = new Set(["latest", "oldest"]);
@@ -109,15 +110,24 @@ class MessageService {
             : 10;
         const limit = Math.min(requestedLimit, 50);
 
-        const [notifications, unreadCount] = await Promise.all([
+        const snapshot = typeof this.repo.getNotificationSnapshot === 'function'
+            ? await this.repo.getNotificationSnapshot(user.idUsuario, limit)
+            : await Promise.all([
             this.repo.listNotifications(user.idUsuario, limit),
             this.repo.countUnreadNotifications(user.idUsuario),
-        ]);
+        ]).then(([notifications, unreadCount]) => ({ notifications, unreadCount }));
+        if (query.view === 'bell') {
+            const notifications = snapshot.notifications.map(message => {
+                const text = String(message.contenido ?? '').replace(/\s+/g, ' ').trim();
+                return { id_mensaje: message.id_mensaje, Asunto: message.Asunto, fecha_publicacion: message.fecha_publicacion,
+                    leido: message.leido, oculto: message.oculto, preview: text.slice(0, 82).trim(), truncated: text.length > 82 };
+            });
+            const revision = createHash('sha256').update(JSON.stringify([user.idUsuario, notifications, snapshot.unreadCount])).digest('hex');
+            return query.revision === revision ? { unchanged: true, revision, unreadCount: snapshot.unreadCount }
+                : { notifications, unreadCount: snapshot.unreadCount, revision };
+        }
 
-        return {
-            notifications,
-            unreadCount,
-        };
+        return snapshot;
     }
 
     async getMessage(identitySubject, messageId, context) {
@@ -130,6 +140,17 @@ class MessageService {
         }
 
         return message;
+    }
+
+    async openMessage(identitySubject, messageId, context) {
+        const user = await this.resolveUser(identitySubject, context);
+        const id = parsePositiveInteger(messageId, 'messageId');
+        const current = await this.repo.findUserMessage(user.idUsuario, id);
+        if (!current) throw createHttpError(404, 'Mensaje no encontrado.');
+        const markedAsRead = context?.canMarkRead === true && !current.leido;
+        const message = markedAsRead ? await this.repo.markAsRead(user.idUsuario, id) : current;
+        if (!message) throw createHttpError(404, 'Mensaje no encontrado.');
+        return { message, markedAsRead };
     }
 
     async markAsRead(identitySubject, messageId, context) {
@@ -145,7 +166,9 @@ class MessageService {
             return current;
         }
 
-        return this.repo.markAsRead(user.idUsuario, parsedMessageId);
+        const updated = await this.repo.markAsRead(user.idUsuario, parsedMessageId);
+        if (!updated) throw createHttpError(404, 'Mensaje no encontrado.');
+        return updated;
     }
 
     async hideNotification(identitySubject, messageId, context) {
@@ -161,7 +184,9 @@ class MessageService {
             return current;
         }
 
-        return this.repo.hideNotification(user.idUsuario, parsedMessageId);
+        const updated = await this.repo.hideNotification(user.idUsuario, parsedMessageId);
+        if (!updated) throw createHttpError(404, 'Notificacion no encontrada.');
+        return updated;
     }
 
     async clearNotifications(identitySubject, context) {

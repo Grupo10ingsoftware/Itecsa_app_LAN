@@ -1,0 +1,1507 @@
+{
+  "reference": "b8e8a94",
+  "capturedAt": "2026-10-27T19:52:46.382Z",
+  "node": "v22.23.4",
+  "environment": "isolated diagnostic container / development MySQL / unchanged strict TLS and pool 10",
+  "methodology": "10 warm sequential samples per series, 250ms pause outside clock; no p95/E2E claim; no real writes",
+  "samples": {
+    "workspace_before": {
+      "n": 10,
+      "minMs": 1318.44,
+      "medianMs": 1321.338,
+      "meanMs": 1321.746,
+      "maxMs": 1327.24,
+      "values": [
+        {
+          "ms": 1323.434,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1327.24,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1321.861,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1323.973,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1321.551,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1319.758,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1321.124,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1320.353,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1318.44,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1319.727,
+          "selects": 6,
+          "bytes": 11350
+        }
+      ]
+    },
+    "workspace_after": {
+      "n": 10,
+      "minMs": 658.33,
+      "medianMs": 664.111,
+      "meanMs": 664.097,
+      "maxMs": 674.205,
+      "values": [
+        {
+          "ms": 659.912,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 664.074,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 664.147,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 658.33,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 664.728,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 660.954,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 666.084,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 674.205,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 661.826,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 666.712,
+          "selects": 2,
+          "bytes": 11350
+        }
+      ]
+    },
+    "status_before": {
+      "n": 10,
+      "minMs": 1319.367,
+      "medianMs": 1320.351,
+      "meanMs": 1320.639,
+      "maxMs": 1322.639,
+      "values": [
+        {
+          "ms": 1319.607,
+          "selects": 6,
+          "bytes": 2446
+        },
+        {
+          "ms": 1322.639,
+          "selects": 6,
+          "bytes": 2446
+        },
+        {
+          "ms": 1319.798,
+          "selects": 6,
+          "bytes": 2446
+        },
+        {
+          "ms": 1321.389,
+          "selects": 6,
+          "bytes": 2446
+        },
+        {
+          "ms": 1321.504,
+          "selects": 6,
+          "bytes": 2446
+        },
+        {
+          "ms": 1319.974,
+          "selects": 6,
+          "bytes": 2446
+        },
+        {
+          "ms": 1319.596,
+          "selects": 6,
+          "bytes": 2446
+        },
+        {
+          "ms": 1321.786,
+          "selects": 6,
+          "bytes": 2446
+        },
+        {
+          "ms": 1319.367,
+          "selects": 6,
+          "bytes": 2446
+        },
+        {
+          "ms": 1320.728,
+          "selects": 6,
+          "bytes": 2446
+        }
+      ]
+    },
+    "status_after": {
+      "n": 10,
+      "minMs": 580.05,
+      "medianMs": 662.044,
+      "meanMs": 652.716,
+      "maxMs": 666.401,
+      "values": [
+        {
+          "ms": 663.808,
+          "selects": 1,
+          "bytes": 2324
+        },
+        {
+          "ms": 580.05,
+          "selects": 1,
+          "bytes": 2324
+        },
+        {
+          "ms": 661.955,
+          "selects": 1,
+          "bytes": 2324
+        },
+        {
+          "ms": 660.418,
+          "selects": 1,
+          "bytes": 2324
+        },
+        {
+          "ms": 662.134,
+          "selects": 1,
+          "bytes": 2324
+        },
+        {
+          "ms": 663.245,
+          "selects": 1,
+          "bytes": 2324
+        },
+        {
+          "ms": 666.401,
+          "selects": 1,
+          "bytes": 2324
+        },
+        {
+          "ms": 646.384,
+          "selects": 1,
+          "bytes": 2324
+        },
+        {
+          "ms": 659.969,
+          "selects": 1,
+          "bytes": 2324
+        },
+        {
+          "ms": 662.797,
+          "selects": 1,
+          "bytes": 2324
+        }
+      ]
+    },
+    "search_before": {
+      "n": 10,
+      "minMs": 1318.655,
+      "medianMs": 1321.388,
+      "meanMs": 1321.423,
+      "maxMs": 1324.155,
+      "values": [
+        {
+          "ms": 1321.75,
+          "selects": 6,
+          "bytes": 657
+        },
+        {
+          "ms": 1323.824,
+          "selects": 6,
+          "bytes": 657
+        },
+        {
+          "ms": 1318.655,
+          "selects": 6,
+          "bytes": 657
+        },
+        {
+          "ms": 1319.611,
+          "selects": 6,
+          "bytes": 657
+        },
+        {
+          "ms": 1321.545,
+          "selects": 6,
+          "bytes": 657
+        },
+        {
+          "ms": 1319.536,
+          "selects": 6,
+          "bytes": 657
+        },
+        {
+          "ms": 1321.231,
+          "selects": 6,
+          "bytes": 657
+        },
+        {
+          "ms": 1324.155,
+          "selects": 6,
+          "bytes": 657
+        },
+        {
+          "ms": 1320.085,
+          "selects": 6,
+          "bytes": 657
+        },
+        {
+          "ms": 1323.836,
+          "selects": 6,
+          "bytes": 657
+        }
+      ]
+    },
+    "search_after": {
+      "n": 10,
+      "minMs": 659.533,
+      "medianMs": 662.463,
+      "meanMs": 661.906,
+      "maxMs": 663.82,
+      "values": [
+        {
+          "ms": 659.867,
+          "selects": 2,
+          "bytes": 657
+        },
+        {
+          "ms": 663.035,
+          "selects": 2,
+          "bytes": 657
+        },
+        {
+          "ms": 663.82,
+          "selects": 2,
+          "bytes": 657
+        },
+        {
+          "ms": 659.533,
+          "selects": 2,
+          "bytes": 657
+        },
+        {
+          "ms": 662.213,
+          "selects": 2,
+          "bytes": 657
+        },
+        {
+          "ms": 660.759,
+          "selects": 2,
+          "bytes": 657
+        },
+        {
+          "ms": 663.722,
+          "selects": 2,
+          "bytes": 657
+        },
+        {
+          "ms": 663.474,
+          "selects": 2,
+          "bytes": 657
+        },
+        {
+          "ms": 659.926,
+          "selects": 2,
+          "bytes": 657
+        },
+        {
+          "ms": 662.713,
+          "selects": 2,
+          "bytes": 657
+        }
+      ]
+    },
+    "date_before": {
+      "n": 10,
+      "minMs": 1320.376,
+      "medianMs": 1321.55,
+      "meanMs": 1321.911,
+      "maxMs": 1324.348,
+      "values": [
+        {
+          "ms": 1324.094,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1321.062,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1320.376,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1321.606,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1323.081,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1320.845,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1324.348,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1321.688,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1320.516,
+          "selects": 6,
+          "bytes": 11350
+        },
+        {
+          "ms": 1321.494,
+          "selects": 6,
+          "bytes": 11350
+        }
+      ]
+    },
+    "date_after": {
+      "n": 10,
+      "minMs": 659.175,
+      "medianMs": 663.13,
+      "meanMs": 662.658,
+      "maxMs": 665.778,
+      "values": [
+        {
+          "ms": 659.175,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 662.026,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 665.01,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 659.842,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 665.778,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 659.974,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 664.7,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 665.157,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 660.681,
+          "selects": 2,
+          "bytes": 11350
+        },
+        {
+          "ms": 664.235,
+          "selects": 2,
+          "bytes": 11350
+        }
+      ]
+    },
+    "page_before": {
+      "n": 10,
+      "minMs": 1318.584,
+      "medianMs": 1320.143,
+      "meanMs": 1320.273,
+      "maxMs": 1322.508,
+      "values": [
+        {
+          "ms": 1320.7,
+          "selects": 6,
+          "bytes": 501
+        },
+        {
+          "ms": 1320.438,
+          "selects": 6,
+          "bytes": 501
+        },
+        {
+          "ms": 1319.123,
+          "selects": 6,
+          "bytes": 501
+        },
+        {
+          "ms": 1322.508,
+          "selects": 6,
+          "bytes": 501
+        },
+        {
+          "ms": 1319.695,
+          "selects": 6,
+          "bytes": 501
+        },
+        {
+          "ms": 1318.584,
+          "selects": 6,
+          "bytes": 501
+        },
+        {
+          "ms": 1321.527,
+          "selects": 6,
+          "bytes": 501
+        },
+        {
+          "ms": 1318.856,
+          "selects": 6,
+          "bytes": 501
+        },
+        {
+          "ms": 1319.848,
+          "selects": 6,
+          "bytes": 501
+        },
+        {
+          "ms": 1321.446,
+          "selects": 6,
+          "bytes": 501
+        }
+      ]
+    },
+    "page_after": {
+      "n": 10,
+      "minMs": 579.772,
+      "medianMs": 661.74,
+      "meanMs": 652.667,
+      "maxMs": 664.684,
+      "values": [
+        {
+          "ms": 663.526,
+          "selects": 1,
+          "bytes": 379
+        },
+        {
+          "ms": 579.772,
+          "selects": 1,
+          "bytes": 379
+        },
+        {
+          "ms": 660.591,
+          "selects": 1,
+          "bytes": 379
+        },
+        {
+          "ms": 661.272,
+          "selects": 1,
+          "bytes": 379
+        },
+        {
+          "ms": 663.856,
+          "selects": 1,
+          "bytes": 379
+        },
+        {
+          "ms": 661.381,
+          "selects": 1,
+          "bytes": 379
+        },
+        {
+          "ms": 664.684,
+          "selects": 1,
+          "bytes": 379
+        },
+        {
+          "ms": 646.089,
+          "selects": 1,
+          "bytes": 379
+        },
+        {
+          "ms": 662.1,
+          "selects": 1,
+          "bytes": 379
+        },
+        {
+          "ms": 663.397,
+          "selects": 1,
+          "bytes": 379
+        }
+      ]
+    },
+    "preview_before": {
+      "n": 10,
+      "minMs": 580.13,
+      "medianMs": 663.154,
+      "meanMs": 654.464,
+      "maxMs": 671.512,
+      "values": [
+        {
+          "ms": 659.553,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 662.206,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 666.603,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 667.792,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 671.512,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 646.12,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 662.344,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 663.963,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 664.415,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 580.13,
+          "selects": 1,
+          "bytes": 264
+        }
+      ]
+    },
+    "preview_after": {
+      "n": 10,
+      "minMs": 579.481,
+      "medianMs": 662.024,
+      "meanMs": 652.766,
+      "maxMs": 665.801,
+      "values": [
+        {
+          "ms": 660.448,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 661.614,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 662.858,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 665.801,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 646.728,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 662.435,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 664.515,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 663.544,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 579.481,
+          "selects": 1,
+          "bytes": 264
+        },
+        {
+          "ms": 660.235,
+          "selects": 1,
+          "bytes": 264
+        }
+      ]
+    },
+    "summary_only_after": {
+      "n": 10,
+      "minMs": 579.833,
+      "medianMs": 661.376,
+      "meanMs": 652.302,
+      "maxMs": 664.826,
+      "values": [
+        {
+          "ms": 660.232,
+          "selects": 1,
+          "bytes": 455
+        },
+        {
+          "ms": 661.886,
+          "selects": 1,
+          "bytes": 455
+        },
+        {
+          "ms": 664.826,
+          "selects": 1,
+          "bytes": 455
+        },
+        {
+          "ms": 645.757,
+          "selects": 1,
+          "bytes": 455
+        },
+        {
+          "ms": 663.63,
+          "selects": 1,
+          "bytes": 455
+        },
+        {
+          "ms": 662.511,
+          "selects": 1,
+          "bytes": 455
+        },
+        {
+          "ms": 663.743,
+          "selects": 1,
+          "bytes": 455
+        },
+        {
+          "ms": 579.833,
+          "selects": 1,
+          "bytes": 455
+        },
+        {
+          "ms": 659.736,
+          "selects": 1,
+          "bytes": 455
+        },
+        {
+          "ms": 660.866,
+          "selects": 1,
+          "bytes": 455
+        }
+      ]
+    }
+  },
+  "sql": {
+    "workspace_before": [
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `Pedidos`.`id_pedido` FROM `Pedidos` LEFT JOIN `Estado_Pago` AS `j0` ON (`j0`.`id_estado_pago`) = (`Pedidos`.`id_estado_pago`) WHERE (`j0`.`nombre_estado_pago` = ? AND (`j0`.`id_estado_pago` IS NOT NULL))) AS `sub`",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`id_estado_pago`, `Pedidos`.`id_cliente` FROM `Pedidos` WHERE 1=1 ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social`, `Cliente`.`rut_cliente` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Estado_Pago`.`id_estado_pago`, `Estado_Pago`.`nombre_estado_pago` FROM `Estado_Pago` WHERE `Estado_Pago`.`id_estado_pago` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    ],
+    "workspace_after": [
+      "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 ORDER BY p.id_pedido DESC LIMIT ?",
+      "SELECT\n    COALESCE(SUM(s.nombre_estado_pago = 'Pendiente'), 0) AS pending,\n    COALESCE(SUM(s.nombre_estado_pago = 'Rechazado'), 0) AS rejected,\n    COALESCE(SUM(s.nombre_estado_pago = 'Confirmado'), 0) AS confirmed\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1"
+    ],
+    "status_before": [
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `Pedidos`.`id_pedido` FROM `Pedidos` LEFT JOIN `Estado_Pago` AS `j0` ON (`j0`.`id_estado_pago`) = (`Pedidos`.`id_estado_pago`) WHERE (`j0`.`nombre_estado_pago` = ? AND (`j0`.`id_estado_pago` IS NOT NULL))) AS `sub`",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`id_estado_pago`, `Pedidos`.`id_cliente` FROM `Pedidos` LEFT JOIN `Estado_Pago` AS `j0` ON (`j0`.`id_estado_pago`) = (`Pedidos`.`id_estado_pago`) WHERE (`j0`.`nombre_estado_pago` = ? AND (`j0`.`id_estado_pago` IS NOT NULL)) ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social`, `Cliente`.`rut_cliente` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Estado_Pago`.`id_estado_pago`, `Estado_Pago`.`nombre_estado_pago` FROM `Estado_Pago` WHERE `Estado_Pago`.`id_estado_pago` IN (?,?,?,?,?,?,?,?,?,?)"
+    ],
+    "status_after": [
+      "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND s.nombre_estado_pago = ? ORDER BY p.id_pedido DESC LIMIT ?"
+    ],
+    "search_before": [
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `Pedidos`.`id_pedido` FROM `Pedidos` LEFT JOIN `Cliente` AS `j0` ON (`j0`.`id_cliente`) = (`Pedidos`.`id_cliente`) LEFT JOIN `Cliente` AS `j1` ON (`j1`.`id_cliente`) = (`Pedidos`.`id_cliente`) LEFT JOIN `Cliente` AS `j2` ON (`j2`.`id_cliente`) = (`Pedidos`.`id_cliente`) LEFT JOIN `Estado_Pago` AS `j3` ON (`j3`.`id_estado_pago`) = (`Pedidos`.`id_estado_pago`) WHERE ((`Pedidos`.`numero_nota_venta` LIKE CONCAT('%', ?, '%') OR (`j0`.`nombre_cliente` LIKE CONCAT('%', ?, '%') AND (`j0`.`id_cliente` IS NOT NULL)) OR (`j1`.`razon_social` LIKE CONCAT('%', ?, '%') AND (`j1`.`id_cliente` IS NOT NULL)) OR (`j2`.`rut_cliente` LIKE CONCAT('%', ?, '%') AND (`j2`.`id_cliente` IS NOT NULL))) AND (`j3`.`nombre_estado_pago` = ? AND (`j3`.`id_estado_pago` IS NOT NULL)))) AS `sub`",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`id_estado_pago`, `Pedidos`.`id_cliente` FROM `Pedidos` LEFT JOIN `Cliente` AS `j0` ON (`j0`.`id_cliente`) = (`Pedidos`.`id_cliente`) LEFT JOIN `Cliente` AS `j1` ON (`j1`.`id_cliente`) = (`Pedidos`.`id_cliente`) LEFT JOIN `Cliente` AS `j2` ON (`j2`.`id_cliente`) = (`Pedidos`.`id_cliente`) WHERE (`Pedidos`.`numero_nota_venta` LIKE CONCAT('%', ?, '%') OR (`j0`.`nombre_cliente` LIKE CONCAT('%', ?, '%') AND (`j0`.`id_cliente` IS NOT NULL)) OR (`j1`.`razon_social` LIKE CONCAT('%', ?, '%') AND (`j1`.`id_cliente` IS NOT NULL)) OR (`j2`.`rut_cliente` LIKE CONCAT('%', ?, '%') AND (`j2`.`id_cliente` IS NOT NULL))) ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social`, `Cliente`.`rut_cliente` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?)",
+      "SELECT `Estado_Pago`.`id_estado_pago`, `Estado_Pago`.`nombre_estado_pago` FROM `Estado_Pago` WHERE `Estado_Pago`.`id_estado_pago` IN (?,?)"
+    ],
+    "search_after": [
+      "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND (p.numero_nota_venta LIKE ? OR c.nombre_cliente LIKE ?\n      OR c.razon_social LIKE ? OR c.rut_cliente LIKE ?) ORDER BY p.id_pedido DESC LIMIT ?",
+      "SELECT\n    COALESCE(SUM(s.nombre_estado_pago = 'Pendiente'), 0) AS pending,\n    COALESCE(SUM(s.nombre_estado_pago = 'Rechazado'), 0) AS rejected,\n    COALESCE(SUM(s.nombre_estado_pago = 'Confirmado'), 0) AS confirmed\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND (p.numero_nota_venta LIKE ? OR c.nombre_cliente LIKE ?\n      OR c.razon_social LIKE ? OR c.rut_cliente LIKE ?)"
+    ],
+    "date_before": [
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `Pedidos`.`id_pedido` FROM `Pedidos` LEFT JOIN `Estado_Pago` AS `j0` ON (`j0`.`id_estado_pago`) = (`Pedidos`.`id_estado_pago`) WHERE (`Pedidos`.`fecha_creacion` >= ? AND `Pedidos`.`fecha_creacion` < ? AND (`j0`.`nombre_estado_pago` = ? AND (`j0`.`id_estado_pago` IS NOT NULL)))) AS `sub`",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`id_estado_pago`, `Pedidos`.`id_cliente` FROM `Pedidos` WHERE (`Pedidos`.`fecha_creacion` >= ? AND `Pedidos`.`fecha_creacion` < ?) ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social`, `Cliente`.`rut_cliente` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "SELECT `Estado_Pago`.`id_estado_pago`, `Estado_Pago`.`nombre_estado_pago` FROM `Estado_Pago` WHERE `Estado_Pago`.`id_estado_pago` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    ],
+    "date_after": [
+      "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND p.fecha_creacion >= ? AND p.fecha_creacion < ? ORDER BY p.id_pedido DESC LIMIT ?",
+      "SELECT\n    COALESCE(SUM(s.nombre_estado_pago = 'Pendiente'), 0) AS pending,\n    COALESCE(SUM(s.nombre_estado_pago = 'Rechazado'), 0) AS rejected,\n    COALESCE(SUM(s.nombre_estado_pago = 'Confirmado'), 0) AS confirmed\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND p.fecha_creacion >= ? AND p.fecha_creacion < ?"
+    ],
+    "page_before": [
+      "SELECT COUNT(*) AS `_count$_all` FROM (SELECT `Pedidos`.`id_pedido` FROM `Pedidos` LEFT JOIN `Estado_Pago` AS `j0` ON (`j0`.`id_estado_pago`) = (`Pedidos`.`id_estado_pago`) WHERE (`j0`.`nombre_estado_pago` = ? AND (`j0`.`id_estado_pago` IS NOT NULL))) AS `sub`",
+      "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`id_estado_pago`, `Pedidos`.`id_cliente` FROM `Pedidos` WHERE `Pedidos`.`id_pedido` < ? ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social`, `Cliente`.`rut_cliente` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?)",
+      "SELECT `Estado_Pago`.`id_estado_pago`, `Estado_Pago`.`nombre_estado_pago` FROM `Estado_Pago` WHERE `Estado_Pago`.`id_estado_pago` IN (?,?)"
+    ],
+    "page_after": [
+      "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND p.id_pedido < ? ORDER BY p.id_pedido DESC LIMIT ?"
+    ],
+    "preview_before": [
+      "\n      SELECT\n        p.id_pedido,\n        p.numero_nota_venta,\n        c.nombre_cliente,\n        c.razon_social,\n        c.rut_cliente,\n        u.id_usuario,\n        u.nombre_usuario,\n        u.apellido_usuario,\n        dp.id_detalle_pedido,\n        dp.cantidad,\n        NULL AS linea_origen, NULL AS codigo_origen, NULL AS producto_origen,\n        tp.nombre_producto,\n        tp.descripcion_producto\n      FROM Pedidos p\n      LEFT JOIN Cliente c ON c.id_cliente = p.id_cliente\n      LEFT JOIN Usuario u ON u.id_usuario = p.id_usuario\n      LEFT JOIN Detalle_pedido dp ON dp.id_pedido = p.id_pedido\n      LEFT JOIN Tipo_Producto tp ON tp.id_tipo_producto = dp.id_tipo_producto\n      WHERE p.id_pedido = ?\n      ORDER BY dp.id_detalle_pedido ASC\n    "
+    ],
+    "preview_after": [
+      "\n      SELECT\n        p.id_pedido,\n        p.numero_nota_venta,\n        c.nombre_cliente,\n        c.razon_social,\n        c.rut_cliente,\n        u.id_usuario,\n        u.nombre_usuario,\n        u.apellido_usuario,\n        dp.id_detalle_pedido,\n        dp.cantidad,\n        NULL AS linea_origen, NULL AS codigo_origen, NULL AS producto_origen,\n        tp.nombre_producto,\n        tp.descripcion_producto\n      FROM Pedidos p\n      LEFT JOIN Cliente c ON c.id_cliente = p.id_cliente\n      LEFT JOIN Usuario u ON u.id_usuario = p.id_usuario\n      LEFT JOIN Detalle_pedido dp ON dp.id_pedido = p.id_pedido\n      LEFT JOIN Tipo_Producto tp ON tp.id_tipo_producto = dp.id_tipo_producto\n      WHERE p.id_pedido = ?\n      ORDER BY dp.id_detalle_pedido ASC\n    "
+    ],
+    "summary_only_after": [
+      "SELECT\n    COALESCE(SUM(s.nombre_estado_pago = 'Pendiente'), 0) AS pending,\n    COALESCE(SUM(s.nombre_estado_pago = 'Rechazado'), 0) AS rejected,\n    COALESCE(SUM(s.nombre_estado_pago = 'Confirmado'), 0) AS confirmed\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1"
+    ]
+  },
+  "equivalence": [
+    "workspace_full_page_summary_0",
+    "workspace_full_page_summary_1",
+    "workspace_full_page_summary_2",
+    "workspace_full_page_summary_3",
+    "workspace_full_page_summary_4",
+    "workspace_full_page_summary_5",
+    "workspace_full_page_summary_6",
+    "workspace_full_page_summary_7",
+    "workspace_full_page_summary_8",
+    "workspace_full_page_summary_9",
+    "workspace_full_page_summary_10",
+    "workspace_full_page_summary_11",
+    "workspace_full_page_summary_12",
+    "workspace_full_page_summary_13",
+    "preview_0",
+    "preview_1",
+    "preview_2"
+  ],
+  "errors": 0,
+  "fixture": {
+    "totalMatching": 50,
+    "previewOrders": 3
+  },
+  "explain": [
+    {
+      "sql": "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "s",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT\n    COALESCE(SUM(s.nombre_estado_pago = 'Pendiente'), 0) AS pending,\n    COALESCE(SUM(s.nombre_estado_pago = 'Rechazado'), 0) AS rejected,\n    COALESCE(SUM(s.nombre_estado_pago = 'Confirmado'), 0) AS confirmed\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "s",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_estado_pago_idx",
+          "key": "id_estado_pago_idx",
+          "key_len": "5",
+          "ref": "mydb.s.id_estado_pago",
+          "rows": "16",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND s.nombre_estado_pago = ? ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "s",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 33.333335876464844,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_estado_pago_idx",
+          "key": "id_estado_pago_idx",
+          "key_len": "5",
+          "ref": "mydb.s.id_estado_pago",
+          "rows": "16",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND (p.numero_nota_venta LIKE ? OR c.nombre_cliente LIKE ?\n      OR c.razon_social LIKE ? OR c.rut_cliente LIKE ?) ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 99.99999237060547,
+          "Extra": "Using where"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "s",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT\n    COALESCE(SUM(s.nombre_estado_pago = 'Pendiente'), 0) AS pending,\n    COALESCE(SUM(s.nombre_estado_pago = 'Rechazado'), 0) AS rejected,\n    COALESCE(SUM(s.nombre_estado_pago = 'Confirmado'), 0) AS confirmed\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND (p.numero_nota_venta LIKE ? OR c.nombre_cliente LIKE ?\n      OR c.razon_social LIKE ? OR c.rut_cliente LIKE ?)",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "s",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_estado_pago_idx",
+          "key": "id_estado_pago_idx",
+          "key_len": "5",
+          "ref": "mydb.s.id_estado_pago",
+          "rows": "16",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 99.99999237060547,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND p.fecha_creacion >= ? AND p.fecha_creacion < ? ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "49",
+          "filtered": 11.108888626098633,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "s",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT\n    COALESCE(SUM(s.nombre_estado_pago = 'Pendiente'), 0) AS pending,\n    COALESCE(SUM(s.nombre_estado_pago = 'Rechazado'), 0) AS rejected,\n    COALESCE(SUM(s.nombre_estado_pago = 'Confirmado'), 0) AS confirmed\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND p.fecha_creacion >= ? AND p.fecha_creacion < ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "s",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "id_estado_pago_idx",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "49",
+          "filtered": 3.70296311378479,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND (p.numero_nota_venta LIKE ? OR c.nombre_cliente LIKE ?\n      OR c.razon_social LIKE ? OR c.rut_cliente LIKE ?) AND p.fecha_creacion >= ? AND s.nombre_estado_pago = ? ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "s",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 33.333335876464844,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_estado_pago_idx",
+          "key": "id_estado_pago_idx",
+          "key_len": "5",
+          "ref": "mydb.s.id_estado_pago",
+          "rows": "16",
+          "filtered": 33.32999801635742,
+          "Extra": "Using where"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 99.99999237060547,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT\n    COALESCE(SUM(s.nombre_estado_pago = 'Pendiente'), 0) AS pending,\n    COALESCE(SUM(s.nombre_estado_pago = 'Rechazado'), 0) AS rejected,\n    COALESCE(SUM(s.nombre_estado_pago = 'Confirmado'), 0) AS confirmed\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND (p.numero_nota_venta LIKE ? OR c.nombre_cliente LIKE ?\n      OR c.razon_social LIKE ? OR c.rut_cliente LIKE ?) AND p.fecha_creacion >= ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "s",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_estado_pago_idx",
+          "key": "id_estado_pago_idx",
+          "key_len": "5",
+          "ref": "mydb.s.id_estado_pago",
+          "rows": "16",
+          "filtered": 33.32999801635742,
+          "Extra": "Using where"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 99.99999237060547,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n    p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago\n    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago\n    WHERE 1=1 AND p.id_pedido < ? ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Using where; Backward index scan; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "s",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        }
+      ]
+    },
+    {
+      "sql": "\n      SELECT\n        p.id_pedido,\n        p.numero_nota_venta,\n        c.nombre_cliente,\n        c.razon_social,\n        c.rut_cliente,\n        u.id_usuario,\n        u.nombre_usuario,\n        u.apellido_usuario,\n        dp.id_detalle_pedido,\n        dp.cantidad,\n        NULL AS linea_origen, NULL AS codigo_origen, NULL AS producto_origen,\n        tp.nombre_producto,\n        tp.descripcion_producto\n      FROM Pedidos p\n      LEFT JOIN Cliente c ON c.id_cliente = p.id_cliente\n      LEFT JOIN Usuario u ON u.id_usuario = p.id_usuario\n      LEFT JOIN Detalle_pedido dp ON dp.id_pedido = p.id_pedido\n      LEFT JOIN Tipo_Producto tp ON tp.id_tipo_producto = dp.id_tipo_producto\n      WHERE p.id_pedido = ?\n      ORDER BY dp.id_detalle_pedido ASC\n    ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "u",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "dp",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "tp",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.dp.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    }
+  ],
+  "indexes": [
+    {
+      "TABLE_NAME": "Cliente",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_cliente"
+    },
+    {
+      "TABLE_NAME": "Cliente",
+      "INDEX_NAME": "rut_cliente_UNIQUE",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "rut_cliente"
+    },
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "Detalle_pedido_Estado_Subprocesos_FK",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_estado_subproceso"
+    },
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "id_pedido_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_pedido"
+    },
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "id_tipo_producto_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_tipo_producto"
+    },
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_detalle_pedido"
+    },
+    {
+      "TABLE_NAME": "Estado_Pago",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_estado_pago"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_cliente_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_cliente"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_estado_pago_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_estado_pago"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_estado_pedido_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_estado_pedido"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_etiqueta_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_etiqueta"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_usuario_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_usuario"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "idx_orders_cursor",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_pedido"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": "1",
+      "COLUMN_NAME": "id_pedido"
+    }
+  ],
+  "databaseVersion": "8.4.8"
+}

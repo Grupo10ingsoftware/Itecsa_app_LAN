@@ -7,6 +7,7 @@ import { formatDate } from '../utils/orderHistoryFormatters'
 import styles from './OrderHistoryPage.module.css'
 import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
 import PageHeader from '../../../shared/components/layout/PageHeader'
+import { historyScope, historyDateError, subscribeHistoryRead } from '../utils/historyReads'
 
 const STATUS_FILTERS = [
   { label: 'Confirmación de Pago', value: 'Confirmación de Pago' },
@@ -23,6 +24,10 @@ function errorMessage(error) {
 
 export default function OrderHistoryPage() {
   const api = useOrderHistoryApi()
+  return <OrderHistoryList key={historyScope(api)} api={api} />
+}
+
+function OrderHistoryList({ api }) {
   const [orders, setOrders] = useState([])
   const [status, setStatus] = useState('')
   const [searchInput, setSearchInput] = useState('')
@@ -32,24 +37,32 @@ export default function OrderHistoryPage() {
   const [pageInfo, setPageInfo] = useState({ nextCursor: null, hasMore: false })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [attempt, setAttempt] = useState(0)
+  const validationError = historyDateError(dateRange)
 
   useEffect(() => {
-    let active = true
+    if (validationError) return undefined
     const cursor = cursorStack.at(-1)
-    api.listOrders({ status, search, from: dateRange.from, to: dateRange.to, cursor, limit: 10 })
-      .then((result) => {
-        if (!active) return
+    return subscribeHistoryRead({ api, method: 'listOrders', params: { status, search, from: dateRange.from, to: dateRange.to, cursor, limit: 50 },
+      onSuccess: (result) => {
         setOrders(result.items ?? [])
         setPageInfo(result.pageInfo ?? { nextCursor: null, hasMore: false })
-      })
-      .catch((requestError) => active && setError(errorMessage(requestError)))
-      .finally(() => active && setLoading(false))
-    return () => { active = false }
-  }, [api, cursorStack, dateRange.from, dateRange.to, search, status])
+        setLoading(false)
+      },
+      onError: (requestError) => { setError(errorMessage(requestError)); setLoading(false) },
+    })
+  }, [api, cursorStack, dateRange.from, dateRange.to, search, status, attempt, validationError])
 
-  function updateDate(name, value) {
+  function beginRead() {
     setLoading(true)
     setError('')
+    setOrders([])
+    setPageInfo({ nextCursor: null, hasMore: false })
+  }
+
+  function updateDate(name, value) {
+    if (dateRange[name] === value) return
+    beginRead()
     setCursorStack([null])
     setDateRange((current) => ({ ...current, [name]: value }))
   }
@@ -58,8 +71,7 @@ export default function OrderHistoryPage() {
     event.preventDefault()
     const nextSearch = searchInput.trim()
     if (nextSearch === search) return
-    setLoading(true)
-    setError('')
+    beginRead()
     setCursorStack([null])
     setSearch(nextSearch)
   }
@@ -67,23 +79,20 @@ export default function OrderHistoryPage() {
   function selectStatus(nextStatus) {
     const resolvedStatus = status === nextStatus ? '' : nextStatus
     if (resolvedStatus === status) return
-    setLoading(true)
-    setError('')
+    beginRead()
     setCursorStack([null])
     setStatus(resolvedStatus)
   }
 
   function nextPage() {
-    if (!pageInfo.nextCursor) return
-    setLoading(true)
-    setError('')
+    if (loading || !pageInfo.nextCursor) return
+    beginRead()
     setCursorStack((current) => [...current, pageInfo.nextCursor])
   }
 
   function previousPage() {
-    if (cursorStack.length === 1) return
-    setLoading(true)
-    setError('')
+    if (loading || cursorStack.length === 1) return
+    beginRead()
     setCursorStack((current) => current.slice(0, -1))
   }
 
@@ -92,7 +101,9 @@ export default function OrderHistoryPage() {
   return (
     <PageShell className={styles.page}>
       <PageSurface>
-      <PageHeader title="Historial de pedidos" />
+      <PageHeader title="Historial de pedidos" actions={
+        <strong className={styles.resultCount}>{orders.length} resultados en esta página</strong>
+      } />
 
       <section className={styles.panel}>
         <div className={styles.statusFilters} aria-label="Filtros por estado">
@@ -125,15 +136,15 @@ export default function OrderHistoryPage() {
             <span>Hasta</span>
             <input min={dateRange.from || undefined} onChange={(event) => updateDate('to', event.target.value)} type="date" value={dateRange.to} />
           </label>
-          <button onClick={() => { setLoading(true); setError(''); setCursorStack([null]); setDateRange({ from: '', to: '' }) }} type="button">
+          <button onClick={() => { if (!dateRange.from && !dateRange.to) return; beginRead(); setCursorStack([null]); setDateRange({ from: '', to: '' }) }} type="button">
             <i className="bi bi-arrow-counterclockwise" aria-hidden="true" /> Restablecer fechas
           </button>
         </div>
 
-        {error && <div className={styles.error} role="alert">{error}</div>}
-        {loading ? (
+        {(validationError || error) && <div className={styles.error} role="alert"><p>{validationError || error}</p>{!validationError && <button onClick={() => { beginRead(); setAttempt(current => current + 1) }} type="button">Reintentar</button>}</div>}
+        {loading && !validationError ? (
           <LoadingIndicator context="pedidos" />
-        ) : orders.length === 0 ? (
+        ) : validationError || error ? null : orders.length === 0 ? (
           <div className={styles.state}>{noRegisteredOrders ? 'No existen pedidos hasta el momento' : 'No se encontraron pedidos'}</div>
         ) : (
           <div className={styles.tableWrap}>
@@ -160,9 +171,9 @@ export default function OrderHistoryPage() {
 
         {(cursorStack.length > 1 || pageInfo.hasMore) && (
           <nav className={styles.pagination} aria-label="Paginación">
-            <button disabled={cursorStack.length === 1} onClick={previousPage} type="button">Anterior</button>
+            <button disabled={loading || cursorStack.length === 1} onClick={previousPage} type="button">Anterior</button>
             <span>Página {cursorStack.length}</span>
-            <button disabled={!pageInfo.hasMore} onClick={nextPage} type="button">Siguiente</button>
+            <button disabled={loading || !pageInfo.hasMore} onClick={nextPage} type="button">Siguiente</button>
           </nav>
         )}
       </section>

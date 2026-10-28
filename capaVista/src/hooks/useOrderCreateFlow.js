@@ -4,7 +4,7 @@ import { useOrdersApi } from '../modules/orders/hooks/useOrdersApi'
 import { canContinueFromSalesNote, validateSalesNoteStep } from '../modules/orders/utils/orderCreateValidation'
 import { normalizeSalesNoteCode } from '../modules/orders/utils/orderCreateFormatters'
 import { useToast } from '../shared/notifications/useToast'
-import { publicOperationMessage } from '../shared/notifications/operationFeedback'
+import { publicOperationMessage, requiresContext, uncertainOperation } from '../shared/notifications/operationFeedback'
 
 function createInitialDraft() {
   return {
@@ -29,15 +29,19 @@ function toDisplayRecord(salesNote) {
   }
 }
 
-export function useOrderCreateFlow({ navigate }) {
+export function useOrderCreateFlow({ navigate, api }) {
   const notify = useToast()
-  const ordersApi = useOrdersApi()
+  const defaultApi = useOrdersApi()
+  const ordersApi = api ?? defaultApi
   const [draft, setDraft] = useState(createInitialDraft)
   const [errors, setErrors] = useState({})
   const [showPinModal, setShowPinModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
   const [isRegistering, setIsRegistering] = useState(false)
+  const [needsReconciliation, setNeedsReconciliation] = useState(false)
+  const searchController = useRef(null)
+  const searchPending = useRef(false)
   const requestVersion = useRef(0)
   const submitting = useRef(false)
   const confirmedPayload = useRef(null)
@@ -48,6 +52,7 @@ export function useOrderCreateFlow({ navigate }) {
     return () => {
       mounted.current = false
       requestVersion.current += 1
+      searchController.current?.abort()
     }
   }, [])
 
@@ -66,6 +71,9 @@ export function useOrderCreateFlow({ navigate }) {
     setShowConfirmModal(false)
     if (field === 'salesNoteCode') {
       requestVersion.current += 1
+      searchController.current?.abort()
+      searchPending.current = false
+      setNeedsReconciliation(false)
       setIsSearching(false)
     }
     setDraft((previous) => {
@@ -86,7 +94,7 @@ export function useOrderCreateFlow({ navigate }) {
   }
 
   async function handleSearchSalesNote() {
-    if (submitting.current) return
+    if (submitting.current || searchPending.current) return
     const code = normalizeSalesNoteCode(draft.salesNoteCode)
 
 
@@ -95,29 +103,36 @@ export function useOrderCreateFlow({ navigate }) {
       return
     }
 
-    if (draft.managerRecord) return
+    if (draft.managerRecord && !needsReconciliation) return
 
     setErrors((previous) => ({ ...previous, salesNoteCode: null }))
     const version = ++requestVersion.current
+    searchController.current = new AbortController()
+    const controller = searchController.current
+    searchPending.current = true
     setIsSearching(true)
 
     try {
-      const salesNote = await ordersApi.getSalesNote(code)
+      const salesNote = await ordersApi.getSalesNote(code, { signal: controller.signal })
       if (!mounted.current || version !== requestVersion.current) return
       const managerRecord = toDisplayRecord(salesNote)
 
       setDraft((previous) => ({ ...previous, salesNoteCode: code, managerRecord }))
+      setNeedsReconciliation(false)
       setErrors((previous) => ({ ...previous, salesNoteCode: null }))
     } catch (error) {
-      if (!mounted.current || version !== requestVersion.current) return
+      if (!mounted.current || version !== requestVersion.current || controller.signal.aborted) return
       const message = getErrorMessage(error, `No se encontro informacion para ${code}.`)
-      setDraft((previous) => ({ ...previous, salesNoteCode: code, managerRecord: null }))
+      if (!needsReconciliation) setDraft((previous) => ({ ...previous, salesNoteCode: code, managerRecord: null }))
       setErrors((previous) => ({
         ...previous,
         salesNoteCode: message,
       }))
     } finally {
-      if (mounted.current && version === requestVersion.current) setIsSearching(false)
+      if (mounted.current && version === requestVersion.current) {
+        searchPending.current = false
+        setIsSearching(false)
+      }
     }
   }
 
@@ -132,7 +147,7 @@ export function useOrderCreateFlow({ navigate }) {
   }
 
   function handleOpenConfirmModal() {
-    if (submitting.current) return
+    if (submitting.current || needsReconciliation) return
     const salesNoteErrors = validateSalesNoteStep(draft)
 
     if (Object.keys(salesNoteErrors).length > 0) {
@@ -151,7 +166,12 @@ export function useOrderCreateFlow({ navigate }) {
   }
 
   async function authorizeRegister({ pin }) {
-    if (submitting.current || !confirmedPayload.current) return
+    if (submitting.current) return
+    if (needsReconciliation) {
+      const message = 'Cierra la autorización y comprueba la Nota de Venta antes de volver a registrar.'
+      throw Object.assign(new Error(message), { status: 409, payload: { message, code: 'ORDER_RESULT_UNCERTAIN' } })
+    }
+    if (!confirmedPayload.current) return
     submitting.current = true
     const payload = confirmedPayload.current
     setIsRegistering(true)
@@ -169,6 +189,10 @@ export function useOrderCreateFlow({ navigate }) {
       })
     } catch (error) {
       if (!mounted.current) return
+      if (uncertainOperation(error) && !requiresContext(error)) {
+        confirmedPayload.current = null
+        setNeedsReconciliation(true)
+      }
       throw error
     } finally {
       submitting.current = false
@@ -186,6 +210,9 @@ export function useOrderCreateFlow({ navigate }) {
   function resetFlow() {
     if (submitting.current) return
     requestVersion.current += 1
+    searchController.current?.abort()
+    searchPending.current = false
+    setNeedsReconciliation(false)
     confirmedPayload.current = null
     setIsSearching(false)
     setShowConfirmModal(false)
@@ -199,6 +226,7 @@ export function useOrderCreateFlow({ navigate }) {
     errors,
     isRegistering,
     isSearching,
+    needsReconciliation,
     salesNoteIsValid,
     showConfirmModal,
     showPinModal,

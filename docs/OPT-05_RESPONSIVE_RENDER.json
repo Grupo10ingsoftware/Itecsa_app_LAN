@@ -1,0 +1,2284 @@
+{
+  "before": {
+    "mode": "before",
+    "results": [
+      {
+        "id": "history",
+        "width": 320,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 305,
+        "clientWidth": 305,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 360,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 375,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 360,
+        "clientWidth": 360,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 390,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 430,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 576,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 561,
+        "clientWidth": 561,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 768,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 992,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 977,
+        "clientWidth": 977,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 992,
+        "collapsed": true,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 977,
+        "clientWidth": 977,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 1024,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1009,
+        "clientWidth": 1009,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 1024,
+        "collapsed": true,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1009,
+        "clientWidth": 1009,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 1200,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1185,
+        "clientWidth": 1185,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 1200,
+        "collapsed": true,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1185,
+        "clientWidth": 1185,
+        "font": "48px"
+      },
+      {
+        "id": "history",
+        "width": 1440,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "font": "48px"
+      },
+      {
+        "id": "history",
+        "width": 1440,
+        "collapsed": true,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "font": "48px"
+      },
+      {
+        "id": "history",
+        "width": 1920,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1905,
+        "clientWidth": 1905,
+        "font": "48px"
+      },
+      {
+        "id": "history",
+        "width": 1920,
+        "collapsed": true,
+        "left": 35.5,
+        "right": 35.5,
+        "side": 35.5,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1905,
+        "clientWidth": 1905,
+        "font": "48px"
+      },
+      {
+        "id": "history-detail",
+        "width": 320,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 832,
+        "clientWidth": 305,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 360,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 832,
+        "clientWidth": 345,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 375,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 832,
+        "clientWidth": 360,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 390,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 832,
+        "clientWidth": 375,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 430,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 832,
+        "clientWidth": 415,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 576,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 1078,
+        "clientWidth": 561,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 768,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 1174,
+        "clientWidth": 753,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 992,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 1418,
+        "clientWidth": 977,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 992,
+        "collapsed": true,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 1462,
+        "clientWidth": 977,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1024,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 1434,
+        "clientWidth": 1009,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1024,
+        "collapsed": true,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 1484,
+        "clientWidth": 1009,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1200,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 1664,
+        "clientWidth": 1185,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1200,
+        "collapsed": true,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 1688,
+        "clientWidth": 1185,
+        "font": "48px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1440,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 1915,
+        "clientWidth": 1425,
+        "font": "48px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1440,
+        "collapsed": true,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 1931,
+        "clientWidth": 1425,
+        "font": "48px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1920,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 2405,
+        "clientWidth": 1905,
+        "font": "48px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1920,
+        "collapsed": true,
+        "left": 34.5,
+        "right": 34.5,
+        "side": 34.5,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": true,
+        "scrollWidth": 2406,
+        "clientWidth": 1905,
+        "font": "48px"
+      }
+    ],
+    "renderSamples": [
+      {
+        "id": "history",
+        "sample": 1,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 9.900000005960464,
+              "baseDuration": 5.4000000059604645
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 0.7000000029802322,
+              "baseDuration": 5.200000010430813
+            },
+            {
+              "phase": "update",
+              "actualDuration": 26.099999994039536,
+              "baseDuration": 25.49999998509884
+            }
+          ],
+          "reads": {
+            "list": 1,
+            "detail": 0,
+            "events": 0
+          }
+        }
+      },
+      {
+        "id": "history",
+        "sample": 2,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 16.200000002980232,
+              "baseDuration": 12.899999998509884
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.3999999985098839,
+              "baseDuration": 9.49999999254942
+            },
+            {
+              "phase": "update",
+              "actualDuration": 26.200000010430813,
+              "baseDuration": 28.99999999254942
+            }
+          ],
+          "reads": {
+            "list": 1,
+            "detail": 0,
+            "events": 0
+          }
+        }
+      },
+      {
+        "id": "history",
+        "sample": 3,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 9.900000005960464,
+              "baseDuration": 7.600000001490116
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 0.7000000029802322,
+              "baseDuration": 6.800000004470348
+            },
+            {
+              "phase": "update",
+              "actualDuration": 26.399999998509884,
+              "baseDuration": 28.100000023841858
+            }
+          ],
+          "reads": {
+            "list": 1,
+            "detail": 0,
+            "events": 0
+          }
+        }
+      },
+      {
+        "id": "history",
+        "sample": 4,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 12.599999994039536,
+              "baseDuration": 8.50000000745058
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.1000000014901161,
+              "baseDuration": 8.100000016391277
+            },
+            {
+              "phase": "update",
+              "actualDuration": 30.100000001490116,
+              "baseDuration": 31.900000050663948
+            }
+          ],
+          "reads": {
+            "list": 1,
+            "detail": 0,
+            "events": 0
+          }
+        }
+      },
+      {
+        "id": "history",
+        "sample": 5,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 12.199999995529652,
+              "baseDuration": 8.499999985098839
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.5,
+              "baseDuration": 8.599999994039536
+            },
+            {
+              "phase": "update",
+              "actualDuration": 24.899999998509884,
+              "baseDuration": 27.600000008940697
+            }
+          ],
+          "reads": {
+            "list": 1,
+            "detail": 0,
+            "events": 0
+          }
+        }
+      },
+      {
+        "id": "history-detail",
+        "sample": 1,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 8.299999997019768,
+              "baseDuration": 6.300000004470348
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.5,
+              "baseDuration": 6.5
+            },
+            {
+              "phase": "update",
+              "actualDuration": 20,
+              "baseDuration": 21.799999997019768
+            }
+          ],
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 0
+          }
+        },
+        "append": {
+          "ms": 75.20000000298023,
+          "profile": [
+            {
+              "phase": "update",
+              "actualDuration": 20.599999994039536,
+              "baseDuration": 26.599999986588955
+            },
+            {
+              "phase": "update",
+              "actualDuration": 39.69999999552965,
+              "baseDuration": 42.400000020861626
+            }
+          ],
+          "events": 100,
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 1
+          }
+        }
+      },
+      {
+        "id": "history-detail",
+        "sample": 2,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 10.99999999254942,
+              "baseDuration": 7.799999989569187
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.4000000059604645,
+              "baseDuration": 7.499999992549419
+            },
+            {
+              "phase": "update",
+              "actualDuration": 30.00000000745058,
+              "baseDuration": 30.99999998509884
+            }
+          ],
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 0
+          }
+        },
+        "append": {
+          "ms": 81,
+          "profile": [
+            {
+              "phase": "update",
+              "actualDuration": 24.100000001490116,
+              "baseDuration": 30.899999991059303
+            },
+            {
+              "phase": "update",
+              "actualDuration": 42.100000001490116,
+              "baseDuration": 47.49999999254942
+            }
+          ],
+          "events": 100,
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 1
+          }
+        }
+      },
+      {
+        "id": "history-detail",
+        "sample": 3,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 14.600000001490116,
+              "baseDuration": 11.100000008940697
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.2999999970197678,
+              "baseDuration": 10.800000004470348
+            },
+            {
+              "phase": "update",
+              "actualDuration": 26.600000001490116,
+              "baseDuration": 31.299999997019768
+            }
+          ],
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 0
+          }
+        },
+        "append": {
+          "ms": 76.19999999552965,
+          "profile": [
+            {
+              "phase": "update",
+              "actualDuration": 22.600000001490116,
+              "baseDuration": 32.70000000298023
+            },
+            {
+              "phase": "update",
+              "actualDuration": 36.80000000447035,
+              "baseDuration": 43.900000013411045
+            }
+          ],
+          "events": 100,
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 1
+          }
+        }
+      },
+      {
+        "id": "history-detail",
+        "sample": 4,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 11.299999997019768,
+              "baseDuration": 8.599999986588955
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.6999999955296516,
+              "baseDuration": 8.899999983608723
+            },
+            {
+              "phase": "update",
+              "actualDuration": 27.50000000745058,
+              "baseDuration": 29.5
+            }
+          ],
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 0
+          }
+        },
+        "append": {
+          "ms": 70,
+          "profile": [
+            {
+              "phase": "update",
+              "actualDuration": 22.30000001192093,
+              "baseDuration": 30.400000020861626
+            },
+            {
+              "phase": "update",
+              "actualDuration": 32.599999994039536,
+              "baseDuration": 37.39999998360872
+            }
+          ],
+          "events": 100,
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 1
+          }
+        }
+      },
+      {
+        "id": "history-detail",
+        "sample": 5,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 11.299999997019768,
+              "baseDuration": 9.599999994039536
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.3999999985098839,
+              "baseDuration": 9.49999999254942
+            },
+            {
+              "phase": "update",
+              "actualDuration": 23.299999997019768,
+              "baseDuration": 28
+            }
+          ],
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 0
+          }
+        },
+        "append": {
+          "ms": 66.70000000298023,
+          "profile": [
+            {
+              "phase": "update",
+              "actualDuration": 19.99999998509884,
+              "baseDuration": 28.599999994039536
+            },
+            {
+              "phase": "update",
+              "actualDuration": 35.79999998956919,
+              "baseDuration": 42.69999998062849
+            }
+          ],
+          "events": 100,
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 1
+          }
+        }
+      }
+    ],
+    "methodology": "Real React/AppLayout via Vite development, synthetic auth/API, five warm render observations. Profiler actualDuration and click-to-two-frames recorded separately; not real authenticated E2E."
+  },
+  "after": {
+    "mode": "after",
+    "results": [
+      {
+        "id": "history",
+        "width": 320,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 305,
+        "clientWidth": 305,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 360,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 375,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 360,
+        "clientWidth": 360,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 390,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 430,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 576,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 561,
+        "clientWidth": 561,
+        "font": "24px"
+      },
+      {
+        "id": "history",
+        "width": 768,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 992,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 977,
+        "clientWidth": 977,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 992,
+        "collapsed": true,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 977,
+        "clientWidth": 977,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 1024,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1009,
+        "clientWidth": 1009,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 1024,
+        "collapsed": true,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1009,
+        "clientWidth": 1009,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 1200,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1185,
+        "clientWidth": 1185,
+        "font": "36px"
+      },
+      {
+        "id": "history",
+        "width": 1200,
+        "collapsed": true,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1185,
+        "clientWidth": 1185,
+        "font": "48px"
+      },
+      {
+        "id": "history",
+        "width": 1440,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "font": "48px"
+      },
+      {
+        "id": "history",
+        "width": 1440,
+        "collapsed": true,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "font": "48px"
+      },
+      {
+        "id": "history",
+        "width": 1920,
+        "collapsed": false,
+        "left": 21,
+        "right": 21,
+        "side": 21,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1905,
+        "clientWidth": 1905,
+        "font": "48px"
+      },
+      {
+        "id": "history",
+        "width": 1920,
+        "collapsed": true,
+        "left": 35.5,
+        "right": 35.5,
+        "side": 35.5,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "Historial de pedidos",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1905,
+        "clientWidth": 1905,
+        "font": "48px"
+      },
+      {
+        "id": "history-detail",
+        "width": 320,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 305,
+        "clientWidth": 305,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 360,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 345,
+        "clientWidth": 345,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 375,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 360,
+        "clientWidth": 360,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 390,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 430,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 415,
+        "clientWidth": 415,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 576,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 561,
+        "clientWidth": 561,
+        "font": "24px"
+      },
+      {
+        "id": "history-detail",
+        "width": 768,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 753,
+        "clientWidth": 753,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 992,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 977,
+        "clientWidth": 977,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 992,
+        "collapsed": true,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 977,
+        "clientWidth": 977,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1024,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1009,
+        "clientWidth": 1009,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1024,
+        "collapsed": true,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1009,
+        "clientWidth": 1009,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1200,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1185,
+        "clientWidth": 1185,
+        "font": "36px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1200,
+        "collapsed": true,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1185,
+        "clientWidth": 1185,
+        "font": "48px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1440,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "font": "48px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1440,
+        "collapsed": true,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1425,
+        "clientWidth": 1425,
+        "font": "48px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1920,
+        "collapsed": false,
+        "left": 20,
+        "right": 20,
+        "side": 20,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1905,
+        "clientWidth": 1905,
+        "font": "48px"
+      },
+      {
+        "id": "history-detail",
+        "width": 1920,
+        "collapsed": true,
+        "left": 34.5,
+        "right": 34.5,
+        "side": 34.5,
+        "background": "rgb(0, 0, 0)",
+        "stripe": "rgb(254, 90, 0)",
+        "thickness": "4px",
+        "stripeVisible": true,
+        "titleColor": "rgb(255, 255, 255)",
+        "weight": "700",
+        "title": "SYN-123",
+        "titleFits": true,
+        "controlsFit": true,
+        "mainCount": 1,
+        "overflow": false,
+        "scrollWidth": 1905,
+        "clientWidth": 1905,
+        "font": "48px"
+      }
+    ],
+    "renderSamples": [
+      {
+        "id": "history",
+        "sample": 1,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 9.299999997019768,
+              "baseDuration": 6.5
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.1000000014901161,
+              "baseDuration": 6.700000002980232
+            },
+            {
+              "phase": "update",
+              "actualDuration": 18.399999998509884,
+              "baseDuration": 18.80000001192093
+            }
+          ],
+          "reads": {
+            "list": 1,
+            "detail": 0,
+            "events": 0
+          }
+        }
+      },
+      {
+        "id": "history",
+        "sample": 2,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 10.100000001490116,
+              "baseDuration": 7.4000000059604645
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1,
+              "baseDuration": 5.600000001490116
+            },
+            {
+              "phase": "update",
+              "actualDuration": 19.700000002980232,
+              "baseDuration": 18.69999998807907
+            }
+          ],
+          "reads": {
+            "list": 1,
+            "detail": 0,
+            "events": 0
+          }
+        }
+      },
+      {
+        "id": "history",
+        "sample": 3,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 7.699999995529652,
+              "baseDuration": 5.899999998509884
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.0999999940395355,
+              "baseDuration": 5.899999991059303
+            },
+            {
+              "phase": "update",
+              "actualDuration": 23.599999994039536,
+              "baseDuration": 23.100000008940697
+            }
+          ],
+          "reads": {
+            "list": 1,
+            "detail": 0,
+            "events": 0
+          }
+        }
+      },
+      {
+        "id": "history",
+        "sample": 4,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 11.49999999254942,
+              "baseDuration": 7.899999998509884
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1,
+              "baseDuration": 7.9000000059604645
+            },
+            {
+              "phase": "update",
+              "actualDuration": 24.399999998509884,
+              "baseDuration": 25.499999977648258
+            }
+          ],
+          "reads": {
+            "list": 1,
+            "detail": 0,
+            "events": 0
+          }
+        }
+      },
+      {
+        "id": "history",
+        "sample": 5,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 11.100000008940697,
+              "baseDuration": 7.699999995529652
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.1000000014901161,
+              "baseDuration": 7.799999997019768
+            },
+            {
+              "phase": "update",
+              "actualDuration": 22.100000001490116,
+              "baseDuration": 23.80000000447035
+            }
+          ],
+          "reads": {
+            "list": 1,
+            "detail": 0,
+            "events": 0
+          }
+        }
+      },
+      {
+        "id": "history-detail",
+        "sample": 1,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 8.100000001490116,
+              "baseDuration": 6.300000011920929
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1,
+              "baseDuration": 6.200000010430813
+            },
+            {
+              "phase": "update",
+              "actualDuration": 23.30000000447035,
+              "baseDuration": 23.599999986588955
+            }
+          ],
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 0
+          }
+        },
+        "append": {
+          "ms": 32.399999998509884,
+          "profile": [
+            {
+              "phase": "update",
+              "actualDuration": 4.5999999940395355,
+              "baseDuration": 24.799999974668026
+            },
+            {
+              "phase": "update",
+              "actualDuration": 19.200000010430813,
+              "baseDuration": 35.00000001490116
+            }
+          ],
+          "events": 100,
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 1
+          }
+        }
+      },
+      {
+        "id": "history-detail",
+        "sample": 2,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 7.5999999940395355,
+              "baseDuration": 5.499999992549419
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1,
+              "baseDuration": 5.499999992549419
+            },
+            {
+              "phase": "update",
+              "actualDuration": 20.799999989569187,
+              "baseDuration": 21.000000022351742
+            }
+          ],
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 0
+          }
+        },
+        "append": {
+          "ms": 32,
+          "profile": [
+            {
+              "phase": "update",
+              "actualDuration": 4.199999995529652,
+              "baseDuration": 21.700000002980232
+            },
+            {
+              "phase": "update",
+              "actualDuration": 20.700000002980232,
+              "baseDuration": 34.19999998807907
+            }
+          ],
+          "events": 100,
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 1
+          }
+        }
+      },
+      {
+        "id": "history-detail",
+        "sample": 3,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 10.299999997019768,
+              "baseDuration": 7.6999999806284904
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.1999999955296516,
+              "baseDuration": 7.399999983608723
+            },
+            {
+              "phase": "update",
+              "actualDuration": 22.399999998509884,
+              "baseDuration": 23.69999996572733
+            }
+          ],
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 0
+          }
+        },
+        "append": {
+          "ms": 43.600000001490116,
+          "profile": [
+            {
+              "phase": "update",
+              "actualDuration": 4.899999991059303,
+              "baseDuration": 25.299999967217445
+            },
+            {
+              "phase": "update",
+              "actualDuration": 29.899999991059303,
+              "baseDuration": 43.999999955296516
+            }
+          ],
+          "events": 100,
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 1
+          }
+        }
+      },
+      {
+        "id": "history-detail",
+        "sample": 4,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 9,
+              "baseDuration": 6.899999991059303
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.3999999985098839,
+              "baseDuration": 7.199999988079071
+            },
+            {
+              "phase": "update",
+              "actualDuration": 19.600000001490116,
+              "baseDuration": 22.100000016391277
+            }
+          ],
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 0
+          }
+        },
+        "append": {
+          "ms": 34.19999999552965,
+          "profile": [
+            {
+              "phase": "update",
+              "actualDuration": 5.700000002980232,
+              "baseDuration": 22.600000023841858
+            },
+            {
+              "phase": "update",
+              "actualDuration": 21.200000002980232,
+              "baseDuration": 35.10000002384186
+            }
+          ],
+          "events": 100,
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 1
+          }
+        }
+      },
+      {
+        "id": "history-detail",
+        "sample": 5,
+        "initial": {
+          "profile": [
+            {
+              "phase": "mount",
+              "actualDuration": 11.600000001490116,
+              "baseDuration": 9.00000000745058
+            },
+            {
+              "phase": "nested-update",
+              "actualDuration": 1.7000000029802322,
+              "baseDuration": 8.900000013411045
+            },
+            {
+              "phase": "update",
+              "actualDuration": 23.5,
+              "baseDuration": 26.00000001490116
+            }
+          ],
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 0
+          }
+        },
+        "append": {
+          "ms": 44.70000000298023,
+          "profile": [
+            {
+              "phase": "update",
+              "actualDuration": 4.600000001490116,
+              "baseDuration": 26.400000020861626
+            },
+            {
+              "phase": "update",
+              "actualDuration": 20.599999994039536,
+              "baseDuration": 38.60000003874302
+            }
+          ],
+          "events": 100,
+          "reads": {
+            "list": 0,
+            "detail": 1,
+            "events": 1
+          }
+        }
+      }
+    ],
+    "methodology": "Real React/AppLayout via Vite development, synthetic auth/API, five warm render observations. Profiler actualDuration and click-to-two-frames recorded separately; not real authenticated E2E."
+  }
+}

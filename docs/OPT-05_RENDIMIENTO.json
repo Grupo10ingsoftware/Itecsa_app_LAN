@@ -1,0 +1,5157 @@
+{
+  "reference": "d9e67ac (history unchanged; pending OPT-07 preserved)",
+  "capturedAt": "2026-10-28T04:05:01.498Z",
+  "methodology": "Five warm samples, strict TLS/pool10; no writes. Driver includes network/adapter. Engine CPU and E2E not measured. No reliable p95 from five samples.",
+  "samples": {
+    "list_before": {
+      "minMs": 1242.791,
+      "meanMs": 1292.1662000000001,
+      "medianMs": 1321.046,
+      "maxMs": 1327.28,
+      "samples": [
+        {
+          "ms": 1322.754,
+          "selects": 3,
+          "resultBytes": 6821,
+          "cpuMs": 0,
+          "heapDeltaBytes": 1051648,
+          "driverMs": [
+            661.5277000000006,
+            582.5274,
+            659.3679000000002
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 13047,
+              "ms": 1322.681
+            }
+          ]
+        },
+        {
+          "ms": 1327.28,
+          "selects": 3,
+          "resultBytes": 6821,
+          "cpuMs": 15,
+          "heapDeltaBytes": 1047752,
+          "driverMs": [
+            664.7914000000001,
+            658.4444000000003,
+            660.4890999999998
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 13047,
+              "ms": 1327.187
+            }
+          ]
+        },
+        {
+          "ms": 1242.791,
+          "selects": 3,
+          "resultBytes": 6821,
+          "cpuMs": 47,
+          "heapDeltaBytes": 1034512,
+          "driverMs": [
+            582.544100000001,
+            645.0575000000008,
+            658.5357000000004
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 13047,
+              "ms": 1242.708
+            }
+          ]
+        },
+        {
+          "ms": 1321.046,
+          "selects": 3,
+          "resultBytes": 6821,
+          "cpuMs": 0,
+          "heapDeltaBytes": 1190016,
+          "driverMs": [
+            661.0833999999995,
+            656.3768999999993,
+            657.9742999999999
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 13047,
+              "ms": 1320.95
+            }
+          ]
+        },
+        {
+          "ms": 1246.96,
+          "selects": 3,
+          "resultBytes": 6821,
+          "cpuMs": 31,
+          "heapDeltaBytes": 1034088,
+          "driverMs": [
+            581.6346999999987,
+            645.5439999999999,
+            663.7554999999993
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 13047,
+              "ms": 1246.872
+            }
+          ]
+        }
+      ]
+    },
+    "list_after": {
+      "minMs": 581.902,
+      "meanMs": 645.9816000000001,
+      "medianMs": 659.625,
+      "maxMs": 665.825,
+      "samples": [
+        {
+          "ms": 665.825,
+          "selects": 1,
+          "resultBytes": 6821,
+          "cpuMs": 0,
+          "heapDeltaBytes": 570832,
+          "driverMs": [
+            664.9724999999999
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 12497,
+              "ms": 665.708
+            }
+          ]
+        },
+        {
+          "ms": 664.555,
+          "selects": 1,
+          "resultBytes": 6821,
+          "cpuMs": 0,
+          "heapDeltaBytes": 551000,
+          "driverMs": [
+            663.9441000000006
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 12497,
+              "ms": 664.477
+            }
+          ]
+        },
+        {
+          "ms": 658.001,
+          "selects": 1,
+          "resultBytes": 6821,
+          "cpuMs": 0,
+          "heapDeltaBytes": 535408,
+          "driverMs": [
+            657.3622999999989
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 12497,
+              "ms": 657.889
+            }
+          ]
+        },
+        {
+          "ms": 659.625,
+          "selects": 1,
+          "resultBytes": 6821,
+          "cpuMs": 16,
+          "heapDeltaBytes": 532448,
+          "driverMs": [
+            658.9994000000006
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 12497,
+              "ms": 659.537
+            }
+          ]
+        },
+        {
+          "ms": 581.902,
+          "selects": 1,
+          "resultBytes": 6821,
+          "cpuMs": 94,
+          "heapDeltaBytes": -10016872,
+          "driverMs": [
+            581.0774999999976
+          ],
+          "reads": [
+            {
+              "rows": 50,
+              "bytes": 12497,
+              "ms": 581.82
+            }
+          ]
+        }
+      ]
+    },
+    "search_before": {
+      "minMs": 1309.857,
+      "meanMs": 1321.0322,
+      "medianMs": 1323.64,
+      "maxMs": 1325.086,
+      "samples": [
+        {
+          "ms": 1323.64,
+          "selects": 3,
+          "resultBytes": 319,
+          "cpuMs": 0,
+          "heapDeltaBytes": -242048,
+          "driverMs": [
+            660.9857000000011,
+            580.557499999999,
+            661.4987000000001
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 497,
+              "ms": 1323.567
+            }
+          ]
+        },
+        {
+          "ms": 1309.857,
+          "selects": 3,
+          "resultBytes": 319,
+          "cpuMs": 15,
+          "heapDeltaBytes": 218920,
+          "driverMs": [
+            646.6931000000004,
+            658.4767000000029,
+            661.8787000000011
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 497,
+              "ms": 1309.787
+            }
+          ]
+        },
+        {
+          "ms": 1325.086,
+          "selects": 3,
+          "resultBytes": 319,
+          "cpuMs": 0,
+          "heapDeltaBytes": 212752,
+          "driverMs": [
+            663.8058999999994,
+            655.9048000000003,
+            660.4503000000004
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 497,
+              "ms": 1325.036
+            }
+          ]
+        },
+        {
+          "ms": 1324.563,
+          "selects": 3,
+          "resultBytes": 319,
+          "cpuMs": 78,
+          "heapDeltaBytes": -1693360,
+          "driverMs": [
+            664.0978000000032,
+            583.1219999999994,
+            659.5865000000013
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 497,
+              "ms": 1324.506
+            }
+          ]
+        },
+        {
+          "ms": 1322.015,
+          "selects": 3,
+          "resultBytes": 319,
+          "cpuMs": 16,
+          "heapDeltaBytes": 209784,
+          "driverMs": [
+            661.081299999998,
+            645.0806999999986,
+            659.5731000000014
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 497,
+              "ms": 1321.95
+            }
+          ]
+        }
+      ]
+    },
+    "search_after": {
+      "minMs": 580.357,
+      "meanMs": 645.2706000000001,
+      "medianMs": 659.289,
+      "maxMs": 664.488,
+      "samples": [
+        {
+          "ms": 663.99,
+          "selects": 1,
+          "resultBytes": 319,
+          "cpuMs": 16,
+          "heapDeltaBytes": 89848,
+          "driverMs": [
+            663.2503999999972
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 475,
+              "ms": 663.773
+            }
+          ]
+        },
+        {
+          "ms": 658.229,
+          "selects": 1,
+          "resultBytes": 319,
+          "cpuMs": 0,
+          "heapDeltaBytes": 63944,
+          "driverMs": [
+            657.6910000000025
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 475,
+              "ms": 658.115
+            }
+          ]
+        },
+        {
+          "ms": 664.488,
+          "selects": 1,
+          "resultBytes": 319,
+          "cpuMs": 0,
+          "heapDeltaBytes": 90416,
+          "driverMs": [
+            664.024300000001
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 475,
+              "ms": 664.395
+            }
+          ]
+        },
+        {
+          "ms": 659.289,
+          "selects": 1,
+          "resultBytes": 319,
+          "cpuMs": 0,
+          "heapDeltaBytes": 93192,
+          "driverMs": [
+            658.8960000000006
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 475,
+              "ms": 659.226
+            }
+          ]
+        },
+        {
+          "ms": 580.357,
+          "selects": 1,
+          "resultBytes": 319,
+          "cpuMs": 0,
+          "heapDeltaBytes": 79088,
+          "driverMs": [
+            579.9066999999995
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 475,
+              "ms": 580.279
+            }
+          ]
+        }
+      ]
+    },
+    "status_before": {
+      "minMs": 1318.822,
+      "meanMs": 1329.9878,
+      "medianMs": 1321.681,
+      "maxMs": 1361.308,
+      "samples": [
+        {
+          "ms": 1361.308,
+          "selects": 3,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": 315488,
+          "driverMs": [
+            702.2707000000009,
+            580.7491999999984,
+            657.7383000000045
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2783,
+              "ms": 1361.216
+            }
+          ]
+        },
+        {
+          "ms": 1320.313,
+          "selects": 3,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": -320368,
+          "driverMs": [
+            659.2002999999968,
+            643.3206000000064,
+            660.0786000000007
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2783,
+              "ms": 1320.23
+            }
+          ]
+        },
+        {
+          "ms": 1321.681,
+          "selects": 3,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": 326232,
+          "driverMs": [
+            659.0164000000004,
+            657.0092999999979,
+            661.5397000000012
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2783,
+              "ms": 1321.62
+            }
+          ]
+        },
+        {
+          "ms": 1327.815,
+          "selects": 3,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": 338640,
+          "driverMs": [
+            663.1446999999971,
+            582.2422999999981,
+            663.4575000000041
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2783,
+              "ms": 1327.733
+            }
+          ]
+        },
+        {
+          "ms": 1318.822,
+          "selects": 3,
+          "resultBytes": 1471,
+          "cpuMs": 15,
+          "heapDeltaBytes": -405368,
+          "driverMs": [
+            658.2949999999983,
+            644.6834999999992,
+            659.2373000000007
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2783,
+              "ms": 1318.709
+            }
+          ]
+        }
+      ]
+    },
+    "status_after": {
+      "minMs": 583.512,
+      "meanMs": 645.4118000000001,
+      "medianMs": 660.269,
+      "maxMs": 663.258,
+      "samples": [
+        {
+          "ms": 660.269,
+          "selects": 1,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": 164632,
+          "driverMs": [
+            659.7822000000015
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2662,
+              "ms": 660.163
+            }
+          ]
+        },
+        {
+          "ms": 657.667,
+          "selects": 1,
+          "resultBytes": 1471,
+          "cpuMs": 16,
+          "heapDeltaBytes": 162640,
+          "driverMs": [
+            657.235099999998
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2662,
+              "ms": 657.577
+            }
+          ]
+        },
+        {
+          "ms": 662.353,
+          "selects": 1,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": 161792,
+          "driverMs": [
+            661.9545999999973
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2662,
+              "ms": 662.281
+            }
+          ]
+        },
+        {
+          "ms": 663.258,
+          "selects": 1,
+          "resultBytes": 1471,
+          "cpuMs": 16,
+          "heapDeltaBytes": 161672,
+          "driverMs": [
+            662.8286000000007
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2662,
+              "ms": 663.179
+            }
+          ]
+        },
+        {
+          "ms": 583.512,
+          "selects": 1,
+          "resultBytes": 1471,
+          "cpuMs": 0,
+          "heapDeltaBytes": -464648,
+          "driverMs": [
+            583.0194999999949
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2662,
+              "ms": 583.443
+            }
+          ]
+        }
+      ]
+    },
+    "dates_before": {
+      "minMs": 1317.623,
+      "meanMs": 1322.4587999999999,
+      "medianMs": 1322.113,
+      "maxMs": 1326.329,
+      "samples": [
+        {
+          "ms": 1326.329,
+          "selects": 3,
+          "resultBytes": 1305,
+          "cpuMs": 15,
+          "heapDeltaBytes": -397832,
+          "driverMs": [
+            661.4931999999972,
+            581.7056999999986,
+            663.5832999999984
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2371,
+              "ms": 1326.184
+            }
+          ]
+        },
+        {
+          "ms": 1322.113,
+          "selects": 3,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": 313712,
+          "driverMs": [
+            663.7759000000005,
+            645.5559000000067,
+            657.2625999999946
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2371,
+              "ms": 1321.953
+            }
+          ]
+        },
+        {
+          "ms": 1317.623,
+          "selects": 3,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": 317808,
+          "driverMs": [
+            657.7201999999961,
+            655.2906000000003,
+            658.9795000000013
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2371,
+              "ms": 1317.539
+            }
+          ]
+        },
+        {
+          "ms": 1320.967,
+          "selects": 3,
+          "resultBytes": 1305,
+          "cpuMs": 31,
+          "heapDeltaBytes": -359736,
+          "driverMs": [
+            658.4199000000008,
+            580.5371999999988,
+            661.1875
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2371,
+              "ms": 1320.879
+            }
+          ]
+        },
+        {
+          "ms": 1325.262,
+          "selects": 3,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": 309432,
+          "driverMs": [
+            663.2517999999982,
+            644.9801000000007,
+            661.2888999999996
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2371,
+              "ms": 1325.193
+            }
+          ]
+        }
+      ]
+    },
+    "dates_after": {
+      "minMs": 582.695,
+      "meanMs": 643.7266,
+      "medianMs": 659.33,
+      "maxMs": 660.53,
+      "samples": [
+        {
+          "ms": 659.33,
+          "selects": 1,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": 147112,
+          "driverMs": [
+            658.8329999999987
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2272,
+              "ms": 659.215
+            }
+          ]
+        },
+        {
+          "ms": 655.654,
+          "selects": 1,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": 149656,
+          "driverMs": [
+            655.0846999999994
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2272,
+              "ms": 655.551
+            }
+          ]
+        },
+        {
+          "ms": 660.424,
+          "selects": 1,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": -500256,
+          "driverMs": [
+            659.9035999999978
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2272,
+              "ms": 660.289
+            }
+          ]
+        },
+        {
+          "ms": 660.53,
+          "selects": 1,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": 161336,
+          "driverMs": [
+            659.9625000000015
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2272,
+              "ms": 660.426
+            }
+          ]
+        },
+        {
+          "ms": 582.695,
+          "selects": 1,
+          "resultBytes": 1305,
+          "cpuMs": 0,
+          "heapDeltaBytes": 150808,
+          "driverMs": [
+            582.2155999999959
+          ],
+          "reads": [
+            {
+              "rows": 9,
+              "bytes": 2272,
+              "ms": 582.604
+            }
+          ]
+        }
+      ]
+    },
+    "next_before": {
+      "minMs": 1318.058,
+      "meanMs": 1324.3946,
+      "medianMs": 1323.711,
+      "maxMs": 1333.729,
+      "samples": [
+        {
+          "ms": 1318.058,
+          "selects": 3,
+          "resultBytes": 1479,
+          "cpuMs": 15,
+          "heapDeltaBytes": 342856,
+          "driverMs": [
+            659.0636999999988,
+            579.9530999999988,
+            658.0997000000061
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2872,
+              "ms": 1317.848
+            }
+          ]
+        },
+        {
+          "ms": 1333.729,
+          "selects": 3,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": 361232,
+          "driverMs": [
+            664.8728999999948,
+            646.0241000000024,
+            668.0683000000063
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2872,
+              "ms": 1333.545
+            }
+          ]
+        },
+        {
+          "ms": 1323.711,
+          "selects": 3,
+          "resultBytes": 1479,
+          "cpuMs": 16,
+          "heapDeltaBytes": -392712,
+          "driverMs": [
+            662.459600000002,
+            659.7950999999957,
+            660.3313999999955
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2872,
+              "ms": 1323.456
+            }
+          ]
+        },
+        {
+          "ms": 1324.919,
+          "selects": 3,
+          "resultBytes": 1479,
+          "cpuMs": 16,
+          "heapDeltaBytes": 327872,
+          "driverMs": [
+            660.6724000000031,
+            583.3545000000013,
+            663.4410999999964
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2872,
+              "ms": 1324.717
+            }
+          ]
+        },
+        {
+          "ms": 1321.556,
+          "selects": 3,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": 328320,
+          "driverMs": [
+            659.3254000000015,
+            645.7798999999941,
+            661.4309999999969
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2872,
+              "ms": 1321.376
+            }
+          ]
+        }
+      ]
+    },
+    "next_after": {
+      "minMs": 582.023,
+      "meanMs": 643.8316000000001,
+      "medianMs": 657.833,
+      "maxMs": 661.987,
+      "samples": [
+        {
+          "ms": 661.987,
+          "selects": 1,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": 170848,
+          "driverMs": [
+            661.0483999999997
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2751,
+              "ms": 661.625
+            }
+          ]
+        },
+        {
+          "ms": 657.151,
+          "selects": 1,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": 169648,
+          "driverMs": [
+            656.6349000000046
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2751,
+              "ms": 656.976
+            }
+          ]
+        },
+        {
+          "ms": 657.833,
+          "selects": 1,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": 170984,
+          "driverMs": [
+            657.2007999999914
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2751,
+              "ms": 657.623
+            }
+          ]
+        },
+        {
+          "ms": 660.164,
+          "selects": 1,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": 167344,
+          "driverMs": [
+            659.5528999999951
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2751,
+              "ms": 659.939
+            }
+          ]
+        },
+        {
+          "ms": 582.023,
+          "selects": 1,
+          "resultBytes": 1479,
+          "cpuMs": 0,
+          "heapDeltaBytes": 164304,
+          "driverMs": [
+            581.4676999999938
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2751,
+              "ms": 581.831
+            }
+          ]
+        }
+      ]
+    },
+    "previous_before": {
+      "minMs": 1316.552,
+      "meanMs": 1320.7194,
+      "medianMs": 1321.071,
+      "maxMs": 1326.707,
+      "samples": [
+        {
+          "ms": 1316.552,
+          "selects": 3,
+          "resultBytes": 1499,
+          "cpuMs": 0,
+          "heapDeltaBytes": 328528,
+          "driverMs": [
+            656.8110999999917,
+            580.290599999993,
+            658.9754000000103
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2905,
+              "ms": 1316.449
+            }
+          ]
+        },
+        {
+          "ms": 1317.29,
+          "selects": 3,
+          "resultBytes": 1499,
+          "cpuMs": 0,
+          "heapDeltaBytes": -341840,
+          "driverMs": [
+            658.306700000001,
+            645.7611000000034,
+            658.2183999999979
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2905,
+              "ms": 1317.182
+            }
+          ]
+        },
+        {
+          "ms": 1326.707,
+          "selects": 3,
+          "resultBytes": 1499,
+          "cpuMs": 0,
+          "heapDeltaBytes": 353160,
+          "driverMs": [
+            662.7062000000005,
+            656.8502000000008,
+            663.2743000000046
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2905,
+              "ms": 1326.592
+            }
+          ]
+        },
+        {
+          "ms": 1321.977,
+          "selects": 3,
+          "resultBytes": 1499,
+          "cpuMs": 0,
+          "heapDeltaBytes": 333944,
+          "driverMs": [
+            662.8515999999945,
+            582.0292999999947,
+            658.2523999999976
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2905,
+              "ms": 1321.868
+            }
+          ]
+        },
+        {
+          "ms": 1321.071,
+          "selects": 3,
+          "resultBytes": 1499,
+          "cpuMs": 32,
+          "heapDeltaBytes": -379496,
+          "driverMs": [
+            660.2516000000032,
+            644.2685000000056,
+            659.9510000000009
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2905,
+              "ms": 1320.957
+            }
+          ]
+        }
+      ]
+    },
+    "previous_after": {
+      "minMs": 583.929,
+      "meanMs": 645.4658000000001,
+      "medianMs": 662.266,
+      "maxMs": 663.081,
+      "samples": [
+        {
+          "ms": 662.266,
+          "selects": 1,
+          "resultBytes": 1499,
+          "cpuMs": 15,
+          "heapDeltaBytes": 52216,
+          "driverMs": [
+            661.8267999999953
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2784,
+              "ms": 662.13
+            }
+          ]
+        },
+        {
+          "ms": 655.651,
+          "selects": 1,
+          "resultBytes": 1499,
+          "cpuMs": 0,
+          "heapDeltaBytes": 163544,
+          "driverMs": [
+            655.2097000000067
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2784,
+              "ms": 655.547
+            }
+          ]
+        },
+        {
+          "ms": 662.402,
+          "selects": 1,
+          "resultBytes": 1499,
+          "cpuMs": 0,
+          "heapDeltaBytes": 160152,
+          "driverMs": [
+            661.9992000000057
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2784,
+              "ms": 662.288
+            }
+          ]
+        },
+        {
+          "ms": 663.081,
+          "selects": 1,
+          "resultBytes": 1499,
+          "cpuMs": 0,
+          "heapDeltaBytes": -576728,
+          "driverMs": [
+            662.1379000000015
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2784,
+              "ms": 662.848
+            }
+          ]
+        },
+        {
+          "ms": 583.929,
+          "selects": 1,
+          "resultBytes": 1499,
+          "cpuMs": 16,
+          "heapDeltaBytes": 160640,
+          "driverMs": [
+            583.2186999999976
+          ],
+          "reads": [
+            {
+              "rows": 11,
+              "bytes": 2784,
+              "ms": 583.769
+            }
+          ]
+        }
+      ]
+    },
+    "detail_before": {
+      "minMs": 661.524,
+      "meanMs": 664.9673999999999,
+      "medianMs": 665.554,
+      "maxMs": 669.107,
+      "samples": [
+        {
+          "ms": 669.107,
+          "selects": 5,
+          "resultBytes": 11864,
+          "cpuMs": 46,
+          "heapDeltaBytes": -152352,
+          "driverMs": [
+            582.9771999999939,
+            646.8738000000012,
+            658.9663999999902,
+            659.2630999999965,
+            666.0500000000029
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 583.719
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 648.573
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 660.469
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 660.852
+            },
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 668.703
+            }
+          ]
+        },
+        {
+          "ms": 666.233,
+          "selects": 5,
+          "resultBytes": 11864,
+          "cpuMs": 0,
+          "heapDeltaBytes": 536904,
+          "driverMs": [
+            657.488400000002,
+            660.9070000000065,
+            661.522100000002,
+            662.8441000000021,
+            664.3450999999914
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 658.26
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 661.917
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 662.557
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 663.972
+            },
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 665.873
+            }
+          ]
+        },
+        {
+          "ms": 662.419,
+          "selects": 5,
+          "resultBytes": 11864,
+          "cpuMs": 0,
+          "heapDeltaBytes": 1327672,
+          "driverMs": [
+            581.2671999999875,
+            646.6581000000006,
+            656.2648999999947,
+            658.6828999999998,
+            659.957899999994
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 581.935
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 647.531
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 657.194
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 659.844
+            },
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 661.803
+            }
+          ]
+        },
+        {
+          "ms": 665.554,
+          "selects": 5,
+          "resultBytes": 11864,
+          "cpuMs": 32,
+          "heapDeltaBytes": -484536,
+          "driverMs": [
+            655.7505000000092,
+            658.1342999999906,
+            658.5053999999946,
+            660.5641000000032,
+            661.7608000000037
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 656.613
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 659.365
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 659.818
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 662.16
+            },
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 663.994
+            }
+          ]
+        },
+        {
+          "ms": 661.524,
+          "selects": 5,
+          "resultBytes": 11864,
+          "cpuMs": 0,
+          "heapDeltaBytes": -51576,
+          "driverMs": [
+            580.8074999999953,
+            644.2445000000007,
+            655.0664000000106,
+            655.9839000000065,
+            659.6886999999988
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 581.448
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 644.961
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 655.88
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 656.896
+            },
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 661.134
+            }
+          ]
+        }
+      ]
+    },
+    "detail_after": {
+      "minMs": 664.687,
+      "meanMs": 666.6716,
+      "medianMs": 666.182,
+      "maxMs": 670.738,
+      "samples": [
+        {
+          "ms": 664.984,
+          "selects": 3,
+          "resultBytes": 11864,
+          "cpuMs": 31,
+          "heapDeltaBytes": 1291344,
+          "driverMs": [
+            587.7458999999944,
+            663.0014999999985,
+            663.756899999993
+          ],
+          "reads": [
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 589.1
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 663.578
+            },
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 664.498
+            }
+          ]
+        },
+        {
+          "ms": 666.767,
+          "selects": 3,
+          "resultBytes": 11864,
+          "cpuMs": 16,
+          "heapDeltaBytes": -574496,
+          "driverMs": [
+            645.3374999999942,
+            659.0421999999962,
+            665.2685000000056
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 646.053
+            },
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 659.893
+            },
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 666.444
+            }
+          ]
+        },
+        {
+          "ms": 664.687,
+          "selects": 3,
+          "resultBytes": 11864,
+          "cpuMs": 0,
+          "heapDeltaBytes": 1274072,
+          "driverMs": [
+            659.9783999999927,
+            660.7486000000063,
+            663.3824999999924
+          ],
+          "reads": [
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 660.442
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 661.065
+            },
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 664.407
+            }
+          ]
+        },
+        {
+          "ms": 670.738,
+          "selects": 3,
+          "resultBytes": 11864,
+          "cpuMs": 15,
+          "heapDeltaBytes": -465856,
+          "driverMs": [
+            583.3785999999964,
+            658.0558000000019,
+            668.7229000000079
+          ],
+          "reads": [
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 584.54
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 659.008
+            },
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 670.385
+            }
+          ]
+        },
+        {
+          "ms": 666.182,
+          "selects": 3,
+          "resultBytes": 11864,
+          "cpuMs": 15,
+          "heapDeltaBytes": -476752,
+          "driverMs": [
+            646.756400000013,
+            663.3307000000059,
+            665.0924999999988
+          ],
+          "reads": [
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 647.255
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 663.736
+            },
+            {
+              "rows": 51,
+              "bytes": 27752,
+              "ms": 665.871
+            }
+          ]
+        }
+      ]
+    },
+    "events_before": {
+      "minMs": 645.621,
+      "meanMs": 657.3682000000001,
+      "medianMs": 660.12,
+      "maxMs": 661.278,
+      "samples": [
+        {
+          "ms": 659.485,
+          "selects": 1,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 122128,
+          "driverMs": [
+            658.8571999999986
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 659.357
+            }
+          ]
+        },
+        {
+          "ms": 660.337,
+          "selects": 1,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 117920,
+          "driverMs": [
+            659.9350999999879
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 660.242
+            }
+          ]
+        },
+        {
+          "ms": 661.278,
+          "selects": 1,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 116016,
+          "driverMs": [
+            660.5746999999974
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 661.189
+            }
+          ]
+        },
+        {
+          "ms": 660.12,
+          "selects": 1,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 116216,
+          "driverMs": [
+            659.7164000000048
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 660.038
+            }
+          ]
+        },
+        {
+          "ms": 645.621,
+          "selects": 1,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 116760,
+          "driverMs": [
+            645.2491000000009
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 645.545
+            }
+          ]
+        }
+      ]
+    },
+    "events_after": {
+      "minMs": 659.131,
+      "meanMs": 663.9972,
+      "medianMs": 664.58,
+      "maxMs": 665.926,
+      "samples": [
+        {
+          "ms": 665.793,
+          "selects": 1,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 117208,
+          "driverMs": [
+            665.2753000000084
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 665.65
+            }
+          ]
+        },
+        {
+          "ms": 664.556,
+          "selects": 1,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 123128,
+          "driverMs": [
+            663.7652999999991
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 664.319
+            }
+          ]
+        },
+        {
+          "ms": 665.926,
+          "selects": 1,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 116888,
+          "driverMs": [
+            665.5492000000086
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 665.841
+            }
+          ]
+        },
+        {
+          "ms": 664.58,
+          "selects": 1,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 116480,
+          "driverMs": [
+            664.123299999992
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 664.469
+            }
+          ]
+        },
+        {
+          "ms": 659.131,
+          "selects": 1,
+          "resultBytes": 641,
+          "cpuMs": 0,
+          "heapDeltaBytes": 121424,
+          "driverMs": [
+            658.6064000000042
+          ],
+          "reads": [
+            {
+              "rows": 2,
+              "bytes": 1122,
+              "ms": 659.043
+            }
+          ]
+        }
+      ]
+    },
+    "more_before": {
+      "minMs": 582.408,
+      "meanMs": 644.0744000000001,
+      "medianMs": 660.616,
+      "maxMs": 666.246,
+      "samples": [
+        {
+          "ms": 647.92,
+          "selects": 1,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": -2589408,
+          "driverMs": [
+            647.1836999999941
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 647.656
+            }
+          ]
+        },
+        {
+          "ms": 582.408,
+          "selects": 1,
+          "resultBytes": 1218,
+          "cpuMs": 16,
+          "heapDeltaBytes": 198208,
+          "driverMs": [
+            581.7320999999938
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 582.126
+            }
+          ]
+        },
+        {
+          "ms": 660.616,
+          "selects": 1,
+          "resultBytes": 1218,
+          "cpuMs": 31,
+          "heapDeltaBytes": 196864,
+          "driverMs": [
+            659.8931999999913
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 660.351
+            }
+          ]
+        },
+        {
+          "ms": 663.182,
+          "selects": 1,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": -415272,
+          "driverMs": [
+            662.3031000000046
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 662.872
+            }
+          ]
+        },
+        {
+          "ms": 666.246,
+          "selects": 1,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": 197608,
+          "driverMs": [
+            665.4515000000101
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 665.962
+            }
+          ]
+        }
+      ]
+    },
+    "more_after": {
+      "minMs": 646.728,
+      "meanMs": 657.7328,
+      "medianMs": 660.346,
+      "maxMs": 662.576,
+      "samples": [
+        {
+          "ms": 662.576,
+          "selects": 1,
+          "resultBytes": 1218,
+          "cpuMs": 16,
+          "heapDeltaBytes": 196992,
+          "driverMs": [
+            661.7608000000037
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 662.234
+            }
+          ]
+        },
+        {
+          "ms": 657.305,
+          "selects": 1,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": -665248,
+          "driverMs": [
+            656.7583000000013
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 657.079
+            }
+          ]
+        },
+        {
+          "ms": 660.346,
+          "selects": 1,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": 206768,
+          "driverMs": [
+            659.448900000003
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 660.035
+            }
+          ]
+        },
+        {
+          "ms": 661.709,
+          "selects": 1,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": 196760,
+          "driverMs": [
+            661.0418999999965
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 661.459
+            }
+          ]
+        },
+        {
+          "ms": 646.728,
+          "selects": 1,
+          "resultBytes": 1218,
+          "cpuMs": 0,
+          "heapDeltaBytes": 201528,
+          "driverMs": [
+            646.0237000000052
+          ],
+          "reads": [
+            {
+              "rows": 6,
+              "bytes": 3234,
+              "ms": 646.494
+            }
+          ]
+        }
+      ]
+    },
+    "header_before": {
+      "minMs": 658.291,
+      "meanMs": 660.4878000000001,
+      "medianMs": 661.032,
+      "maxMs": 661.563,
+      "samples": [
+        {
+          "ms": 658.291,
+          "selects": 4,
+          "resultBytes": 975,
+          "cpuMs": 0,
+          "heapDeltaBytes": -279176,
+          "driverMs": [
+            645.8189999999886,
+            655.4413000000059,
+            656.5894999999873,
+            657.5025999999925
+          ],
+          "reads": [
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 646.581
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 655.897
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 657.19
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 658.171
+            }
+          ]
+        },
+        {
+          "ms": 661.032,
+          "selects": 4,
+          "resultBytes": 975,
+          "cpuMs": 30,
+          "heapDeltaBytes": 234104,
+          "driverMs": [
+            580.0360000000073,
+            657.7872999999963,
+            658.2247000000061,
+            660.1635999999999
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 580.562
+            },
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 658.513
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 658.836
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 660.896
+            }
+          ]
+        },
+        {
+          "ms": 661.563,
+          "selects": 4,
+          "resultBytes": 975,
+          "cpuMs": 16,
+          "heapDeltaBytes": 236440,
+          "driverMs": [
+            645.7971000000107,
+            656.5198999999993,
+            660.3907000000036,
+            660.8929999999964
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 646.591
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 657.383
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 660.89
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 661.505
+            }
+          ]
+        },
+        {
+          "ms": 661.466,
+          "selects": 4,
+          "resultBytes": 975,
+          "cpuMs": 0,
+          "heapDeltaBytes": -453904,
+          "driverMs": [
+            582.1885000000038,
+            657.2111999999906,
+            659.4622999999992,
+            661.0113000000129
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 582.713
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 657.837
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 659.838
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 661.423
+            }
+          ]
+        },
+        {
+          "ms": 660.087,
+          "selects": 4,
+          "resultBytes": 975,
+          "cpuMs": 16,
+          "heapDeltaBytes": 225456,
+          "driverMs": [
+            644.6149999999907,
+            656.1169000000082,
+            658.2363000000041,
+            659.539300000004
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 72,
+              "ms": 645.227
+            },
+            {
+              "rows": 0,
+              "bytes": 2,
+              "ms": 656.823
+            },
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 658.636
+            },
+            {
+              "rows": 2,
+              "bytes": 349,
+              "ms": 660.04
+            }
+          ]
+        }
+      ]
+    },
+    "header_after": {
+      "minMs": 659.227,
+      "meanMs": 660.8266,
+      "medianMs": 660.022,
+      "maxMs": 663.008,
+      "samples": [
+        {
+          "ms": 659.902,
+          "selects": 2,
+          "resultBytes": 975,
+          "cpuMs": 0,
+          "heapDeltaBytes": 166280,
+          "driverMs": [
+            581.4438000000082,
+            659.2804000000033
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 581.793
+            },
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 659.757
+            }
+          ]
+        },
+        {
+          "ms": 660.022,
+          "selects": 2,
+          "resultBytes": 975,
+          "cpuMs": 0,
+          "heapDeltaBytes": -506536,
+          "driverMs": [
+            657.4415000000008,
+            659.4349999999977
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 657.793
+            },
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 659.91
+            }
+          ]
+        },
+        {
+          "ms": 659.227,
+          "selects": 2,
+          "resultBytes": 975,
+          "cpuMs": 0,
+          "heapDeltaBytes": 159696,
+          "driverMs": [
+            644.9017999999924,
+            658.6273999999976
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 645.376
+            },
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 659.141
+            }
+          ]
+        },
+        {
+          "ms": 661.974,
+          "selects": 2,
+          "resultBytes": 975,
+          "cpuMs": 0,
+          "heapDeltaBytes": 158200,
+          "driverMs": [
+            657.3597999999911,
+            661.4032000000007
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 657.725
+            },
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 661.901
+            }
+          ]
+        },
+        {
+          "ms": 663.008,
+          "selects": 2,
+          "resultBytes": 975,
+          "cpuMs": 16,
+          "heapDeltaBytes": 157816,
+          "driverMs": [
+            660.842599999989,
+            662.4867000000086
+          ],
+          "reads": [
+            {
+              "rows": 1,
+              "bytes": 346,
+              "ms": 661.246
+            },
+            {
+              "rows": 3,
+              "bytes": 741,
+              "ms": 662.927
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "equivalence": [
+    {
+      "operation": "list",
+      "equal": true
+    },
+    {
+      "operation": "search",
+      "equal": true
+    },
+    {
+      "operation": "status",
+      "equal": true
+    },
+    {
+      "operation": "dates",
+      "equal": true
+    },
+    {
+      "operation": "next",
+      "equal": true
+    },
+    {
+      "operation": "previous",
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "equal": true
+    },
+    {
+      "operation": "events",
+      "equal": true
+    },
+    {
+      "operation": "more",
+      "equal": true
+    },
+    {
+      "operation": "header",
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "all",
+      "includePaymentDetails": false,
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "stage",
+      "includePaymentDetails": false,
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "payment",
+      "includePaymentDetails": false,
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "subprocess",
+      "includePaymentDetails": false,
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "calendar",
+      "includePaymentDetails": false,
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "general",
+      "includePaymentDetails": false,
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "all",
+      "includePaymentDetails": true,
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "stage",
+      "includePaymentDetails": true,
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "payment",
+      "includePaymentDetails": true,
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "subprocess",
+      "includePaymentDetails": true,
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "calendar",
+      "includePaymentDetails": true,
+      "equal": true
+    },
+    {
+      "operation": "detail",
+      "type": "general",
+      "includePaymentDetails": true,
+      "equal": true
+    },
+    {
+      "operation": "list",
+      "scenario": "bounded edge case",
+      "equal": true
+    },
+    {
+      "operation": "list",
+      "scenario": "bounded edge case",
+      "equal": true
+    },
+    {
+      "operation": "list",
+      "scenario": "bounded edge case",
+      "equal": true
+    },
+    {
+      "operation": "list",
+      "scenario": "bounded edge case",
+      "equal": true
+    },
+    {
+      "operation": "list",
+      "scenario": "bounded edge case",
+      "equal": true
+    },
+    {
+      "operation": "list",
+      "scenario": "bounded edge case",
+      "equal": true
+    },
+    {
+      "operation": "list",
+      "scenario": "bounded edge case",
+      "equal": true
+    },
+    {
+      "operation": "list",
+      "scenario": "bounded edge case",
+      "equal": true
+    },
+    {
+      "operation": "list",
+      "scenario": "bounded edge case",
+      "equal": true
+    }
+  ],
+  "explain": [
+    {
+      "sql": "\n            SELECT r.ID_REGISTRO, r.FECHA_HORA,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.id_usuario END AS id_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.observacion END AS observacion_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.nombre_usuario END AS nombre_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.apellido_usuario END AS apellido_usuario_visible,\n                   re.id_registro AS stage_record_id, re.fecha_hora_entrada AS stage_entered_at,\n                   re.fecha_hora_salida AS stage_exited_at, stage.nombre_etapa AS stage_name,\n                   rp.id_registro AS payment_record_id,\n                   CASE WHEN ? = 1 THEN rp.observacion ELSE NULL END AS payment_observation,\n                   previous_payment.nombre_estado_pago AS previous_payment_status,\n                   next_payment.nombre_estado_pago AS next_payment_status,\n                   rs.id_registro AS subprocess_record_id,\n                   rs.fecha_hora_entrada AS subprocess_entered_at,\n                   rs.fecha_hora_salida AS subprocess_exited_at,\n                   subprocess.nombre_estado AS subprocess_name,\n                   product.nombre_producto AS product_name\n            FROM Registros r\n            LEFT JOIN Usuario u ON u.id_usuario = r.id_usuario\n            LEFT JOIN Registro_Etapas re ON re.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pedido stage ON stage.id_estado_pedido = re.id_estado_pedido\n            LEFT JOIN Registro_Pago rp ON rp.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pago previous_payment ON previous_payment.id_estado_pago = rp.id_estado_pago_anterior\n            LEFT JOIN Estado_Pago next_payment ON next_payment.id_estado_pago = rp.id_estado_pago_nuevo\n            LEFT JOIN registro_subprocesos rs ON rs.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Subprocesos subprocess ON subprocess.id_estado_subproceso = rs.id_estado_subproceso\n            LEFT JOIN Detalle_pedido detail ON detail.id_detalle_pedido = rs.id_detalle_pedido\n            LEFT JOIN Tipo_Producto product ON product.id_tipo_producto = detail.id_tipo_producto\n            WHERE r.id_pedido = ?\n            \n            \n            ORDER BY r.FECHA_HORA DESC, r.ID_REGISTRO DESC\n            LIMIT ?\n        ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "r",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "Registros_Pedidos_FK,idx_records_order_cursor",
+          "key": "Registros_Pedidos_FK",
+          "key_len": "5",
+          "ref": "const",
+          "rows": "53",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "u",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.id_usuario",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "re",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "stage",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.re.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rp",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "previous_payment",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "next_payment",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_estado_pago_nuevo",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rs",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "subprocess",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "detail",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_detalle_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "product",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.detail.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n        SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,\n               c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,\n               ep.id_estado_pedido,ep.nombre_etapa,ep.orden_kanban\n        FROM Pedidos p\n        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n        \n        ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "index",
+          "possible_keys": null,
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Backward index scan"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n        SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,\n               c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,\n               ep.id_estado_pedido,ep.nombre_etapa,ep.orden_kanban\n        FROM Pedidos p\n        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n        WHERE (p.numero_nota_venta LIKE ? OR c.nombre_cliente LIKE ? OR c.razon_social LIKE ?)\n        ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "index",
+          "possible_keys": null,
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Backward index scan"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 99.99999237060547,
+          "Extra": "Using where"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n        SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,\n               c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,\n               ep.id_estado_pedido,ep.nombre_etapa,ep.orden_kanban\n        FROM Pedidos p\n        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n        WHERE ep.nombre_etapa = ?\n        ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "7",
+          "filtered": 14.285715103149414,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_estado_pedido_idx",
+          "key": "id_estado_pedido_idx",
+          "key_len": "5",
+          "ref": "mydb.ep.id_estado_pedido",
+          "rows": "9",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n        SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,\n               c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,\n               ep.id_estado_pedido,ep.nombre_etapa,ep.orden_kanban\n        FROM Pedidos p\n        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n        WHERE p.fecha_creacion >= ? AND p.fecha_creacion < ?\n        ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "index",
+          "possible_keys": null,
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 11.108888626098633,
+          "Extra": "Using where; Backward index scan"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n        SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,\n               c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,\n               ep.id_estado_pedido,ep.nombre_etapa,ep.orden_kanban\n        FROM Pedidos p\n        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n        WHERE p.id_pedido < ?\n        ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "40",
+          "filtered": 100,
+          "Extra": "Using where; Backward index scan"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n                SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,\n                       p.fecha_estimada_termino, c.nombre_cliente, c.razon_social,\n                       u.id_usuario, u.nombre_usuario, u.apellido_usuario,\n                       ep.nombre_etapa, epa.nombre_estado_pago\n                FROM Pedidos p\n                LEFT JOIN Cliente c ON c.id_cliente = p.id_cliente\n                LEFT JOIN Usuario u ON u.id_usuario = p.id_usuario\n                LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido = p.id_estado_pedido\n                LEFT JOIN Estado_Pago epa ON epa.id_estado_pago = p.id_estado_pago\n                WHERE p.id_pedido = ?\n                LIMIT 1\n            ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "u",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "epa",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n                SELECT d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino,\n                       d.fecha_real_termino, tp.nombre_producto, es.nombre_estado\n                FROM Detalle_pedido d\n                LEFT JOIN Tipo_Producto tp ON tp.id_tipo_producto = d.id_tipo_producto\n                LEFT JOIN Estado_Subprocesos es ON es.id_estado_subproceso = d.id_estado_subproceso\n                WHERE d.id_pedido = ?\n                ORDER BY d.id_detalle_pedido ASC\n            ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "d",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "const",
+          "rows": "2",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "tp",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "es",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n                SELECT id_item_sin_seguimiento, producto, cantidad\n                FROM Pedido_Item_Sin_Seguimiento\n                WHERE id_pedido = ?\n                ORDER BY id_item_sin_seguimiento ASC\n            ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Pedido_Item_Sin_Seguimiento",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "Pedido_Item_Sin_Seguimiento_id_pedido_idx",
+          "key": "Pedido_Item_Sin_Seguimiento_id_pedido_idx",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n                SELECT e.nombre_etiqueta\n                FROM Pedido_Etiqueta pe\n                INNER JOIN etiqueta e ON e.id_etiqueta = pe.id_etiqueta\n                WHERE pe.id_pedido = ?\n                ORDER BY e.nombre_etiqueta ASC\n            ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "pe",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Pedido_Etiqueta_Etiqueta_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "e",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.pe.id_etiqueta",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n    SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,p.fecha_estimada_termino,\n           c.nombre_cliente,c.razon_social,u.id_usuario,u.nombre_usuario,u.apellido_usuario,\n           ep.nombre_etapa,epa.nombre_estado_pago\n    FROM Pedidos p\n    LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n    LEFT JOIN Usuario u ON u.id_usuario=p.id_usuario\n    LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n    LEFT JOIN Estado_Pago epa ON epa.id_estado_pago=p.id_estado_pago\n    WHERE p.id_pedido=? LIMIT 1",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "u",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "epa",
+          "partitions": null,
+          "type": "const",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n    SELECT 0 AS kind,d.id_detalle_pedido,NULL AS id_item_sin_seguimiento,\n           d.cantidad,d.fecha_estimada_termino,d.fecha_real_termino,\n           tp.nombre_producto,es.nombre_estado,NULL AS producto,NULL AS nombre_etiqueta\n    FROM Detalle_pedido d\n    LEFT JOIN Tipo_Producto tp ON tp.id_tipo_producto=d.id_tipo_producto\n    LEFT JOIN Estado_Subprocesos es ON es.id_estado_subproceso=d.id_estado_subproceso\n    WHERE d.id_pedido=?\n    UNION ALL\n    SELECT 1,NULL,id_item_sin_seguimiento,cantidad,NULL,NULL,NULL,NULL,producto,NULL\n    FROM Pedido_Item_Sin_Seguimiento WHERE id_pedido=?\n    UNION ALL\n    SELECT 2,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,e.nombre_etiqueta\n    FROM Pedido_Etiqueta pe INNER JOIN etiqueta e ON e.id_etiqueta=pe.id_etiqueta\n    WHERE pe.id_pedido=?\n    ORDER BY kind,id_detalle_pedido,id_item_sin_seguimiento,nombre_etiqueta",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "d",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_pedido_idx",
+          "key": "id_pedido_idx",
+          "key_len": "5",
+          "ref": "const",
+          "rows": "2",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "tp",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "PRIMARY",
+          "table": "es",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.d.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "2",
+          "select_type": "UNION",
+          "table": "Pedido_Item_Sin_Seguimiento",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "Pedido_Item_Sin_Seguimiento_id_pedido_idx",
+          "key": "Pedido_Item_Sin_Seguimiento_id_pedido_idx",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "3",
+          "select_type": "UNION",
+          "table": "pe",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Pedido_Etiqueta_Etiqueta_FK",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "const",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using index"
+        },
+        {
+          "id": "3",
+          "select_type": "UNION",
+          "table": "e",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.pe.id_etiqueta",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "4",
+          "select_type": "UNION RESULT",
+          "table": "<union1,2,3>",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": null,
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": null,
+          "filtered": null,
+          "Extra": "Using temporary; Using filesort"
+        }
+      ]
+    },
+    {
+      "sql": "\n            SELECT r.ID_REGISTRO, r.FECHA_HORA,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.id_usuario END AS id_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.observacion END AS observacion_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.nombre_usuario END AS nombre_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.apellido_usuario END AS apellido_usuario_visible,\n                   re.id_registro AS stage_record_id, re.fecha_hora_entrada AS stage_entered_at,\n                   re.fecha_hora_salida AS stage_exited_at, stage.nombre_etapa AS stage_name,\n                   rp.id_registro AS payment_record_id,\n                   CASE WHEN ? = 1 THEN rp.observacion ELSE NULL END AS payment_observation,\n                   previous_payment.nombre_estado_pago AS previous_payment_status,\n                   next_payment.nombre_estado_pago AS next_payment_status,\n                   rs.id_registro AS subprocess_record_id,\n                   rs.fecha_hora_entrada AS subprocess_entered_at,\n                   rs.fecha_hora_salida AS subprocess_exited_at,\n                   subprocess.nombre_estado AS subprocess_name,\n                   product.nombre_producto AS product_name\n            FROM Registros r\n            LEFT JOIN Usuario u ON u.id_usuario = r.id_usuario\n            LEFT JOIN Registro_Etapas re ON re.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pedido stage ON stage.id_estado_pedido = re.id_estado_pedido\n            LEFT JOIN Registro_Pago rp ON rp.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pago previous_payment ON previous_payment.id_estado_pago = rp.id_estado_pago_anterior\n            LEFT JOIN Estado_Pago next_payment ON next_payment.id_estado_pago = rp.id_estado_pago_nuevo\n            LEFT JOIN registro_subprocesos rs ON rs.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Subprocesos subprocess ON subprocess.id_estado_subproceso = rs.id_estado_subproceso\n            LEFT JOIN Detalle_pedido detail ON detail.id_detalle_pedido = rs.id_detalle_pedido\n            LEFT JOIN Tipo_Producto product ON product.id_tipo_producto = detail.id_tipo_producto\n            WHERE r.id_pedido = ?\n            AND re.id_registro IS NOT NULL\n            \n            ORDER BY r.FECHA_HORA DESC, r.ID_REGISTRO DESC\n            LIMIT ?\n        ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "re",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "61",
+          "filtered": 90,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "r",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,Registros_Pedidos_FK,idx_records_order_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.re.id_registro",
+          "rows": "1",
+          "filtered": 10.860655784606934,
+          "Extra": "Using where"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "u",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.id_usuario",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "stage",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.re.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rp",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.re.id_registro",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "previous_payment",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "next_payment",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_estado_pago_nuevo",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rs",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.re.id_registro",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "subprocess",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "detail",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_detalle_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "product",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.detail.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n            SELECT r.ID_REGISTRO, r.FECHA_HORA,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.id_usuario END AS id_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.observacion END AS observacion_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.nombre_usuario END AS nombre_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.apellido_usuario END AS apellido_usuario_visible,\n                   re.id_registro AS stage_record_id, re.fecha_hora_entrada AS stage_entered_at,\n                   re.fecha_hora_salida AS stage_exited_at, stage.nombre_etapa AS stage_name,\n                   rp.id_registro AS payment_record_id,\n                   CASE WHEN ? = 1 THEN rp.observacion ELSE NULL END AS payment_observation,\n                   previous_payment.nombre_estado_pago AS previous_payment_status,\n                   next_payment.nombre_estado_pago AS next_payment_status,\n                   rs.id_registro AS subprocess_record_id,\n                   rs.fecha_hora_entrada AS subprocess_entered_at,\n                   rs.fecha_hora_salida AS subprocess_exited_at,\n                   subprocess.nombre_estado AS subprocess_name,\n                   product.nombre_producto AS product_name\n            FROM Registros r\n            LEFT JOIN Usuario u ON u.id_usuario = r.id_usuario\n            LEFT JOIN Registro_Etapas re ON re.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pedido stage ON stage.id_estado_pedido = re.id_estado_pedido\n            LEFT JOIN Registro_Pago rp ON rp.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pago previous_payment ON previous_payment.id_estado_pago = rp.id_estado_pago_anterior\n            LEFT JOIN Estado_Pago next_payment ON next_payment.id_estado_pago = rp.id_estado_pago_nuevo\n            LEFT JOIN registro_subprocesos rs ON rs.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Subprocesos subprocess ON subprocess.id_estado_subproceso = rs.id_estado_subproceso\n            LEFT JOIN Detalle_pedido detail ON detail.id_detalle_pedido = rs.id_detalle_pedido\n            LEFT JOIN Tipo_Producto product ON product.id_tipo_producto = detail.id_tipo_producto\n            WHERE r.id_pedido = ?\n            \n            AND (r.FECHA_HORA < ? OR (r.FECHA_HORA = ? AND r.ID_REGISTRO < ?))\n            ORDER BY r.FECHA_HORA DESC, r.ID_REGISTRO DESC\n            LIMIT ?\n        ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "r",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "PRIMARY,Registros_Pedidos_FK,idx_records_order_cursor",
+          "key": "Registros_Pedidos_FK",
+          "key_len": "5",
+          "ref": "const",
+          "rows": "53",
+          "filtered": 35.5521125793457,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "u",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.id_usuario",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "re",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "stage",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.re.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rp",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "previous_payment",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "next_payment",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_estado_pago_nuevo",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rs",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "subprocess",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "detail",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_detalle_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "product",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.detail.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n            SELECT r.ID_REGISTRO, r.FECHA_HORA,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.id_usuario END AS id_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.observacion END AS observacion_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.nombre_usuario END AS nombre_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.apellido_usuario END AS apellido_usuario_visible,\n                   re.id_registro AS stage_record_id, re.fecha_hora_entrada AS stage_entered_at,\n                   re.fecha_hora_salida AS stage_exited_at, stage.nombre_etapa AS stage_name,\n                   rp.id_registro AS payment_record_id,\n                   CASE WHEN ? = 1 THEN rp.observacion ELSE NULL END AS payment_observation,\n                   previous_payment.nombre_estado_pago AS previous_payment_status,\n                   next_payment.nombre_estado_pago AS next_payment_status,\n                   rs.id_registro AS subprocess_record_id,\n                   rs.fecha_hora_entrada AS subprocess_entered_at,\n                   rs.fecha_hora_salida AS subprocess_exited_at,\n                   subprocess.nombre_estado AS subprocess_name,\n                   product.nombre_producto AS product_name\n            FROM Registros r\n            LEFT JOIN Usuario u ON u.id_usuario = r.id_usuario\n            LEFT JOIN Registro_Etapas re ON re.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pedido stage ON stage.id_estado_pedido = re.id_estado_pedido\n            LEFT JOIN Registro_Pago rp ON rp.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pago previous_payment ON previous_payment.id_estado_pago = rp.id_estado_pago_anterior\n            LEFT JOIN Estado_Pago next_payment ON next_payment.id_estado_pago = rp.id_estado_pago_nuevo\n            LEFT JOIN registro_subprocesos rs ON rs.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Subprocesos subprocess ON subprocess.id_estado_subproceso = rs.id_estado_subproceso\n            LEFT JOIN Detalle_pedido detail ON detail.id_detalle_pedido = rs.id_detalle_pedido\n            LEFT JOIN Tipo_Producto product ON product.id_tipo_producto = detail.id_tipo_producto\n            WHERE r.id_pedido = ?\n            AND rp.id_registro IS NOT NULL\n            \n            ORDER BY r.FECHA_HORA DESC, r.ID_REGISTRO DESC\n            LIMIT ?\n        ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rp",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "39",
+          "filtered": 90,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "r",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,Registros_Pedidos_FK,idx_records_order_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_registro",
+          "rows": "1",
+          "filtered": 10.860655784606934,
+          "Extra": "Using where"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "previous_payment",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_estado_pago_anterior",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "next_payment",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_estado_pago_nuevo",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "u",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.id_usuario",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "re",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_registro",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "stage",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.re.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rs",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_registro",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "subprocess",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "detail",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_detalle_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "product",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.detail.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n            SELECT r.ID_REGISTRO, r.FECHA_HORA,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.id_usuario END AS id_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.observacion END AS observacion_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.nombre_usuario END AS nombre_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.apellido_usuario END AS apellido_usuario_visible,\n                   re.id_registro AS stage_record_id, re.fecha_hora_entrada AS stage_entered_at,\n                   re.fecha_hora_salida AS stage_exited_at, stage.nombre_etapa AS stage_name,\n                   rp.id_registro AS payment_record_id,\n                   CASE WHEN ? = 1 THEN rp.observacion ELSE NULL END AS payment_observation,\n                   previous_payment.nombre_estado_pago AS previous_payment_status,\n                   next_payment.nombre_estado_pago AS next_payment_status,\n                   rs.id_registro AS subprocess_record_id,\n                   rs.fecha_hora_entrada AS subprocess_entered_at,\n                   rs.fecha_hora_salida AS subprocess_exited_at,\n                   subprocess.nombre_estado AS subprocess_name,\n                   product.nombre_producto AS product_name\n            FROM Registros r\n            LEFT JOIN Usuario u ON u.id_usuario = r.id_usuario\n            LEFT JOIN Registro_Etapas re ON re.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pedido stage ON stage.id_estado_pedido = re.id_estado_pedido\n            LEFT JOIN Registro_Pago rp ON rp.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pago previous_payment ON previous_payment.id_estado_pago = rp.id_estado_pago_anterior\n            LEFT JOIN Estado_Pago next_payment ON next_payment.id_estado_pago = rp.id_estado_pago_nuevo\n            LEFT JOIN registro_subprocesos rs ON rs.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Subprocesos subprocess ON subprocess.id_estado_subproceso = rs.id_estado_subproceso\n            LEFT JOIN Detalle_pedido detail ON detail.id_detalle_pedido = rs.id_detalle_pedido\n            LEFT JOIN Tipo_Producto product ON product.id_tipo_producto = detail.id_tipo_producto\n            WHERE r.id_pedido = ?\n            AND rs.id_registro IS NOT NULL\n            \n            ORDER BY r.FECHA_HORA DESC, r.ID_REGISTRO DESC\n            LIMIT ?\n        ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rs",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "106",
+          "filtered": 89.99999237060547,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "r",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY,Registros_Pedidos_FK,idx_records_order_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_registro",
+          "rows": "1",
+          "filtered": 10.860655784606934,
+          "Extra": "Using where"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "u",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.id_usuario",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "re",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_registro",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "stage",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.re.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rp",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_registro",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "subprocess",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "detail",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_detalle_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "product",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.detail.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "previous_payment",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "next_payment",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_estado_pago_nuevo",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n            SELECT r.ID_REGISTRO, r.FECHA_HORA,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.id_usuario END AS id_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.observacion END AS observacion_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.nombre_usuario END AS nombre_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.apellido_usuario END AS apellido_usuario_visible,\n                   re.id_registro AS stage_record_id, re.fecha_hora_entrada AS stage_entered_at,\n                   re.fecha_hora_salida AS stage_exited_at, stage.nombre_etapa AS stage_name,\n                   rp.id_registro AS payment_record_id,\n                   CASE WHEN ? = 1 THEN rp.observacion ELSE NULL END AS payment_observation,\n                   previous_payment.nombre_estado_pago AS previous_payment_status,\n                   next_payment.nombre_estado_pago AS next_payment_status,\n                   rs.id_registro AS subprocess_record_id,\n                   rs.fecha_hora_entrada AS subprocess_entered_at,\n                   rs.fecha_hora_salida AS subprocess_exited_at,\n                   subprocess.nombre_estado AS subprocess_name,\n                   product.nombre_producto AS product_name\n            FROM Registros r\n            LEFT JOIN Usuario u ON u.id_usuario = r.id_usuario\n            LEFT JOIN Registro_Etapas re ON re.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pedido stage ON stage.id_estado_pedido = re.id_estado_pedido\n            LEFT JOIN Registro_Pago rp ON rp.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pago previous_payment ON previous_payment.id_estado_pago = rp.id_estado_pago_anterior\n            LEFT JOIN Estado_Pago next_payment ON next_payment.id_estado_pago = rp.id_estado_pago_nuevo\n            LEFT JOIN registro_subprocesos rs ON rs.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Subprocesos subprocess ON subprocess.id_estado_subproceso = rs.id_estado_subproceso\n            LEFT JOIN Detalle_pedido detail ON detail.id_detalle_pedido = rs.id_detalle_pedido\n            LEFT JOIN Tipo_Producto product ON product.id_tipo_producto = detail.id_tipo_producto\n            WHERE r.id_pedido = ?\n            AND re.id_registro IS NULL AND rp.id_registro IS NULL AND rs.id_registro IS NULL AND r.observacion LIKE ?\n            \n            ORDER BY r.FECHA_HORA DESC, r.ID_REGISTRO DESC\n            LIMIT ?\n        ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "r",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "Registros_Pedidos_FK,idx_records_order_cursor",
+          "key": "Registros_Pedidos_FK",
+          "key_len": "5",
+          "ref": "const",
+          "rows": "53",
+          "filtered": 11.110000610351562,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "u",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.id_usuario",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "re",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using where; Not exists"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "stage",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.re.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rp",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using where; Not exists"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "previous_payment",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "next_payment",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_estado_pago_nuevo",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rs",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using where; Not exists"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "subprocess",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "detail",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_detalle_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "product",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.detail.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n            SELECT r.ID_REGISTRO, r.FECHA_HORA,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.id_usuario END AS id_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.observacion END AS observacion_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.nombre_usuario END AS nombre_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.apellido_usuario END AS apellido_usuario_visible,\n                   re.id_registro AS stage_record_id, re.fecha_hora_entrada AS stage_entered_at,\n                   re.fecha_hora_salida AS stage_exited_at, stage.nombre_etapa AS stage_name,\n                   rp.id_registro AS payment_record_id,\n                   CASE WHEN ? = 1 THEN rp.observacion ELSE NULL END AS payment_observation,\n                   previous_payment.nombre_estado_pago AS previous_payment_status,\n                   next_payment.nombre_estado_pago AS next_payment_status,\n                   rs.id_registro AS subprocess_record_id,\n                   rs.fecha_hora_entrada AS subprocess_entered_at,\n                   rs.fecha_hora_salida AS subprocess_exited_at,\n                   subprocess.nombre_estado AS subprocess_name,\n                   product.nombre_producto AS product_name\n            FROM Registros r\n            LEFT JOIN Usuario u ON u.id_usuario = r.id_usuario\n            LEFT JOIN Registro_Etapas re ON re.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pedido stage ON stage.id_estado_pedido = re.id_estado_pedido\n            LEFT JOIN Registro_Pago rp ON rp.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pago previous_payment ON previous_payment.id_estado_pago = rp.id_estado_pago_anterior\n            LEFT JOIN Estado_Pago next_payment ON next_payment.id_estado_pago = rp.id_estado_pago_nuevo\n            LEFT JOIN registro_subprocesos rs ON rs.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Subprocesos subprocess ON subprocess.id_estado_subproceso = rs.id_estado_subproceso\n            LEFT JOIN Detalle_pedido detail ON detail.id_detalle_pedido = rs.id_detalle_pedido\n            LEFT JOIN Tipo_Producto product ON product.id_tipo_producto = detail.id_tipo_producto\n            WHERE r.id_pedido = ?\n            AND re.id_registro IS NULL AND rp.id_registro IS NULL AND rs.id_registro IS NULL AND (r.observacion IS NULL OR r.observacion NOT LIKE ?)\n            \n            ORDER BY r.FECHA_HORA DESC, r.ID_REGISTRO DESC\n            LIMIT ?\n        ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "r",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "Registros_Pedidos_FK,idx_records_order_cursor",
+          "key": "Registros_Pedidos_FK",
+          "key_len": "5",
+          "ref": "const",
+          "rows": "53",
+          "filtered": 90.0009994506836,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "u",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.id_usuario",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "re",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using where; Not exists"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "stage",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.re.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rp",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using where; Not exists"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "previous_payment",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "next_payment",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_estado_pago_nuevo",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rs",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using where; Not exists"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "subprocess",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "detail",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_detalle_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "product",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.detail.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n        SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,\n               c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,\n               ep.id_estado_pedido,ep.nombre_etapa,ep.orden_kanban\n        FROM Pedidos p\n        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n        WHERE ep.nombre_etapa = ? AND p.fecha_creacion >= ? AND p.fecha_creacion < ?\n        ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "7",
+          "filtered": 14.285715103149414,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_estado_pedido_idx",
+          "key": "id_estado_pedido_idx",
+          "key_len": "5",
+          "ref": "mydb.ep.id_estado_pedido",
+          "rows": "9",
+          "filtered": 11.108888626098633,
+          "Extra": "Using where"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "ordersInFirstPage": 50,
+    "defaultLimit": 50,
+    "deepPageLimit": 10,
+    "eventPageLimit": 5,
+    "hasNextPage": true,
+    "hasMoreEvents": true
+  },
+  "indexes": [
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "Detalle_pedido_Estado_Subprocesos_FK",
+      "COLUMN_NAME": "id_estado_subproceso",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "id_pedido_idx",
+      "COLUMN_NAME": "id_pedido",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "id_tipo_producto_idx",
+      "COLUMN_NAME": "id_tipo_producto",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Detalle_pedido",
+      "INDEX_NAME": "PRIMARY",
+      "COLUMN_NAME": "id_detalle_pedido",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Pedido_Etiqueta",
+      "INDEX_NAME": "Pedido_Etiqueta_Etiqueta_FK",
+      "COLUMN_NAME": "id_etiqueta",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Pedido_Etiqueta",
+      "INDEX_NAME": "Pedido_Etiqueta_Usuario_FK",
+      "COLUMN_NAME": "id_usuario_asigna",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Pedido_Etiqueta",
+      "INDEX_NAME": "PRIMARY",
+      "COLUMN_NAME": "id_pedido",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Pedido_Etiqueta",
+      "INDEX_NAME": "PRIMARY",
+      "COLUMN_NAME": "id_etiqueta",
+      "SEQ_IN_INDEX": "2"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_cliente_idx",
+      "COLUMN_NAME": "id_cliente",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_estado_pago_idx",
+      "COLUMN_NAME": "id_estado_pago",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_estado_pedido_idx",
+      "COLUMN_NAME": "id_estado_pedido",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_etiqueta_idx",
+      "COLUMN_NAME": "id_etiqueta",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "id_usuario_idx",
+      "COLUMN_NAME": "id_usuario",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "idx_orders_cursor",
+      "COLUMN_NAME": "id_pedido",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Pedidos",
+      "INDEX_NAME": "PRIMARY",
+      "COLUMN_NAME": "id_pedido",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "idx_records_order_cursor",
+      "COLUMN_NAME": "id_pedido",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "idx_records_order_cursor",
+      "COLUMN_NAME": "FECHA_HORA",
+      "SEQ_IN_INDEX": "2"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "idx_records_order_cursor",
+      "COLUMN_NAME": "ID_REGISTRO",
+      "SEQ_IN_INDEX": "3"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "PRIMARY",
+      "COLUMN_NAME": "ID_REGISTRO",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "Registros_Pedidos_FK",
+      "COLUMN_NAME": "id_pedido",
+      "SEQ_IN_INDEX": "1"
+    },
+    {
+      "TABLE_NAME": "Registros",
+      "INDEX_NAME": "Registros_Usuario_FK",
+      "COLUMN_NAME": "id_usuario",
+      "SEQ_IN_INDEX": "1"
+    }
+  ],
+  "sqlFixtures": {
+    "source": "Read-only CTE tables inside SELECT; no fixture DDL/DML",
+    "equivalence": [
+      {
+        "operation": "list",
+        "equal": true
+      },
+      {
+        "operation": "list",
+        "equal": true
+      },
+      {
+        "operation": "list",
+        "equal": true
+      },
+      {
+        "operation": "list",
+        "equal": true
+      },
+      {
+        "operation": "list",
+        "equal": true
+      },
+      {
+        "operation": "list",
+        "equal": true
+      },
+      {
+        "operation": "header",
+        "fixtureOrder": 1,
+        "equal": true
+      },
+      {
+        "operation": "header",
+        "fixtureOrder": 2,
+        "equal": true
+      },
+      {
+        "operation": "header",
+        "fixtureOrder": 999,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "all",
+        "includePaymentDetails": false,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "stage",
+        "includePaymentDetails": false,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "payment",
+        "includePaymentDetails": false,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "subprocess",
+        "includePaymentDetails": false,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "calendar",
+        "includePaymentDetails": false,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "general",
+        "includePaymentDetails": false,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "all",
+        "includePaymentDetails": true,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "stage",
+        "includePaymentDetails": true,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "payment",
+        "includePaymentDetails": true,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "subprocess",
+        "includePaymentDetails": true,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "calendar",
+        "includePaymentDetails": true,
+        "equal": true
+      },
+      {
+        "operation": "detail",
+        "type": "general",
+        "includePaymentDetails": true,
+        "equal": true
+      }
+    ],
+    "chronology": [
+      7,
+      6,
+      5,
+      4,
+      3,
+      2,
+      1
+    ],
+    "crossOrderCursorNoLeak": true,
+    "concurrentVariants": {
+      "method": "Changed read-only CTE rows between pages; no live writes",
+      "newOrdersNotMixedIntoOlderPages": true,
+      "newEventsVisibleOnFreshPage": true,
+      "updatedOrderStatusVisible": true
+    },
+    "likeSemantics": {
+      "syntheticProbe": "SYN%_\\literal",
+      "prismaParameter": "SYN%_\\literal",
+      "prismaSql": "SELECT `Pedidos`.`id_pedido` FROM `Pedidos` WHERE `Pedidos`.`numero_nota_venta` LIKE CONCAT('%', ?, '%') ORDER BY `Pedidos`.`id_pedido` ASC LIMIT ? OFFSET ?",
+      "effectivePattern": "%SYN%_\\literal%",
+      "equal": true
+    }
+  },
+  "physicalListPlans": [
+    {
+      "sql": "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`id_cliente`, `Pedidos`.`id_estado_pedido` FROM `Pedidos` WHERE 1=1 ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Pedidos",
+          "partitions": null,
+          "type": "index",
+          "possible_keys": null,
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Backward index scan"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Cliente",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "45",
+          "filtered": 88.8888931274414,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Estado_Pedido`.`id_estado_pedido`, `Estado_Pedido`.`nombre_etapa`, `Estado_Pedido`.`orden_kanban` FROM `Estado_Pedido` WHERE `Estado_Pedido`.`id_estado_pedido` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Estado_Pedido",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "7",
+          "filtered": 100,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT p.id_pedido FROM Pedidos p LEFT JOIN Registros r ON r.id_pedido=p.id_pedido GROUP BY p.id_pedido ORDER BY COUNT(r.ID_REGISTRO) DESC,p.id_pedido DESC LIMIT 1",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "index",
+          "possible_keys": "PRIMARY,id_usuario_idx,id_estado_pedido_idx,id_etiqueta_idx,id_cliente_idx,id_estado_pago_idx,idx_orders_cursor",
+          "key": "idx_orders_cursor",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Using index; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "r",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "Registros_Pedidos_FK,idx_records_order_cursor",
+          "key": "Registros_Pedidos_FK",
+          "key_len": "5",
+          "ref": "mydb.p.id_pedido",
+          "rows": "11",
+          "filtered": 100,
+          "Extra": "Using index"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?,?,?,?,?,?,?,?,?,?)",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Cliente",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "11",
+          "filtered": 100,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Estado_Pedido`.`id_estado_pedido`, `Estado_Pedido`.`nombre_etapa`, `Estado_Pedido`.`orden_kanban` FROM `Estado_Pedido` WHERE `Estado_Pedido`.`id_estado_pedido` IN (?,?,?,?,?,?,?,?,?,?,?)",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Estado_Pedido",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "5",
+          "filtered": 100,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "\n            SELECT r.ID_REGISTRO, r.FECHA_HORA,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.id_usuario END AS id_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE r.observacion END AS observacion_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.nombre_usuario END AS nombre_usuario_visible,\n                   CASE WHEN rp.id_registro IS NOT NULL AND ? = 0 THEN NULL ELSE u.apellido_usuario END AS apellido_usuario_visible,\n                   re.id_registro AS stage_record_id, re.fecha_hora_entrada AS stage_entered_at,\n                   re.fecha_hora_salida AS stage_exited_at, stage.nombre_etapa AS stage_name,\n                   rp.id_registro AS payment_record_id,\n                   CASE WHEN ? = 1 THEN rp.observacion ELSE NULL END AS payment_observation,\n                   previous_payment.nombre_estado_pago AS previous_payment_status,\n                   next_payment.nombre_estado_pago AS next_payment_status,\n                   rs.id_registro AS subprocess_record_id,\n                   rs.fecha_hora_entrada AS subprocess_entered_at,\n                   rs.fecha_hora_salida AS subprocess_exited_at,\n                   subprocess.nombre_estado AS subprocess_name,\n                   product.nombre_producto AS product_name\n            FROM Registros r\n            LEFT JOIN Usuario u ON u.id_usuario = r.id_usuario\n            LEFT JOIN Registro_Etapas re ON re.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pedido stage ON stage.id_estado_pedido = re.id_estado_pedido\n            LEFT JOIN Registro_Pago rp ON rp.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Pago previous_payment ON previous_payment.id_estado_pago = rp.id_estado_pago_anterior\n            LEFT JOIN Estado_Pago next_payment ON next_payment.id_estado_pago = rp.id_estado_pago_nuevo\n            LEFT JOIN registro_subprocesos rs ON rs.id_registro = r.ID_REGISTRO\n            LEFT JOIN Estado_Subprocesos subprocess ON subprocess.id_estado_subproceso = rs.id_estado_subproceso\n            LEFT JOIN Detalle_pedido detail ON detail.id_detalle_pedido = rs.id_detalle_pedido\n            LEFT JOIN Tipo_Producto product ON product.id_tipo_producto = detail.id_tipo_producto\n            WHERE r.id_pedido = ?\n            \n            \n            ORDER BY r.FECHA_HORA DESC, r.ID_REGISTRO DESC\n            LIMIT ?\n        ",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "r",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "Registros_Pedidos_FK,idx_records_order_cursor",
+          "key": "Registros_Pedidos_FK",
+          "key_len": "5",
+          "ref": "const",
+          "rows": "53",
+          "filtered": 100,
+          "Extra": "Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "u",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.id_usuario",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "re",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "stage",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.re.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rp",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "previous_payment",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "3",
+          "filtered": 100,
+          "Extra": "Using where; Using join buffer (hash join)"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "next_payment",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rp.id_estado_pago_nuevo",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "rs",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.r.ID_REGISTRO",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "subprocess",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_estado_subproceso",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "detail",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.rs.id_detalle_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "product",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.detail.id_tipo_producto",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n        SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,\n               c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,\n               ep.id_estado_pedido,ep.nombre_etapa,ep.orden_kanban\n        FROM Pedidos p\n        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n        \n        ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "index",
+          "possible_keys": null,
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Backward index scan"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`id_cliente`, `Pedidos`.`id_estado_pedido` FROM `Pedidos` LEFT JOIN `Cliente` AS `j0` ON (`j0`.`id_cliente`) = (`Pedidos`.`id_cliente`) LEFT JOIN `Cliente` AS `j1` ON (`j1`.`id_cliente`) = (`Pedidos`.`id_cliente`) WHERE (`Pedidos`.`numero_nota_venta` LIKE CONCAT('%', ?, '%') OR (`j0`.`nombre_cliente` LIKE CONCAT('%', ?, '%') AND (`j0`.`id_cliente` IS NOT NULL)) OR (`j1`.`razon_social` LIKE CONCAT('%', ?, '%') AND (`j1`.`id_cliente` IS NOT NULL))) ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Pedidos",
+          "partitions": null,
+          "type": "index",
+          "possible_keys": null,
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Backward index scan"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "j0",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.Pedidos.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "j1",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.Pedidos.id_cliente",
+          "rows": "1",
+          "filtered": 99.99999237060547,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?)",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Cliente",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Estado_Pedido`.`id_estado_pedido`, `Estado_Pedido`.`nombre_etapa`, `Estado_Pedido`.`orden_kanban` FROM `Estado_Pedido` WHERE `Estado_Pedido`.`id_estado_pedido` IN (?,?)",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Estado_Pedido",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "1",
+          "filtered": 100,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "\n        SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,\n               c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,\n               ep.id_estado_pedido,ep.nombre_etapa,ep.orden_kanban\n        FROM Pedidos p\n        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n        WHERE (p.numero_nota_venta LIKE ? OR c.nombre_cliente LIKE ? OR c.razon_social LIKE ?)\n        ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "index",
+          "possible_keys": null,
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 100,
+          "Extra": "Backward index scan"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 99.99999237060547,
+          "Extra": "Using where"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`id_cliente`, `Pedidos`.`id_estado_pedido` FROM `Pedidos` LEFT JOIN `Estado_Pedido` AS `j0` ON (`j0`.`id_estado_pedido`) = (`Pedidos`.`id_estado_pedido`) WHERE (`j0`.`nombre_etapa` = ? AND (`j0`.`id_estado_pedido` IS NOT NULL)) ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "j0",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "7",
+          "filtered": 14.285715103149414,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Pedidos",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_estado_pedido_idx",
+          "key": "id_estado_pedido_idx",
+          "key_len": "5",
+          "ref": "mydb.j0.id_estado_pedido",
+          "rows": "9",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "\n        SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,\n               c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,\n               ep.id_estado_pedido,ep.nombre_etapa,ep.orden_kanban\n        FROM Pedidos p\n        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n        WHERE ep.nombre_etapa = ?\n        ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "ALL",
+          "possible_keys": "PRIMARY",
+          "key": null,
+          "key_len": null,
+          "ref": null,
+          "rows": "7",
+          "filtered": 14.285715103149414,
+          "Extra": "Using where; Using temporary; Using filesort"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "ref",
+          "possible_keys": "id_estado_pedido_idx",
+          "key": "id_estado_pedido_idx",
+          "key_len": "5",
+          "ref": "mydb.ep.id_estado_pedido",
+          "rows": "9",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`id_cliente`, `Pedidos`.`id_estado_pedido` FROM `Pedidos` WHERE (`Pedidos`.`fecha_creacion` >= ? AND `Pedidos`.`fecha_creacion` < ?) ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Pedidos",
+          "partitions": null,
+          "type": "index",
+          "possible_keys": null,
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 11.108888626098633,
+          "Extra": "Using where; Backward index scan"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social` FROM `Cliente` WHERE `Cliente`.`id_cliente` IN (?,?,?,?,?,?,?,?,?)",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Cliente",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "9",
+          "filtered": 100,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Estado_Pedido`.`id_estado_pedido`, `Estado_Pedido`.`nombre_etapa`, `Estado_Pedido`.`orden_kanban` FROM `Estado_Pedido` WHERE `Estado_Pedido`.`id_estado_pedido` IN (?,?,?,?,?,?,?,?,?)",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Estado_Pedido",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "5",
+          "filtered": 100,
+          "Extra": "Using where"
+        }
+      ]
+    },
+    {
+      "sql": "\n        SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,\n               c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,\n               ep.id_estado_pedido,ep.nombre_etapa,ep.orden_kanban\n        FROM Pedidos p\n        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n        WHERE p.fecha_creacion >= ? AND p.fecha_creacion < ?\n        ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "index",
+          "possible_keys": null,
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "49",
+          "filtered": 11.108888626098633,
+          "Extra": "Using where; Backward index scan"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    },
+    {
+      "sql": "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`id_cliente`, `Pedidos`.`id_estado_pedido` FROM `Pedidos` WHERE `Pedidos`.`id_pedido` < ? ORDER BY `Pedidos`.`id_pedido` DESC LIMIT ? OFFSET ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "Pedidos",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "40",
+          "filtered": 100,
+          "Extra": "Using where; Backward index scan"
+        }
+      ]
+    },
+    {
+      "sql": "\n        SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,\n               c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,\n               ep.id_estado_pedido,ep.nombre_etapa,ep.orden_kanban\n        FROM Pedidos p\n        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente\n        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido\n        WHERE p.id_pedido < ?\n        ORDER BY p.id_pedido DESC LIMIT ?",
+      "plan": [
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "p",
+          "partitions": null,
+          "type": "range",
+          "possible_keys": "PRIMARY,idx_orders_cursor",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": null,
+          "rows": "40",
+          "filtered": 100,
+          "Extra": "Using where; Backward index scan"
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "c",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_cliente",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        },
+        {
+          "id": "1",
+          "select_type": "SIMPLE",
+          "table": "ep",
+          "partitions": null,
+          "type": "eq_ref",
+          "possible_keys": "PRIMARY",
+          "key": "PRIMARY",
+          "key_len": "4",
+          "ref": "mydb.p.id_estado_pedido",
+          "rows": "1",
+          "filtered": 100,
+          "Extra": null
+        }
+      ]
+    }
+  ],
+  "versions": {
+    "node": "v24.19.0",
+    "prisma": "7.10.0",
+    "adapter": "7.10.0",
+    "mariadb": "3.5.4",
+    "react": "19.2.6",
+    "vite": "8.3.5"
+  },
+  "verification": {
+    "verifiedAt": "2026-10-28T04:33:27.707Z",
+    "backend": {
+      "baselineTests": 318,
+      "baselinePassed": 315,
+      "finalTests": 347,
+      "finalPassed": 344,
+      "preexistingFailures": 3,
+      "focusedPassed": 29
+    },
+    "frontend": {
+      "baselinePassed": 288,
+      "finalPassed": 304,
+      "files": 40,
+      "focusedPassed": 16
+    },
+    "lint": "passed",
+    "build": "passed after final JS/CSS",
+    "prismaValidate": "passed",
+    "previousOPT07": "SHA256 unchanged"
+  }
+}

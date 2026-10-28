@@ -77,3 +77,22 @@ it('disabled web storage cancels preparation and leaves original page/session in
   expect(f.api.cancelPinRecovery).toHaveBeenCalledWith('state')
   expect(f.browser.location.assign).not.toHaveBeenCalled()
 })
+
+it('BFCache return forces protected session restoration; cancellation after departure cannot race navigation', async () => {
+  const f = fixture(), task = beginPinRecovery(f.api, f.browser)
+  await Promise.resolve()
+  const [event, listener, options] = f.browser.addEventListener.mock.calls[0]
+  expect(event).toBe('pageshow'); expect(options).toEqual({ once: true })
+  listener({ persisted: false }); expect(f.browser.location.reload).not.toHaveBeenCalled()
+  listener({ persisted: true }); expect(f.browser.location.reload).toHaveBeenCalledOnce()
+  task.cancel(); expect(f.api.cancelPinRecovery).not.toHaveBeenCalled()
+  expect(f.browser.sessionStorage.getItem(PIN_RECOVERY_CONTEXT)).toBeTruthy()
+})
+
+it('a failed finish never retries rotation automatically and removes callback secrets from URL', async () => {
+  const f = fixture(); f.api.finishPinRecovery.mockRejectedValue(Error('uncertain commit'))
+  await continuePinRecovery(f.browser, f.options); await continuePinRecovery(f.browser, f.options)
+  expect(f.api.finishPinRecovery).toHaveBeenCalledOnce()
+  expect(f.browser.history.replaceState).toHaveBeenCalledWith(null, '', '/auth/pin-recovery/callback')
+  expect(getPinRecoveryOutcome('original').recovered).toBe(false)
+})

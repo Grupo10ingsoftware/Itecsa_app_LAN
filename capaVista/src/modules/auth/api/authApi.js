@@ -24,8 +24,8 @@ export function createAuthApi(apiClient, { subject, getRecoveryRefreshToken } = 
   }
   return {
     getProfile,
-    getProfileMovements: ({ page = 1, perPage = 10, search = '' } = {}) =>
-      apiClient.get(`/auth/profile/movements?${new URLSearchParams({ page, perPage, ...(search ? { search } : {}) })}`),
+    getProfileMovements: ({ page = 1, perPage = 10, search = '' } = {}, { signal } = {}) =>
+      apiClient.get(`/auth/profile/movements?${new URLSearchParams({ page, perPage, ...(search ? { search } : {}) })}`, { signal }),
     verify: () => apiClient.get('/auth/verify'),
     revealPin: () => apiClient.post('/auth/pin/reveal', {}),
     acknowledgePin: () => apiClient.post('/auth/pin/acknowledge', {}),

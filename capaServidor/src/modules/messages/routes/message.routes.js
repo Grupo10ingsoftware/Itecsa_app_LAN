@@ -15,6 +15,7 @@ export function createMessageRouter({
     router.patch("/notifications/:messageId", authenticate, requireCapability(P.UPDATE_MESSAGES), controller.hideNotification);
     router.patch("/:messageId/read", authenticate, requireCapability(P.UPDATE_MESSAGES), controller.markAsRead);
     router.get("/:messageId", authenticate, requireCapability(P.READ_MESSAGES), controller.getMessage);
+    router.post("/:messageId/open", authenticate, requireCapability(P.READ_MESSAGES), controller.openMessage ?? new MessageController().openMessage);
 
     return router;
 }

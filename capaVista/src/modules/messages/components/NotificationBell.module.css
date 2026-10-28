@@ -28,4 +28,4 @@
 .emptyState i { color: #cbd5e1; font-size: 1.75rem; }
 .emptyState strong { color: #334155; }
 .emptyState span { font-size: .8rem; }
-@media (max-width: 575.98px) { .panel { position: fixed; right: .75rem; top: 4.4rem; } }
+@media (max-width: 991.98px) { .panel { position: fixed; right: .75rem; top: 4.4rem; } }

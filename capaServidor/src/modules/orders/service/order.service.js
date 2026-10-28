@@ -209,8 +209,9 @@ class OrderService {
     const to = parseDate(query.to, true);
     if (from && to && from >= to) throw new AppError(400, 'Rango de fechas no valido');
     const [page, paymentStatuses] = await Promise.all([
-      this.repo.listPaymentViews({ limit, cursor, status, search, from, to }),
-      this.paymentRepo.getAll(),
+      this.repo.listPaymentViews({ limit, cursor, status, search, from, to,
+        includeSummary: query.includeSummary !== 'false', summaryOnly: query.summaryOnly === 'true' }),
+      query.includeSummary === 'false' ? [] : this.paymentRepo.getAll(),
     ]);
     return { ...pageResult(page.rows, limit), counts: page.counts, paymentStatuses };
   }

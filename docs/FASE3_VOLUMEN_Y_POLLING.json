@@ -1,0 +1,131 @@
+{
+  "reference": "1e7bddd",
+  "methodology": "CPU-only calendar collection merge, 5 warm samples; virtual notification time, no real HTTP/SQL, server capacity or production p95.",
+  "merges": [
+    {
+      "monthRows": 100,
+      "pendingRows": 100,
+      "equal": true,
+      "before": {
+        "n": 5,
+        "minMs": 0.13840000000000074,
+        "meanMs": 0.14783999999999936,
+        "medianMs": 0.1451999999999991,
+        "maxMs": 0.15919999999999845,
+        "samples": [
+          0.14300000000000068,
+          0.15919999999999845,
+          0.13840000000000074,
+          0.15339999999999776,
+          0.1451999999999991
+        ]
+      },
+      "after": {
+        "n": 5,
+        "minMs": 0.011099999999999,
+        "meanMs": 0.0183400000000006,
+        "medianMs": 0.011400000000001853,
+        "maxMs": 0.034900000000000375,
+        "samples": [
+          0.02319999999999922,
+          0.011099999999999,
+          0.011100000000002552,
+          0.034900000000000375,
+          0.011400000000001853
+        ]
+      }
+    },
+    {
+      "monthRows": 1000,
+      "pendingRows": 1000,
+      "equal": true,
+      "before": {
+        "n": 5,
+        "minMs": 13.788999999999987,
+        "meanMs": 14.6293,
+        "medianMs": 14.660800000000009,
+        "maxMs": 15.74629999999999,
+        "samples": [
+          14.75350000000001,
+          14.1969,
+          13.788999999999987,
+          15.74629999999999,
+          14.660800000000009
+        ]
+      },
+      "after": {
+        "n": 5,
+        "minMs": 0.10119999999997731,
+        "meanMs": 0.1598799999999983,
+        "medianMs": 0.136099999999999,
+        "maxMs": 0.26770000000001914,
+        "samples": [
+          0.136099999999999,
+          0.18319999999999936,
+          0.11119999999999663,
+          0.26770000000001914,
+          0.10119999999997731
+        ]
+      }
+    },
+    {
+      "monthRows": 5000,
+      "pendingRows": 5000,
+      "equal": true,
+      "before": {
+        "n": 5,
+        "minMs": 251.42230000000006,
+        "meanMs": 259.05268,
+        "medianMs": 258.40149999999994,
+        "maxMs": 272.1305,
+        "samples": [
+          251.42230000000006,
+          259.4634,
+          272.1305,
+          258.40149999999994,
+          253.84570000000008
+        ]
+      },
+      "after": {
+        "n": 5,
+        "minMs": 0.4106000000001586,
+        "meanMs": 0.4582599999999729,
+        "medianMs": 0.4315999999998894,
+        "maxMs": 0.5782999999998992,
+        "samples": [
+          0.4315999999998894,
+          0.4106000000001586,
+          0.411200000000008,
+          0.5782999999998992,
+          0.4595999999999094
+        ]
+      }
+    }
+  ],
+  "polling": [
+    {
+      "tabs": 1,
+      "hidden": false,
+      "simulatedHttpPerMinute": 12,
+      "observationWindow": "[0,60000)",
+      "detectionDelayNominalMs": 5000,
+      "note": "Detection also includes actual request latency; no shared multi-tab leader is implemented."
+    },
+    {
+      "tabs": 3,
+      "hidden": false,
+      "simulatedHttpPerMinute": 36,
+      "observationWindow": "[0,60000)",
+      "detectionDelayNominalMs": 5000,
+      "note": "Detection also includes actual request latency; no shared multi-tab leader is implemented."
+    },
+    {
+      "tabs": 1,
+      "hidden": true,
+      "simulatedHttpPerMinute": 0,
+      "observationWindow": "[0,60000)",
+      "detectionDelayNominalMs": null,
+      "note": "Detection also includes actual request latency; no shared multi-tab leader is implemented."
+    }
+  ]
+}

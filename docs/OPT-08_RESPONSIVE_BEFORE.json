@@ -1,0 +1,475 @@
+{
+  "version": "before",
+  "reference": "b71fd33",
+  "methodology": "Actual components with synthetic account, 10 long records and total10000; local Vite development profiler, no real HTTP/Keycloak E2E. Five warm render samples. Geometry checks at 7 widths plus 200% zoom, keyboard Tab, secret-storage inspection.",
+  "results": [
+    {
+      "mode": "active",
+      "width": 320,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "active",
+      "width": 375,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "active",
+      "width": 430,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "active",
+      "width": 768,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "active",
+      "width": 1024,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "active",
+      "width": 1440,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "active",
+      "width": 1920,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "active",
+      "width": 1920,
+      "zoom": 2,
+      "pageOverflow": false,
+      "contentOverflow": false
+    },
+    {
+      "mode": "history",
+      "width": 320,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "history",
+      "width": 375,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "history",
+      "width": 430,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "history",
+      "width": 768,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "history",
+      "width": 1024,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "history",
+      "width": 1440,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "history",
+      "width": 1920,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "history",
+      "width": 1920,
+      "zoom": 2,
+      "pageOverflow": false,
+      "contentOverflow": false
+    },
+    {
+      "mode": "pending",
+      "width": 320,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 1,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "pending",
+      "width": 375,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 1,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "pending",
+      "width": 430,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 1,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "pending",
+      "width": 768,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 1,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "pending",
+      "width": 1024,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 1,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "pending",
+      "width": 1440,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 1,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "pending",
+      "width": 1920,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 1,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "pending",
+      "width": 1920,
+      "zoom": 2,
+      "pageOverflow": false,
+      "contentOverflow": false
+    },
+    {
+      "mode": "recovery",
+      "width": 320,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "recovery",
+      "width": 375,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "recovery",
+      "width": 430,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "recovery",
+      "width": 768,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "recovery",
+      "width": 1024,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "recovery",
+      "width": 1440,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "recovery",
+      "width": 1920,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "recovery",
+      "width": 1920,
+      "zoom": 2,
+      "pageOverflow": false,
+      "contentOverflow": false
+    },
+    {
+      "mode": "error",
+      "width": 320,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "error",
+      "width": 375,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "error",
+      "width": 430,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "error",
+      "width": 768,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "error",
+      "width": 1024,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "error",
+      "width": 1440,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "error",
+      "width": 1920,
+      "pageOverflow": false,
+      "contentOverflow": false,
+      "mainFits": true,
+      "dialogFits": true,
+      "profileRequests": 1,
+      "revealRequests": 0,
+      "storageContainsSecret": false
+    },
+    {
+      "mode": "error",
+      "width": 1920,
+      "zoom": 2,
+      "pageOverflow": false,
+      "contentOverflow": false
+    }
+  ],
+  "render": [
+    {
+      "phase": "profile",
+      "actualDuration": 16.69999999552965
+    },
+    {
+      "phase": "modal",
+      "twoFrameMs": 34,
+      "actualDuration": 8.099999994039536
+    },
+    {
+      "phase": "profile",
+      "actualDuration": 18.599999994039536
+    },
+    {
+      "phase": "modal",
+      "twoFrameMs": 30.299999997019768,
+      "actualDuration": 10.100000008940697
+    },
+    {
+      "phase": "profile",
+      "actualDuration": 18.19999999552965
+    },
+    {
+      "phase": "modal",
+      "twoFrameMs": 30.799999997019768,
+      "actualDuration": 11.399999991059303
+    },
+    {
+      "phase": "profile",
+      "actualDuration": 18.19999999552965
+    },
+    {
+      "phase": "modal",
+      "twoFrameMs": 36.29999999701977,
+      "actualDuration": 8.700000002980232
+    },
+    {
+      "phase": "profile",
+      "actualDuration": 18.19999998807907
+    },
+    {
+      "phase": "modal",
+      "twoFrameMs": 30.100000001490116,
+      "actualDuration": 9.400000005960464
+    }
+  ],
+  "errors": []
+}

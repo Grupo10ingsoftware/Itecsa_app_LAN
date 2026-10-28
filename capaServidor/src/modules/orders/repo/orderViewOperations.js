@@ -1,3 +1,4 @@
+﻿import { readPaymentPage, readPaymentCounts } from './paymentWorkspaceRead.repo.js';
 import { listKanbanRows, getKanbanRow } from './kanbanRead.repo.js';
 import { toOrderSummaryDTO } from './orderMapping.js';
 import { stripLanyardProgressObservation } from './orderProductionRules.js';
@@ -113,6 +114,8 @@ function mapKanbanCommentGroups(row) {
 export async function listOrderViewsOperation(repository, { view, limit, cursor, status, search, productType, from, to, unscheduled = false }) {
   if (view === 'kanban') return (await listKanbanRows(repository.client,
     { limit, cursor, status, search, productType, from, to })).map(mapKanbanSummary);
+  if (view === 'calendar') return (await listKanbanRows(repository.client,
+    { limit, cursor, status, search, productType, from, to, calendar: true, unscheduled })).map(mapCalendarSummary);
   const where = {
     ...(cursor ? { id_pedido: { lt: cursor.id } } : {}),
     ...(view === 'kanban'
@@ -166,44 +169,10 @@ export async function getOrderViewOperation(repository, id, view) {
   };
 }
 
-export async function listPaymentViewsOperation(repository, { limit, cursor, status, search, from, to }) {
-  const baseWhere = {
-    ...(search ? { OR: [
-      { numero_nota_venta: { contains: search } },
-      { Cliente: { is: { nombre_cliente: { contains: search } } } },
-      { Cliente: { is: { razon_social: { contains: search } } } },
-      { Cliente: { is: { rut_cliente: { contains: search } } } },
-    ] } : {}),
-    ...((from || to) ? { fecha_creacion: { ...(from ? { gte: from } : {}), ...(to ? { lt: to } : {}) } } : {}),
-  };
-  const select = {
-    id_pedido: true, numero_nota_venta: true, fecha_creacion: true, id_estado_pago: true,
-    Cliente: { select: { nombre_cliente: true, razon_social: true, rut_cliente: true } },
-    Estado_Pago: { select: { nombre_estado_pago: true } },
-  };
+export async function listPaymentViewsOperation(repository, filters) {
   const [rows, counts] = await Promise.all([
-    repository.client.pedidos.findMany({
-      where: {
-        ...baseWhere,
-        ...(cursor ? { id_pedido: { lt: cursor.id } } : {}),
-        ...(status ? { Estado_Pago: { is: { nombre_estado_pago: status } } } : {}),
-      }, select, orderBy: { id_pedido: 'desc' }, take: limit + 1,
-    }),
-    Promise.all(['Pendiente', 'Rechazado', 'Confirmado'].map((name) =>
-      repository.client.pedidos.count({ where: { ...baseWhere, Estado_Pago: { is: { nombre_estado_pago: name } } } }),
-    )),
+    filters.summaryOnly ? [] : readPaymentPage(repository.client, filters),
+    filters.includeSummary === false ? null : readPaymentCounts(repository.client, filters),
   ]);
-  return {
-    rows: rows.map((row) => ({
-      id_pedido: row.id_pedido,
-      numero_nota_venta: row.numero_nota_venta,
-      fecha_creacion: row.fecha_creacion,
-      id_estado_pago: row.id_estado_pago,
-      nombre_cliente: row.Cliente?.nombre_cliente ?? null,
-      razon_social: row.Cliente?.razon_social ?? null,
-      rut_cliente: row.Cliente?.rut_cliente ?? null,
-      estado_pago: row.Estado_Pago?.nombre_estado_pago ?? null,
-    })),
-    counts: { pending: counts[0], rejected: counts[1], confirmed: counts[2] },
-  };
+  return { rows, counts };
 }

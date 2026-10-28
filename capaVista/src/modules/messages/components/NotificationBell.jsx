@@ -1,9 +1,10 @@
+import { createNotificationRefresh } from '../utils/notificationRefresh'
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
-import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { APP_ROUTES } from '../../../config/routes'
 import { useMessagesApi } from '../hooks/useMessagesApi'
-import { formatMessageDate, messagePreview, notifyMessagesChanged } from '../utils/messageFormatters'
+import { formatMessageDate, notificationPreview, notifyMessagesChanged } from '../utils/messageFormatters'
 import styles from './NotificationBell.module.css'
 import { collectNewNotifications } from '../utils/popupNotifications'
 import { useToast } from '../../../shared/notifications/useToast'
@@ -12,20 +13,25 @@ import { useMessageSound } from '../hooks/useMessageSound'
 const REFRESH_INTERVAL_MS = 5_000
 
 export default function NotificationBell({ buttonClassName }) {
+  const api = useMessagesApi()
+  return <NotificationBellSession key={api.scopeId} api={api} buttonClassName={buttonClassName} />
+}
+
+function NotificationBellSession({ api, buttonClassName }) {
   const notify = useToast()
   const playSound = useMessageSound()
-  const api = useMessagesApi()
   const navigate = useNavigate()
   const rootRef = useRef(null)
   const latestIdRef = useRef(null)
-  const loadingRef = useRef(false)
+  const revision = useRef(null)
+  const refresh = useRef(null)
   const actionRef = useRef(false)
   const [action, setAction] = useState(null)
-  const activity = useRef({ active: true, version: 0 })
+  const activity = useRef({ active: true })
   useEffect(() => {
     const tracker = activity.current
     tracker.active = true
-    return () => { tracker.active = false; tracker.version++ }
+    return () => { tracker.active = false }
   }, [api])
   const [isOpen, setIsOpen] = useState(false)
   const [notifications, setNotifications] = useState([])
@@ -33,100 +39,105 @@ export default function NotificationBell({ buttonClassName }) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const loadNotifications = useCallback(async ({ quiet = false } = {}) => {
-    if (loadingRef.current || actionRef.current) return
-    const version = activity.current.version
-    loadingRef.current = true
-    if (!quiet) setIsLoading(true)
-
-    try {
-      const result = await api.getNotifications(50)
-      if (!activity.current.active || version !== activity.current.version) return
+  const receive = useEffectEvent(result => {
+    if (!result.unchanged) {
       const incoming = result.notifications ?? []
       const { latestId, messages } = collectNewNotifications(incoming, latestIdRef.current)
       latestIdRef.current = latestId
       for (const { id_mensaje: messageId } of messages) notify.info('Nuevo mensaje recibido.', {
         title: 'Nuevo mensaje', source: 'messages', operation: String(messageId),
-        action: { label: 'Leer mensaje', onClick: () => navigate(APP_ROUTES.MESSAGE_DETAIL.replace(':messageId', messageId)) },
+        action: { label: 'Leer mensaje', onClick: () => {
+          if (activity.current.active) navigate(APP_ROUTES.MESSAGE_DETAIL.replace(':messageId', messageId))
+        } },
       })
       if (messages.length) playSound()
       setNotifications(incoming)
-      setUnreadCount(result.unreadCount ?? 0)
-      setError('')
-    } catch {
-      if (activity.current.active && version === activity.current.version) setError('No fue posible cargar las notificaciones.')
-    } finally {
-      loadingRef.current = false
-      if (!quiet && activity.current.active) setIsLoading(false)
     }
-  }, [api, navigate, notify, playSound])
-
-  const refreshNotifications = useEffectEvent((options) => loadNotifications(options))
+    revision.current = result.revision ?? null
+    setUnreadCount(result.unreadCount ?? 0)
+    setIsLoading(false)
+    setError('')
+  })
 
   useEffect(() => {
-    const initialLoad = window.setTimeout(() => refreshNotifications(), 0)
-    const refreshVisible = () => {
-      if (document.visibilityState === 'visible') refreshNotifications({ quiet: true })
-    }
+    const visible = () => document.visibilityState === 'visible'
+    let authorized = true
+    const scheduler = createNotificationRefresh({
+      visible: () => visible() && authorized,
+      load: ({ signal }) => api.getNotifications(50, { compact: true, revision: revision.current, signal }),
+      onData: result => receive(result),
+      onLoading: setIsLoading,
+      onError: error => {
+        setIsLoading(false)
+        setError('No fue posible cargar las notificaciones.')
+        if ([401, 403].includes(error?.status)) {
+          authorized = false
+          revision.current = null
+          setNotifications([])
+          setUnreadCount(0)
+        }
+      },
+    })
+    refresh.current = scheduler
+    const initialLoad = window.setTimeout(() => scheduler.request({ quiet: false }), 0)
+    const refreshVisible = () => scheduler.request()
+    const changed = () => { revision.current = null; void scheduler.request({ invalidate: true }) }
     const interval = window.setInterval(refreshVisible, REFRESH_INTERVAL_MS)
     document.addEventListener('visibilitychange', refreshVisible)
     window.addEventListener('focus', refreshVisible)
-    const handleMessagesChanged = () => refreshNotifications({ quiet: true })
-    window.addEventListener('messages:changed', handleMessagesChanged)
-
+    window.addEventListener('messages:changed', changed)
     return () => {
+      scheduler.dispose()
       window.clearTimeout(initialLoad)
       window.clearInterval(interval)
       document.removeEventListener('visibilitychange', refreshVisible)
       window.removeEventListener('focus', refreshVisible)
-      window.removeEventListener('messages:changed', handleMessagesChanged)
+      window.removeEventListener('messages:changed', changed)
     }
-  }, [])
+  }, [api])
 
   useEffect(() => {
     function handlePointerDown(event) {
       if (rootRef.current && !rootRef.current.contains(event.target)) setIsOpen(false)
     }
+    function handleKeyDown(event) {
+      if (isOpen && event.key === 'Escape') {
+        setIsOpen(false)
+        rootRef.current?.querySelector('button')?.focus()
+      }
+    }
 
     document.addEventListener('pointerdown', handlePointerDown)
-    return () => document.removeEventListener('pointerdown', handlePointerDown)
-  }, [])
-
-  async function handleOpenMessage(message) {
-    if (actionRef.current) return
-    actionRef.current = true
-    activity.current.version++
-    setAction({ kind: 'open', id: message.id_mensaje })
-    try {
-      await api.markAsRead(message.id_mensaje)
-      if (!activity.current.active) return
-      notifyMessagesChanged()
-      setIsOpen(false)
-      navigate(APP_ROUTES.MESSAGE_DETAIL.replace(':messageId', message.id_mensaje))
-    } catch {
-      if (activity.current.active) notify.error('No fue posible abrir la notificación.')
-    } finally {
-      actionRef.current = false
-      if (activity.current.active) setAction(null)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
     }
+  }, [isOpen])
+
+  function handleOpenMessage(message) {
+    if (actionRef.current) return
+    setIsOpen(false)
+    navigate(APP_ROUTES.MESSAGE_DETAIL.replace(':messageId', message.id_mensaje))
   }
 
   async function handleHide(event, messageId) {
     event.stopPropagation()
     if (actionRef.current) return
     actionRef.current = true
-    activity.current.version++
+    refresh.current?.beginAction()
     setAction({ kind: 'hide', id: messageId })
 
     try {
       await api.hideNotification(messageId)
       if (!activity.current.active) return
       setNotifications((current) => current.filter((item) => item.id_mensaje !== messageId))
-      setUnreadCount((current) => Math.max(0, current - 1))
+      revision.current = null
       notifyMessagesChanged()
     } catch {
       if (activity.current.active) notify.error('No fue posible limpiar la notificación.')
     } finally {
+      await refresh.current?.endAction()
       actionRef.current = false
       if (activity.current.active) setAction(null)
     }
@@ -135,18 +146,21 @@ export default function NotificationBell({ buttonClassName }) {
   async function handleClearAll() {
     if (actionRef.current) return
     actionRef.current = true
-    activity.current.version++
+    refresh.current?.beginAction()
+    const before = notifications
     setAction({ kind: 'clear' })
     try {
       await api.clearNotifications()
       if (!activity.current.active) return
-      setNotifications([])
-      setUnreadCount(0)
+      const removed = new Set(before.map(item => item.id_mensaje))
+      setNotifications(current => current.filter(item => !removed.has(item.id_mensaje)))
+      revision.current = null
       setError('')
       notifyMessagesChanged()
     } catch {
       if (activity.current.active) notify.error('No fue posible limpiar las notificaciones.')
     } finally {
+      await refresh.current?.endAction()
       actionRef.current = false
       if (activity.current.active) setAction(null)
     }
@@ -161,7 +175,7 @@ export default function NotificationBell({ buttonClassName }) {
         className={`${styles.bellButton} ${buttonClassName}`}
         onClick={() => {
           setIsOpen((current) => !current)
-          if (!isOpen) loadNotifications()
+          if (!isOpen) void refresh.current?.request({ quiet: false })
         }}
         type="button"
       >
@@ -194,12 +208,11 @@ export default function NotificationBell({ buttonClassName }) {
             )}
             {!isLoading && notifications.map((notification) => (
               <article className={styles.notification} key={notification.id_mensaje}>
-                <button className={styles.notificationMain} disabled={Boolean(action)} aria-busy={action?.kind === 'open' && action.id === notification.id_mensaje} onClick={() => handleOpenMessage(notification)} type="button">
-                  {action?.kind === 'open' && action.id === notification.id_mensaje && <LoadingIndicator scope="action" context="Abrir notificación" />}
+                <button className={styles.notificationMain} disabled={Boolean(action)} onClick={() => handleOpenMessage(notification)} type="button">
                   <span className={styles.unreadDot} aria-label="Sin leer" />
                   <span className={styles.notificationCopy}>
                     <strong>{notification.Asunto}</strong>
-                    <span>{messagePreview(notification.contenido, 82)}</span>
+                    <span>{notificationPreview(notification)}</span>
                     <small>{formatMessageDate(notification.fecha_publicacion)}</small>
                   </span>
                 </button>

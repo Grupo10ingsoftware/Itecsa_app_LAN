@@ -8,11 +8,18 @@ import SalesNoteStep from '../components/SalesNoteStep'
 import { useOrderCreateFlow } from '../../../hooks/useOrderCreateFlow'
 import styles from './OrderCreatePage.module.css'
 import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
+import { useOrdersApi } from '../hooks/useOrdersApi'
+import { getOrderApiScope } from '../api/ordersApi'
 
 export default function OrderCreatePage() {
+  const api = useOrdersApi()
+  return <OrderCreateContent key={getOrderApiScope(api)} api={api} />
+}
+
+function OrderCreateContent({ api }) {
   const navigate = useNavigate()
   const { identityUser, user } = useAuth()
-  const flow = useOrderCreateFlow({ navigate })
+  const flow = useOrderCreateFlow({ navigate, api })
   const { actions } = flow
   const responsibleUserName = [
     user?.nombreUsuario,
@@ -40,6 +47,11 @@ export default function OrderCreatePage() {
             responsibleUserName={responsibleUserName}
           />
 
+          {flow.needsReconciliation && <div role="alert">
+            <p>No se pudo confirmar el resultado del registro. Comprueba la Nota de Venta antes de volver a registrar.</p>
+            <button className={styles.cancelButton} disabled={flow.isSearching} onClick={actions.handleSearchSalesNote} type="button">Comprobar estado</button>
+          </div>}
+
           <div className={styles.footerActions}>
             <button
               className={styles.cancelButton}
@@ -51,7 +63,7 @@ export default function OrderCreatePage() {
             </button>
             <button
               className={styles.registerButton}
-              disabled={!flow.salesNoteIsValid || flow.isRegistering}
+              disabled={!flow.salesNoteIsValid || flow.isRegistering || flow.needsReconciliation}
               onClick={actions.handleOpenConfirmModal}
               type="button"
              aria-busy={flow.isRegistering}>

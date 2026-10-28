@@ -45,6 +45,7 @@
 .content {
   display: grid;
   gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
   padding: 1.25rem 1.5rem 1.5rem;
 }
 
@@ -183,6 +184,7 @@
 .dwellPanelHeader {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
   justify-content: space-between;
   margin-bottom: 0.9rem;
@@ -199,6 +201,11 @@
   white-space: nowrap;
 }
 
+.productSelector {
+  max-width: 100%;
+  min-width: 0;
+}
+
 .productSelector select {
   background: #fff;
   border: 1px solid #dbe1e8;
@@ -206,6 +213,7 @@
   color: var(--itexsa-text);
   font-size: 0.78rem;
   min-height: 2.1rem;
+  max-width: 100%;
   padding: 0 0.5rem;
 }
 

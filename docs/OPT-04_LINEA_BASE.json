@@ -1,0 +1,399 @@
+{
+  "reference": "0be21bb",
+  "capturedAt": "2026-10-27T22:10:49.407Z",
+  "node": "v24.19.0",
+  "methodology": "5 warm sequential samples, 250ms pauses; development reads only. Final hydration is an existing-order stage proxy, NOT creation/transaction/HTTP/E2E. No business/security writes.",
+  "samples": {
+    "duplicate_lookup": {
+      "medianMs": 664.913,
+      "samples": [
+        {
+          "ms": 664.913,
+          "selects": 1,
+          "bytes": 4,
+          "driverMs": [
+            664.1939999999995
+          ]
+        },
+        {
+          "ms": 682.315,
+          "selects": 1,
+          "bytes": 4,
+          "driverMs": [
+            680.2708999999995
+          ]
+        },
+        {
+          "ms": 672.869,
+          "selects": 1,
+          "bytes": 4,
+          "driverMs": [
+            671.9148000000005
+          ]
+        },
+        {
+          "ms": 584.784,
+          "selects": 1,
+          "bytes": 4,
+          "driverMs": [
+            583.8335000000006
+          ]
+        },
+        {
+          "ms": 661.325,
+          "selects": 1,
+          "bytes": 4,
+          "driverMs": [
+            660.5082000000002
+          ]
+        }
+      ],
+      "sql": [
+        "SELECT `Pedidos`.`id_pedido` FROM `Pedidos` WHERE `Pedidos`.`numero_nota_venta` = ? LIMIT ? OFFSET ?"
+      ]
+    },
+    "final_hydration_stage_before": {
+      "medianMs": 3036.69,
+      "samples": [
+        {
+          "ms": 3036.69,
+          "selects": 13,
+          "bytes": 1573,
+          "driverMs": [
+            662.9745999999996,
+            570.2115999999987,
+            571.957699999999,
+            660.5744999999988,
+            661.0709999999999,
+            661.7907000000014,
+            661.5867999999991,
+            578.2458000000006,
+            657.0817000000025,
+            657.6008000000002,
+            659.568299999999,
+            563.7605999999978,
+            569.0475000000006
+          ]
+        },
+        {
+          "ms": 3113.971,
+          "selects": 13,
+          "bytes": 1573,
+          "driverMs": [
+            655.7949000000008,
+            578.9268000000011,
+            656.0273000000016,
+            657.5313999999998,
+            658.0171999999984,
+            659.2825000000012,
+            659.7193999999981,
+            564.4229000000014,
+            567.2254999999968,
+            656.2332999999999,
+            660.8058000000019,
+            577.7832000000017,
+            655.8258000000023
+          ]
+        },
+        {
+          "ms": 3026.934,
+          "selects": 13,
+          "bytes": 1573,
+          "driverMs": [
+            657.6430999999975,
+            564.4992999999995,
+            568.9148999999998,
+            654.7531000000017,
+            656.7497000000003,
+            658.1561999999976,
+            658.8244999999988,
+            660.7525999999998,
+            578.0786000000007,
+            655.3163999999997,
+            656.8361000000004,
+            562.3053999999975,
+            569.0110999999997
+          ]
+        },
+        {
+          "ms": 3117.662,
+          "selects": 13,
+          "bytes": 1573,
+          "driverMs": [
+            655.4200999999994,
+            578.8284000000021,
+            658.0156000000025,
+            657.8784000000014,
+            659.1138000000028,
+            659.8078999999998,
+            659.8234000000011,
+            562.9828999999991,
+            568.6425999999992,
+            657.9991000000009,
+            656.647399999998,
+            578.3163999999997,
+            659.6890000000021
+          ]
+        },
+        {
+          "ms": 3024.629,
+          "selects": 13,
+          "bytes": 1573,
+          "driverMs": [
+            655.9274000000005,
+            563.311099999999,
+            568.3667999999998,
+            658.1142,
+            658.1083999999973,
+            659.8179000000018,
+            660.2483999999968,
+            657.4544000000024,
+            578.3787000000011,
+            656.8016000000025,
+            657.7666000000027,
+            562.395199999999,
+            566.3244999999988
+          ]
+        }
+      ],
+      "sql": [
+        "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`id_estado_pedido`, `Pedidos`.`id_estado_pago`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`fecha_estimada_termino`, `Pedidos`.`id_cliente` FROM `Pedidos` WHERE (`Pedidos`.`id_pedido` = ? AND 1=1) LIMIT ? OFFSET ?",
+        "SELECT `Estado_Pago`.`id_estado_pago`, `Estado_Pago`.`nombre_estado_pago` FROM `Estado_Pago` WHERE `Estado_Pago`.`id_estado_pago` = ?",
+        "SELECT `Pedido_Etiqueta`.`id_pedido`, `Pedido_Etiqueta`.`id_etiqueta` FROM `Pedido_Etiqueta` WHERE `Pedido_Etiqueta`.`id_pedido` = ?",
+        "SELECT `Cliente`.`id_cliente`, `Cliente`.`nombre_cliente`, `Cliente`.`razon_social` FROM `Cliente` WHERE `Cliente`.`id_cliente` = ?",
+        "SELECT `Pedido_Item_Sin_Seguimiento`.`id_item_sin_seguimiento`, `Pedido_Item_Sin_Seguimiento`.`codigo`, `Pedido_Item_Sin_Seguimiento`.`producto`, `Pedido_Item_Sin_Seguimiento`.`cantidad`, `Pedido_Item_Sin_Seguimiento`.`subfamilia`, `Pedido_Item_Sin_Seguimiento`.`id_pedido` FROM `Pedido_Item_Sin_Seguimiento` WHERE `Pedido_Item_Sin_Seguimiento`.`id_pedido` = ?",
+        "SELECT `Detalle_pedido`.`id_detalle_pedido`, `Detalle_pedido`.`id_tipo_producto`, `Detalle_pedido`.`cantidad`, `Detalle_pedido`.`fecha_estimada_termino`, `Detalle_pedido`.`fecha_real_termino`, `Detalle_pedido`.`id_estado_subproceso`, `Detalle_pedido`.`id_pedido` FROM `Detalle_pedido` WHERE `Detalle_pedido`.`id_pedido` = ?",
+        "SELECT `Estado_Pedido`.`id_estado_pedido`, `Estado_Pedido`.`orden_kanban`, `Estado_Pedido`.`nombre_etapa` FROM `Estado_Pedido` WHERE `Estado_Pedido`.`id_estado_pedido` = ?",
+        "SELECT `etiqueta`.`id_etiqueta`, `etiqueta`.`nombre_etiqueta` FROM `etiqueta` WHERE `etiqueta`.`id_etiqueta` IN (?,?)",
+        "SELECT `Tipo_Producto`.`id_tipo_producto`, `Tipo_Producto`.`nombre_producto`, `Tipo_Producto`.`descripcion_producto` FROM `Tipo_Producto` WHERE `Tipo_Producto`.`id_tipo_producto` IN (?)",
+        "SELECT `Avance_Lanyard`.`id_avance_lanyard`, `Avance_Lanyard`.`cantidad_acumulada`, `Avance_Lanyard`.`porcentaje_acumulado`, `Avance_Lanyard`.`fecha_actualizacion`, `Avance_Lanyard`.`fecha_produccion`, `Avance_Lanyard`.`id_detalle_pedido` FROM `Avance_Lanyard` WHERE `Avance_Lanyard`.`id_detalle_pedido` IN (?) ORDER BY `Avance_Lanyard`.`fecha_produccion` DESC, `Avance_Lanyard`.`id_avance_lanyard` DESC",
+        "SELECT `Estado_Subprocesos`.`id_estado_subproceso`, `Estado_Subprocesos`.`nombre_estado` FROM `Estado_Subprocesos` WHERE `Estado_Subprocesos`.`id_estado_subproceso` IN (?)",
+        "SELECT `Producto_Subproceso`.`id_tipo_producto`, `Producto_Subproceso`.`id_estado_subproceso`, `Producto_Subproceso`.`orden_flujo` FROM `Producto_Subproceso` WHERE `Producto_Subproceso`.`id_tipo_producto` IN (?) ORDER BY `Producto_Subproceso`.`orden_flujo` ASC",
+        "SELECT `Estado_Subprocesos`.`id_estado_subproceso`, `Estado_Subprocesos`.`nombre_estado` FROM `Estado_Subprocesos` WHERE `Estado_Subprocesos`.`id_estado_subproceso` IN (?,?,?,?,?)"
+      ]
+    },
+    "receipt_projection_only": {
+      "medianMs": 0.037,
+      "samples": [
+        {
+          "ms": 0.009,
+          "selects": 0,
+          "bytes": 35,
+          "driverMs": []
+        },
+        {
+          "ms": 0.046,
+          "selects": 0,
+          "bytes": 35,
+          "driverMs": []
+        },
+        {
+          "ms": 0.029,
+          "selects": 0,
+          "bytes": 35,
+          "driverMs": []
+        },
+        {
+          "ms": 0.05,
+          "selects": 0,
+          "bytes": 35,
+          "driverMs": []
+        },
+        {
+          "ms": 0.037,
+          "selects": 0,
+          "bytes": 35,
+          "driverMs": []
+        }
+      ],
+      "sql": []
+    },
+    "product_Yoyo_before": {
+      "medianMs": 1894.495,
+      "samples": [
+        {
+          "ms": 1899.378,
+          "selects": 3,
+          "bytes": 84,
+          "driverMs": [
+            661.3689999999988,
+            658.6514999999999,
+            578.4254000000001
+          ]
+        },
+        {
+          "ms": 1879.478,
+          "selects": 3,
+          "bytes": 84,
+          "driverMs": [
+            656.7887999999948,
+            658.0612000000037,
+            563.3973000000042
+          ]
+        },
+        {
+          "ms": 1888.141,
+          "selects": 3,
+          "bytes": 84,
+          "driverMs": [
+            570.047599999998,
+            660.1113999999943,
+            657.0325000000012
+          ]
+        },
+        {
+          "ms": 1980.151,
+          "selects": 3,
+          "bytes": 84,
+          "driverMs": [
+            660.8361000000004,
+            662.2415999999939,
+            655.9923999999955
+          ]
+        },
+        {
+          "ms": 1894.495,
+          "selects": 3,
+          "bytes": 84,
+          "driverMs": [
+            577.8068000000058,
+            656.2912999999971,
+            659.1035999999949
+          ]
+        }
+      ],
+      "sql": [
+        "SELECT `Tipo_Producto`.`id_tipo_producto`, `Tipo_Producto`.`nombre_producto`, `Tipo_Producto`.`descripcion_producto`, `Tipo_Producto`.`capacidad_diaria` FROM `Tipo_Producto` WHERE `Tipo_Producto`.`nombre_producto` = ? LIMIT ? OFFSET ?",
+        "SELECT `Producto_Subproceso`.`id_tipo_producto`, `Producto_Subproceso`.`id_estado_subproceso`, `Producto_Subproceso`.`orden_flujo` FROM `Producto_Subproceso` WHERE `Producto_Subproceso`.`id_tipo_producto` = ? ORDER BY `Producto_Subproceso`.`orden_flujo` ASC",
+        "SELECT `Estado_Subprocesos`.`id_estado_subproceso`, `Estado_Subprocesos`.`nombre_estado`, `Estado_Subprocesos`.`descripcion_estado` FROM `Estado_Subprocesos` WHERE `Estado_Subprocesos`.`id_estado_subproceso` IN (?,?)"
+      ]
+    },
+    "product_Lanyard_before": {
+      "medianMs": 1896.717,
+      "samples": [
+        {
+          "ms": 1984.765,
+          "selects": 3,
+          "bytes": 83,
+          "driverMs": [
+            658.9743999999992,
+            662.7796000000017,
+            661.620799999997
+          ]
+        },
+        {
+          "ms": 1891.676,
+          "selects": 3,
+          "bytes": 83,
+          "driverMs": [
+            656.3926999999967,
+            578.5659999999989,
+            655.7089999999953
+          ]
+        },
+        {
+          "ms": 1791.98,
+          "selects": 3,
+          "bytes": 83,
+          "driverMs": [
+            658.7109999999957,
+            563.5921000000017,
+            568.5509999999995
+          ]
+        },
+        {
+          "ms": 1976.44,
+          "selects": 3,
+          "bytes": 83,
+          "driverMs": [
+            657.6568000000043,
+            657.0830999999962,
+            660.7080999999962
+          ]
+        },
+        {
+          "ms": 1896.717,
+          "selects": 3,
+          "bytes": 83,
+          "driverMs": [
+            661.316899999998,
+            656.9093999999968,
+            577.4821999999986
+          ]
+        }
+      ],
+      "sql": [
+        "SELECT `Tipo_Producto`.`id_tipo_producto`, `Tipo_Producto`.`nombre_producto`, `Tipo_Producto`.`descripcion_producto`, `Tipo_Producto`.`capacidad_diaria` FROM `Tipo_Producto` WHERE `Tipo_Producto`.`nombre_producto` = ? LIMIT ? OFFSET ?",
+        "SELECT `Producto_Subproceso`.`id_tipo_producto`, `Producto_Subproceso`.`id_estado_subproceso`, `Producto_Subproceso`.`orden_flujo` FROM `Producto_Subproceso` WHERE `Producto_Subproceso`.`id_tipo_producto` = ? ORDER BY `Producto_Subproceso`.`orden_flujo` ASC",
+        "SELECT `Estado_Subprocesos`.`id_estado_subproceso`, `Estado_Subprocesos`.`nombre_estado`, `Estado_Subprocesos`.`descripcion_estado` FROM `Estado_Subprocesos` WHERE `Estado_Subprocesos`.`id_estado_subproceso` IN (?,?,?,?,?)"
+      ]
+    },
+    "product_Tarjeta_before": {
+      "medianMs": 1893.676,
+      "samples": [
+        {
+          "ms": 1884.18,
+          "selects": 3,
+          "bytes": 83,
+          "driverMs": [
+            568.6823999999979,
+            658.4003999999986,
+            656.0357999999978
+          ]
+        },
+        {
+          "ms": 1978.446,
+          "selects": 3,
+          "bytes": 83,
+          "driverMs": [
+            660.7867999999944,
+            659.8987000000052,
+            656.6177000000025
+          ]
+        },
+        {
+          "ms": 1893.676,
+          "selects": 3,
+          "bytes": 83,
+          "driverMs": [
+            578.449099999998,
+            655.6051000000007,
+            658.6913000000059
+          ]
+        },
+        {
+          "ms": 1791.19,
+          "selects": 3,
+          "bytes": 83,
+          "driverMs": [
+            564.1680000000051,
+            569.3120999999956,
+            656.6483000000007
+          ]
+        },
+        {
+          "ms": 1977.593,
+          "selects": 3,
+          "bytes": 83,
+          "driverMs": [
+            657.4934999999969,
+            658.5861000000004,
+            660.5101000000141
+          ]
+        }
+      ],
+      "sql": [
+        "SELECT `Tipo_Producto`.`id_tipo_producto`, `Tipo_Producto`.`nombre_producto`, `Tipo_Producto`.`descripcion_producto`, `Tipo_Producto`.`capacidad_diaria` FROM `Tipo_Producto` WHERE `Tipo_Producto`.`nombre_producto` = ? LIMIT ? OFFSET ?",
+        "SELECT `Producto_Subproceso`.`id_tipo_producto`, `Producto_Subproceso`.`id_estado_subproceso`, `Producto_Subproceso`.`orden_flujo` FROM `Producto_Subproceso` WHERE `Producto_Subproceso`.`id_tipo_producto` = ? ORDER BY `Producto_Subproceso`.`orden_flujo` ASC",
+        "SELECT `Estado_Subprocesos`.`id_estado_subproceso`, `Estado_Subprocesos`.`nombre_estado`, `Estado_Subprocesos`.`descripcion_estado` FROM `Estado_Subprocesos` WHERE `Estado_Subprocesos`.`id_estado_subproceso` IN (?,?,?,?,?)"
+      ]
+    }
+  },
+  "equivalence": [
+    {
+      "operation": "public creation DTO projection",
+      "equal": true
+    }
+  ],
+  "explain": []
+}

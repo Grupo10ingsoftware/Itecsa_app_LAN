@@ -37,6 +37,7 @@ jobs:
           npm run prisma:generate --prefix capaServidor
           (cd capaServidor && node --test)
           npm ci --prefix capaVista
+          npm test --prefix capaVista
           npm run lint --prefix capaVista
           npm run build --prefix capaVista
           docker buildx build --load --platform linux/amd64 --target production --build-arg APP_VERSION="$RELEASE_SHA" -f capaServidor/Dockerfile -t itecsa-api:ci .
@@ -88,6 +89,7 @@ jobs:
           npm run prisma:generate --prefix capaServidor
           (cd capaServidor && node --test)
           npm ci --prefix capaVista
+          npm test --prefix capaVista
           npm run lint --prefix capaVista
           npm run build --prefix capaVista
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f

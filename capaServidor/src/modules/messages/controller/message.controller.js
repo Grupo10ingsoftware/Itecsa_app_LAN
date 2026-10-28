@@ -1,6 +1,8 @@
 import { respondError } from "../../../errors/httpErrors.js";
 import { request, response } from "express";
 import MessageService from "../service/message.service.js";
+import { authorizationForProvider } from '../../../../../shared/identityAuthorization.js';
+import { PERMISSIONS as P } from '../../../../../shared/authorization.js';
 
 class MessageController {
     constructor({ service } = {}) {
@@ -39,6 +41,15 @@ class MessageController {
         } catch (error) {
             return respondError(error, req, res);
         }
+    };
+
+    openMessage = async (req = request, res = response) => {
+        try {
+            const policy = authorizationForProvider(req.identityProvider);
+            const canMarkRead = policy?.can(policy.roleFromPayload(req.auth?.payload), req.auth?.payload?.permissions, P.UPDATE_MESSAGES) === true;
+            return res.status(200).json(await this.service.openMessage(req.auth?.payload?.sub, req.params.messageId,
+                { currentUser: req.currentUser, canMarkRead }));
+        } catch (error) { return respondError(error, req, res); }
     };
 
     markAsRead = async (req = request, res = response) => {

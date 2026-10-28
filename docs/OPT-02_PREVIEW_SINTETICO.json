@@ -1,0 +1,302 @@
+{
+  "reference": "b8e8a94",
+  "node": "v24.19.0",
+  "capturedAt": "2026-10-27T19:56:15.751Z",
+  "methodology": "10 fresh fixtures per series; mocked preview resolves after 5ms. Existing Map/promise cache reproduced for baseline; no real HTTP, token, DB or PIN.",
+  "samples": {
+    "cold_before": {
+      "n": 10,
+      "minMs": 14.4027,
+      "medianMs": 15.5773,
+      "meanMs": 16.12,
+      "maxMs": 21.4703,
+      "values": [
+        {
+          "ms": 21.4703,
+          "mockedReads": 1
+        },
+        {
+          "ms": 14.4027,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.8302,
+          "mockedReads": 1
+        },
+        {
+          "ms": 16.512,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.4345,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.5985,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.4672,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.6022,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.5561,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.3262,
+          "mockedReads": 1
+        }
+      ]
+    },
+    "cold_after": {
+      "n": 10,
+      "minMs": 14.9697,
+      "medianMs": 15.2679,
+      "meanMs": 15.3444,
+      "maxMs": 15.7762,
+      "values": [
+        {
+          "ms": 15.634,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.036,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.3352,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.6826,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.482,
+          "mockedReads": 1
+        },
+        {
+          "ms": 14.9697,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.1314,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.1961,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.2006,
+          "mockedReads": 1
+        },
+        {
+          "ms": 15.7762,
+          "mockedReads": 1
+        }
+      ]
+    },
+    "prefetched_before": {
+      "n": 10,
+      "minMs": 0.0286,
+      "medianMs": 0.0529,
+      "meanMs": 0.05,
+      "maxMs": 0.0724,
+      "values": [
+        {
+          "ms": 0.0587,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.048,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0322,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0724,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0627,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0577,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.044,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0364,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0592,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0286,
+          "mockedReads": 0
+        }
+      ]
+    },
+    "prefetched_after": {
+      "n": 10,
+      "minMs": 0.0174,
+      "medianMs": 0.0294,
+      "meanMs": 0.0283,
+      "maxMs": 0.0378,
+      "values": [
+        {
+          "ms": 0.036,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0329,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0245,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0274,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0378,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.032,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0256,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0174,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0314,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0185,
+          "mockedReads": 0
+        }
+      ]
+    },
+    "reopen_before": {
+      "n": 10,
+      "minMs": 0.015,
+      "medianMs": 0.0275,
+      "meanMs": 0.0289,
+      "maxMs": 0.0452,
+      "values": [
+        {
+          "ms": 0.0289,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.015,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0452,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0348,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0267,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0273,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0276,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0265,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0331,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0234,
+          "mockedReads": 0
+        }
+      ]
+    },
+    "reopen_after": {
+      "n": 10,
+      "minMs": 0.0177,
+      "medianMs": 0.0239,
+      "meanMs": 0.0242,
+      "maxMs": 0.0351,
+      "values": [
+        {
+          "ms": 0.0215,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0238,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0254,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0227,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0241,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0351,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0252,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0182,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0285,
+          "mockedReads": 0
+        },
+        {
+          "ms": 0.0177,
+          "mockedReads": 0
+        }
+      ]
+    }
+  }
+}

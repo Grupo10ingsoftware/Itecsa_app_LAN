@@ -1,22 +1,5 @@
 import getPrismaClient from "../../../database/prisma.js";
-const orderSummarySelect = {
-    id_pedido: true,
-    numero_nota_venta: true,
-    fecha_creacion: true,
-    Cliente: {
-        select: {
-            nombre_cliente: true,
-            razon_social: true,
-        },
-    },
-    Estado_Pedido: {
-        select: {
-            id_estado_pedido: true,
-            nombre_etapa: true,
-            orden_kanban: true,
-        },
-    },
-};
+import { orderListQuery, orderHeaderQuery, orderChildrenQuery } from './historyRead.repo.js';
 
 const CALENDARIZATION_DESCRIPTION_PREFIX = "Fecha de termino definida para ";
 
@@ -114,75 +97,30 @@ export default class OrderHistoryRepository {
     }
 
     async list({ status, search, dateRange, cursor, limit }) {
-        const searchConditions = search
-            ? [
-                { numero_nota_venta: { contains: search } },
-                { Cliente: { is: { nombre_cliente: { contains: search } } } },
-                { Cliente: { is: { razon_social: { contains: search } } } },
-            ]
-            : [];
-
-        const where = {
-            ...(cursor ? { id_pedido: { lt: cursor.id } } : {}),
-            ...(status
-                ? { Estado_Pedido: { is: { nombre_etapa: status } } }
-                : {}),
-            ...(searchConditions.length > 0 ? { OR: searchConditions } : {}),
-            ...(dateRange ? {
-                fecha_creacion: {
-                    ...(dateRange.start ? { gte: dateRange.start } : {}),
-                    ...(dateRange.end ? { lt: dateRange.end } : {}),
-                },
-            } : {}),
-        };
-
-        return this.client.pedidos.findMany({
-            where,
-            select: orderSummarySelect,
-            orderBy: { id_pedido: "desc" },
-            take: limit + 1,
-        });
+        const rows = await this.client.$queryRaw(orderListQuery({ status, search, dateRange, cursor, limit }));
+        return rows.map(row => ({
+            id_pedido: Number(row.id_pedido),
+            numero_nota_venta: row.numero_nota_venta,
+            fecha_creacion: row.fecha_creacion,
+            Cliente: row.relatedClient == null ? null : { nombre_cliente: row.nombre_cliente, razon_social: row.razon_social },
+            Estado_Pedido: row.id_estado_pedido == null ? null : {
+                id_estado_pedido: Number(row.id_estado_pedido), nombre_etapa: row.nombre_etapa, orden_kanban: row.orden_kanban,
+            },
+        }));
     }
 
     async getById(orderId) {
         const id = Number(orderId);
-        const [headers, trackedItems, untrackedItems, labels] = await Promise.all([
-            this.client.$queryRawUnsafe(`
-                SELECT p.id_pedido, p.numero_nota_venta, p.fecha_creacion,
-                       p.fecha_estimada_termino, c.nombre_cliente, c.razon_social,
-                       u.id_usuario, u.nombre_usuario, u.apellido_usuario,
-                       ep.nombre_etapa, epa.nombre_estado_pago
-                FROM Pedidos p
-                LEFT JOIN Cliente c ON c.id_cliente = p.id_cliente
-                LEFT JOIN Usuario u ON u.id_usuario = p.id_usuario
-                LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido = p.id_estado_pedido
-                LEFT JOIN Estado_Pago epa ON epa.id_estado_pago = p.id_estado_pago
-                WHERE p.id_pedido = ?
-                LIMIT 1
-            `, id),
-            this.client.$queryRawUnsafe(`
-                SELECT d.id_detalle_pedido, d.cantidad, d.fecha_estimada_termino,
-                       d.fecha_real_termino, tp.nombre_producto, es.nombre_estado
-                FROM Detalle_pedido d
-                LEFT JOIN Tipo_Producto tp ON tp.id_tipo_producto = d.id_tipo_producto
-                LEFT JOIN Estado_Subprocesos es ON es.id_estado_subproceso = d.id_estado_subproceso
-                WHERE d.id_pedido = ?
-                ORDER BY d.id_detalle_pedido ASC
-            `, id),
-            this.client.$queryRawUnsafe(`
-                SELECT id_item_sin_seguimiento, producto, cantidad
-                FROM Pedido_Item_Sin_Seguimiento
-                WHERE id_pedido = ?
-                ORDER BY id_item_sin_seguimiento ASC
-            `, id),
-            this.client.$queryRawUnsafe(`
-                SELECT e.nombre_etiqueta
-                FROM Pedido_Etiqueta pe
-                INNER JOIN etiqueta e ON e.id_etiqueta = pe.id_etiqueta
-                WHERE pe.id_pedido = ?
-                ORDER BY e.nombre_etiqueta ASC
-            `, id),
+        const [headers, children] = await Promise.all([
+            this.client.$queryRaw(orderHeaderQuery(id)),
+            this.client.$queryRaw(orderChildrenQuery(id)),
         ]);
+        const trackedItems = [], untrackedItems = [], labels = [];
+        for (const item of children) {
+            if (Number(item.kind) === 0) trackedItems.push(item);
+            else if (Number(item.kind) === 1) untrackedItems.push(item);
+            else labels.push(item);
+        }
         return mapOrderHeader(headers[0], trackedItems, untrackedItems, labels);
     }
 

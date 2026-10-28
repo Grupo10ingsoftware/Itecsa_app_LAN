@@ -1,3 +1,4 @@
+import { movementsQuery, movementsCountQuery, mapMovement } from './movementsRead.repo.js';
 import { identityKey, identityUserWhere } from '../../../database/identityBinding.js';
 import getPrismaClient from "../../../database/prisma.js";
 import {
@@ -97,50 +98,25 @@ export class UserRepository {
         return where;
     }
 
-    async listRecentRecords(idUsuario, { page = 1, perPage = 10, search = '' } = {}) {
-        const records = await this.client.registros.findMany({
-            where: this.buildRecordsWhere(idUsuario, { search }),
-            orderBy: [{ FECHA_HORA: "desc" }, { ID_REGISTRO: "desc" }],
-            skip: (page - 1) * perPage,
-            take: perPage,
-            select: {
-                ID_REGISTRO: true,
-                FECHA_HORA: true,
-                observacion: true,
-                Registro_Pago: { select: {
-                    Estado_Pago_Registro_Pago_id_estado_pago_nuevoToEstado_Pago: {
-                        select: { nombre_estado_pago: true },
-                    },
-                } },
-                Registro_Etapas: { select: {
-                    Estado_Pedido: { select: { nombre_etapa: true } },
-                } },
-                registro_subprocesos: { select: {
-                    Estado_Subprocesos: { select: { nombre_estado: true } },
-                } },
-            },
-        });
-        return records.map((record) => ({
-            id: record.ID_REGISTRO,
-            dateTime: record.FECHA_HORA,
-            detail: record.Registro_Pago
-                ? `Estado de pago: ${record.Registro_Pago.Estado_Pago_Registro_Pago_id_estado_pago_nuevoToEstado_Pago?.nombre_estado_pago ?? 'No informado'}`
-                : record.Registro_Etapas
-                    ? `Etapa del pedido: ${record.Registro_Etapas.Estado_Pedido?.nombre_etapa ?? 'No informada'}`
-                    : record.registro_subprocesos
-                        ? `Subproceso: ${record.registro_subprocesos.Estado_Subprocesos?.nombre_estado ?? 'No informado'}`
-                        : record.observacion?.trim() || 'Actividad del pedido',
-        }));
+    assertRecordsUser(idUsuario) {
+        if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
+            throw new UserRepositoryError("USER_NOT_FOUND", "Usuario no válido.");
+        }
+    }
+
+    async listRecentRecords(idUsuario, filters = {}) {
+        this.assertRecordsUser(idUsuario);
+        return (await this.client.$queryRaw(movementsQuery(idUsuario, filters))).map(mapMovement);
     }
 
     async listMovements(idUsuario, { page, perPage, search = '' }) {
-        const [records, total] = await Promise.all([
+        this.assertRecordsUser(idUsuario);
+        const [records, totals] = await Promise.all([
             this.listRecentRecords(idUsuario, { page, perPage, search }),
-            this.client.registros.count({ where: this.buildRecordsWhere(idUsuario, { search }) }),
+            this.client.$queryRaw(movementsCountQuery(idUsuario, { search })),
         ]);
-        return { records, total, page, perPage };
+        return { records, total: Number(totals[0].total), page, perPage };
     }
-
     async activateOnFirstAccess(identitySubject, role) {
         try {
             await this.client.usuario.updateMany({

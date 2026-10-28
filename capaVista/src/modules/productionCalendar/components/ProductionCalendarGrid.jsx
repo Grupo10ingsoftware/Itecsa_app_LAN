@@ -29,9 +29,11 @@ export default function ProductionCalendarGrid({
   const [detailError, setDetailError] = useState(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const detailRequest = useRef(0)
+  const active = useRef(false)
   useEffect(() => {
+    active.current = true
     const requests = detailRequest
-    return () => { requests.current++ }
+    return () => { active.current = false; requests.current++ }
   }, [])
   const [pendingChange, setPendingChange] = useState(null)
   const [isCredentialStepOpen, setIsCredentialStepOpen] = useState(false)
@@ -130,6 +132,7 @@ export default function ProductionCalendarGrid({
     if (!pendingChange) return
 
     await onChangeDeliveryDate?.(pendingChange.item.id, pendingChange.toDate, credentials)
+    if (!active.current) return
     setTransferItems((currentItems) =>
       currentItems.filter((item) => String(item.id) !== String(pendingChange.item.id)),
     )

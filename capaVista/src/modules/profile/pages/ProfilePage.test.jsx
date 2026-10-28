@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
 import { render } from '../../../test/renderWithToast'
 import { MemoryRouter } from 'react-router-dom'
 import ProfilePage from './ProfilePage.jsx'
@@ -15,6 +15,7 @@ vi.mock('../../users/components/UserMovementsModal', () => ({ default: () => nul
 beforeEach(() => {
   vi.resetAllMocks()
   mocks.auth.pinStatus = 'active'
+  mocks.auth.user = { sub: 'current', rolUsuario: 'Soporte' }
   mocks.outcome = null
   mocks.api.getProfile.mockResolvedValue({ email: null })
   mocks.api.revealPin.mockResolvedValue({ pin: '123456' })
@@ -65,4 +66,40 @@ it('cancelled callback returns to profile with message and without PIN modal', a
   await screen.findByText('La recuperación fue cancelada.')
   expect(screen.queryByRole('dialog')).toBeNull()
   expect(mocks.api.revealPin).not.toHaveBeenCalled()
+})
+
+it('late personal data from another account cannot replace the current profile', async () => {
+  let resolve
+  mocks.api.getProfile.mockReturnValueOnce(new Promise(done => { resolve = done }))
+  const view = show()
+  mocks.auth.user = { sub: 'other', primerNombre: 'Cuenta actual' }
+  mocks.api.getProfile.mockResolvedValue({ primerNombre: 'Cuenta actual', email: null })
+  view.rerender(<MemoryRouter><ProfilePage /></MemoryRouter>)
+  await act(async () => resolve({ primerNombre: 'CUENTA ANTERIOR', email: 'previous@example.invalid' }))
+  expect(screen.queryByText('CUENTA ANTERIOR')).toBeNull()
+  expect(screen.queryByText('previous@example.invalid')).toBeNull()
+})
+
+it('leaving pending reception clears its secret even when the same account becomes pending again', async () => {
+  mocks.auth.pinStatus = 'pending_acknowledgement'
+  const view = show(); await screen.findByText('123456')
+  mocks.auth.pinStatus = 'active'; view.rerender(<MemoryRouter><ProfilePage /></MemoryRouter>)
+  expect(screen.queryByText('123456')).toBeNull()
+  mocks.auth.pinStatus = 'pending_acknowledgement'
+  mocks.api.revealPin.mockReturnValue(new Promise(() => {}))
+  view.rerender(<MemoryRouter><ProfilePage /></MemoryRouter>)
+  expect(screen.queryByText('123456')).toBeNull()
+})
+
+it('a new API session for the same subject removes the old PIN before its read finishes', async () => {
+  mocks.auth.pinStatus = 'pending_acknowledgement'
+  const original = mocks.api
+  const view = show(); await screen.findByText('123456')
+  try {
+    mocks.api = { ...original, getProfile: vi.fn().mockResolvedValue({ email: null }), revealPin: vi.fn().mockReturnValue(new Promise(() => {})) }
+    view.rerender(<MemoryRouter><ProfilePage /></MemoryRouter>)
+    expect(screen.queryByText('123456')).toBeNull()
+    await act(async () => {})
+    expect(mocks.api.revealPin).toHaveBeenCalledOnce()
+  } finally { mocks.api = original }
 })

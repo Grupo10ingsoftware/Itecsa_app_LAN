@@ -1,10 +1,11 @@
 .page { color: #111827; }
+.resultCount { background: var(--page-brand-orange); border-radius: 999px; color: #111827; padding: .65rem 1rem; }
 .panel { border-radius: 0 0 var(--page-radius) var(--page-radius); overflow: hidden; }
 .statusFilters { display: flex; flex-wrap: wrap; gap: .5rem; padding: 1rem 1.25rem .25rem; }
 .statusFilters button { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 999px; color: #475569; font-size: .82rem; font-weight: 800; padding: .48rem .8rem; }
 .statusFilters button:hover, .statusFilters .activeFilter { background: #111827; border-color: #111827; color: #fff; }
 .search { align-items: center; display: flex; gap: .65rem; padding: .75rem 1.25rem 1rem; }
-.search input { border: 1px solid #dbe1e8; border-radius: .75rem; flex: 1; min-height: 2.7rem; padding: 0 .85rem; }
+.search input { border: 1px solid #dbe1e8; border-radius: .75rem; flex: 1; min-width: 0; min-height: 2.7rem; padding: 0 .85rem; }
 .search button, .pagination button { background: #111827; border: 0; border-radius: .7rem; color: #fff; font-weight: 800; min-height: 2.5rem; padding: .5rem .9rem; }
 .dateFilters { align-items: end; border-top: 1px solid #f1f5f9; display: flex; flex-wrap: wrap; gap: .75rem; padding: 0 1.25rem 1rem; }
 .dateFilters label { color: #475569; display: grid; font-size: .78rem; font-weight: 800; gap: .3rem; }
@@ -20,6 +21,6 @@
 .detailButton:hover { color: #ea580c; }
 .state { color: #64748b; font-weight: 750; padding: 3rem; text-align: center; }
 .error { background: #fff1f2; color: #be123c; margin: 1rem 1.25rem; padding: .85rem; }
-.pagination { align-items: center; border-top: 1px solid #e5e7eb; display: flex; gap: 1rem; justify-content: flex-end; padding: 1rem 1.25rem; }
+.pagination { align-items: center; border-top: 1px solid #e5e7eb; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: flex-end; padding: 1rem 1.25rem; }
 .pagination button:disabled { background: #cbd5e1; }
 @media (max-width: 700px) { .search { align-items: stretch; flex-wrap: wrap; } .search input { width: calc(100% - 2rem); } }

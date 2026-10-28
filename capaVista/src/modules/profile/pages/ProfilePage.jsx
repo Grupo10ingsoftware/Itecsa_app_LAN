@@ -1,4 +1,4 @@
-import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { beginPinRecovery, getPinRecoveryOutcome, clearPinRecoveryOutcome } from '../../auth/pinRecoveryBrowser'
 import { useAuth } from '../../../hooks/useAuth'
@@ -12,8 +12,8 @@ import { displayUserStatus, isActiveUserStatus } from '../../../config/userLifec
 import UserMovementsModal from '../../users/components/UserMovementsModal'
 import UserMovementsTable from '../../users/components/UserMovementsTable'
 import confirmationStyles from '../../../shared/styles/ConfirmationModal.module.css'
-import PinModal, { PinError } from '../../../shared/components/pin/PinModal'
-import pinStyles from '../../../shared/components/pin/PinModal.module.css'
+import PendingPinModal from '../components/PendingPinModal'
+
 import { useToast } from '../../../shared/notifications/useToast'
 
 function getDisplayValue(value, fallback = 'No informado') {
@@ -22,23 +22,26 @@ function getDisplayValue(value, fallback = 'No informado') {
 
 export default function ProfilePage() {
   const { user } = useAuth()
-  return <ProfileContent key={user?.sub ?? ''} />
+  const api = useAuthApi()
+  return <ProfileContent key={profileScope(api, user?.sub)} authApi={api} />
 }
 
-function ProfileContent() {
+const scopes = new WeakMap()
+let nextScope = 0
+function profileScope(api, subject) {
+  if (!scopes.has(api)) scopes.set(api, ++nextScope)
+  return [scopes.get(api), subject].join(':')
+}
+
+function ProfileContent({ authApi }) {
   const notify = useToast()
   const { identityUser, pinStatus, refreshSession, user, provider } = useAuth()
-  const authApi = useAuthApi()
   const recoveryTask = useRef(null)
-  const acknowledgementPending = useRef(false)
-  const acknowledged = useRef(false)
-  const [pinAcknowledged, setPinAcknowledged] = useState(false)
-  const active = useRef(false)
-  useEffect(() => { active.current = true; return () => { active.current = false } }, [])
+
   const [recoveryVerified, setRecoveryVerified] = useState(() => getPinRecoveryOutcome(user?.sub)?.recovered ?? false)
   useEffect(() => () => { recoveryTask.current?.cancel(); recoveryTask.current = null }, [user?.sub])
   const [historyOpen, setHistoryOpen] = useState(false)
-  const historyApi = useMemo(() => ({ getMovements: (_subject, query) => authApi.getProfileMovements(query) }), [authApi])
+  const historyApi = useMemo(() => ({ getMovements: (_subject, query, options) => authApi.getProfileMovements(query, options) }), [authApi])
   const historyUser = { idUsuarioAutenticacionExterna: user?.sub }
   const [profileData, setProfileData] = useState(null)
   const [profileAttempt, setProfileAttempt] = useState(0)
@@ -55,7 +58,7 @@ function ProfileContent() {
   const profileCurrent = profileData?.subject === user?.sub && profileData?.api === authApi && profileData?.attempt === profileAttempt
   const loadedProfile = profileCurrent ? profileData?.data : null
   const profileError = profileCurrent ? profileData?.error : ''
-  const [visiblePin, setVisiblePin] = useState('')
+
   const [pinError, setPinError] = useState(() => getPinRecoveryOutcome(user?.sub)?.message ?? '')
   const [isPinBusy, setIsPinBusy] = useState(false)
   const [recoveryOpen, setRecoveryOpen] = useState(false)
@@ -76,45 +79,6 @@ function ProfileContent() {
       picture: identityUser?.picture,
     }
   }, [identityUser, user, loadedProfile])
-
-  useEffect(() => {
-    if (pinStatus !== 'pending_acknowledgement' || visiblePin || acknowledged.current) return
-
-    let current = true
-    authApi.revealPin()
-      .then(({ pin }) => {
-        if (current) { setPinError(''); setVisiblePin(pin) }
-      })
-      .catch((error) => {
-        if (current) setPinError(error?.payload?.message ?? 'No fue posible mostrar el PIN.')
-      })
-
-    return () => {
-      current = false
-    }
-  }, [authApi, pinStatus, visiblePin])
-
-  async function acknowledgePin() {
-    if (acknowledgementPending.current) return
-    acknowledgementPending.current = true
-    setIsPinBusy(true)
-    setPinError('')
-
-    try {
-      if (!acknowledged.current) await authApi.acknowledgePin()
-      if (!active.current) return
-      acknowledged.current = true
-      setPinAcknowledged(true)
-      if (recoveryVerified) { notify.success('Tu PIN se ha actualizado correctamente'); setRecoveryVerified(false); clearPinRecoveryOutcome() }
-      setVisiblePin('')
-      await refreshSession()
-    } catch (error) {
-      if (active.current) setPinError(error?.payload?.message ?? 'No fue posible confirmar la recepcion del PIN.')
-    } finally {
-      acknowledgementPending.current = false
-      if (active.current) setIsPinBusy(false)
-    }
-  }
 
   async function recoverPin() {
     if (recoveryTask.current || isPinBusy) return
@@ -220,20 +184,14 @@ function ProfileContent() {
         user={historyUser} api={historyApi} onClose={() => setHistoryOpen(false)} title="Historial completo"
         description="Consulta el registro completo de movimientos de tu cuenta." />}
 
-      {pinStatus === 'pending_acknowledgement' && (
-        <PinModal title="Tu PIN personal" canClose={false} busy={isPinBusy}
-          description="Guardalo en un lugar seguro. Despues de aceptar no volvera a mostrarse."
-          actions={<button className={pinStyles.primary} disabled={(!visiblePin && !pinAcknowledged) || isPinBusy}
-            onClick={acknowledgePin} type="button" aria-busy={isPinBusy}>
-            <LoadingAction busy={isPinBusy} surface="light" context="Aceptar">{pinAcknowledged ? 'Continuar' : 'Aceptar'}</LoadingAction>
-          </button>}>
-          <div className={pinStyles.secret}>
-            {visiblePin || (pinAcknowledged ? 'PIN aceptado' : pinError ? 'PIN no disponible' : <LoadingIndicator scope="action" context="PIN operativo" />)}
-          </div>
-          <PinError>{pinError}</PinError>
-        </PinModal>
-      )}
-
+      {pinStatus === 'pending_acknowledgement' && <PendingPinModal api={authApi} refreshSession={refreshSession}
+        onAcknowledged={() => {
+          if (recoveryVerified) {
+            notify.success('Tu PIN se ha actualizado correctamente')
+            setRecoveryVerified(false)
+            clearPinRecoveryOutcome()
+          }
+        }} />}
       {recoveryOpen && (
         <>
           <div className="modal d-block" role="dialog" aria-modal="true" aria-labelledby="pin-recovery-title">

@@ -8,11 +8,12 @@ function queryString(params = {}) {
 }
 
 export function createOrderHistoryApi(apiClient) {
+  const read = (path, { signal, ...params } = {}) => apiClient.get(`${path}${queryString(params)}`, { signal })
   return {
-    listOrders: (params) => apiClient.get(`/history/orders${queryString(params)}`),
+    listOrders: (params) => read('/history/orders', params),
     getOrderHistory: (orderId, params = {}) =>
-      apiClient.get(`/history/orders/${orderId}${queryString(params)}`),
+      read(`/history/orders/${orderId}`, params),
     listOrderEvents: (orderId, params = {}) =>
-      apiClient.get(`/history/orders/${orderId}/events${queryString(params)}`),
+      read(`/history/orders/${orderId}/events`, params),
   }
 }

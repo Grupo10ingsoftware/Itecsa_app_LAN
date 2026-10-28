@@ -1,7 +1,10 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createKeycloakSession, safeReturnPath } from './keycloakSession.js'
+import { scheduleSessionRevalidation } from './sessionRevalidation.js'
 
-function setup(authenticated = false) {
+afterEach(() => vi.useRealTimers())
+
+function setup(authenticated = false, options) {
   const keycloak = {
     authenticated, token: authenticated ? 'access-token' : undefined,
     idToken: authenticated ? 'id-token' : undefined,
@@ -23,11 +26,103 @@ function setup(authenticated = false) {
     sessionStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value), removeItem: key => storage.delete(key) },
   }
   const onRedirect = vi.fn()
-  const session = createKeycloakSession(keycloak, browser, onRedirect)
+  const session = createKeycloakSession(keycloak, browser, onRedirect, undefined, options)
   return { session, keycloak, browser, storage, onRedirect }
 }
 
 describe('Keycloak navigation and session lifecycle', () => {
+  it('renews access tokens without invalidating the view before 30 minutes', async () => {
+    let clock = 0
+    const { session, keycloak } = setup(true, { now: () => clock })
+    await session.init()
+    const initial = session.getSnapshot()
+    keycloak.updateToken.mockResolvedValue(true)
+    for (const elapsed of [60_000, 300_000, 1_799_999]) {
+      clock = elapsed
+      keycloak.tokenParsed = { ...keycloak.tokenParsed, iat: elapsed, exp: elapsed + 300_000, jti: String(elapsed) }
+      await session.getAccessToken()
+      expect(session.getSnapshot().verificationKey).toBe(initial.verificationKey)
+      expect(session.getSnapshot().sessionKey).toBe(initial.sessionKey)
+      expect(session.getSnapshot().isAuthenticated).toBe(true)
+    }
+    expect(keycloak.updateToken).toHaveBeenCalledTimes(3)
+  })
+
+  it('revalidates at the 30-minute boundary without duplicating a renewal-triggered check', async () => {
+    let clock = 0
+    const { session, keycloak } = setup(true, { now: () => clock })
+    await session.init()
+    const key = session.getSnapshot().verificationKey
+    clock = 1_799_999
+    await session.revalidate()
+    expect(session.getSnapshot().verificationKey).toBe(key)
+    clock++
+    keycloak.updateToken.mockResolvedValue(true)
+    await session.getAccessToken()
+    expect(session.getSnapshot().verificationKey).toBe(key + 1)
+    await session.revalidate()
+    expect(session.getSnapshot().verificationKey).toBe(key + 1)
+    expect(session.getRevalidationDelay()).toBe(1_800_000)
+  })
+
+  it('schedules a check after 30 minutes even when no API call renews the token', async () => {
+    vi.useFakeTimers()
+    const { session, keycloak } = setup(true)
+    await session.init()
+    const key = session.getSnapshot().verificationKey
+    const stop = scheduleSessionRevalidation(session, window)
+    await vi.advanceTimersByTimeAsync(1_799_999)
+    expect(keycloak.updateToken).not.toHaveBeenCalled()
+    await vi.advanceTimersByTimeAsync(1)
+    expect(session.getSnapshot().verificationKey).toBe(key + 1)
+    stop()
+    await vi.advanceTimersByTimeAsync(1_800_000)
+    expect(session.getSnapshot().verificationKey).toBe(key + 1)
+  })
+
+  it('immediately revalidates authorization changes while ignoring role order', async () => {
+    let clock = 0
+    const { session, keycloak } = setup(true, { now: () => clock })
+    keycloak.tokenParsed.permissions = ['read', 'write']
+    keycloak.tokenParsed.resource_access = { api: { roles: ['A', 'B'] } }
+    await session.init()
+    const key = session.getSnapshot().verificationKey
+    clock = 1000
+    keycloak.updateToken.mockResolvedValue(true)
+    keycloak.tokenParsed = { ...keycloak.tokenParsed, permissions: ['write', 'read'], resource_access: { api: { roles: ['B', 'A'] } } }
+    await session.getAccessToken()
+    expect(session.getSnapshot().verificationKey).toBe(key)
+    keycloak.tokenParsed.permissions = ['read']
+    await session.getAccessToken()
+    expect(session.getSnapshot().verificationKey).toBe(key + 1)
+  })
+
+  it('an overdue timer follows a recent authorization change instead of revalidating twice', async () => {
+    vi.useFakeTimers()
+    const { session, keycloak } = setup(true)
+    await session.init()
+    const key = session.getSnapshot().verificationKey
+    const stop = scheduleSessionRevalidation(session, window)
+    await vi.advanceTimersByTimeAsync(1_500_000)
+    keycloak.updateToken.mockResolvedValue(true)
+    keycloak.tokenParsed.permissions = ['changed']
+    await session.getAccessToken()
+    expect(session.getSnapshot().verificationKey).toBe(key + 1)
+    await vi.advanceTimersByTimeAsync(300_000)
+    expect(session.getSnapshot().verificationKey).toBe(key + 1)
+    await vi.advanceTimersByTimeAsync(1_500_000)
+    expect(session.getSnapshot().verificationKey).toBe(key + 2)
+    stop()
+  })
+
+  it('restoring browser history still revalidates immediately inside the 30-minute window', async () => {
+    const { session } = setup(true)
+    await session.init()
+    const key = session.getSnapshot().verificationKey
+    await session.resume()
+    expect(session.getSnapshot().verificationKey).toBe(key + 1)
+    expect(session.getSnapshot().isLoading).toBe(false)
+  })
   it('initializes once and preserves PKCE and session monitoring', async () => {
     const { session, keycloak } = setup()
     await Promise.all([session.init(), session.init()])

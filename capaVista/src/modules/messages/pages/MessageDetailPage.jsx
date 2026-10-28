@@ -11,6 +11,10 @@ import PageHeader from '../../../shared/components/layout/PageHeader'
 export default function MessageDetailPage() {
   const { messageId } = useParams()
   const api = useMessagesApi()
+  return <DetailSession key={api.scopeId + ":" + messageId} api={api} messageId={messageId} />
+}
+
+function DetailSession({ api, messageId }) {
   const [message, setMessage] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -22,17 +26,16 @@ export default function MessageDetailPage() {
     setError('')
 
     try {
-      let response = await api.getMessage(messageId)
+      const result = await api.openMessage(messageId)
       if (id !== requestId.current) return
-
-      if (!response.leido) {
-        response = await api.markAsRead(messageId)
-        notifyMessagesChanged()
-      }
+      if (Number(result?.message?.id_mensaje) !== Number(messageId)) throw new Error('Respuesta de mensaje no valida')
+      const response = result.message
+      if (result.markedAsRead) notifyMessagesChanged()
 
       if (id === requestId.current) setMessage(response)
     } catch (requestError) {
       if (id !== requestId.current) return
+      setMessage(null)
       setError(requestError?.status === 404 ? 'El mensaje no existe o no te pertenece.' : 'No fue posible cargar el mensaje.')
     } finally {
       if (id === requestId.current) setIsLoading(false)
@@ -72,7 +75,7 @@ export default function MessageDetailPage() {
                 <h2>{message.Asunto}</h2>
                 <time dateTime={message.fecha_publicacion}>{formatMessageDate(message.fecha_publicacion)}</time>
               </div>
-              <span className={styles.readBadge}><i className="bi bi-check2-all" aria-hidden="true" /> Leído</span>
+              <span className={styles.readBadge}><i className="bi bi-check2-all" aria-hidden="true" /> {message.leido ? 'Leído' : 'Sin leer'}</span>
             </header>
 
             <div className={styles.content}>{message.contenido}</div>

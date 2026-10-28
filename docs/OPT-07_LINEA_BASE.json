@@ -1,0 +1,206 @@
+{
+  "reference": "51a4d89",
+  "node": "v24.19.0",
+  "capturedAt": "2026-10-27T21:29:00.806Z",
+  "methodology": "5 warm sequential samples, 250ms pauses, strict TLS/pool10. Service only, no E2E claim; query durations overlap in parallel branches.",
+  "samples": {
+    "summary_before": {
+      "medianMs": 1982.382,
+      "samples": [
+        {
+          "ms": 2158.264,
+          "selects": 15,
+          "bytes": 3799,
+          "driverMs": [
+            429.28499999999985,
+            437.7629999999999,
+            439.6764000000003,
+            657.9697000000006,
+            429.1966999999995,
+            448.47959999999966,
+            442.3629000000001,
+            658.2053999999998,
+            849.6450999999997,
+            876.0472,
+            662.7710000000006,
+            551.6682000000001,
+            438.40929999999935,
+            428.9547999999995,
+            439.03709999999955
+          ]
+        },
+        {
+          "ms": 1944.515,
+          "selects": 15,
+          "bytes": 3799,
+          "driverMs": [
+            641.8575999999994,
+            657.3635999999988,
+            658.583700000001,
+            662.5906999999988,
+            428.116,
+            438.9503999999997,
+            439.72310000000107,
+            445.90430000000015,
+            572.0292000000009,
+            656.7152999999998,
+            826.9063999999998,
+            428.78439999999864,
+            438.08150000000023,
+            440.8654000000006,
+            442.6352999999999
+          ]
+        },
+        {
+          "ms": 1953.461,
+          "selects": 15,
+          "bytes": 3799,
+          "driverMs": [
+            572.5854000000018,
+            642.0742999999984,
+            658.3546999999999,
+            659.1388999999999,
+            381.96219999999994,
+            441.0766000000003,
+            428.58160000000134,
+            437.47160000000076,
+            656.5071000000007,
+            659.500399999999,
+            662.4647999999997,
+            382.22890000000007,
+            439.5426000000007,
+            439.2542999999987,
+            427.91179999999986
+          ]
+        },
+        {
+          "ms": 1982.382,
+          "selects": 15,
+          "bytes": 3799,
+          "driverMs": [
+            657.5722000000005,
+            658.050299999999,
+            659.5051999999996,
+            660.7453000000005,
+            428.34569999999985,
+            437.47609999999986,
+            566.5859,
+            570.3791000000001,
+            641.9526999999998,
+            658.7546000000002,
+            659.7917999999991,
+            438.71720000000096,
+            440.29409999999916,
+            427.78889999999956,
+            661.1267000000007
+          ]
+        },
+        {
+          "ms": 2528.378,
+          "selects": 15,
+          "bytes": 3799,
+          "driverMs": [
+            566.6247999999996,
+            572.402399999999,
+            641.466699999999,
+            656.7066999999988,
+            377.40669999999955,
+            658.0616000000009,
+            656.4161999999997,
+            658.3123000000014,
+            642.2227000000003,
+            659.927099999999,
+            661.253200000001,
+            569.9652999999998,
+            641.253999999999,
+            656.4998000000014,
+            566.4399999999987
+          ]
+        }
+      ],
+      "sql": [
+        "SELECT `Registro_Etapas`.`id_registro`, `Registro_Etapas`.`fecha_hora_entrada`, `Registro_Etapas`.`fecha_hora_salida`, `Registro_Etapas`.`id_estado_pedido` FROM `Registro_Etapas` WHERE (`Registro_Etapas`.`fecha_hora_entrada` >= ? AND `Registro_Etapas`.`fecha_hora_entrada` < ? AND `Registro_Etapas`.`fecha_hora_salida` IS NOT NULL)",
+        "SELECT `registro_subprocesos`.`id_registro`, `registro_subprocesos`.`fecha_hora_entrada`, `registro_subprocesos`.`fecha_hora_salida`, `registro_subprocesos`.`id_estado_subproceso`, `registro_subprocesos`.`id_detalle_pedido` FROM `registro_subprocesos` WHERE (`registro_subprocesos`.`fecha_hora_entrada` >= ? AND `registro_subprocesos`.`fecha_hora_entrada` < ? AND `registro_subprocesos`.`fecha_hora_salida` IS NOT NULL)",
+        "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`numero_nota_venta`, `Pedidos`.`fecha_creacion`, `Pedidos`.`fecha_estimada_termino`, `Pedidos`.`id_usuario` FROM `Pedidos` WHERE (`Pedidos`.`fecha_creacion` >= ? AND `Pedidos`.`fecha_creacion` < ?) ORDER BY `Pedidos`.`fecha_creacion` ASC",
+        "SELECT `Detalle_pedido`.`id_detalle_pedido`, `Detalle_pedido`.`cantidad`, `Detalle_pedido`.`id_tipo_producto` FROM `Detalle_pedido` WHERE (`Detalle_pedido`.`fecha_real_termino` >= ? AND `Detalle_pedido`.`fecha_real_termino` < ?)",
+        "SELECT `Tipo_Producto`.`id_tipo_producto`, `Tipo_Producto`.`nombre_producto` FROM `Tipo_Producto` WHERE `Tipo_Producto`.`id_tipo_producto` IN (?,?,?)",
+        "SELECT `Estado_Pedido`.`id_estado_pedido`, `Estado_Pedido`.`nombre_etapa` FROM `Estado_Pedido` WHERE `Estado_Pedido`.`id_estado_pedido` IN (?,?,?,?,?,?,?,?,?,?)",
+        "SELECT `Detalle_pedido`.`id_detalle_pedido`, `Detalle_pedido`.`id_tipo_producto` FROM `Detalle_pedido` WHERE `Detalle_pedido`.`id_detalle_pedido` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "SELECT `Estado_Subprocesos`.`id_estado_subproceso`, `Estado_Subprocesos`.`nombre_estado` FROM `Estado_Subprocesos` WHERE `Estado_Subprocesos`.`id_estado_subproceso` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "SELECT `Detalle_pedido`.`id_detalle_pedido`, `Detalle_pedido`.`cantidad`, `Detalle_pedido`.`fecha_estimada_termino`, `Detalle_pedido`.`fecha_real_termino`, `Detalle_pedido`.`id_tipo_producto`, `Detalle_pedido`.`id_pedido` FROM `Detalle_pedido` WHERE `Detalle_pedido`.`id_pedido` IN (?,?,?,?,?,?,?,?,?)",
+        "SELECT `Usuario`.`id_usuario`, `Usuario`.`nombre_usuario`, `Usuario`.`apellido_usuario` FROM `Usuario` WHERE `Usuario`.`id_usuario` IN (?,?,?,?,?,?,?,?,?)",
+        "SELECT `Registros`.`ID_REGISTRO`, `Registros`.`FECHA_HORA`, `Registros`.`id_pedido` FROM `Registros` WHERE `Registros`.`id_pedido` IN (?,?,?,?,?,?,?,?,?) ORDER BY `Registros`.`FECHA_HORA` ASC",
+        "SELECT `Tipo_Producto`.`id_tipo_producto`, `Tipo_Producto`.`nombre_producto` FROM `Tipo_Producto` WHERE `Tipo_Producto`.`id_tipo_producto` IN (?,?,?,?,?,?)",
+        "SELECT `Tipo_Producto`.`id_tipo_producto`, `Tipo_Producto`.`nombre_producto` FROM `Tipo_Producto` WHERE `Tipo_Producto`.`id_tipo_producto` IN (?,?,?,?,?,?,?,?,?,?)",
+        "SELECT `Registro_Etapas`.`id_registro`, `Registro_Etapas`.`fecha_hora_entrada`, `Registro_Etapas`.`id_estado_pedido` FROM `Registro_Etapas` WHERE `Registro_Etapas`.`id_registro` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "SELECT `Estado_Pedido`.`id_estado_pedido`, `Estado_Pedido`.`nombre_etapa` FROM `Estado_Pedido` WHERE `Estado_Pedido`.`id_estado_pedido` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+      ]
+    },
+    "productionPerformance_before": {
+      "medianMs": 1928.631,
+      "samples": [
+        {
+          "ms": 1966.189,
+          "selects": 3,
+          "bytes": 124,
+          "driverMs": [
+            643.4183999999987,
+            659.5635999999977,
+            661.8015999999989
+          ]
+        },
+        {
+          "ms": 1893.076,
+          "selects": 3,
+          "bytes": 124,
+          "driverMs": [
+            571.9036999999989,
+            644.3091999999997,
+            675.3221000000012
+          ]
+        },
+        {
+          "ms": 1928.631,
+          "selects": 3,
+          "bytes": 124,
+          "driverMs": [
+            577.2589999999982,
+            677.5298000000003,
+            671.6824000000015
+          ]
+        },
+        {
+          "ms": 1987.263,
+          "selects": 3,
+          "bytes": 124,
+          "driverMs": [
+            668.2906000000003,
+            648.2474000000002,
+            668.8816000000006
+          ]
+        },
+        {
+          "ms": 1904.842,
+          "selects": 3,
+          "bytes": 124,
+          "driverMs": [
+            672.317500000001,
+            582.3742999999995,
+            648.1031999999977
+          ]
+        }
+      ],
+      "sql": [
+        "SELECT `Pedidos`.`id_pedido`, `Pedidos`.`fecha_estimada_termino` FROM `Pedidos` WHERE EXISTS(SELECT `t0`.`id_pedido` FROM `Registros` AS `t0` LEFT JOIN `Registro_Etapas` AS `j1` ON (`j1`.`id_registro`) = (`t0`.`ID_REGISTRO`) LEFT JOIN `Estado_Pedido` AS `j2` ON (`j2`.`id_estado_pedido`) = (`j1`.`id_estado_pedido`) WHERE ((`j2`.`nombre_etapa` = ? AND (`j2`.`id_estado_pedido` IS NOT NULL)) AND `j1`.`fecha_hora_entrada` >= ? AND `j1`.`fecha_hora_entrada` < ? AND (`j1`.`id_registro` IS NOT NULL) AND (`Pedidos`.`id_pedido`) = (`t0`.`id_pedido`) AND `t0`.`id_pedido` IS NOT NULL))",
+        "SELECT `Registros`.`ID_REGISTRO`, `Registros`.`id_pedido` FROM `Registros` LEFT JOIN `Registro_Etapas` AS `orderby_1` ON (`orderby_1`.`id_registro`) = (`Registros`.`ID_REGISTRO`) LEFT JOIN `Registro_Etapas` AS `j3` ON (`j3`.`id_registro`) = (`Registros`.`ID_REGISTRO`) LEFT JOIN `Estado_Pedido` AS `j4` ON (`j4`.`id_estado_pedido`) = (`j3`.`id_estado_pedido`) WHERE (((`j4`.`nombre_etapa` = ? AND (`j4`.`id_estado_pedido` IS NOT NULL)) AND `j3`.`fecha_hora_entrada` IS NOT NULL AND (`j3`.`id_registro` IS NOT NULL)) AND `Registros`.`id_pedido` IN (?,?,?)) ORDER BY `orderby_1`.`fecha_hora_entrada` DESC, `Registros`.`ID_REGISTRO` DESC",
+        "SELECT `Registro_Etapas`.`id_registro`, `Registro_Etapas`.`fecha_hora_entrada` FROM `Registro_Etapas` WHERE `Registro_Etapas`.`id_registro` IN (?,?,?)"
+      ]
+    }
+  },
+  "equivalence": [],
+  "explain": [],
+  "period": {
+    "from": "2026-10-01",
+    "to": "2026-10-31"
+  }
+}

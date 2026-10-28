@@ -196,7 +196,7 @@ export async function cancelProductionOperation(service, orderId, comment, { act
   });
 }
 
-export async function updateDeliveryDateOperation(service, orderId, dueDate, { actor } = {}) {
+export async function updateDeliveryDateOperation(service, orderId, dueDate, { actor, response } = {}) {
   if (!orderId) {
     const error = new AppError(400, "El ID del pedido es obligatorio");
     throw error;
@@ -209,7 +209,8 @@ export async function updateDeliveryDateOperation(service, orderId, dueDate, { a
 
   const parsedDate = toPrismaDate(dueDate);
 
-  if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
+  if (typeof dueDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate) ||
+      !parsedDate || Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== dueDate) {
     const error = new AppError(400, "La fecha de entrega no es valida.");
     throw error;
   }
@@ -225,17 +226,20 @@ export async function updateDeliveryDateOperation(service, orderId, dueDate, { a
   }
 
   const formattedDate = dueDate.split("-").reverse().join("-");
-  const updatedOrder = await service.repo.updateDeliveryDate(orderId, parsedDate, {
-    userId: actor.idUsuario,
-    comment: `Fecha de termino definida para ${formattedDate}.`,
+  return service.runInTransaction(async ({ repo }) => {
+    const updatedOrder = await repo.updateDeliveryDate(orderId, parsedDate, {
+      userId: actor.idUsuario,
+      comment: `Fecha de termino definida para ${formattedDate}.`,
+      hydrate: response !== 'receipt',
+    });
+
+    if (!updatedOrder) {
+      const error = new AppError(404, "Pedido no encontrado", "ORDER_NOT_FOUND");
+      throw error;
+    }
+
+    return updatedOrder;
   });
-
-  if (!updatedOrder) {
-    const error = new AppError(404, "Pedido no encontrado", "ORDER_NOT_FOUND");
-    throw error;
-  }
-
-  return updatedOrder;
 }
 
 export async function completeSubprocessOperation(service, orderId, detailId, subprocessId, { actor, comment, response } = {}) {

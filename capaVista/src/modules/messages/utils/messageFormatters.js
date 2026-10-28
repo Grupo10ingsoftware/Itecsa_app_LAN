@@ -20,3 +20,9 @@ export function messagePreview(content, maxLength = 110) {
 export function notifyMessagesChanged() {
   window.dispatchEvent(new CustomEvent('messages:changed'))
 }
+
+export function notificationPreview(message) {
+  // Compact and legacy responses display exactly the existing preview suffix.
+  return message.preview === undefined ? messagePreview(message.contenido, 82)
+    : message.preview + (message.truncated ? '\u2026' : '')
+}
