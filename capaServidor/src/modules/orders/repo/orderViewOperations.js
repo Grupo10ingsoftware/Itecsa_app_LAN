@@ -114,6 +114,8 @@ function mapKanbanCommentGroups(row) {
 export async function listOrderViewsOperation(repository, { view, limit, cursor, status, search, productType, from, to, unscheduled = false }) {
   if (view === 'kanban') return (await listKanbanRows(repository.client,
     { limit, cursor, status, search, productType, from, to })).map(mapKanbanSummary);
+  if (view === 'calendar') return (await listKanbanRows(repository.client,
+    { limit, cursor, status, search, productType, from, to, calendar: true, unscheduled })).map(mapCalendarSummary);
   const where = {
     ...(cursor ? { id_pedido: { lt: cursor.id } } : {}),
     ...(view === 'kanban'

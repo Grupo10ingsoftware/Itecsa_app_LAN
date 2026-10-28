@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import CalendarFilters from '../components/CalendarFilters'
 import CalendarHeader from '../components/CalendarHeader'
 import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
@@ -8,6 +8,7 @@ import { useOrdersCalendarApi } from '../hooks/useOrdersCalendarApi'
 import { loadCalendarMonth, loadUnscheduledOrders } from '../api/ordersCalendarApi'
 import { getCalendarOrderQuantity, getCalendarOrderStatus } from '../utils/calendarOrder'
 import styles from './ProductionCalendarPage.module.css'
+import { calendarScope, mergeCalendarCollections, reconcileCalendarRead } from '../utils/calendarReads'
 
 const DEFAULT_FILTERS = Object.freeze({
   search: '',
@@ -72,6 +73,13 @@ function normalizeCalendarOrder(order) {
 
 export default function ProductionCalendarPage() {
   const ordersCalendarApi = useOrdersCalendarApi()
+  return <CalendarContent key={calendarScope(ordersCalendarApi)} ordersCalendarApi={ordersCalendarApi} />
+}
+
+function CalendarContent({ ordersCalendarApi }) {
+  const active = useRef(false)
+  const pendingReads = useRef(new Set())
+  useEffect(() => { active.current = true; return () => { active.current = false } }, [])
   const [calendarItems, setCalendarItems] = useState([])
   const [unscheduledItems, setUnscheduledItems] = useState([])
   const [monthDate, setMonthDate] = useState(() => {
@@ -80,6 +88,8 @@ export default function ProductionCalendarPage() {
     return new Date(today.getFullYear(), today.getMonth(), 1)
   })
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
+  const currentMonth = useRef(monthDate)
+  useEffect(() => { currentMonth.current = monthDate }, [monthDate])
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
   const [loadError, setLoadError] = useState(null)
   const [draggedItemId, setDraggedItemId] = useState(null)
@@ -89,24 +99,29 @@ export default function ProductionCalendarPage() {
 
   useEffect(() => {
     let isMounted = true
+    const controller = new AbortController()
+    const read = { overrides: new Map(), range: monthRange(monthDate) }
+    const reads = pendingReads.current
+    reads.add(read)
 
     async function loadOrders() {
       try {
         setLoadError(null)
-        const orders = await loadCalendarMonth(ordersCalendarApi, monthRange(monthDate), () => isMounted)
+        const orders = await loadCalendarMonth(ordersCalendarApi, read.range, () => isMounted, { signal: controller.signal })
 
         if (isMounted) {
-          setCalendarItems(Array.isArray(orders)
+          setCalendarItems(reconcileCalendarRead(Array.isArray(orders)
             ? orders
                 .filter((order) => order?.salesNoteNumber)
                 .map(normalizeCalendarOrder)
-            : [])
+            : [], read.overrides, read.range))
         }
       } catch {
         if (isMounted) {
           setLoadError('No fue posible cargar los pedidos compartidos del calendario.')
         }
       } finally {
+        reads.delete(read)
         if (isMounted) setLoadedMonth(monthDate)
       }
     }
@@ -115,20 +130,26 @@ export default function ProductionCalendarPage() {
 
     return () => {
       isMounted = false
+      reads.delete(read)
+      controller.abort()
     }
   }, [monthDate, ordersCalendarApi])
 
   useEffect(() => {
     let isMounted = true
-    loadUnscheduledOrders(ordersCalendarApi, () => isMounted)
+    const controller = new AbortController()
+    const read = { overrides: new Map(), range: { unscheduled: true } }
+    const reads = pendingReads.current
+    reads.add(read)
+    loadUnscheduledOrders(ordersCalendarApi, () => isMounted, { signal: controller.signal })
       .then((orders) => {
-        if (isMounted) setUnscheduledItems(orders.filter((order) => order?.salesNoteNumber).map(normalizeCalendarOrder))
+        if (isMounted) setUnscheduledItems(reconcileCalendarRead(orders.filter((order) => order?.salesNoteNumber).map(normalizeCalendarOrder), read.overrides, read.range))
       })
       .catch(() => {
         if (isMounted) setLoadError('No fue posible cargar los pedidos pendientes de fecha.')
       })
-      .finally(() => { if (isMounted) setLoadedPendingApi(ordersCalendarApi) })
-    return () => { isMounted = false }
+      .finally(() => { reads.delete(read); if (isMounted) setLoadedPendingApi(ordersCalendarApi) })
+    return () => { isMounted = false; reads.delete(read); controller.abort() }
   }, [ordersCalendarApi])
 
   useEffect(() => {
@@ -178,13 +199,11 @@ export default function ProductionCalendarPage() {
 
   async function updateItemDeliveryDate(itemId, nextDate, credentials) {
     const normalizedOrder = normalizeCalendarOrder(await ordersCalendarApi.updateDeliveryDate(itemId, nextDate, credentials))
-
-    setCalendarItems((currentItems) =>
-      currentItems.some((item) => String(item.id) === String(itemId))
-        ? currentItems.map((item) => (String(item.id) === String(itemId) ? normalizedOrder : item))
-        : [...currentItems, normalizedOrder],
-    )
-    setUnscheduledItems((currentItems) => currentItems.filter((item) => String(item.id) !== String(itemId)))
+    if (!active.current) return
+    const overrides = new Map([[String(itemId), normalizedOrder]])
+    for (const read of pendingReads.current) read.overrides.set(String(itemId), normalizedOrder)
+    setCalendarItems(current => reconcileCalendarRead(current, overrides, monthRange(currentMonth.current)))
+    setUnscheduledItems(current => reconcileCalendarRead(current, overrides, { unscheduled: true }))
   }
 
   async function getOrderDetail(orderId) {
@@ -214,7 +233,7 @@ export default function ProductionCalendarPage() {
             <ProductionCalendarGrid
               isLoading={isLoading}
               getOrderDetail={getOrderDetail}
-              allItems={[...calendarItems, ...unscheduledItems.filter((item) => !calendarItems.some((monthItem) => String(monthItem.id) === String(item.id)))]}
+              allItems={mergeCalendarCollections(calendarItems, unscheduledItems)}
               draggedItemId={draggedItemId}
               items={filteredItems}
               monthDate={monthDate}

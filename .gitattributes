@@ -1,0 +1,4 @@
+# Keep migration checksums and the standalone Compose contract stable on Windows.
+/capaServidor/prisma/migrations/**/migration.sql text eol=lf
+/compose.mysql.yaml text eol=lf
+*.sh text eol=lf

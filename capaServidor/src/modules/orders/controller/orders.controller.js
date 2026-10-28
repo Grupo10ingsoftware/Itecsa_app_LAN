@@ -155,7 +155,7 @@ class OrderController {
 
   updateDeliveryDate = async (req = request, res = response) => {
     try {
-      await this.service.updateDeliveryDate(req.params.orderId, req.body?.dueDate, { actor: req.pinActor });
+      await this.service.updateDeliveryDate(req.params.orderId, req.body?.dueDate, { actor: req.pinActor, response: 'receipt' });
       return res.status(200).json(toCalendarOrderDetailDTO(await this.service.getOrderViewById(req.params.orderId, "calendar")));
     }
     catch (error) { return respondError(error, req, res); }

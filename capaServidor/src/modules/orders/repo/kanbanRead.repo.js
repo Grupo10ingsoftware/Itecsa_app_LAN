@@ -24,8 +24,9 @@ function root(row) {
     observacion_origen: row.observacion_origen, observacion_interna: row.observacion_interna };
 }
 
-export async function listKanbanRows(client, { limit, cursor, status, search, productType, from, to }) {
-  const conditions = [Prisma.sql`ep.orden_kanban <> 4 AND ep.nombre_etapa NOT IN ('Terminado', 'Cancelado')`];
+export async function listKanbanRows(client, { limit, cursor, status, search, productType, from, to, calendar = false, unscheduled = false }) {
+  const conditions = [calendar ? Prisma.sql`1=1` : Prisma.sql`ep.orden_kanban <> 4 AND ep.nombre_etapa NOT IN ('Terminado', 'Cancelado')`];
+  if (calendar && unscheduled) conditions.push(Prisma.sql`p.fecha_estimada_termino IS NULL`);
   if (cursor) conditions.push(Prisma.sql`p.id_pedido < ${cursor.id}`);
   if (status) conditions.push(Prisma.sql`ep.nombre_etapa = ${status}`);
   if (search) {

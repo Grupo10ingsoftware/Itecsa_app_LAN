@@ -176,5 +176,5 @@ export async function updateDeliveryDateOperation(repository, id, dueDate, audit
     throw error;
   }
 
-  return repository.get(id);
+  return audit.hydrate === false ? { id_pedido: Number(id) } : repository.get(id);
 }
