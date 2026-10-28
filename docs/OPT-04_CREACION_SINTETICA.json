@@ -1,0 +1,2922 @@
+{
+  "reference": "0be21bb",
+  "node": "v24.19.0",
+  "capturedAt": "2026-10-27T22:25:14.875Z",
+  "methodology": "20 warm sequential synthetic samples; isolated transactional model. Times include JS/model work, no database/network/security PIN cost. Model-call counts are NOT physical SQL counts. p95 applies only to this synthetic workload; not the 1s application goal.",
+  "cases": [
+    {
+      "fixture": {
+        "lines": 1,
+        "accessories": 0,
+        "types": [
+          "Lanyard"
+        ]
+      },
+      "existingClient": true,
+      "equivalent": true,
+      "before": {
+        "n": 20,
+        "medianMs": 0.163,
+        "p95Ms": 0.341,
+        "samples": [
+          {
+            "ms": 0.341,
+            "transactionModelMs": 0.261,
+            "cpuMs": 0,
+            "heapDeltaBytes": 114832,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.543,
+            "transactionModelMs": 0.378,
+            "cpuMs": 0,
+            "heapDeltaBytes": -451432,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.213,
+            "transactionModelMs": 0.142,
+            "cpuMs": 0,
+            "heapDeltaBytes": 53896,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.236,
+            "transactionModelMs": 0.17,
+            "cpuMs": 0,
+            "heapDeltaBytes": 564216,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.183,
+            "transactionModelMs": 0.13,
+            "cpuMs": 0,
+            "heapDeltaBytes": 58640,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.195,
+            "transactionModelMs": 0.146,
+            "cpuMs": 0,
+            "heapDeltaBytes": 55576,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.215,
+            "transactionModelMs": 0.17,
+            "cpuMs": 0,
+            "heapDeltaBytes": 714552,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.234,
+            "transactionModelMs": 0.185,
+            "cpuMs": 0,
+            "heapDeltaBytes": 749584,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.216,
+            "transactionModelMs": 0.167,
+            "cpuMs": 0,
+            "heapDeltaBytes": 63408,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.172,
+            "transactionModelMs": 0.121,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54016,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.098,
+            "transactionModelMs": 0.066,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54080,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.154,
+            "transactionModelMs": 0.104,
+            "cpuMs": 0,
+            "heapDeltaBytes": 53816,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.098,
+            "transactionModelMs": 0.066,
+            "cpuMs": 0,
+            "heapDeltaBytes": 53664,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.088,
+            "transactionModelMs": 0.053,
+            "cpuMs": 0,
+            "heapDeltaBytes": 53616,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.094,
+            "transactionModelMs": 0.064,
+            "cpuMs": 0,
+            "heapDeltaBytes": 53616,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.153,
+            "transactionModelMs": 0.101,
+            "cpuMs": 0,
+            "heapDeltaBytes": 53616,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.099,
+            "transactionModelMs": 0.067,
+            "cpuMs": 0,
+            "heapDeltaBytes": 53656,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.091,
+            "transactionModelMs": 0.059,
+            "cpuMs": 0,
+            "heapDeltaBytes": 53616,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.113,
+            "transactionModelMs": 0.073,
+            "cpuMs": 0,
+            "heapDeltaBytes": 53648,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.081,
+            "transactionModelMs": 0.052,
+            "cpuMs": 0,
+            "heapDeltaBytes": 53616,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          }
+        ]
+      },
+      "after": {
+        "n": 20,
+        "medianMs": 0.136,
+        "p95Ms": 0.273,
+        "samples": [
+          {
+            "ms": 0.243,
+            "transactionModelMs": 0.168,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50928,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.247,
+            "transactionModelMs": 0.175,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50392,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.231,
+            "transactionModelMs": 0.184,
+            "cpuMs": 0,
+            "heapDeltaBytes": 405064,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.578,
+            "transactionModelMs": 0.503,
+            "cpuMs": 0,
+            "heapDeltaBytes": -372208,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.136,
+            "transactionModelMs": 0.098,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50808,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.184,
+            "transactionModelMs": 0.141,
+            "cpuMs": 16,
+            "heapDeltaBytes": 52584,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.273,
+            "transactionModelMs": 0.221,
+            "cpuMs": 0,
+            "heapDeltaBytes": 51544,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.258,
+            "transactionModelMs": 0.213,
+            "cpuMs": 0,
+            "heapDeltaBytes": 58840,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.178,
+            "transactionModelMs": 0.132,
+            "cpuMs": 0,
+            "heapDeltaBytes": 658560,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.13,
+            "transactionModelMs": 0.086,
+            "cpuMs": 0,
+            "heapDeltaBytes": 51296,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.091,
+            "transactionModelMs": 0.063,
+            "cpuMs": 0,
+            "heapDeltaBytes": 49872,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.106,
+            "transactionModelMs": 0.067,
+            "cpuMs": 0,
+            "heapDeltaBytes": 49824,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.135,
+            "transactionModelMs": 0.097,
+            "cpuMs": 0,
+            "heapDeltaBytes": 49832,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.082,
+            "transactionModelMs": 0.054,
+            "cpuMs": 0,
+            "heapDeltaBytes": 49824,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.144,
+            "transactionModelMs": 0.1,
+            "cpuMs": 0,
+            "heapDeltaBytes": 49824,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.125,
+            "transactionModelMs": 0.091,
+            "cpuMs": 0,
+            "heapDeltaBytes": 49824,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.099,
+            "transactionModelMs": 0.068,
+            "cpuMs": 0,
+            "heapDeltaBytes": 49824,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.088,
+            "transactionModelMs": 0.061,
+            "cpuMs": 0,
+            "heapDeltaBytes": 49824,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.082,
+            "transactionModelMs": 0.054,
+            "cpuMs": 0,
+            "heapDeltaBytes": 49824,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          },
+          {
+            "ms": 0.08,
+            "transactionModelMs": 0.053,
+            "cpuMs": 0,
+            "heapDeltaBytes": 49824,
+            "receiptBytes": 38,
+            "modelCalls": 15
+          }
+        ]
+      },
+      "modelCalls": {
+        "before": [
+          "order.findFirst",
+          "client.findUnique",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "product.findFirst",
+          "flow.findMany",
+          "raw.read",
+          "detail.create",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "audit.create",
+          "fullOrder.read"
+        ],
+        "after": [
+          "order.findFirst",
+          "client.findUnique",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "raw.read",
+          "raw.read",
+          "detail.createMany",
+          "raw.read",
+          "message.create",
+          "message.create",
+          "assignment.createMany",
+          "audit.create"
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "lines": 1,
+        "accessories": 0,
+        "types": [
+          "Lanyard"
+        ]
+      },
+      "existingClient": false,
+      "equivalent": true,
+      "before": {
+        "n": 20,
+        "medianMs": 0.083,
+        "p95Ms": 0.1,
+        "samples": [
+          {
+            "ms": 0.084,
+            "transactionModelMs": 0.057,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54744,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.081,
+            "transactionModelMs": 0.053,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54744,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.076,
+            "transactionModelMs": 0.05,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54744,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.14,
+            "transactionModelMs": 0.091,
+            "cpuMs": 0,
+            "heapDeltaBytes": 475088,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.087,
+            "transactionModelMs": 0.058,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54848,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.078,
+            "transactionModelMs": 0.049,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54664,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.095,
+            "transactionModelMs": 0.066,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54704,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.077,
+            "transactionModelMs": 0.048,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54520,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.077,
+            "transactionModelMs": 0.05,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54720,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.07,
+            "transactionModelMs": 0.045,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54520,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.07,
+            "transactionModelMs": 0.044,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54520,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.069,
+            "transactionModelMs": 0.044,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54520,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.084,
+            "transactionModelMs": 0.057,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54520,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.097,
+            "transactionModelMs": 0.069,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54520,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.1,
+            "transactionModelMs": 0.07,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54488,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.098,
+            "transactionModelMs": 0.071,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54512,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.078,
+            "transactionModelMs": 0.052,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54488,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.086,
+            "transactionModelMs": 0.061,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54528,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.072,
+            "transactionModelMs": 0.046,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54488,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          },
+          {
+            "ms": 0.098,
+            "transactionModelMs": 0.065,
+            "cpuMs": 0,
+            "heapDeltaBytes": 54488,
+            "receiptBytes": 38,
+            "modelCalls": 20
+          }
+        ]
+      },
+      "after": {
+        "n": 20,
+        "medianMs": 0.084,
+        "p95Ms": 0.1,
+        "samples": [
+          {
+            "ms": 0.095,
+            "transactionModelMs": 0.067,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50952,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.079,
+            "transactionModelMs": 0.053,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50952,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.132,
+            "transactionModelMs": 0.073,
+            "cpuMs": 0,
+            "heapDeltaBytes": 51016,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.1,
+            "transactionModelMs": 0.067,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50872,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.086,
+            "transactionModelMs": 0.057,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50920,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.096,
+            "transactionModelMs": 0.058,
+            "cpuMs": 0,
+            "heapDeltaBytes": 51096,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.095,
+            "transactionModelMs": 0.056,
+            "cpuMs": 0,
+            "heapDeltaBytes": 53592,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.077,
+            "transactionModelMs": 0.052,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50824,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.073,
+            "transactionModelMs": 0.048,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50744,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.071,
+            "transactionModelMs": 0.047,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50744,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.071,
+            "transactionModelMs": 0.046,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50744,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.081,
+            "transactionModelMs": 0.056,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50848,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.079,
+            "transactionModelMs": 0.054,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50744,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.092,
+            "transactionModelMs": 0.065,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50744,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.095,
+            "transactionModelMs": 0.053,
+            "cpuMs": 0,
+            "heapDeltaBytes": 52320,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.096,
+            "transactionModelMs": 0.064,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50712,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.078,
+            "transactionModelMs": 0.053,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50712,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.094,
+            "transactionModelMs": 0.054,
+            "cpuMs": 16,
+            "heapDeltaBytes": 50712,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.073,
+            "transactionModelMs": 0.048,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50712,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.082,
+            "transactionModelMs": 0.055,
+            "cpuMs": 0,
+            "heapDeltaBytes": 50712,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          }
+        ]
+      },
+      "modelCalls": {
+        "before": [
+          "order.findFirst",
+          "client.findUnique",
+          "client.create",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "product.findFirst",
+          "flow.findMany",
+          "raw.read",
+          "detail.create",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "audit.create",
+          "fullOrder.read"
+        ],
+        "after": [
+          "order.findFirst",
+          "client.findUnique",
+          "client.create",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "raw.read",
+          "raw.read",
+          "detail.createMany",
+          "raw.read",
+          "message.create",
+          "message.create",
+          "assignment.createMany",
+          "audit.create"
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "lines": 5,
+        "accessories": 3,
+        "types": [
+          "Lanyard"
+        ]
+      },
+      "existingClient": true,
+      "equivalent": true,
+      "before": {
+        "n": 20,
+        "medianMs": 0.14,
+        "p95Ms": 0.276,
+        "samples": [
+          {
+            "ms": 0.308,
+            "transactionModelMs": 0.091,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78432,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.203,
+            "transactionModelMs": 0.101,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79616,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.207,
+            "transactionModelMs": 0.122,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79976,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.207,
+            "transactionModelMs": 0.141,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78552,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.137,
+            "transactionModelMs": 0.078,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78528,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.133,
+            "transactionModelMs": 0.084,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78528,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.276,
+            "transactionModelMs": 0.154,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78528,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.135,
+            "transactionModelMs": 0.082,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78552,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.153,
+            "transactionModelMs": 0.103,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78528,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.121,
+            "transactionModelMs": 0.068,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78448,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.143,
+            "transactionModelMs": 0.073,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79608,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.133,
+            "transactionModelMs": 0.081,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78456,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.13,
+            "transactionModelMs": 0.067,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79344,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.119,
+            "transactionModelMs": 0.067,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78448,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.271,
+            "transactionModelMs": 0.121,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78472,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.12,
+            "transactionModelMs": 0.069,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78448,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.173,
+            "transactionModelMs": 0.093,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78448,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.114,
+            "transactionModelMs": 0.065,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78448,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.188,
+            "transactionModelMs": 0.105,
+            "cpuMs": 16,
+            "heapDeltaBytes": 78456,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          },
+          {
+            "ms": 0.134,
+            "transactionModelMs": 0.087,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78448,
+            "receiptBytes": 38,
+            "modelCalls": 26
+          }
+        ]
+      },
+      "after": {
+        "n": 20,
+        "medianMs": 0.129,
+        "p95Ms": 0.236,
+        "samples": [
+          {
+            "ms": 0.216,
+            "transactionModelMs": 0.11,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66264,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.155,
+            "transactionModelMs": 0.085,
+            "cpuMs": 0,
+            "heapDeltaBytes": 67496,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.236,
+            "transactionModelMs": 0.185,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66280,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.205,
+            "transactionModelMs": 0.113,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66184,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.135,
+            "transactionModelMs": 0.08,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66208,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.116,
+            "transactionModelMs": 0.064,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66184,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.15,
+            "transactionModelMs": 0.077,
+            "cpuMs": 0,
+            "heapDeltaBytes": 451952,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.133,
+            "transactionModelMs": 0.081,
+            "cpuMs": 0,
+            "heapDeltaBytes": 68480,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.127,
+            "transactionModelMs": 0.074,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66104,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.118,
+            "transactionModelMs": 0.071,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66112,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.112,
+            "transactionModelMs": 0.065,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66104,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.112,
+            "transactionModelMs": 0.065,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66104,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.118,
+            "transactionModelMs": 0.069,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66104,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 1.646,
+            "transactionModelMs": 1.598,
+            "cpuMs": 0,
+            "heapDeltaBytes": -6064192,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.159,
+            "transactionModelMs": 0.089,
+            "cpuMs": 0,
+            "heapDeltaBytes": 71688,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.112,
+            "transactionModelMs": 0.063,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66128,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.119,
+            "transactionModelMs": 0.068,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66104,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.108,
+            "transactionModelMs": 0.06,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66104,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.107,
+            "transactionModelMs": 0.06,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66104,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          },
+          {
+            "ms": 0.131,
+            "transactionModelMs": 0.07,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66120,
+            "receiptBytes": 38,
+            "modelCalls": 16
+          }
+        ]
+      },
+      "modelCalls": {
+        "before": [
+          "order.findFirst",
+          "client.findUnique",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "product.findFirst",
+          "flow.findMany",
+          "raw.read",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "audit.create",
+          "fullOrder.read"
+        ],
+        "after": [
+          "order.findFirst",
+          "client.findUnique",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "raw.read",
+          "raw.read",
+          "detail.createMany",
+          "accessory.createMany",
+          "raw.read",
+          "message.create",
+          "message.create",
+          "assignment.createMany",
+          "audit.create"
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "lines": 5,
+        "accessories": 3,
+        "types": [
+          "Lanyard"
+        ]
+      },
+      "existingClient": false,
+      "equivalent": true,
+      "before": {
+        "n": 20,
+        "medianMs": 0.151,
+        "p95Ms": 0.358,
+        "samples": [
+          {
+            "ms": 0.185,
+            "transactionModelMs": 0.108,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79504,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.111,
+            "transactionModelMs": 0.064,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79472,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.16,
+            "transactionModelMs": 0.105,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79464,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.149,
+            "transactionModelMs": 0.089,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79464,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.127,
+            "transactionModelMs": 0.075,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79496,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.165,
+            "transactionModelMs": 0.079,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79504,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.179,
+            "transactionModelMs": 0.104,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79464,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.119,
+            "transactionModelMs": 0.067,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79464,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.121,
+            "transactionModelMs": 0.064,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79608,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.153,
+            "transactionModelMs": 0.1,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79488,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.527,
+            "transactionModelMs": 0.448,
+            "cpuMs": 0,
+            "heapDeltaBytes": 79464,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.138,
+            "transactionModelMs": 0.078,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78872,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.358,
+            "transactionModelMs": 0.182,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78944,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.164,
+            "transactionModelMs": 0.091,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78920,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.189,
+            "transactionModelMs": 0.108,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78872,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.156,
+            "transactionModelMs": 0.07,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78872,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.123,
+            "transactionModelMs": 0.073,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78904,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.102,
+            "transactionModelMs": 0.06,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78880,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.097,
+            "transactionModelMs": 0.058,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78872,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          },
+          {
+            "ms": 0.15,
+            "transactionModelMs": 0.101,
+            "cpuMs": 0,
+            "heapDeltaBytes": 78872,
+            "receiptBytes": 38,
+            "modelCalls": 27
+          }
+        ]
+      },
+      "after": {
+        "n": 20,
+        "medianMs": 0.162,
+        "p95Ms": 0.321,
+        "samples": [
+          {
+            "ms": 0.114,
+            "transactionModelMs": 0.065,
+            "cpuMs": 0,
+            "heapDeltaBytes": 67120,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.131,
+            "transactionModelMs": 0.086,
+            "cpuMs": 0,
+            "heapDeltaBytes": 67120,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.111,
+            "transactionModelMs": 0.065,
+            "cpuMs": 0,
+            "heapDeltaBytes": 67192,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.19,
+            "transactionModelMs": 0.104,
+            "cpuMs": 0,
+            "heapDeltaBytes": 67120,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.222,
+            "transactionModelMs": 0.178,
+            "cpuMs": 0,
+            "heapDeltaBytes": 67120,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.131,
+            "transactionModelMs": 0.074,
+            "cpuMs": 0,
+            "heapDeltaBytes": 67120,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.134,
+            "transactionModelMs": 0.088,
+            "cpuMs": 0,
+            "heapDeltaBytes": 67184,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.104,
+            "transactionModelMs": 0.061,
+            "cpuMs": 0,
+            "heapDeltaBytes": 67120,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.099,
+            "transactionModelMs": 0.058,
+            "cpuMs": 0,
+            "heapDeltaBytes": 67120,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.388,
+            "transactionModelMs": 0.225,
+            "cpuMs": 0,
+            "heapDeltaBytes": 67120,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.196,
+            "transactionModelMs": 0.125,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66528,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.229,
+            "transactionModelMs": 0.148,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66528,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.255,
+            "transactionModelMs": 0.162,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66528,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.226,
+            "transactionModelMs": 0.092,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66528,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.26,
+            "transactionModelMs": 0.108,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66528,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.101,
+            "transactionModelMs": 0.06,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66528,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.1,
+            "transactionModelMs": 0.06,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66528,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.1,
+            "transactionModelMs": 0.061,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66528,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.321,
+            "transactionModelMs": 0.279,
+            "cpuMs": 15,
+            "heapDeltaBytes": 66560,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          },
+          {
+            "ms": 0.209,
+            "transactionModelMs": 0.156,
+            "cpuMs": 0,
+            "heapDeltaBytes": 66528,
+            "receiptBytes": 38,
+            "modelCalls": 17
+          }
+        ]
+      },
+      "modelCalls": {
+        "before": [
+          "order.findFirst",
+          "client.findUnique",
+          "client.create",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "product.findFirst",
+          "flow.findMany",
+          "raw.read",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "audit.create",
+          "fullOrder.read"
+        ],
+        "after": [
+          "order.findFirst",
+          "client.findUnique",
+          "client.create",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "raw.read",
+          "raw.read",
+          "detail.createMany",
+          "accessory.createMany",
+          "raw.read",
+          "message.create",
+          "message.create",
+          "assignment.createMany",
+          "audit.create"
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "lines": 20,
+        "accessories": 30,
+        "types": [
+          "Yoyo",
+          "Lanyard",
+          "Tarjeta"
+        ]
+      },
+      "existingClient": true,
+      "equivalent": true,
+      "before": {
+        "n": 20,
+        "medianMs": 0.251,
+        "p95Ms": 0.43,
+        "samples": [
+          {
+            "ms": 0.343,
+            "transactionModelMs": 0.182,
+            "cpuMs": 0,
+            "heapDeltaBytes": 195888,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 2.365,
+            "transactionModelMs": 0.283,
+            "cpuMs": 0,
+            "heapDeltaBytes": -10890104,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.256,
+            "transactionModelMs": 0.132,
+            "cpuMs": 0,
+            "heapDeltaBytes": 199616,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.236,
+            "transactionModelMs": 0.117,
+            "cpuMs": 0,
+            "heapDeltaBytes": 199632,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.238,
+            "transactionModelMs": 0.117,
+            "cpuMs": 0,
+            "heapDeltaBytes": 199624,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.252,
+            "transactionModelMs": 0.116,
+            "cpuMs": 0,
+            "heapDeltaBytes": 207096,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.238,
+            "transactionModelMs": 0.129,
+            "cpuMs": 0,
+            "heapDeltaBytes": 199448,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.236,
+            "transactionModelMs": 0.118,
+            "cpuMs": 0,
+            "heapDeltaBytes": 199464,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.25,
+            "transactionModelMs": 0.115,
+            "cpuMs": 0,
+            "heapDeltaBytes": 199480,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.276,
+            "transactionModelMs": 0.146,
+            "cpuMs": 0,
+            "heapDeltaBytes": 199456,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.219,
+            "transactionModelMs": 0.111,
+            "cpuMs": 0,
+            "heapDeltaBytes": 199456,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.234,
+            "transactionModelMs": 0.129,
+            "cpuMs": 0,
+            "heapDeltaBytes": 199528,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.273,
+            "transactionModelMs": 0.138,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198488,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.43,
+            "transactionModelMs": 0.284,
+            "cpuMs": 0,
+            "heapDeltaBytes": 203480,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.426,
+            "transactionModelMs": 0.236,
+            "cpuMs": 0,
+            "heapDeltaBytes": 197528,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.28,
+            "transactionModelMs": 0.135,
+            "cpuMs": 0,
+            "heapDeltaBytes": 197624,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.222,
+            "transactionModelMs": 0.109,
+            "cpuMs": 0,
+            "heapDeltaBytes": 197528,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.221,
+            "transactionModelMs": 0.106,
+            "cpuMs": 0,
+            "heapDeltaBytes": 197528,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.362,
+            "transactionModelMs": 0.165,
+            "cpuMs": 0,
+            "heapDeltaBytes": 217824,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          },
+          {
+            "ms": 0.241,
+            "transactionModelMs": 0.112,
+            "cpuMs": 0,
+            "heapDeltaBytes": 197536,
+            "receiptBytes": 38,
+            "modelCalls": 72
+          }
+        ]
+      },
+      "after": {
+        "n": 20,
+        "medianMs": 0.231,
+        "p95Ms": 0.576,
+        "samples": [
+          {
+            "ms": 0.576,
+            "transactionModelMs": 0.33,
+            "cpuMs": 0,
+            "heapDeltaBytes": 143632,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.25,
+            "transactionModelMs": 0.116,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147368,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.236,
+            "transactionModelMs": 0.118,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147368,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.212,
+            "transactionModelMs": 0.095,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147448,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.231,
+            "transactionModelMs": 0.095,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147368,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.199,
+            "transactionModelMs": 0.091,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147208,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.203,
+            "transactionModelMs": 0.091,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147208,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.197,
+            "transactionModelMs": 0.088,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147232,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.228,
+            "transactionModelMs": 0.109,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147232,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.202,
+            "transactionModelMs": 0.093,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147560,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.196,
+            "transactionModelMs": 0.088,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147208,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.332,
+            "transactionModelMs": 0.211,
+            "cpuMs": 0,
+            "heapDeltaBytes": 151976,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.23,
+            "transactionModelMs": 0.101,
+            "cpuMs": 0,
+            "heapDeltaBytes": 153984,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.286,
+            "transactionModelMs": 0.115,
+            "cpuMs": 0,
+            "heapDeltaBytes": 146424,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.433,
+            "transactionModelMs": 0.198,
+            "cpuMs": 0,
+            "heapDeltaBytes": 146424,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.24,
+            "transactionModelMs": 0.105,
+            "cpuMs": 0,
+            "heapDeltaBytes": 146408,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.196,
+            "transactionModelMs": 0.088,
+            "cpuMs": 0,
+            "heapDeltaBytes": 146408,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.322,
+            "transactionModelMs": 0.118,
+            "cpuMs": 0,
+            "heapDeltaBytes": 146408,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.933,
+            "transactionModelMs": 0.114,
+            "cpuMs": 0,
+            "heapDeltaBytes": -8106224,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          },
+          {
+            "ms": 0.199,
+            "transactionModelMs": 0.089,
+            "cpuMs": 0,
+            "heapDeltaBytes": 146408,
+            "receiptBytes": 38,
+            "modelCalls": 18
+          }
+        ]
+      },
+      "modelCalls": {
+        "before": [
+          "order.findFirst",
+          "client.findUnique",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "product.findFirst",
+          "flow.findMany",
+          "raw.read",
+          "detail.create",
+          "product.findFirst",
+          "flow.findMany",
+          "detail.create",
+          "product.findFirst",
+          "flow.findMany",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "audit.create",
+          "fullOrder.read"
+        ],
+        "after": [
+          "order.findFirst",
+          "client.findUnique",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "raw.read",
+          "raw.read",
+          "raw.read",
+          "raw.read",
+          "detail.createMany",
+          "accessory.createMany",
+          "raw.read",
+          "message.create",
+          "message.create",
+          "assignment.createMany",
+          "audit.create"
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "lines": 20,
+        "accessories": 30,
+        "types": [
+          "Yoyo",
+          "Lanyard",
+          "Tarjeta"
+        ]
+      },
+      "existingClient": false,
+      "equivalent": true,
+      "before": {
+        "n": 20,
+        "medianMs": 0.215,
+        "p95Ms": 0.351,
+        "samples": [
+          {
+            "ms": 0.21,
+            "transactionModelMs": 0.099,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198680,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.231,
+            "transactionModelMs": 0.104,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198696,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.215,
+            "transactionModelMs": 0.1,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198696,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.225,
+            "transactionModelMs": 0.117,
+            "cpuMs": 15,
+            "heapDeltaBytes": 198680,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.204,
+            "transactionModelMs": 0.096,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198672,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.219,
+            "transactionModelMs": 0.097,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198688,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.214,
+            "transactionModelMs": 0.097,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198792,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.268,
+            "transactionModelMs": 0.108,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198696,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.212,
+            "transactionModelMs": 0.098,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198776,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.459,
+            "transactionModelMs": 0.238,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198680,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.215,
+            "transactionModelMs": 0.104,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198672,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.233,
+            "transactionModelMs": 0.115,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198704,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.351,
+            "transactionModelMs": 0.168,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198768,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.213,
+            "transactionModelMs": 0.103,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198720,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.205,
+            "transactionModelMs": 0.098,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198696,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.294,
+            "transactionModelMs": 0.144,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198720,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.209,
+            "transactionModelMs": 0.099,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198712,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.213,
+            "transactionModelMs": 0.101,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198752,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.207,
+            "transactionModelMs": 0.097,
+            "cpuMs": 0,
+            "heapDeltaBytes": 198672,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          },
+          {
+            "ms": 0.231,
+            "transactionModelMs": 0.1,
+            "cpuMs": 0,
+            "heapDeltaBytes": 194256,
+            "receiptBytes": 38,
+            "modelCalls": 73
+          }
+        ]
+      },
+      "after": {
+        "n": 20,
+        "medianMs": 0.204,
+        "p95Ms": 0.249,
+        "samples": [
+          {
+            "ms": 0.192,
+            "transactionModelMs": 0.083,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147560,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.192,
+            "transactionModelMs": 0.086,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147568,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.2,
+            "transactionModelMs": 0.084,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147576,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.233,
+            "transactionModelMs": 0.09,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147552,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.205,
+            "transactionModelMs": 0.082,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147552,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.203,
+            "transactionModelMs": 0.083,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147568,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.194,
+            "transactionModelMs": 0.086,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147568,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.239,
+            "transactionModelMs": 0.101,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147632,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.188,
+            "transactionModelMs": 0.082,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147552,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.223,
+            "transactionModelMs": 0.1,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147552,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.209,
+            "transactionModelMs": 0.088,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147552,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.319,
+            "transactionModelMs": 0.144,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147576,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.21,
+            "transactionModelMs": 0.095,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147552,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.204,
+            "transactionModelMs": 0.089,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147656,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.191,
+            "transactionModelMs": 0.083,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147552,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.249,
+            "transactionModelMs": 0.113,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147592,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.211,
+            "transactionModelMs": 0.094,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147904,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.198,
+            "transactionModelMs": 0.088,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147552,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.231,
+            "transactionModelMs": 0.118,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147552,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          },
+          {
+            "ms": 0.192,
+            "transactionModelMs": 0.082,
+            "cpuMs": 0,
+            "heapDeltaBytes": 147560,
+            "receiptBytes": 38,
+            "modelCalls": 19
+          }
+        ]
+      },
+      "modelCalls": {
+        "before": [
+          "order.findFirst",
+          "client.findUnique",
+          "client.create",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "product.findFirst",
+          "flow.findMany",
+          "raw.read",
+          "detail.create",
+          "product.findFirst",
+          "flow.findMany",
+          "detail.create",
+          "product.findFirst",
+          "flow.findMany",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "detail.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "accessory.create",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "recipients.findMany",
+          "message.create",
+          "assignment.createMany",
+          "audit.create",
+          "fullOrder.read"
+        ],
+        "after": [
+          "order.findFirst",
+          "client.findUnique",
+          "client.create",
+          "label.findMany",
+          "order.create",
+          "label.create",
+          "record.create",
+          "stage.create",
+          "raw.read",
+          "raw.read",
+          "raw.read",
+          "raw.read",
+          "detail.createMany",
+          "accessory.createMany",
+          "raw.read",
+          "message.create",
+          "message.create",
+          "assignment.createMany",
+          "audit.create"
+        ]
+      }
+    }
+  ],
+  "source": [
+    {
+      "lines": 1,
+      "equivalent": true,
+      "before": {
+        "medianMs": 0.000328,
+        "p95Ms": 0.000528
+      },
+      "after": {
+        "medianMs": 0.000445,
+        "p95Ms": 0.000951
+      }
+    },
+    {
+      "lines": 5,
+      "equivalent": true,
+      "before": {
+        "medianMs": 0.001261,
+        "p95Ms": 0.001656
+      },
+      "after": {
+        "medianMs": 0.000619,
+        "p95Ms": 0.004738
+      }
+    },
+    {
+      "lines": 20,
+      "equivalent": true,
+      "before": {
+        "medianMs": 0.002776,
+        "p95Ms": 0.005213
+      },
+      "after": {
+        "medianMs": 0.001683,
+        "p95Ms": 0.004459
+      }
+    },
+    {
+      "lines": 1000,
+      "equivalent": true,
+      "before": {
+        "medianMs": 0.134546,
+        "p95Ms": 0.167207
+      },
+      "after": {
+        "medianMs": 0.045773,
+        "p95Ms": 0.05662
+      }
+    }
+  ],
+  "fixtureLookup": [
+    {
+      "lines": 1,
+      "methodology": "Current fixture file only; no DB, duplicate check, monitoring or HTTP. Cache policy unchanged, no before/after speedup claim.",
+      "cold": {
+        "n": 20,
+        "medianMs": 0.315,
+        "p95Ms": 0.565,
+        "samples": [
+          {
+            "ms": 0.3
+          },
+          {
+            "ms": 0.316
+          },
+          {
+            "ms": 0.31
+          },
+          {
+            "ms": 0.335
+          },
+          {
+            "ms": 0.314
+          },
+          {
+            "ms": 0.565
+          },
+          {
+            "ms": 0.322
+          },
+          {
+            "ms": 0.378
+          },
+          {
+            "ms": 0.388
+          },
+          {
+            "ms": 0.328
+          },
+          {
+            "ms": 0.251
+          },
+          {
+            "ms": 0.306
+          },
+          {
+            "ms": 0.302
+          },
+          {
+            "ms": 0.28
+          },
+          {
+            "ms": 0.715
+          },
+          {
+            "ms": 0.444
+          },
+          {
+            "ms": 0.301
+          },
+          {
+            "ms": 0.315
+          },
+          {
+            "ms": 0.284
+          },
+          {
+            "ms": 0.271
+          }
+        ]
+      },
+      "warm": {
+        "n": 20,
+        "medianMs": 0.041,
+        "p95Ms": 0.07,
+        "samples": [
+          {
+            "ms": 0.068
+          },
+          {
+            "ms": 0.074
+          },
+          {
+            "ms": 0.07
+          },
+          {
+            "ms": 0.058
+          },
+          {
+            "ms": 0.055
+          },
+          {
+            "ms": 0.05
+          },
+          {
+            "ms": 0.042
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.037
+          },
+          {
+            "ms": 0.037
+          },
+          {
+            "ms": 0.037
+          },
+          {
+            "ms": 0.039
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.062
+          },
+          {
+            "ms": 0.055
+          },
+          {
+            "ms": 0.052
+          }
+        ]
+      }
+    },
+    {
+      "lines": 5,
+      "methodology": "Current fixture file only; no DB, duplicate check, monitoring or HTTP. Cache policy unchanged, no before/after speedup claim.",
+      "cold": {
+        "n": 20,
+        "medianMs": 0.276,
+        "p95Ms": 0.467,
+        "samples": [
+          {
+            "ms": 0.259
+          },
+          {
+            "ms": 0.467
+          },
+          {
+            "ms": 0.281
+          },
+          {
+            "ms": 0.239
+          },
+          {
+            "ms": 0.283
+          },
+          {
+            "ms": 0.274
+          },
+          {
+            "ms": 0.352
+          },
+          {
+            "ms": 0.307
+          },
+          {
+            "ms": 0.238
+          },
+          {
+            "ms": 0.261
+          },
+          {
+            "ms": 0.38
+          },
+          {
+            "ms": 0.245
+          },
+          {
+            "ms": 0.239
+          },
+          {
+            "ms": 0.278
+          },
+          {
+            "ms": 0.215
+          },
+          {
+            "ms": 0.497
+          },
+          {
+            "ms": 0.324
+          },
+          {
+            "ms": 0.252
+          },
+          {
+            "ms": 0.226
+          },
+          {
+            "ms": 0.457
+          }
+        ]
+      },
+      "warm": {
+        "n": 20,
+        "medianMs": 0.039,
+        "p95Ms": 0.048,
+        "samples": [
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.04
+          },
+          {
+            "ms": 0.04
+          },
+          {
+            "ms": 0.039
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.039
+          },
+          {
+            "ms": 0.039
+          },
+          {
+            "ms": 0.039
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.186
+          },
+          {
+            "ms": 0.047
+          },
+          {
+            "ms": 0.04
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.041
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.039
+          },
+          {
+            "ms": 0.047
+          },
+          {
+            "ms": 0.048
+          }
+        ]
+      }
+    },
+    {
+      "lines": 20,
+      "methodology": "Current fixture file only; no DB, duplicate check, monitoring or HTTP. Cache policy unchanged, no before/after speedup claim.",
+      "cold": {
+        "n": 20,
+        "medianMs": 0.251,
+        "p95Ms": 0.363,
+        "samples": [
+          {
+            "ms": 0.242
+          },
+          {
+            "ms": 0.218
+          },
+          {
+            "ms": 0.212
+          },
+          {
+            "ms": 0.211
+          },
+          {
+            "ms": 0.286
+          },
+          {
+            "ms": 0.24
+          },
+          {
+            "ms": 0.22
+          },
+          {
+            "ms": 0.29
+          },
+          {
+            "ms": 0.257
+          },
+          {
+            "ms": 0.243
+          },
+          {
+            "ms": 0.221
+          },
+          {
+            "ms": 0.238
+          },
+          {
+            "ms": 0.276
+          },
+          {
+            "ms": 0.291
+          },
+          {
+            "ms": 0.293
+          },
+          {
+            "ms": 0.363
+          },
+          {
+            "ms": 0.286
+          },
+          {
+            "ms": 0.367
+          },
+          {
+            "ms": 0.244
+          },
+          {
+            "ms": 0.297
+          }
+        ]
+      },
+      "warm": {
+        "n": 20,
+        "medianMs": 0.058,
+        "p95Ms": 0.076,
+        "samples": [
+          {
+            "ms": 0.065
+          },
+          {
+            "ms": 0.059
+          },
+          {
+            "ms": 0.074
+          },
+          {
+            "ms": 0.397
+          },
+          {
+            "ms": 0.063
+          },
+          {
+            "ms": 0.067
+          },
+          {
+            "ms": 0.073
+          },
+          {
+            "ms": 0.062
+          },
+          {
+            "ms": 0.067
+          },
+          {
+            "ms": 0.076
+          },
+          {
+            "ms": 0.058
+          },
+          {
+            "ms": 0.049
+          },
+          {
+            "ms": 0.043
+          },
+          {
+            "ms": 0.041
+          },
+          {
+            "ms": 0.04
+          },
+          {
+            "ms": 0.057
+          },
+          {
+            "ms": 0.043
+          },
+          {
+            "ms": 0.039
+          },
+          {
+            "ms": 0.038
+          },
+          {
+            "ms": 0.039
+          }
+        ]
+      }
+    }
+  ]
+}

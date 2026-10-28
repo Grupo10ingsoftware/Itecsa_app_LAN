@@ -44,14 +44,14 @@ function resolveProductType(item = {}) {
   return null;
 }
 
-function normalizeProductionItem(item = {}) {
+function normalizeProductionItem(item = {}, productType = resolveProductType(item)) {
   return {
     codigo: item.codigo ?? null,
     producto: item.producto ?? null,
     cantidad: item.cantidad ?? null,
     familia: item.familia ?? null,
     subfamilia: item.subfamilia ?? null,
-    tipoProducto: resolveProductType(item),
+    tipoProducto: productType,
   };
 }
 
@@ -67,12 +67,13 @@ function normalizeUntrackedItem(item = {}) {
 
 function normalizeSalesNote(record) {
   const items = Array.isArray(record.items) ? record.items : [];
-  const productionItems = items
-    .filter((item) => item.importable === true && resolveProductType(item))
-    .map(normalizeProductionItem);
-  const untrackedItems = items
-    .filter((item) => item.importable !== true || !resolveProductType(item))
-    .map(normalizeUntrackedItem);
+  const productionItems = [];
+  const untrackedItems = [];
+  for (const item of items) {
+    const type = item.importable === true ? resolveProductType(item) : null;
+    if (type) productionItems.push(normalizeProductionItem(item, type));
+    else untrackedItems.push(normalizeUntrackedItem(item));
+  }
 
   return {
     numeroNota: String(record.numeroNota),

@@ -34,6 +34,7 @@ import {
 import { lockProductionOrderOperation, completeSubprocessOperation, rollbackSubprocessOperation } from './orderSubprocessOperations.js';
 import getPrismaClient from '../../../database/prisma.js';
 import { listOrderViewsOperation, getOrderViewOperation, listPaymentViewsOperation } from './orderViewOperations.js';
+import { getCreationProductContextOperation, createCreationDetailsOperation, createCreationAccessoriesOperation, notifyCreatedOrderOperation } from './orderCreationOperations.js';
 
 // Keep the public repository API and the injected transaction client in one place.
 // Operation modules receive this repository so cross-operation calls use that same client.
@@ -52,6 +53,22 @@ class OrderRepository {
 
   async getBySalesNoteNumber(...args) {
     return getBySalesNoteNumberOperation(this, ...args);
+  }
+
+  async getCreationProductContext(...args) {
+    return getCreationProductContextOperation(this, ...args);
+  }
+
+  async createCreationDetails(...args) {
+    return createCreationDetailsOperation(this, ...args);
+  }
+
+  async createCreationAccessories(...args) {
+    return createCreationAccessoriesOperation(this, ...args);
+  }
+
+  async notifyCreatedOrder(...args) {
+    return notifyCreatedOrderOperation(this, ...args);
   }
 
   async existsBySalesNoteNumber(...args) {

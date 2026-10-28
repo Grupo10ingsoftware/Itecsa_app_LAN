@@ -1,3 +1,5 @@
+import { authorizationVersion, SESSION_REVALIDATION_INTERVAL_MS } from './sessionRevalidation.js'
+
 export function safeReturnPath(value) {
   if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')
     || Array.from(value).some(c => c.charCodeAt(0) < 32)) return '/kanban'
@@ -5,22 +7,27 @@ export function safeReturnPath(value) {
   return ['/login', '/access-denied'].includes(value.split(/[?#]/, 1)[0]) ? '/kanban' : value
 }
 
-export function createKeycloakSession(keycloak, browser, onRedirect = () => {}, recoverySession) {
+export function createKeycloakSession(keycloak, browser, onRedirect = () => {}, recoverySession, { now = Date.now } = {}) {
   let snapshot = { isLoading: true, isAuthenticated: false, user: null, error: null, sessionKey: 0, verificationKey: 0 }
   const listeners = new Set()
   let initialization, renewal, loginRedirect, loggingOut = false, resuming = false, initialized = false, generation = 0
+  let verifiedAuthorization, lastVerificationAt = -Infinity
   const notify = patch => { snapshot = { ...snapshot, ...patch }; listeners.forEach(fn => fn()) }
   const invalid = error => {
     generation++
     notify({ isLoading: false, isAuthenticated: false, user: null, error: error ?? Error('No fue posible iniciar sesión.'), sessionKey: generation })
     keycloak.clearToken()
   }
-  const publish = () => {
+  const publish = ({ forceVerification = false } = {}) => {
     const claims = keycloak.tokenParsed
     if (!keycloak.authenticated || !keycloak.token || typeof claims?.sub !== 'string' || !claims.sub) throw Error('Sesion Keycloak incompleta.')
     if (recoverySession && (claims.sub !== recoverySession.subject || claims.sid !== recoverySession.sid)) throw Error('La cuenta original no coincide.')
     if (snapshot.user?.sub !== claims.sub || !snapshot.isAuthenticated) generation++
-    notify({ isLoading: resuming, isAuthenticated: true, error: null, sessionKey: generation, verificationKey: snapshot.verificationKey + 1,
+    const authorization = authorizationVersion(claims)
+    const revalidate = forceVerification || !snapshot.isAuthenticated || authorization !== verifiedAuthorization
+      || now() - lastVerificationAt >= SESSION_REVALIDATION_INTERVAL_MS
+    if (revalidate) { lastVerificationAt = now(); verifiedAuthorization = authorization }
+    notify({ isLoading: resuming, isAuthenticated: true, error: null, sessionKey: generation, verificationKey: snapshot.verificationKey + Number(revalidate),
       user: { sub: claims.sub, name: claims.name || claims.preferred_username,
         ...(typeof claims.email === 'string' && claims.email ? { email: claims.email } : {}), picture: claims.picture } })
   }
@@ -104,6 +111,17 @@ export function createKeycloakSession(keycloak, browser, onRedirect = () => {}, 
       } catch (error) { loggingOut = false; invalid(error) }
     },
     getAccessToken: () => getAccessToken(),
+    getRevalidationDelay: () => snapshot.isAuthenticated && !loggingOut && !resuming
+      ? Math.max(0, lastVerificationAt + SESSION_REVALIDATION_INTERVAL_MS - now())
+      : SESSION_REVALIDATION_INTERVAL_MS,
+    async revalidate() {
+      if (!snapshot.isAuthenticated || loggingOut || resuming || now() - lastVerificationAt < SESSION_REVALIDATION_INTERVAL_MS) return
+      const verificationKey = snapshot.verificationKey
+      try {
+        await getAccessToken()
+        if (snapshot.isAuthenticated && !loggingOut && snapshot.verificationKey === verificationKey) publish({ forceVerification: true })
+      } catch { /* Token failures invalidate the session immediately. */ }
+    },
     async getRecoveryRefreshToken() {
       await getAccessToken()
       if (!keycloak.refreshToken) throw Error('La sesión no permite continuar la recuperación.')
@@ -117,7 +135,9 @@ export function createKeycloakSession(keycloak, browser, onRedirect = () => {}, 
         // A cached-token check already in flight cannot stand in for this server check.
         if (renewal) await renewal
         if (!snapshot.isAuthenticated || loggingOut) return
+        const verificationKey = snapshot.verificationKey
         await getAccessToken(-1)
+        if (snapshot.isAuthenticated && !loggingOut && snapshot.verificationKey === verificationKey) publish({ forceVerification: true })
         if (snapshot.isAuthenticated) notify({ isLoading: false })
       } catch { /* The token request invalidates access on failure. */ }
       finally { resuming = false }

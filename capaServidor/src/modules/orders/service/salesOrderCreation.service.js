@@ -23,6 +23,7 @@ export default class SalesOrderCreationService {
   }
 
   async create(input, options = {}) {
+    const receipt = options.response === 'receipt';
     const editable = validateCreateSalesOrder(input);
     let resolvedUserId = options.actorId;
     if (!Number.isSafeInteger(resolvedUserId) || resolvedUserId <= 0) {
@@ -117,21 +118,18 @@ export default class SalesOrderCreationService {
         let productContext = productContextByName.get(item.tipoProducto);
 
         if (!productContext) {
-          const productType = await productTypeService.getProductTypeByName(
-            item.tipoProducto,
-          );
-          const subprocesses = await repo.getProductSubprocesses(
-            productType.id_tipo_producto,
-          );
+          if (receipt) {
+            productContext = await repo.getCreationProductContext(item.tipoProducto);
+          } else {
+            const productType = await productTypeService.getProductTypeByName(item.tipoProducto);
+            const subprocesses = await repo.getProductSubprocesses(productType.id_tipo_producto);
 
-          productContext = {
-            productType,
-            firstSubprocess: subprocesses[0] ?? null,
-          };
+            productContext = { productType, firstSubprocess: subprocesses[0] ?? null };
+          }
           productContextByName.set(item.tipoProducto, productContext);
         }
 
-        const detail = await orderDetailService.createOrderDetail(order.id_pedido, {
+        const detailData = {
           ...lineSnapshots[lineIndex],
           id_tipo_producto: productContext.productType.id_tipo_producto,
           cantidad: item.cantidad,
@@ -139,7 +137,13 @@ export default class SalesOrderCreationService {
           fecha_real_termino: null,
           id_estado_subproceso:
             productContext.firstSubprocess?.id_estado_subproceso ?? null,
-        });
+        };
+
+        if (receipt) {
+          details.push(detailData);
+          continue;
+        }
+        const detail = await orderDetailService.createOrderDetail(order.id_pedido, detailData);
 
         details.push({
           ...detail,
@@ -147,22 +151,25 @@ export default class SalesOrderCreationService {
         });
       }
 
-      const createdUntrackedItems = await repo.createUntrackedItems(
-        order.id_pedido,
-        untrackedItems,
-      );
+      let createdUntrackedItems = [];
+      if (receipt) {
+        await repo.createCreationDetails(order.id_pedido, details);
+        await repo.createCreationAccessories(order.id_pedido, untrackedItems);
+        await repo.notifyCreatedOrder({ orderId: order.id_pedido, numeroNota });
+      } else {
+        createdUntrackedItems = await repo.createUntrackedItems(order.id_pedido, untrackedItems);
+        await repo.notifyCollectionsAdministrators({
+          orderId: order.id_pedido,
+          subject: "Nuevo pedido pendiente de confirmación de pago",
+          content: `Se registró el pedido ${numeroNota}. Está pendiente de confirmación de pago.`,
+        });
 
-      await repo.notifyCollectionsAdministrators({
-        orderId: order.id_pedido,
-        subject: "Nuevo pedido pendiente de confirmación de pago",
-        content: `Se registró el pedido ${numeroNota}. Está pendiente de confirmación de pago.`,
-      });
-
-      await repo.notifyProductionAdministrators({
-        orderId: order.id_pedido,
-        subject: "Pedido pendiente de programacion",
-        content: `Se registro el pedido ${numeroNota}. Debe asignarse una fecha habil en el calendario de produccion.`,
-      });
+        await repo.notifyProductionAdministrators({
+          orderId: order.id_pedido,
+          subject: "Pedido pendiente de programacion",
+          content: `Se registro el pedido ${numeroNota}. Debe asignarse una fecha habil en el calendario de produccion.`,
+        });
+      }
 
       await securityAudit?.record({
         eventType: "order.imported",
@@ -174,6 +181,8 @@ export default class SalesOrderCreationService {
         outcome: "allowed",
       });
 
+      // Awaiting the enclosing transaction still precedes the HTTP 201.
+      if (receipt) return { id_pedido: order.id_pedido, numero_nota_venta: order.numero_nota_venta };
       const fullOrder = await repo.get(order.id_pedido);
 
       return {
