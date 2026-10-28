@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, screen } from '@testing-library/react'
+import { render } from '../../../test/renderWithToast'
 import ProductionCalendarPage from './ProductionCalendarPage'
 
 const mocks = vi.hoisted(() => ({ api: null, grid: null }))

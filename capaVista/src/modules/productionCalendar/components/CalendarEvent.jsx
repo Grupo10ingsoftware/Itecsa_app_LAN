@@ -1,3 +1,4 @@
+import { getOrderStagePresentation } from '../../../shared/orderStagePresentation.js'
 import { getProductSummary, getOrderToneClass, formatScheduleState } from '../utils/calendarPresentation.js';
 import { useAuth } from '../../../hooks/useAuth';
 import styles from './ProductionCalendarGrid.module.css';
@@ -12,6 +13,7 @@ export function CalendarEvent({ isDragging, item, onDragEnd, onDragStart, onOpen
       className={[styles.calendarEvent, getOrderToneClass(item), isDragging ? styles.draggingEvent : '']
         .filter(Boolean)
         .join(' ')}
+      data-stage={getOrderStagePresentation(formatScheduleState(item)).token}
       draggable={hasPermission(PERMISSIONS.UPDATE_DELIVERY_DATE)}
       onDragEnd={onDragEnd}
       onDoubleClick={() => onOpenDetail(item)}
@@ -37,7 +39,7 @@ export function CalendarEvent({ isDragging, item, onDragEnd, onDragStart, onOpen
       </span>
       <span className={styles.eventLine}>
         <b>Etapa:</b>
-        <small>{formatScheduleState(item)}</small>
+        <small className={styles.stageBadge}><span className={styles.stageFull}>{formatScheduleState(item)}</span><span className={styles.stageShort} aria-hidden="true">{getOrderStagePresentation(formatScheduleState(item)).short}</span></small>
       </span>
     </button>
   )
