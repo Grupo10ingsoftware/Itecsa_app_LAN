@@ -47,7 +47,7 @@ it('list preserves cursor stack, guards double pagination and resets cursor on f
  const second=deferred();session.api={listOrders:vi.fn().mockResolvedValueOnce(list('Primera','c2')).mockReturnValueOnce(second.promise).mockResolvedValue(list('Fresca','c2'))};mountList();await screen.findByText('Primera')
  const next=screen.getByRole('button',{name:'Siguiente'});fireEvent.click(next);fireEvent.click(next);await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(2));expect(session.api.listOrders.mock.calls[1][0].cursor).toBe('c2');expect(screen.queryByText('Primera')).toBeNull()
  await act(async()=>second.resolve(list('Segunda','c3')));fireEvent.click(screen.getByRole('button',{name:'Anterior'}));await screen.findByText('Fresca');expect(session.api.listOrders.mock.calls[2][0].cursor).toBeNull()
- fireEvent.click(screen.getByRole('button',{name:'Cancelado'}));await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(4));expect(session.api.listOrders.mock.calls[3][0]).toMatchObject({status:'Cancelado',cursor:null,limit:50})
+ fireEvent.click(screen.getByRole('button',{name:'Cancelado'}));await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(4));expect(session.api.listOrders.mock.calls[3][0]).toMatchObject({status:'Cancelado',cursor:null,limit:15})
 })
 
 it('rapid list filters abort abandoned reads, reject late results and keep the latest selection',async()=>{
@@ -114,4 +114,37 @@ it('formatters preserve UTC dates, local datetimes, DST boundaries and duration/
  for(const value of [null,undefined,'bad','2024-02-29','2024-09-08T03:59:59Z','2024-09-08T04:00:00Z','2025-01-01T00:00:00Z']){expect(formatDate(value)).toBe(beforeFormat.formatDate(value));expect(formatDateTime(value)).toBe(beforeFormat.formatDateTime(value))}
  for(const value of [null,undefined,'bad',0,1,59,60,3600,-1,0.5])expect(formatDuration(value)).toBe(beforeFormat.formatDuration(value))
  const a=[event(3),event(2)],result=appendHistoryEvents(a,[event(2),event(1),event(1)]);expect(result.map(e=>e.id)).toEqual([3,2,1]);expect(result[0]).toBe(a[0]);expect(a).toHaveLength(2)
+})
+
+it('requests 15 orders per cursor page, navigates back without duplicates and omits the header counter', async () => {
+ const rows=Array.from({length:31},(_,i)=>({id:i+1,salesNoteNumber:`PAGE-${i+1}`,clientName:'Cliente',status:'Cancelado'}))
+ session.api={listOrders:vi.fn(async ({cursor,limit})=>{
+  const offset=Number(cursor??0)
+  const items=rows.slice(offset,offset+limit)
+  return {items,pageInfo:{hasMore:offset+limit<rows.length,nextCursor:offset+limit<rows.length?String(offset+limit):null}}
+ })}
+ mountList()
+ await screen.findByText('PAGE-1')
+ expect(screen.getAllByRole('row')).toHaveLength(16)
+ expect(screen.queryByText(/resultados en esta página/)).toBeNull()
+ expect(screen.getByRole('heading',{name:'Historial de pedidos'})).toBeTruthy()
+ fireEvent.click(screen.getByRole('button',{name:'Siguiente'}))
+ await screen.findByText('PAGE-16')
+ expect(screen.getAllByRole('row')).toHaveLength(16)
+ expect(screen.queryByText('PAGE-1')).toBeNull()
+ expect(screen.getByText('Página 2')).toBeTruthy()
+ fireEvent.click(screen.getByRole('button',{name:'Siguiente'}))
+ await screen.findByText('PAGE-31')
+ expect(screen.getAllByRole('row')).toHaveLength(2)
+ expect(screen.getByRole('button',{name:'Siguiente'}).disabled).toBe(true)
+ fireEvent.click(screen.getByRole('button',{name:'Anterior'}))
+ await screen.findByText('PAGE-16')
+ expect(screen.getAllByRole('row')).toHaveLength(16)
+ expect(session.api.listOrders.mock.calls.map(([params])=>params.cursor)).toEqual([null,'15','30','15'])
+ expect(session.api.listOrders.mock.calls.every(([params])=>params.limit===15)).toBe(true)
+ fireEvent.change(screen.getByRole('searchbox'),{target:{value:'Nueva búsqueda'}})
+ fireEvent.click(screen.getByRole('button',{name:'Buscar'}))
+ await waitFor(()=>expect(session.api.listOrders.mock.calls.at(-1)[0]).toMatchObject({cursor:null,limit:15,search:'Nueva búsqueda'}))
+ await screen.findByText('PAGE-1')
+ expect(screen.getByText('Página 1')).toBeTruthy()
 })

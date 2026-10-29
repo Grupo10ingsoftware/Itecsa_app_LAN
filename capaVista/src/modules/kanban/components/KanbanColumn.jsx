@@ -24,9 +24,18 @@ import KanbanCard from './KanbanCard';
 import KanbanOffCanvas from './KanbanOffCanvas';
 import KanbanDetailBoundary from './KanbanDetailBoundary.jsx';
 
+function rememberCardExpansion(current, orders) {
+  const byOrder = { ...current.byOrder }
+  for (const order of orders) {
+    byOrder[order.id] ??= current.byColumn[order.generalStepId] ?? true
+  }
+  return { ...current, byOrder }
+}
+
 function KanbanColumn({ filters, refreshKey = 0 }) {
   const notify = useToast()
   const [orders, setOrders] = useState([])
+  const [cardExpansion, setCardExpansion] = useState({ byOrder: {}, byColumn: {} })
   const [columns, setColumns] = useState(baseColumns)
   const [loading, setLoading] = useState(true)
   const [selectedOrder, setSelectedOrder] = useState(null)
@@ -90,6 +99,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
                 .filter((order) => Number(order.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(order.orderStatus)))
             : []
           setOrders(normalizedOrders)
+          setCardExpansion(current => rememberCardExpansion(current, normalizedOrders))
           setPageInfo(result?.pageInfo ?? { nextCursor: null, hasMore: false })
         }).catch(() => {
           if (!controller.signal.aborted && id === listRequestId.current) setLoadError('No fue posible cargar las ordenes.')
@@ -157,6 +167,7 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
           return true
         })]
       })
+      setCardExpansion(current => rememberCardExpansion(current, nextOrders))
       setPageInfo(result.pageInfo ?? { nextCursor: null, hasMore: false })
     } catch {
       if (id === listRequestId.current) setLoadError('No fue posible cargar más ordenes.')
@@ -409,6 +420,13 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
                 icon={column.icon}
                 id={column.title}
                 key={column.title}
+                allCollapsed={columnOrders.length > 0 && columnOrders.every(order => cardExpansion.byOrder[order.id] === false)}
+                onToggleExpansion={() => setCardExpansion(current => {
+                  const expanded = columnOrders.every(order => current.byOrder[order.id] === false)
+                  const byOrder = { ...current.byOrder }
+                  for (const order of columnOrders) byOrder[order.id] = expanded
+                  return { byOrder, byColumn: { ...current.byColumn, [column.generalStepId]: expanded } }
+                })}
               >
                 {loading && <LoadingIndicator context="Pedidos de la columna" />}
                 {!loading && columnOrders.length > 0
@@ -428,6 +446,10 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
                         onOpenDetail={() => openOrderDetail(order)}
                         onToggleIndicator={(indicator) => handleToggleIndicator(order.id, indicator)}
                         {...order}
+                        expanded={cardExpansion.byOrder[order.id] ?? true}
+                        onExpandedChange={expanded => setCardExpansion(current => ({
+                          ...current, byOrder: { ...current.byOrder, [order.id]: expanded },
+                        }))}
                       />
                     ))
                   : !loading && <div className={styles.emptyColumn}>Arrastra una orden hacia esta columna.</div>}

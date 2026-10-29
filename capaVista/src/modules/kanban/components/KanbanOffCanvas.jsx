@@ -1,4 +1,6 @@
+import { KanbanDetailSection } from './KanbanDetailSection'
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
+import PinModal, { PinActions } from '../../../shared/components/pin/PinModal'
 import PinAuthorizationModal from '../../../shared/components/pin/PinAuthorizationModal'
 import { isItemReadyForDelivery, isPaymentConfirmed } from '../utils/kanbanOrderRules'
 import { formatCommentDate } from '../utils/kanbanDetail'
@@ -61,13 +63,13 @@ function KanbanOffCanvasContent({
   const [isCancelling, setIsCancelling] = useState(false)
   const [isReevaluating, setIsReevaluating] = useState(false)
   const notify = useToast()
-  const [actionIssue, setActionIssue] = useState('')
+  const [reevaluateOpen, setReevaluateOpen] = useState(false)
   const [isSendingCorrection, setIsSendingCorrection] = useState(false)
   const correctionPending = useRef(false)
   const operationPending = useRef(false)
   const panelRef = useRef(null)
   const isMutating = isFinishing || isCompletingSubprocess || isCancelling || isReevaluating || isApprovingDeconfirmation || isSendingCorrection
-  useModalDialog({ containerRef: panelRef, isOpen: Boolean(isOpen && order && !finishOpen && !authModal && !isCancelModalOpen && !deconfirmationAuthOpen), canClose: !isMutating, onClose })
+  useModalDialog({ containerRef: panelRef, isOpen: Boolean(isOpen && order && !finishOpen && !authModal && !isCancelModalOpen && !deconfirmationAuthOpen && !reevaluateOpen), canClose: !isMutating, onClose })
 
   if (!isOpen || !order) {
     return null
@@ -114,6 +116,26 @@ function KanbanOffCanvasContent({
     canReview && typeof onApprovePaymentDeconfirmation === 'function' &&
     Number(order.generalStepId) === KANBAN_LISTO_PRODUCCION_STEP &&
     Boolean(order.paymentDeconfirmationRequested)
+
+  function closeReevaluation() {
+    if (!operationPending.current) setReevaluateOpen(false)
+  }
+
+  async function confirmReevaluation(event) {
+    event.preventDefault()
+    if (operationPending.current || !canReevaluate) return
+    operationPending.current = true
+    setIsReevaluating(true)
+    try {
+      const result = await onReevaluate?.(order)
+      if (result !== false) setReevaluateOpen(false)
+    } catch (error) {
+      notify.error(operationFailureMessage(error, 'No fue posible reevaluar el pedido.'))
+    } finally {
+      operationPending.current = false
+      setIsReevaluating(false)
+    }
+  }
 
   function openAuthModal(item, process, processIndex, currentProcessIndex) {
     if (
@@ -289,7 +311,6 @@ function KanbanOffCanvasContent({
         </header>
 
         <div className={styles.offcanvasBody}>
-          {actionIssue && <p className={styles.operatorModalError} role="alert">{actionIssue}</p>}
           <KanbanOrderSummary
             order={order}
             orderItems={orderItems}
@@ -297,20 +318,28 @@ function KanbanOffCanvasContent({
 
           {(productionFinished || readyToFinish) && (
             <section className={styles.productionCompletion}>
-              <h3>{Number(order.generalStepId) === 4 ? 'Pedido terminado' : productionFinished ? 'Producción finalizada' : 'Proceso productivo completo'}</h3>
-              {productionFinished ? <>
-                <p>{order.orderStatus}</p>
-                {order.productionCompletion?.completedAt && <p>{formatCommentDate(order.productionCompletion.completedAt)}</p>}
-                {order.productionCompletion?.responsible && <p>{order.productionCompletion.responsible}</p>}
-                {readyToFinishOrder && canFinishProduction && <button className={styles.orderCardButton} disabled={isMutating} type="button" onClick={() => setFinishOpen(true)}>Finalizar pedido</button>}
-              </> : <>
-                <p>Todos los subprocesos están completados. El pedido puede quedar listo para entrega.</p>
-                {canFinishProduction && <button className={styles.orderCardButton} disabled={isMutating} type="button" onClick={() => setFinishOpen(true)}>Finalizar producción</button>}
-              </>}
+              <header className={styles.completionHeader}>
+                <span className={styles.completionCheck}><i className="bi bi-check-lg" aria-hidden="true" /></span>
+                <div className={styles.completionTitle}>
+                  <span className={styles.completionKicker}>{productionFinished ? 'ETAPA COMPLETADA' : 'SUBPROCESOS COMPLETADOS'}</span>
+                  <h3>{Number(order.generalStepId) === 4 ? 'Pedido terminado' : productionFinished ? 'Producción finalizada' : 'Proceso productivo completo'}</h3>
+                </div>
+                {productionFinished && order.orderStatus && <span className={styles.completionStatus}>{order.orderStatus}</span>}
+              </header>
+              <div className={styles.completionBody}>
+                {readyToFinishOrder && canFinishProduction && <p>Producción finalizada, ahora puedes finalizar este pedido.</p>}
+                {!productionFinished && <p>Todos los subprocesos están completados. El pedido puede quedar listo para entrega.</p>}
+                {productionFinished && (order.productionCompletion?.completedAt || order.productionCompletion?.responsible) && (
+                  <div className={styles.completionMeta}>
+                    {order.productionCompletion?.completedAt && <span><i className="bi bi-calendar-check" aria-hidden="true" /> {formatCommentDate(order.productionCompletion.completedAt)}</span>}
+                    {order.productionCompletion?.responsible && <span><i className="bi bi-person" aria-hidden="true" /> {order.productionCompletion.responsible}</span>}
+                  </div>
+                )}
+              </div>
             </section>
           )}
           {canApprovePaymentDeconfirmation && (
-            <section className={styles.detailSection}>
+            <KanbanDetailSection title="Solicitud de desconfirmacion" icon="clipboard-check">
               <div className={styles.deconfirmationApprovalPanel}>
                 <div>
                   <span>Solicitud de desconfirmacion</span>
@@ -327,12 +356,11 @@ function KanbanOffCanvasContent({
                   Aprobar Desconfirmacion
                 </button>
               </div>
-            </section>
+            </KanbanDetailSection>
           )}
 
           {canRequestCorrection && (
-            <section className={styles.detailSection}>
-              <h3>Correccion previa a OP</h3>
+            <KanbanDetailSection title="Correccion previa a OP" icon="wrench">
               {hasCorrectionRequest && (
                 <div className={styles.correctionNotice}>
                   <i className="bi bi-exclamation-triangle-fill" aria-hidden="true" />
@@ -340,7 +368,7 @@ function KanbanOffCanvasContent({
                 </div>
               )}
               <button
-                className={styles.correctionButton}
+                className={styles.orderCardButton}
                 disabled={isMutating}
                 onClick={() => {
                   setIsCorrectionFormOpen((currentValue) => !currentValue)
@@ -385,7 +413,16 @@ function KanbanOffCanvasContent({
                   </div>
                 </form>
               )}
-            </section>
+            </KanbanDetailSection>
+          )}
+
+          {canReevaluate && (
+            <KanbanDetailSection title="Revision del pedido" icon="arrow-repeat">
+              <button className={styles.orderCardButton} disabled={isMutating} onClick={() => setReevaluateOpen(true)} type="button" aria-busy={isReevaluating}>
+                <i className="bi bi-arrow-repeat" aria-hidden="true" />
+                <LoadingAction busy={isReevaluating} context="Reevaluar pedido">Reevaluar pedido</LoadingAction>
+              </button>
+            </KanbanDetailSection>
           )}
 
           <KanbanSubprocesses
@@ -397,53 +434,34 @@ function KanbanOffCanvasContent({
             openAuthModal={openAuthModal}
           />
 
-          {canCancelProduction && (
-            <section className={`${styles.detailSection} ${styles.dangerZone}`}>
-              <h3>Cancelar produccion</h3>
-              <button
-                className={styles.correctionButton}
-                onClick={() => {
-                  setCancelError('')
-                  setIsCancelModalOpen(true)
-                }}
-                type="button"
-              >
-                <i className="bi bi-x-octagon" aria-hidden="true" />
-                Cancelar pedido
-              </button>
-            </section>
-          )}
-
-          {canReevaluate && (
-            <section className={styles.detailSection}>
-              <h3>Revision del pedido</h3>
-              <button className={styles.orderCardButton} disabled={isMutating} onClick={async () => {
-                if (operationPending.current) return
-                operationPending.current = true
-                setIsReevaluating(true)
-                setActionIssue('')
-                try {
-                  await onReevaluate?.(order)
-                }
-                catch (error) {
-                  const message = operationFailureMessage(error, 'No fue posible reevaluar el pedido.')
-                  if (requiresContext(error) || uncertainOperation(error)) setActionIssue(message)
-                  else notify.error(message)
-                }
-                finally { operationPending.current = false; setIsReevaluating(false) }
-              }} type="button" aria-busy={isReevaluating}>
-                <i className="bi bi-arrow-repeat" aria-hidden="true" />
-                <LoadingAction busy={isReevaluating} context="Reevaluar pedido">Reevaluar pedido</LoadingAction>
-              </button>
-            </section>
-          )}
-
           <KanbanComments
             commentGroups={commentGroups}
           />
         </div>
+        {(canCancelProduction || (canFinishProduction && (readyToFinishOrder || readyToFinish))) && (
+          <footer className={styles.offcanvasFooter}>
+            {canCancelProduction && <button className={styles.cancelOrderButton} type="button"
+              onClick={() => { setCancelError(''); setIsCancelModalOpen(true) }}>
+              <i className="bi bi-trash" aria-hidden="true" /> Cancelar pedido
+            </button>}
+            {canFinishProduction && (readyToFinishOrder || readyToFinish) && (
+              <button className={styles.finishOrderButton} disabled={isMutating} aria-busy={isFinishing}
+                type="button" onClick={() => setFinishOpen(true)}>
+                <i className="bi bi-check-lg" aria-hidden="true" />
+                <LoadingAction busy={isFinishing}>{finishLabel}</LoadingAction>
+              </button>
+            )}
+          </footer>
+        )}
       </aside>
 
+      {reevaluateOpen && <PinModal
+        title="Confirmar reevaluación"
+        description="¿Confirmas que ya corregiste la información de este pedido en Manager?"
+        busy={isReevaluating} onClose={closeReevaluation} onSubmit={confirmReevaluation}
+        actions={<PinActions busy={isReevaluating} onCancel={closeReevaluation} confirmLabel="Sí, ya corregí los datos" />}>
+        <p>Antes de continuar, verifica que los cambios necesarios estén guardados en Manager. Al confirmar, el sistema ejecutará la reevaluación del pedido.</p>
+      </PinModal>}
       {finishOpen && <PinAuthorizationModal
         contextKey={`finish-${order.id}-${order.generalStepId}`} title={finishLabel}
         description={readyToFinishOrder ? 'Ingrese su PIN personal para cambiar el pedido a Terminado.' : 'Ingrese su PIN personal para finalizar la producción del pedido.'}

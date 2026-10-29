@@ -1,10 +1,10 @@
+import { KanbanDetailSection } from './KanbanDetailSection'
 import styles from '../styles/Kanban.module.css';
 import { getManufacturingDetails, isLanyardItem } from '../utils/kanbanDetail.js';
 
 export function KanbanOrderSummary({ order, orderItems }) {
   return (
-    <section className={styles.detailSection}>
-      <h3>Resumen</h3>
+    <KanbanDetailSection title="Resumen" icon="clipboard">
       {Array.isArray(order.labels) && order.labels.length > 0 && (
         <div className={styles.visibleLabels}>
           {order.labels.map((label) => (
@@ -85,6 +85,6 @@ export function KanbanOrderSummary({ order, orderItems }) {
           )
         })}
       </div>
-    </section>
+    </KanbanDetailSection>
   )
 }
