@@ -1,5 +1,6 @@
 import { AppError } from '../../../errors/AppError.js';
 import { isLanyardProduct } from './orderProductionRules.js';
+import { hasValidProductionSchedule, PRODUCTION_SCHEDULE_REQUIRED_MESSAGE } from '../../../../../shared/productionScheduling.js';
 
 export async function transitionGeneralStageOperation(repository, { id, ordenKanban, statusName, userId, comment, now = new Date(), compact = false, expectedState }) {
   const status = await repository.client.estado_Pedido.findFirst({
@@ -86,6 +87,16 @@ export async function transitionGeneralStageOperation(repository, { id, ordenKan
 }
 
 export async function updateGeneralStepOperation(repository, id, ordenKanban, audit = {}) {
+  if (Number(ordenKanban) === 2) {
+    await repository.lockProductionOrder(id);
+    const current = await repository.getTransitionState(id);
+    if (!current || Number(current.id_etapa_general) !== 1 || current.estado_pago !== 'Confirmado') {
+      throw new AppError(409, 'El pedido no esta en la etapa requerida o no tiene el pago confirmado.');
+    }
+    if (!hasValidProductionSchedule(current.fecha_estimada_termino)) {
+      throw new AppError(409, PRODUCTION_SCHEDULE_REQUIRED_MESSAGE, 'PRODUCTION_SCHEDULE_REQUIRED');
+    }
+  }
   if ([3, 4].includes(Number(ordenKanban))) {
     await repository.lockProductionOrder(id);
     const current = await repository.getTransitionState(id);

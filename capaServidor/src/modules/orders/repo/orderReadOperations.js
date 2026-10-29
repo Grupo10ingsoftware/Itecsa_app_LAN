@@ -110,7 +110,7 @@ export async function getOperation(repository, id) {
 
 export async function getTransitionStateOperation(repository, id) {
   const rows = await repository.client.$queryRaw`SELECT p.id_pedido, p.id_estado_pedido, p.id_estado_pago,
-    p.fecha_creacion, p.numero_nota_venta, ep.orden_kanban, ep.nombre_etapa, pay.nombre_estado_pago
+    p.fecha_creacion, p.fecha_estimada_termino, p.numero_nota_venta, ep.orden_kanban, ep.nombre_etapa, pay.nombre_estado_pago
     FROM Pedidos p LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido
     LEFT JOIN Estado_Pago pay ON pay.id_estado_pago=p.id_estado_pago WHERE p.id_pedido=${Number(id)} LIMIT 1`;
   const order = rows[0];
@@ -127,6 +127,7 @@ export async function getTransitionStateOperation(repository, id) {
     estado_pago: order.nombre_estado_pago ?? null,
     paymentStatus: order.nombre_estado_pago ?? null,
     fecha_creacion: order.fecha_creacion,
+    fecha_estimada_termino: order.fecha_estimada_termino,
     numero_nota_venta: order.numero_nota_venta,
   };
 }

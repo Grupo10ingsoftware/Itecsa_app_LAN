@@ -18,7 +18,7 @@ import { productionFixture } from '../scripts/fixtures/kanbanProductionFixture.m
 const actor = { idUsuario: 9 };
 for (const [current, next] of [[1, 2], [2, 3], [3, 4]]) test(`manual transition ${current}→${next} preserves expected-state and PIN actor`, async () => {
   let call;
-  const state = { id_estado_pedido: current + 10, id_estado_pago: 2, id_etapa_general: current, estado_pago: 'Confirmado' };
+  const state = { fecha_estimada_termino: new Date('2026-10-29T00:00:00Z'), id_estado_pedido: current + 10, id_estado_pago: 2, id_etapa_general: current, estado_pago: 'Confirmado' };
   const service = new OrderService({ repo: { getTransitionState: async () => state,
     updateGeneralStep: async (...args) => { call = args; return { id_pedido: 1 }; } } });
   assert.deepEqual(await service.updGeneralStep(1, next, { actor, role: ROLES.ADMINISTRADOR, identityProvider: 'keycloak',
