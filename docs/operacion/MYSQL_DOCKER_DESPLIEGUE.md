@@ -1,5 +1,10 @@
 # MySQL Docker: despliegue autónomo
 
+La guía completa de la instalación integrada con Keycloak 26.8.1 está en
+`docs/operacion/KEYCLOAK_LAN_OFFLINE_DESPLIEGUE.md`. Las instrucciones de esta
+página describen el despliegue MySQL anterior y deben leerse junto con la guía
+integrada para instalaciones nuevas.
+
 Este despliegue utiliza `compose.mysql.yaml` de forma independiente. No combina
 `compose.production.yaml`, no monta certificados de Aiven y no necesita acceso
 a ese proveedor.

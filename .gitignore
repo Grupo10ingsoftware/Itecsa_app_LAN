@@ -4,6 +4,8 @@ deploy/mysql-lab.env
 deploy/mysql.env
 deploy/mysql/certs/
 deploy/mysql/private/
+deploy/keycloak/private/
+deploy/https/private/
 deploy/mysql-lab/certs/
 deploy/mysql-lab/private/
 deploy/mysql-lab/state/
@@ -39,6 +41,7 @@ capaVista/**/dist-ssr/
 capaServidor/**/build/
 capaServidor/**/coverage/
 data/backups/
+data/offline/
 
 # Configuracion local frontend
 capaVista/**/*.local

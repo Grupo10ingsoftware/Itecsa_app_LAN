@@ -28,7 +28,7 @@ resolve_path() {
     *) printf '%s\n' "$ROOT_DIR/${1#./}" ;;
   esac
 }
-[[ -n "$ACTION" ]] || fail "uso: manage.sh install|update|start|stop|verify|backup|restore"
+[[ -n "$ACTION" ]] || fail "uso: manage.sh install|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|first-user"
 [[ -r "$ENV_FILE" ]] || fail "no se puede leer $ENV_FILE"
 PROJECT="$(read_value COMPOSE_PROJECT_NAME)"
 APP_VERSION="$(read_value APP_VERSION)"
@@ -36,6 +36,8 @@ IMAGE_MODE="$(read_value DEPLOY_IMAGE_MODE)"
 API_IMAGE="$(read_value API_IMAGE)"
 WEB_IMAGE="$(read_value WEB_IMAGE)"
 TOOLS_IMAGE="$(read_value DB_TOOLS_IMAGE)"
+KEYCLOAK_IMAGE="$(read_value KEYCLOAK_IMAGE)"
+PUBLIC_ORIGIN="$(read_value PUBLIC_ORIGIN)"
 API_ENV_FILE="$(resolve_path "$(read_value API_ENV_FILE)")"
 WEB_ENV_FILE="$(resolve_path "$(read_value WEB_ENV_FILE)")"
 CERTS_DIR="$(resolve_path "$(read_value MYSQL_CERTS_DIR)")"
@@ -43,30 +45,64 @@ PRIVATE_DIR="$(resolve_path "$(read_value MYSQL_PRIVATE_DIR)")"
 [[ "$PROJECT" =~ ^[a-z0-9][a-z0-9_-]{2,62}$ ]] || fail "COMPOSE_PROJECT_NAME no es valido"
 [[ "$APP_VERSION" =~ ^[A-Za-z0-9._-]{1,128}$ ]] || fail "APP_VERSION no es valido"
 [[ "$IMAGE_MODE" =~ ^(build|pull|preloaded)$ ]] || fail "DEPLOY_IMAGE_MODE debe ser build, pull o preloaded"
-for value in "$API_IMAGE" "$WEB_IMAGE" "$TOOLS_IMAGE"; do [[ -n "$value" ]] || fail "faltan referencias de imagen"; done
+for value in "$API_IMAGE" "$WEB_IMAGE" "$TOOLS_IMAGE" "$KEYCLOAK_IMAGE"; do [[ -n "$value" ]] || fail "faltan referencias de imagen"; done
+[[ "$PUBLIC_ORIGIN" =~ ^https://[A-Za-z0-9.-]+$ || "$PUBLIC_ORIGIN" =~ ^https://\[[0-9a-fA-F:]+\]$ ]] || fail "PUBLIC_ORIGIN debe ser HTTPS sin puerto ni ruta"
+[[ "$PUBLIC_ORIGIN" != *localhost* && "$PUBLIC_ORIGIN" != *127.0.0.1* ]] || fail "PUBLIC_ORIGIN provisional"
+for key in KEYCLOAK_DB_NAME KEYCLOAK_DB_USER KEYCLOAK_DB_PASSWORD KEYCLOAK_ADMIN_CLIENT_SECRET KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD KEYCLOAK_OPERATOR_USERNAME KEYCLOAK_OPERATOR_PASSWORD LAN_CA_FILE LAN_TLS_CERT_FILE LAN_TLS_KEY_FILE; do
+  [[ -n "$(read_value "$key")" ]] || fail "falta $key"
+done
+for key in LAN_CA_FILE LAN_TLS_CERT_FILE LAN_TLS_KEY_FILE; do
+  [[ -r "$(resolve_path "$(read_value "$key")")" ]] || fail "archivo TLS no legible: $key"
+done
+verify_public_certificate() {
+  local host cert key ca cert_pub key_pub
+  host="${PUBLIC_ORIGIN#https://}"
+  host="${host#[}"
+  host="${host%]}"
+  cert="$(resolve_path "$(read_value LAN_TLS_CERT_FILE)")"
+  key="$(resolve_path "$(read_value LAN_TLS_KEY_FILE)")"
+  ca="$(resolve_path "$(read_value LAN_CA_FILE)")"
+  openssl verify -CAfile "$ca" "$cert" >/dev/null || fail "la CA no valida el certificado publico"
+  if [[ "$host" =~ ^[0-9.]+$ || "$PUBLIC_ORIGIN" == *'['* ]]; then
+    openssl x509 -in "$cert" -noout -checkip "$host" | grep -q 'does match' || fail "el SAN no incluye la IP publica"
+  else
+    openssl x509 -in "$cert" -noout -checkhost "$host" | grep -q 'does match' || fail "el SAN no incluye el nombre publico"
+  fi
+  cert_pub="$(openssl x509 -in "$cert" -pubkey -noout | openssl pkey -pubin -outform DER | sha256sum | cut -d' ' -f1)"
+  key_pub="$(openssl pkey -in "$key" -pubout -outform DER | sha256sum | cut -d' ' -f1)"
+  [[ "$cert_pub" == "$key_pub" ]] || fail "clave privada y certificado publico no coinciden"
+}
 [[ -r "$API_ENV_FILE" ]] || fail "falta API_ENV_FILE"
 [[ -r "$WEB_ENV_FILE" ]] || fail "falta WEB_ENV_FILE"
 if grep -Eq '<[^>]+>' "$ENV_FILE" "$API_ENV_FILE" "$WEB_ENV_FILE"; then fail "quedan marcadores sin reemplazar"; fi
 if grep -qi aiven "$COMPOSE_FILE"; then fail "el Compose autonomo contiene una referencia a Aiven"; fi
 compose() { docker compose --project-name "$PROJECT" --env-file "$ENV_FILE" -f "$COMPOSE_FILE" "$@"; }
 verify_release_images() {
-  local api_revision tools_revision web_revision
+  local api_revision tools_revision web_revision keycloak_revision
   api_revision="$(docker image inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' "$API_IMAGE")"
   tools_revision="$(docker image inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' "$TOOLS_IMAGE")"
   web_revision="$(docker image inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' "$WEB_IMAGE")"
+  keycloak_revision="$(docker image inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' "$KEYCLOAK_IMAGE")"
   [[ "$api_revision" == "$APP_VERSION" ]] || fail "API_IMAGE no corresponde a APP_VERSION"
   [[ "$tools_revision" == "$APP_VERSION" ]] || fail "DB_TOOLS_IMAGE no corresponde a APP_VERSION"
   [[ "$web_revision" == "$APP_VERSION" ]] || fail "WEB_IMAGE no corresponde a APP_VERSION"
+  [[ "$keycloak_revision" == "$APP_VERSION" ]] || fail "KEYCLOAK_IMAGE no corresponde a APP_VERSION"
   [[ "$api_revision" == "$tools_revision" ]] || fail "API y database-tools pertenecen a versiones distintas"
 }
 prepare_images() {
   case "$IMAGE_MODE" in
     build)
-      compose --profile tools build api web database-tools
-      if ! docker image inspect "$(read_value MYSQL_IMAGE)" >/dev/null 2>&1; then compose pull mysql; fi ;;
-    pull) compose --profile tools pull mysql api web database-tools ;;
+      compose --profile tools build api web database-tools keycloak
+      if ! docker image inspect "$(read_value MYSQL_IMAGE)" >/dev/null 2>&1; then
+        docker pull mysql@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69
+        docker tag mysql@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69 "$(read_value MYSQL_IMAGE)"
+      fi ;;
+    pull)
+      compose --profile tools pull api web database-tools keycloak
+      docker pull mysql@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69
+      docker tag mysql@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69 "$(read_value MYSQL_IMAGE)" ;;
     preloaded)
-      for image in "$(read_value MYSQL_IMAGE)" "$API_IMAGE" "$WEB_IMAGE" "$TOOLS_IMAGE"; do
+      for image in "$(read_value MYSQL_IMAGE)" "$API_IMAGE" "$WEB_IMAGE" "$TOOLS_IMAGE" "$KEYCLOAK_IMAGE"; do
         docker image inspect "$image" >/dev/null 2>&1 || fail "imagen no cargada: $image"
       done ;;
   esac
@@ -101,19 +137,61 @@ backup_database() {
   chmod 700 "$ROOT_DIR/data/backups/mysql"
   compose --profile tools run --rm --no-deps db-backup
 }
+backup_keycloak_database() {
+  mkdir -p "$ROOT_DIR/data/backups/keycloak"
+  chmod 700 "$ROOT_DIR/data/backups/keycloak"
+  compose --profile tools run --rm --no-deps keycloak-db-backup
+}
 preflight() {
+  verify_public_certificate
   prepare_images
   ensure_tls
+  compose --profile tools run --rm --no-deps keycloak-trust-bootstrap
   compose --profile tools config --quiet
+  PUBLIC_ORIGIN="$PUBLIC_ORIGIN" node -e 'const dns=require("node:dns").promises;dns.lookup(new URL(process.env.PUBLIC_ORIGIN).hostname).catch(e=>{console.error(e.message);process.exitCode=1})' \
+    || fail "el host no resuelve PUBLIC_ORIGIN"
+  compose run --rm --no-deps --entrypoint node api -e 'const dns=require("node:dns").promises;dns.lookup(new URL(process.env.FRONTEND_ORIGIN).hostname).catch(e=>{console.error(e.message);process.exitCode=1})' \
+    || fail "la API no resuelve PUBLIC_ORIGIN"
+}
+verify_public_issuer() {
+  PUBLIC_ORIGIN="$PUBLIC_ORIGIN" NODE_EXTRA_CA_CERTS="$(resolve_path "$(read_value LAN_CA_FILE)")" \
+    node -e 'const expected=process.env.PUBLIC_ORIGIN+"/realms/itecsa"; fetch(expected+"/.well-known/openid-configuration",{signal:AbortSignal.timeout(10000)}).then(async r=>{if(!r.ok||((await r.json()).issuer!==expected))throw Error("issuer publico incorrecto")}).catch(e=>{console.error(e.message);process.exitCode=1})' \
+    || fail "el host no llega al issuer publico por HTTPS"
+  compose exec -T api node -e 'const expected=process.env.KEYCLOAK_ISSUER; fetch(expected+"/.well-known/openid-configuration",{signal:AbortSignal.timeout(10000)}).then(async r=>{if(!r.ok||((await r.json()).issuer!==expected))throw Error("issuer no coincide")}).catch(e=>{console.error(e.message);process.exitCode=1})' \
+    || fail "la API no llega al mismo issuer publico por HTTPS"
+}
+render_realm() {
+  PUBLIC_ORIGIN="$PUBLIC_ORIGIN" KEYCLOAK_ADMIN_CLIENT_SECRET="$(read_value KEYCLOAK_ADMIN_CLIENT_SECRET)" \
+    node "$ROOT_DIR/deploy/keycloak/render-realm.mjs"
+}
+post_bootstrap() {
+  PUBLIC_ORIGIN="$PUBLIC_ORIGIN" \
+  KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME="$(read_value KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME)" \
+  KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD="$(read_value KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD)" \
+  KEYCLOAK_OPERATOR_USERNAME="$(read_value KEYCLOAK_OPERATOR_USERNAME)" \
+  KEYCLOAK_OPERATOR_PASSWORD="$(read_value KEYCLOAK_OPERATOR_PASSWORD)" \
+  NODE_EXTRA_CA_CERTS="$(resolve_path "$(read_value LAN_CA_FILE)")" \
+    node "$ROOT_DIR/deploy/keycloak/post-bootstrap.mjs"
+}
+bootstrap_keycloak_database() {
+  compose --profile tools run --rm --no-deps keycloak-db-bootstrap
+}
+start_application() {
+  [[ -s "$ROOT_DIR/deploy/keycloak/private/itecsa-realm.json" ]] || fail "falta el import privado del realm"
+  compose up -d --wait keycloak api web
 }
 install_database() {
   preflight
   if state_exists; then fail "la instalacion ya tiene identidad; usar manage.sh update"; fi
+  render_realm
   start_mysql
   bootstrap_accounts
+  bootstrap_keycloak_database
   deploy_database
   verify_database
-  compose up -d api web
+  start_application
+  verify_public_issuer
+  post_bootstrap
   echo "MYSQL_DEPLOY: instalacion completa para $PROJECT."
 }
 update_database() {
@@ -135,34 +213,50 @@ update_database() {
   fi
   maintenance_active=0
   trap - ERR
-  compose up -d api web
+  start_application
+  verify_public_issuer
   echo "MYSQL_DEPLOY: actualizacion completa para $PROJECT."
 }
 case "$ACTION" in
   install) install_database ;;
   update) update_database ;;
-  start) compose up -d mysql api web ;;
-  stop) compose stop api web mysql ;;
+  start) start_mysql; start_application; verify_public_issuer ;;
+  stop) compose stop web api keycloak mysql ;;
   verify)
     preflight
     state_exists || fail "no existe identidad de instalacion"
     start_mysql
-    verify_database ;;
+    verify_database
+    start_application
+    verify_public_issuer ;;
   backup)
     preflight
     state_exists || fail "no existe identidad de instalacion"
-    compose stop api
+    compose stop api keycloak
     start_mysql
     lock_writes
     backup_database
+    backup_keycloak_database
     enable_migrations
     unlock_writes
-    compose up -d api ;;
+    start_application
+    verify_public_issuer ;;
+  keycloak-backup)
+    preflight
+    state_exists || fail "no existe identidad de instalacion"
+    compose stop keycloak
+    start_mysql
+    backup_keycloak_database
+    start_application
+    verify_public_issuer ;;
   restore)
     [[ -n "$BACKUP_FILE" ]] || fail "restore requiere --backup archivo.sql"
     preflight
     start_mysql
-    if ! state_exists; then bootstrap_accounts; fi
+    if ! state_exists; then
+      bootstrap_accounts
+      bootstrap_keycloak_database
+    fi
     if [[ -z "$RESTORE_CONFIRM" ]]; then
       compose --profile tools run --rm --no-deps database-tools sh -c 'cat /run/mysql-state/instance.env'
       fail "repetir con --confirm proyecto:base:UUID-del-destino"
@@ -172,6 +266,27 @@ case "$ACTION" in
     compose --profile tools run --rm --no-deps db-restore
     deploy_database
     verify_database
-    compose up -d api web ;;
+    echo "MYSQL_DEPLOY: base de aplicacion restaurada; restaurar Keycloak antes de arrancar." ;;
+  keycloak-restore)
+    [[ -n "$BACKUP_FILE" ]] || fail "keycloak-restore requiere --backup archivo.sql"
+    preflight
+    state_exists || fail "restaurar primero la base de aplicacion"
+    compose stop keycloak api web
+    start_mysql
+    [[ -n "$RESTORE_CONFIRM" ]] || fail "repetir con --confirm proyecto:base-keycloak:UUID-del-destino"
+    export KEYCLOAK_RESTORE_FILE="$BACKUP_FILE"
+    export KEYCLOAK_RESTORE_CONFIRM="$RESTORE_CONFIRM"
+    compose --profile tools run --rm --no-deps keycloak-db-restore
+    render_realm
+    start_application
+    verify_public_issuer ;;
+  first-user)
+    preflight
+    state_exists || fail "instalar antes de crear el primer usuario"
+    for key in FIRST_USER_USERNAME FIRST_USER_EMAIL FIRST_USER_FIRST_NAME FIRST_USER_LAST_NAME FIRST_USER_RUT FIRST_USER_TEMP_PASSWORD; do
+      [[ -n "$(read_value "$key")" ]] || fail "falta $key"
+    done
+    start_application
+    compose --profile tools run --rm --no-deps keycloak-first-user ;;
   *) fail "accion desconocida: $ACTION" ;;
 esac

@@ -28,7 +28,7 @@ x-db-tools: &db-tools
 
 services:
   mysql:
-    image: ${MYSQL_IMAGE:-mysql@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69}
+    image: ${MYSQL_IMAGE:-itecsa-mysql:8.4-pinned}
     command: ["mysqld", "--defaults-extra-file=/etc/itecsa-mysql.cnf"]
     hostname: itecsa-mysql
     environment:
@@ -74,16 +74,30 @@ services:
       DB_NAME: ${MYSQL_DATABASE}
       DB_SSL_MODE: required
       DB_SSL_CA_PATH: /run/secrets/mysql-ca.pem
+      NODE_EXTRA_CA_CERTS: /run/secrets/lan-ca.pem
+      FRONTEND_ORIGIN: ${PUBLIC_ORIGIN:?Definir PUBLIC_ORIGIN}
+      TRUST_PROXY: "1"
+      KEYCLOAK_ISSUER: ${PUBLIC_ORIGIN}/realms/itecsa
+      KEYCLOAK_JWKS_URI: ${PUBLIC_ORIGIN}/realms/itecsa/protocol/openid-connect/certs
+      KEYCLOAK_AUDIENCE: https://api.itecsa.local
+      KEYCLOAK_CLIENT_ID: itecsa-web
+      KEYCLOAK_ROLE_CLIENT_ID: itecsa-api-v1
+      KEYCLOAK_ADMIN_CLIENT_ID: itecsa-backend-admin
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:?Definir KEYCLOAK_ADMIN_CLIENT_SECRET}
+      KEYCLOAK_PIN_RECOVERY_CLIENT_ID: itecsa-pin-recovery
+      KEYCLOAK_PIN_RECOVERY_REDIRECT_URI: ${PUBLIC_ORIGIN}/auth/pin-recovery/callback
       ENABLE_DEMO_ROUTES: "false"
     secrets:
       - source: mysql_ca
         target: mysql-ca.pem
+      - source: lan_ca
+        target: lan-ca.pem
     depends_on:
       mysql:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks: [default, mysql_private]
-    ports:
-      - "${BIND_ADDRESS:-127.0.0.1}:${API_PORT:-3000}:3000"
     init: true
     restart: unless-stopped
     stop_grace_period: 15s
@@ -97,9 +111,62 @@ services:
       args:
         APP_VERSION: ${APP_VERSION:?Definir APP_VERSION}
     env_file: ${WEB_ENV_FILE:-./capaVista/.env}
+    environment:
+      VITE_AUTH_PROVIDER: keycloak
+      VITE_KEYCLOAK_URL: ${PUBLIC_ORIGIN:?Definir PUBLIC_ORIGIN}
+      VITE_KEYCLOAK_REALM: itecsa
+      VITE_KEYCLOAK_CLIENT_ID: itecsa-web
+      VITE_KEYCLOAK_AUDIENCE: https://api.itecsa.local
+      VITE_API_BASE_URL: ${PUBLIC_ORIGIN}/api
+    volumes:
+      - ${LAN_TLS_CERT_FILE:?Definir LAN_TLS_CERT_FILE}:/run/lan-tls/tls.crt:ro
+      - ${LAN_TLS_KEY_FILE:?Definir LAN_TLS_KEY_FILE}:/run/lan-tls/tls.key:ro
+    group_add:
+      - "${LAN_TLS_KEY_GID:-101}"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      api:
+        condition: service_healthy
     ports:
-      - "${BIND_ADDRESS:-127.0.0.1}:${WEB_PORT:-8080}:8080"
+      - "${LAN_BIND_ADDRESS:-0.0.0.0}:443:8443"
     restart: unless-stopped
+
+  keycloak:
+    image: ${KEYCLOAK_IMAGE:-itecsa-keycloak:local}
+    build:
+      context: .
+      dockerfile: deploy/keycloak/Dockerfile
+      args:
+        APP_VERSION: ${APP_VERSION:?Definir APP_VERSION}
+    command: ["start", "--optimized", "--import-realm"]
+    environment:
+      KC_DB: mysql
+      KC_DB_URL: "jdbc:mysql://mysql:3306/${KEYCLOAK_DB_NAME:?Definir KEYCLOAK_DB_NAME}?sslMode=VERIFY_CA&trustCertificateKeyStoreUrl=file:/run/keycloak-trust/mysql.p12&trustCertificateKeyStorePassword=changeit"
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:?Definir KEYCLOAK_DB_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?Definir KEYCLOAK_DB_PASSWORD}
+      KC_HOSTNAME: ${PUBLIC_ORIGIN:?Definir PUBLIC_ORIGIN}
+      KC_PROXY_HEADERS: xforwarded
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME:?Definir KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD:?Definir KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD}
+    volumes:
+      - ./deploy/keycloak/private/itecsa-realm.json:/opt/keycloak/data/import/itecsa-realm.json:ro
+      - mysql_trust:/run/keycloak-trust:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: [default, mysql_private]
+    healthcheck:
+      test: ["CMD", "bash", "-ec", "exec 3<>/dev/tcp/127.0.0.1/9000; printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3; grep -q '200 OK' <&3"]
+      interval: 15s
+      timeout: 5s
+      start_period: 90s
+      retries: 8
+    restart: unless-stopped
+    stop_grace_period: 45s
 
   database-tools:
     <<: *db-tools
@@ -164,6 +231,41 @@ services:
         npm run mysql:bootstrap-accounts
         chown 1000:1000 /run/mysql-state/instance.env
         chmod 0600 /run/mysql-state/instance.env
+
+  keycloak-db-bootstrap:
+    <<: *db-tools
+    network_mode: none
+    user: "0:0"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_MIGRATION_USER: ${MYSQL_MIGRATION_USER}
+      MYSQL_INSTANCE_FILE: /run/mysql-state/instance.env
+      COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME}
+      KEYCLOAK_DB_NAME: ${KEYCLOAK_DB_NAME}
+      KEYCLOAK_DB_USER: ${KEYCLOAK_DB_USER}
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - mysql_socket:/var/run/mysqld
+      - mysql_state:/run/mysql-state:ro
+    command: ["npm", "run", "keycloak:mysql-bootstrap"]
+
+  keycloak-trust-bootstrap:
+    image: ${KEYCLOAK_IMAGE:-itecsa-keycloak:local}
+    profiles: ["tools"]
+    network_mode: none
+    user: "0:0"
+    entrypoint: ["/bin/bash", "-ec"]
+    command:
+      - |
+        if [ ! -s /output/mysql.p12 ]; then
+          keytool -importcert -noprompt -alias itecsa-mysql-ca -file /input/ca.pem -keystore /output/mysql.p12 -storetype PKCS12 -storepass changeit
+          chmod 0644 /output/mysql.p12
+        fi
+    volumes:
+      - ${MYSQL_CERTS_DIR:-./deploy/mysql/certs}/ca.pem:/input/ca.pem:ro
+      - mysql_trust:/output
 
   maintenance:
     <<: *db-tools
@@ -241,11 +343,70 @@ services:
     networks: [mysql_private]
     command: ["npm", "run", "mysql:restore"]
 
+  keycloak-db-backup:
+    <<: *db-tools
+    network_mode: none
+    user: "0:0"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_INSTANCE_FILE: /run/mysql-state/instance.env
+      COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME}
+      KEYCLOAK_DB_NAME: ${KEYCLOAK_DB_NAME}
+      KEYCLOAK_BACKUP_DIR: /backups
+    volumes:
+      - mysql_socket:/var/run/mysqld
+      - mysql_state:/run/mysql-state:ro
+      - ./data/backups/keycloak:/backups
+    command: ["npm", "run", "keycloak:mysql-backup"]
+
+  keycloak-db-restore:
+    <<: *db-tools
+    network_mode: none
+    user: "0:0"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_INSTANCE_FILE: /run/mysql-state/instance.env
+      COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME}
+      KEYCLOAK_DB_NAME: ${KEYCLOAK_DB_NAME}
+      KEYCLOAK_BACKUP_DIR: /backups
+      KEYCLOAK_RESTORE_FILE: ${KEYCLOAK_RESTORE_FILE:-}
+      KEYCLOAK_RESTORE_CONFIRM: ${KEYCLOAK_RESTORE_CONFIRM:-}
+    volumes:
+      - mysql_socket:/var/run/mysqld
+      - mysql_state:/run/mysql-state:ro
+      - ./data/backups/keycloak:/backups:ro
+    command: ["npm", "run", "keycloak:mysql-restore"]
+
+  keycloak-first-user:
+    <<: *db-tools
+    environment:
+      <<: *db-environment
+      NODE_EXTRA_CA_CERTS: /run/secrets/lan-ca.pem
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN}
+      KEYCLOAK_OPERATOR_USERNAME: ${KEYCLOAK_OPERATOR_USERNAME}
+      KEYCLOAK_OPERATOR_PASSWORD: ${KEYCLOAK_OPERATOR_PASSWORD}
+      FIRST_USER_USERNAME: ${FIRST_USER_USERNAME:-}
+      FIRST_USER_EMAIL: ${FIRST_USER_EMAIL:-}
+      FIRST_USER_FIRST_NAME: ${FIRST_USER_FIRST_NAME:-}
+      FIRST_USER_LAST_NAME: ${FIRST_USER_LAST_NAME:-}
+      FIRST_USER_RUT: ${FIRST_USER_RUT:-}
+      FIRST_USER_TEMP_PASSWORD: ${FIRST_USER_TEMP_PASSWORD:-}
+    secrets:
+      - source: mysql_ca
+        target: mysql-ca.pem
+      - source: lan_ca
+        target: lan-ca.pem
+    networks: [default, mysql_private]
+    command: ["npm", "run", "keycloak:first-user"]
+
 volumes:
   mysql_data:
   mysql_socket:
   mysql_state:
   mysql_tls:
+  mysql_trust:
 
 networks:
   mysql_private:
@@ -254,3 +415,5 @@ networks:
 secrets:
   mysql_ca:
     file: ${MYSQL_CERTS_DIR:-./deploy/mysql/certs}/ca.pem
+  lan_ca:
+    file: ${LAN_CA_FILE:?Definir LAN_CA_FILE}
