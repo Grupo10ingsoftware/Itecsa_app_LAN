@@ -7,6 +7,8 @@ import { formatMessageDate, notifyMessagesChanged } from '../utils/messageFormat
 import styles from './MessageDetailPage.module.css'
 import PageShell from '../../../shared/components/layout/PageShell'
 import PageHeader from '../../../shared/components/layout/PageHeader'
+import { useAuth } from '../../../hooks/useAuth'
+import { PERMISSIONS } from '../../../config/permissions'
 
 export default function MessageDetailPage() {
   const { messageId } = useParams()
@@ -15,6 +17,7 @@ export default function MessageDetailPage() {
 }
 
 function DetailSession({ api, messageId }) {
+  const { hasPermission } = useAuth()
   const [message, setMessage] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -53,7 +56,7 @@ function DetailSession({ api, messageId }) {
       <section className={styles.shell}>
         {!isLoading && message && <PageHeader title="Detalle del mensaje" />}
         <Link className={styles.backLink} to={APP_ROUTES.MESSAGES}>
-          <i className="bi bi-arrow-left" aria-hidden="true" /> Volver a la bandeja
+          <span className={styles.backIcon}><i className="bi bi-chevron-left" aria-hidden="true" /></span> Volver a la bandeja
         </Link>
 
         {isLoading && <LoadingIndicator context="Detalle del mensaje" />}
@@ -69,25 +72,32 @@ function DetailSession({ api, messageId }) {
         {!isLoading && message && (
           <article className={styles.messageCard}>
             <header className={styles.header}>
-              <div className={styles.mailIcon}><i className="bi bi-envelope-open" aria-hidden="true" /></div>
-              <div className={styles.heading}>
-                <span className={styles.eyebrow}>Mensaje recibido</span>
-                <h2>{message.Asunto}</h2>
-                <time dateTime={message.fecha_publicacion}>{formatMessageDate(message.fecha_publicacion)}</time>
+              <div className={styles.bannerUpper}>
+                <span className={styles.eyebrow}><span className={styles.mailIcon}><i className="bi bi-envelope-open" aria-hidden="true" /></span>Mensaje recibido</span>
+                <span className={styles.readBadge}><i className={message.leido ? 'bi bi-check2-all' : 'bi bi-envelope'} aria-hidden="true" /> {message.leido ? 'Leído' : 'Sin leer'}</span>
               </div>
-              <span className={styles.readBadge}><i className="bi bi-check2-all" aria-hidden="true" /> {message.leido ? 'Leído' : 'Sin leer'}</span>
+              <h2>{message.Asunto}</h2>
+              <div className={styles.date}><i className="bi bi-clock" aria-hidden="true" /><time dateTime={message.fecha_publicacion}>{formatMessageDate(message.fecha_publicacion)}</time></div>
             </header>
 
-            <div className={styles.content}>{message.contenido}</div>
+            <section className={styles.contentSection} aria-label="Contenido del mensaje">
+              <h3 className={styles.sectionHeading}>Contenido del mensaje</h3>
+              <p className={styles.content}>{message.contenido}</p>
+            </section>
 
             {message.id_pedido && (
               <aside className={styles.orderCard}>
                 <span className={styles.orderIcon}><i className="bi bi-box-seam" aria-hidden="true" /></span>
-                <div>
+                <div className={styles.orderMeta}>
                   <small>Pedido relacionado</small>
-                  <strong>Pedido #{message.id_pedido}</strong>
+                  <strong>{message.pedido?.numero_nota_venta ? `Nota de Venta ${message.pedido.numero_nota_venta}` : 'Nota de Venta no disponible'}</strong>
                   {message.pedido?.fecha_estimada_termino && <span>Entrega estimada: {formatMessageDate(message.pedido.fecha_estimada_termino, { includeTime: false })}</span>}
                 </div>
+                {hasPermission(PERMISSIONS.VIEW_KANBAN_MODULE) && (
+                  <Link className={styles.orderLink} to={`${APP_ROUTES.KANBAN}?pedido=${encodeURIComponent(message.id_pedido)}`}>
+                    Ver pedido en Kanban <i className="bi bi-arrow-right" aria-hidden="true" />
+                  </Link>
+                )}
               </aside>
             )}
           </article>

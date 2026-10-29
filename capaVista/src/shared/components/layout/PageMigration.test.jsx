@@ -103,7 +103,7 @@ describe('Páginas migradas sin modificar sus operaciones', () => {
     expect(subject.closest('article')).toBeTruthy()
     expect(screen.getByText('Leído')).toBeTruthy()
     expect(screen.getByText(/Este mensaje sintético conserva/)).toBeTruthy()
-    expect(screen.getByText('Pedido #123')).toBeTruthy()
+    expect(screen.getByText('Nota de Venta no disponible')).toBeTruthy()
     expect(screen.getByRole('link', { name: /Volver a la bandeja/ }).getAttribute('href')).toBe('/mensajes')
   })
 

@@ -1,5 +1,6 @@
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import KanbanColumn from '../components/KanbanColumn'
 import KanbanFilters from '../components/KanbanFilters'
 import styles from './KanbanBoardPage.module.css'
@@ -54,6 +55,15 @@ function hasDailyLoadChange(detail) {
 }
 
 export default function KanbanBoardPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const requestedOrderId = searchParams.getAll('pedido').length > 1 ? '' : searchParams.get('pedido')
+  function clearRequestedOrder() {
+    setSearchParams(current => {
+      const next = new URLSearchParams(current)
+      next.delete('pedido')
+      return next
+    }, { replace: true })
+  }
   const notify = useToast()
   const api = useKanbanApi()
   const { hasPermission } = useAuth()
@@ -206,7 +216,10 @@ export default function KanbanBoardPage() {
             onApplyFilters={(nextFilters) => setAppliedFilters(nextFilters)}
             onClearFilters={() => setAppliedFilters({})}
           />
-          <KanbanColumn filters={appliedFilters} refreshKey={kanbanRefreshKey} />
+          <KanbanColumn filters={appliedFilters} refreshKey={kanbanRefreshKey}
+            requestedOrderId={requestedOrderId}
+            onClearRequestedOrder={clearRequestedOrder}
+          />
         </div>
       </PageSurface>
       {isCapacityOpen && (

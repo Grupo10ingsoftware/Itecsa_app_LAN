@@ -319,6 +319,12 @@
   display: none;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .sidebar, .contentArea, .navText {
+    transition: none;
+  }
+}
+
 @media (max-width: 991.98px) {
   .appShell {
     display: block;
