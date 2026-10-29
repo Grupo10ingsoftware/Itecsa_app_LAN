@@ -13,6 +13,8 @@ test('realm import has the full application contract and exact PIN callback', ()
   assert.equal(realm.loginTheme, 'itecsa');
   assert.equal(realm.resetPasswordAllowed, false);
   assert.equal(realm.bruteForceProtected, true);
+  assert.deepEqual(realm.requiredActions, [{ alias: 'UPDATE_PASSWORD', providerId: 'UPDATE_PASSWORD',
+    name: 'Update Password', enabled: true, defaultAction: false }]);
   assert.deepEqual(realm.roles.client['itecsa-api'].map(role => role.name), BUSINESS_PERMISSIONS);
   assert.deepEqual(realm.roles.client['itecsa-api-v1'].map(role => role.name), RECOGNIZED_ROLES);
   for (const role of realm.roles.client['itecsa-api-v1']) {

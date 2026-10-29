@@ -55,6 +55,11 @@ export async function bootstrap(env = process.env, fetcher = fetch) {
   }
 
   const realm = await request('');
+  const requiredActions = await request('/authentication/required-actions');
+  const updatePassword = requiredActions.find(action => action.alias === 'UPDATE_PASSWORD');
+  if (updatePassword?.providerId !== 'UPDATE_PASSWORD' || updatePassword.enabled !== true) {
+    fail('UPDATE_PASSWORD sin proveedor habilitado; requiere reparacion administrativa antes del primer acceso');
+  }
   if (realm.realm !== 'itecsa' || realm.sslRequired !== 'all' ||
       realm.registrationAllowed !== false || realm.resetPasswordAllowed !== false ||
       realm.bruteForceProtected !== true || realm.loginTheme !== 'itecsa' ||

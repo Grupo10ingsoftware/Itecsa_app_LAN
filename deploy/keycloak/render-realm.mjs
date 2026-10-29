@@ -56,7 +56,7 @@ export function buildRealm({ origin, adminClientSecret }) {
     passwordPolicy: 'length(8) and upperCase(1) and lowerCase(1) and digits(1) and specialChars(1)',
     bruteForceProtected: true, permanentLockout: false, failureFactor: 5,
     waitIncrementSeconds: 60, maxFailureWaitSeconds: 900, maxDeltaTimeSeconds: 43200,
-    requiredActions: [{ alias: 'UPDATE_PASSWORD', name: 'Update Password', enabled: true, defaultAction: false }],
+    requiredActions: [{ alias: 'UPDATE_PASSWORD', providerId: 'UPDATE_PASSWORD', name: 'Update Password', enabled: true, defaultAction: false }],
     attributes: { userProfileEnabled: 'true' },
     roles: { client: {
       [capabilityClient]: BUSINESS_PERMISSIONS.map(name => ({ name })),

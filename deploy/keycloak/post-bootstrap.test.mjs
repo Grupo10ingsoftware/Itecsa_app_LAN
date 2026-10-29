@@ -11,8 +11,9 @@ const env = {
   KEYCLOAK_OPERATOR_PASSWORD: 'synthetic-permanent-password',
 };
 
-function fixture({ failAssignment = false, rejectOperator = false } = {}) {
+function fixture({ failAssignment = false, rejectOperator = false, missingActionProvider = false } = {}) {
   const realm = buildRealm({ origin: env.PUBLIC_ORIGIN, adminClientSecret: 'synthetic-client-secret-at-least-32-chars' });
+  if (missingActionProvider) delete realm.requiredActions[0].providerId;
   const clients = realm.clients.map(client => ({ ...client, id: client.clientId }));
   clients.push({ clientId: 'realm-management', id: 'realm-management' });
   const roles = Object.fromEntries(Object.entries(realm.roles.client).map(([client, values]) => [client,
@@ -56,6 +57,7 @@ function fixture({ failAssignment = false, rejectOperator = false } = {}) {
     }
     const route = url.pathname.slice('/admin/realms/itecsa'.length);
     if (route === '') { if (method === 'PUT') Object.assign(realm, body); return ok(realm); }
+    if (route === '/authentication/required-actions') return ok(realm.requiredActions);
     if (route === '/clients') return ok(clients.filter(client => client.clientId === url.searchParams.get('clientId')));
     if (route === '/users/profile') { if (method === 'PUT') profile = body; return ok(profile); }
     if (route.includes('/scope-mappings/') || route.includes('/role-mappings/')) {
@@ -98,5 +100,12 @@ test('invalid permanent credentials never grant admin or remove temporary access
   const { state, fetcher } = fixture({ rejectOperator: true });
   await assert.rejects(bootstrap(env, fetcher), /no puede iniciar sesion/);
   assert.equal(state.grants, 0);
+  assert.equal(state.temporary, true);
+});
+
+test('bootstrap rejects an imported password action without its provider before retiring temporary access', async () => {
+  const { state, fetcher } = fixture({ missingActionProvider: true });
+  await assert.rejects(bootstrap(env, fetcher), /UPDATE_PASSWORD sin proveedor/);
+  assert.equal(state.operator, false);
   assert.equal(state.temporary, true);
 });
