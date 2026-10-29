@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-const migrationsRoot = path.resolve("prisma/migrations");
+const migrationsRoot = fileURLToPath(new URL("../prisma/migrations/", import.meta.url));
 const expected = Object.freeze({
   "0_init": "34c502aa4b163bb204a6858f3bd9fed6cc8970c8cba9b2ef6836e0d62c803ce5",
   "20260814120000_remove_electronic_signatures": "b718dd43821ee3490b5ecc528b0e6f9dff4e5801454623aa3a11b7e375a0781f",
@@ -26,7 +27,7 @@ const expected = Object.freeze({
 
 test("la tarea de inicializacion fija exactamente la cadena Prisma provisional", () => {
   const directories = readdirSync(migrationsRoot, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
+    .filter((entry) => entry.isDirectory() && existsSync(path.join(migrationsRoot, entry.name, "migration.sql")))
     .map((entry) => entry.name)
     .sort();
   assert.deepEqual(directories, Object.keys(expected).sort());

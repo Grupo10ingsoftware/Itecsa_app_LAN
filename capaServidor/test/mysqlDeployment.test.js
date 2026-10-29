@@ -101,7 +101,7 @@ test("update valida versiones, bloquea escritores y respalda antes de migrar", (
   const body = script.slice(script.indexOf("update_database()"), script.indexOf("case \"$ACTION\""));
   const ordered = [
     "preflight", "compose stop api", "lock_writes", "backup_database", "enable_migrations",
-    "deploy_database", "verify_database_read_only", "unlock_writes", "verify_database", "compose up -d api web",
+    "deploy_database", "verify_database_read_only", "unlock_writes", "verify_database", "start_application", "verify_public_issuer",
   ];
   let position = -1;
   for (const step of ordered) {
@@ -112,7 +112,8 @@ test("update valida versiones, bloquea escritores y respalda antes de migrar", (
   assert.match(script, /api_revision.*tools_revision/s);
   assert.match(script, /API y database-tools pertenecen a versiones distintas/);
   assert.match(body, /trap 'if \(\( maintenance_active \)\); then lock_writes[^']+' ERR/);
-  assert.ok(body.indexOf("maintenance_active=0", body.indexOf("deploy_database")) < body.indexOf("compose up -d api web"));
+  assert.ok(body.indexOf("maintenance_active=0", body.indexOf("deploy_database")) < body.indexOf("start_application"));
+  assert.match(script, /compose up -d --wait keycloak api web/);
 });
 
 

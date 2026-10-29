@@ -1,5 +1,10 @@
 # Autenticación ITECSA · Keycloak 26.8.1
 
+Esta página registra la implementación anterior del tema en la VM de desarrollo.
+Para la instalación nueva y autónoma de Keycloak en la LAN, consultar
+`docs/operacion/KEYCLOAK_LAN_OFFLINE_DESPLIEGUE.md`. Las afirmaciones de abajo
+sobre el Compose antiguo describen ese estado histórico.
+
 ## Diagnóstico y alcance
 
 El contexto de operación del 25-10-2026 identifica Keycloak **26.8.1** en Ubuntu. El SDK de la SPA es `keycloak-js` **26.2.4**: son versiones independientes. El realm es `itecsa` y la SPA pública es `itecsa-web`. Ubuntu sirve las páginas de autenticación; Compose contiene solamente `api` y `web`. Este cambio no instala otro Keycloak ni cambia producción, roles, permisos, cuentas o contraseñas.

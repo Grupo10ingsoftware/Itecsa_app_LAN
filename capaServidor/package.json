@@ -29,7 +29,11 @@
     "mysql:maintenance": "node scripts/mysqlMaintenance.mjs",
     "mysql:generate-tls": "node scripts/mysqlGenerateTls.mjs",
     "mysql:backup": "node scripts/mysqlBackup.mjs",
-    "mysql:restore": "node scripts/mysqlRestore.mjs"
+    "mysql:restore": "node scripts/mysqlRestore.mjs",
+    "keycloak:mysql-bootstrap": "node scripts/keycloakMysqlBootstrap.mjs",
+    "keycloak:mysql-backup": "node scripts/keycloakMysqlBackup.mjs backup",
+    "keycloak:mysql-restore": "node scripts/keycloakMysqlBackup.mjs restore",
+    "keycloak:first-user": "node scripts/keycloakFirstUser.mjs"
   },
   "nodemonConfig": {
     "watch": [
