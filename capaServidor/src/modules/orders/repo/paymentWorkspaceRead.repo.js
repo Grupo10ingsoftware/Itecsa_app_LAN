@@ -22,7 +22,8 @@ export async function readPaymentPage(client, filters) {
     p.id_estado_pago, c.nombre_cliente, c.razon_social, c.rut_cliente, s.nombre_estado_pago AS estado_pago
     FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente
     LEFT JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago
-    WHERE ${Prisma.join(where, ' AND ')} ORDER BY p.id_pedido DESC LIMIT ${filters.limit + 1}`);
+    WHERE ${Prisma.join(where, ' AND ')} ORDER BY p.id_pedido DESC LIMIT ${filters.limit + 1}
+    ${filters.page ? Prisma.sql`OFFSET ${(filters.page - 1) * filters.limit}` : Prisma.empty}`);
 }
 
 export async function readPaymentCounts(client, filters) {

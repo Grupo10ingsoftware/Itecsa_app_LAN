@@ -10,8 +10,9 @@ import UserManagementTable from '../components/UserManagementTable'
 import UserMovementsModal from '../components/UserMovementsModal'
 import { displayUserStatus } from '../../../config/userLifecycle.js'
 import styles from './UserManagementPage.module.css'
-import PageShell from '../../../shared/components/layout/PageShell'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
 import PageHeader from '../../../shared/components/layout/PageHeader'
+import FilterContent from '../../../shared/components/filters/FilterContent'
 import { useToast } from '../../../shared/notifications/useToast'
 import { FEEDBACK_HANDLED, publicOperationMessage, requiresContext, uncertainOperation, operationFailureMessage } from '../../../shared/notifications/operationFeedback'
 
@@ -88,6 +89,7 @@ export default function UserManagementPage() {
   const [draftFilters, setDraftFilters] = useState(EMPTY_FILTERS)
   const [appliedSearch, setAppliedSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
   const [totalUsers, setTotalUsers] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [actionMessage, setActionMessage] = useState(null)
@@ -124,7 +126,7 @@ export default function UserManagementPage() {
       try {
         const response = await adminUsersApi.listUsers({
           page: requestedPage,
-          perPage: DEFAULT_PAGE_SIZE,
+          perPage: pageSize,
           search: appliedSearch,
           estadoUsuario: activeStatus,
           department: activeDepartment,
@@ -148,6 +150,11 @@ export default function UserManagementPage() {
           }),
         )
         setTotalUsers(response.total ?? 0)
+        const lastPage = Math.max(1, Math.ceil((response.total ?? 0) / pageSize))
+        if (requestedPage > lastPage) {
+          preserveNextListMessage.current = preserveMessage
+          setPage(lastPage)
+        }
       } catch (error) {
         if (controller.signal.aborted || requestId !== latestRequestRef.current) {
           return
@@ -162,7 +169,7 @@ export default function UserManagementPage() {
         }
       }
     },
-    [activeDepartment, activeStatus, adminUsersApi, currentExternalUserId, appliedSearch, page],
+    [activeDepartment, activeStatus, adminUsersApi, currentExternalUserId, appliedSearch, page, pageSize],
   )
 
   useEffect(() => {
@@ -179,7 +186,7 @@ export default function UserManagementPage() {
     }
   }, [loadUsers])
 
-  const totalPages = Math.max(1, Math.ceil(totalUsers / DEFAULT_PAGE_SIZE))
+  const totalPages = Math.max(1, Math.ceil(totalUsers / pageSize))
 
   function handleApplyFilters() {
     setActiveStatus(draftFilters.status)
@@ -260,10 +267,10 @@ export default function UserManagementPage() {
 
   return (
     <PageShell className={styles.page} aria-labelledby="user-management-title">
-      <section className={styles.dashboardShell}>
+      <PageSurface>
         <PageHeader title="Gestion de usuarios" titleId="user-management-title" />
 
-        <div className={styles.content}>
+        <FilterContent>
           {actionMessage && (
             <div className={`${styles.feedbackMessage} ${styles[`feedback${actionMessage.type}`]}`} role="status">
               <span>{actionMessage.text}</span>
@@ -296,13 +303,24 @@ export default function UserManagementPage() {
             isLoading={isLoading}
             onEditUser={handleInspectUser}
             onViewMovements={setMovementsUser}
-            onPageChange={setPage}
+            onPageChange={nextPage => {
+              if (nextPage === page || nextPage < 1 || nextPage > totalPages) return
+              setIsLoading(true)
+              setPage(nextPage)
+            }}
+            pageSize={pageSize}
+            onPageSizeChange={nextSize => {
+              if (nextSize === pageSize) return
+              setIsLoading(true)
+              setPage(1)
+              setPageSize(nextSize)
+            }}
             totalPages={totalPages}
             totalUsers={totalUsers}
             users={users}
           />
-        </div>
-      </section>
+        </FilterContent>
+      </PageSurface>
 
       {movementsUser && (
         <UserMovementsModal

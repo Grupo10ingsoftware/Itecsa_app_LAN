@@ -66,9 +66,10 @@ describe('Páginas migradas sin modificar sus operaciones', () => {
     expect(screen.getByRole('heading', { name: 'Carga diaria de Lanyard' })).toBeTruthy()
   })
 
-  it('actualiza el contador del historial conservando el enlace al detalle', async () => {
+  it('muestra el rango del historial en el footer conservando el enlace al detalle', async () => {
     mount(OrderHistoryPage)
-    await screen.findByText('1 resultados en esta página')
+    await screen.findByText('Mostrando 1 a 1 de 1 resultados')
+    expect(screen.getByRole('combobox', { name: 'Filas por página' }).value).toBe('10')
     expect(screen.getByRole('link', { name: /Ver detalle/ }).getAttribute('href')).toBe('/historial-pedidos/123')
     fireEvent.click(screen.getByRole('button', { name: 'Expandir filtros del historial' }))
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'NV-123' } })

@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 
-export function orderListQuery({status,search,dateRange,cursor,limit}) {
+function orderConditions({status,search,dateRange,cursor}) {
     const filters = [];
     if (cursor) filters.push(Prisma.sql`p.id_pedido < ${cursor.id}`);
     if (status) filters.push(Prisma.sql`ep.nombre_etapa = ${status}`);
@@ -10,6 +10,10 @@ export function orderListQuery({status,search,dateRange,cursor,limit}) {
     }
     if (dateRange?.start) filters.push(Prisma.sql`p.fecha_creacion >= ${dateRange.start}`);
     if (dateRange?.end) filters.push(Prisma.sql`p.fecha_creacion < ${dateRange.end}`);
+    return filters.length ? Prisma.sql`WHERE ${Prisma.join(filters,' AND ')}` : Prisma.empty;
+}
+
+export function orderListQuery({status,search,dateRange,cursor,limit,page}) {
     return Prisma.sql`
         SELECT p.id_pedido,p.numero_nota_venta,p.fecha_creacion,
                c.id_cliente AS relatedClient,c.nombre_cliente,c.razon_social,
@@ -17,8 +21,17 @@ export function orderListQuery({status,search,dateRange,cursor,limit}) {
         FROM Pedidos p
         LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente
         LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido
-        ${filters.length ? Prisma.sql`WHERE ${Prisma.join(filters,' AND ')}` : Prisma.empty}
-        ORDER BY p.id_pedido DESC LIMIT ${limit+1}`;
+        ${orderConditions({status,search,dateRange,cursor})}
+        ORDER BY p.id_pedido DESC LIMIT ${limit+1}
+        ${page ? Prisma.sql`OFFSET ${(page-1)*limit}` : Prisma.empty}`;
+}
+
+export function orderCountQuery({status,search,dateRange}) {
+    return Prisma.sql`SELECT COUNT(*) AS total
+        FROM Pedidos p
+        LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente
+        LEFT JOIN Estado_Pedido ep ON ep.id_estado_pedido=p.id_estado_pedido
+        ${orderConditions({status,search,dateRange})}`;
 }
 
 export const orderHeaderQuery = id => Prisma.sql`

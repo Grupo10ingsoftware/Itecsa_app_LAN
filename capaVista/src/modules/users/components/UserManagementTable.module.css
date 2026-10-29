@@ -1,0 +1,62 @@
+.tableCard {
+  background: var(--page-white);
+  border: 1px solid var(--page-header-black);
+  border-radius: var(--page-radius);
+  font-family: var(--page-font-family);
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
+}
+.tableResponsive { container-type: inline-size; overflow-x: auto; }
+.tableResponsive:focus-visible { outline: 2px solid var(--page-brand-orange); outline-offset: -3px; }
+.usersTable {
+  /* Reserve space for RUT (104), badges (120 + 16) and two actions
+     (120 + 120 + 8 + 16). Share the remainder using the 11:16:20:17
+     proportions for variable text, with one colgroup for every row. */
+  --users-text-width: calc(max(1256px, 100cqi) - 504px);
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1256px;
+  table-layout: fixed;
+  width: 100%;
+}
+.colUsername { width: calc(var(--users-text-width) * 11 / 64); }
+.colName { width: calc(var(--users-text-width) * 16 / 64); }
+.colEmail { width: calc(var(--users-text-width) * 20 / 64); }
+.colRut { width: 104px; }
+.colRole { width: calc(var(--users-text-width) * 17 / 64); }
+.colStatus { width: 136px; }
+.colActions { width: 264px; }
+.usersTable tr, .usersTable th, .usersTable td { border-inline: 0; vertical-align: middle; }
+.usersTable th {
+  background: var(--page-header-black);
+  color: var(--page-white);
+  font-size: 14px;
+  font-weight: 600;
+  height: 48px;
+  line-height: 20px;
+  padding: 12px 8px;
+  text-align: center;
+  text-transform: uppercase;
+}
+.usersTable td {
+  background: var(--page-white);
+  border-bottom: 1px solid var(--page-border);
+  color: var(--itexsa-text);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+  padding: calc(.8rem + 4px) 8px;
+  text-align: left;
+}
+.usersTable tbody tr:hover td { background: var(--page-background); }
+.usersTable td:first-child { border-radius: var(--filter-control-radius) 0 0 var(--filter-control-radius); }
+.usersTable td:last-child { border-radius: 0 var(--filter-control-radius) var(--filter-control-radius) 0; }
+.usersTable td:nth-child(3), .usersTable td:nth-child(6), .usersTable td:nth-child(7) { text-align: center; }
+.usersTable td:nth-child(3) { overflow-wrap: normal; white-space: nowrap; }
+.usersTable .tableStateCell { color: var(--itexsa-muted); padding: 2rem; text-align: center; }
+.userActions { align-items: center; display: flex; gap: 8px; justify-content: center; }
+.tableCard .actionButton { font-size: 14px; font-weight: 600; line-height: 20px; min-height: 40px; min-width: 120px; padding: 8px; width: 120px; }
+.tableCard .actionButton:focus-visible { box-shadow: none; outline: 2px solid var(--page-brand-orange); outline-offset: 2px; }
+

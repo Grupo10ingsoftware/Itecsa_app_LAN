@@ -41,6 +41,28 @@ test('one grouped count keeps zeroes, BigInt conversion and ignores selected sta
   assert.match(query.sql, /SUM\(s.nombre_estado_pago = 'Pendiente'\)/);
 });
 
+test('numbered payment pages bind their offset and preserve the selected filters', async () => {
+  let query;
+  await readPaymentPage({ $queryRaw: async statement => { query = statement; return []; } },
+    { page: 3, limit: 20, status: 'Pendiente', search: 'Cliente' });
+  assert.match(query.sql, /ORDER BY p.id_pedido DESC LIMIT \?\s+OFFSET \?/);
+  assert.deepEqual(query.values.slice(-3), ['Pendiente', 21, 40]);
+  assert.equal(query.values.filter(value => value === '%Cliente%').length, 4);
+});
+
+test('numbered payment pages accept all UI sizes and reject invalid page numbers', async () => {
+  let args;
+  const service = new OrderService({ repo: { listPaymentViews: async filters => { args = filters; return { rows: [], counts: {} }; } },
+    paymentRepo: { getAll: async () => [] } });
+  for (const size of [10, 20, 30, 40, 50]) {
+    await service.getPagedPaymentWorkspace({ page: '3', limit: String(size), status: 'Pendiente' });
+    assert.equal(args.limit, size); assert.equal(args.page, 3); assert.equal(args.cursor, null);
+  }
+  for (const page of ['0', '-1', '1.5', 'invalid', String(Number.MAX_SAFE_INTEGER)]) {
+    await assert.rejects(service.getPagedPaymentWorkspace({ page, limit: 50 }), /Pagina de pagos no valida/);
+  }
+});
+
 test('page and grouped summary execute concurrently; partial modes do exactly requested work', async () => {
   const holds = [deferred(), deferred()]; let calls = 0;
   const repo = { client: { $queryRaw: () => holds[calls++].promise } };

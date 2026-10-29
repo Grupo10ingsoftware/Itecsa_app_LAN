@@ -7,7 +7,11 @@ vi.mock('../hooks/useAdminUsersApi', () => ({ useAdminUsersApi: () => state.api 
 vi.mock('../../../hooks/useAuth', () => ({ useAuth: () => ({ user: { rolUsuario: 'Soporte' }, identityUser: { sub: 'operator' }, loginWithRedirect: state.login }) }))
 vi.mock('../../../shared/notifications/useToast', () => ({ useToast: () => ({ success: state.success, error: state.error }) }))
 vi.mock('../components/UserManagementTable', () => ({ default: props => <section>
-  <output data-testid="table">{JSON.stringify({ page: props.currentPage, loading: props.isLoading, total: props.totalUsers, users: props.users })}</output>
+  <output data-testid="table">{JSON.stringify({ page: props.currentPage, pageSize: props.pageSize, loading: props.isLoading, total: props.totalUsers, users: props.users })}</output>
+  <select aria-label="Filas por página" value={props.pageSize} disabled={props.isLoading}
+    onChange={event => props.onPageSizeChange(Number(event.target.value))}>
+    {[10, 20, 30, 40, 50].map(size => <option key={size} value={size}>{size}</option>)}
+  </select>
   <button onClick={() => props.onPageChange(props.currentPage + 1)}>Next</button>
   <button onClick={() => props.onEditUser(props.users[0])}>Inspect</button>
 </section> }))
@@ -37,6 +41,45 @@ beforeEach(() => {
     updateUser: vi.fn().mockResolvedValue({ outcome: 'user_updated' }) }
 })
 afterEach(() => { cleanup(); vi.useRealTimers() })
+
+it.each([10, 20, 30, 40, 50])('uses the server to request %s users per page and resets the page once', async perPage => {
+  state.api.listUsers.mockImplementation(async query => ({ usuarios: Array.from({ length: Math.min(query.perPage, 50 - (query.page - 1) * query.perPage) },
+    (_, index) => ({ ...user, idUsuarioAutenticacionExterna: `synthetic-${(query.page - 1) * query.perPage + index}` })), total: 50 }))
+  renderUsers(); await tick()
+  expect(table().users).toHaveLength(10)
+  fireEvent.click(screen.getByText('Next')); await tick()
+  fireEvent.change(screen.getByRole('combobox', { name: 'Filas por página' }), { target: { value: String(perPage) } }); await tick()
+  expect(state.api.listUsers.mock.calls.at(-1)[0]).toMatchObject({ perPage, page: perPage === 10 ? 2 : 1 })
+  expect(table().users).toHaveLength(perPage)
+  expect(state.api.listUsers).toHaveBeenCalledTimes(perPage === 10 ? 2 : 3)
+})
+
+it('keeps the selected page size with filters and returns to 10 on re-entry', async () => {
+  const view = renderUsers(); await tick()
+  fireEvent.change(screen.getByRole('combobox', { name: 'Filas por página' }), { target: { value: '20' } }); await tick()
+  fireEvent.click(screen.getByText('Next')); await tick()
+  fireEvent.click(screen.getByText('Ventas')); fireEvent.click(screen.getByText('Aplicar filtros')); await tick()
+  expect(state.api.listUsers.mock.calls.at(-1)[0]).toMatchObject({ page: 1, perPage: 20, department: 'sales' })
+  expect(state.api.listUsers).toHaveBeenCalledTimes(4)
+  view.unmount(); renderUsers(); await tick()
+  expect(state.api.listUsers.mock.calls.at(-1)[0]).toMatchObject({ page: 1, perPage: 10, department: '' })
+})
+
+it('returns to the last valid page if an edit removes the last matching user', async () => {
+  let total = 21
+  state.api.listUsers.mockImplementation(async query => ({ usuarios: query.page === 3 && total === 20 ? [] : [user], total }))
+  state.api.updateUser.mockImplementation(async () => { total = 20; return { outcome: 'user_updated' } })
+  renderUsers(); await tick()
+  fireEvent.click(screen.getByText('Next')); await tick()
+  fireEvent.click(screen.getByText('Next')); await tick()
+  fireEvent.click(screen.getByText('Inspect')); await tick()
+  fireEvent.click(screen.getByText('Save')); await tick(10)
+  await tick()
+  expect(table().page).toBe(2)
+  expect(table().total).toBe(20)
+  expect(state.api.listUsers.mock.calls.map(([query]) => query.page)).toEqual([1, 2, 3, 3, 2])
+  expect(state.api.updateUser).toHaveBeenCalledTimes(1)
+})
 
 it('loads the list without requesting summary and cancels its read on unmount', async () => {
   const view = renderUsers(); await tick()

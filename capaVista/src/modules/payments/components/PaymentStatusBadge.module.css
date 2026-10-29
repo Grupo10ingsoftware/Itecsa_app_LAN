@@ -1,37 +1,19 @@
 .paymentStatusBadge {
-  background: #fff;
+  align-items: center;
+  background: var(--page-white);
   border: 1px solid currentColor;
-  border-radius: 0.42rem;
+  border-radius: var(--filter-control-radius);
   display: inline-flex;
-  font-size: 0.93rem;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 600;
   justify-content: center;
-  line-height: 1;
-  min-width: 7.15rem;
-  padding: 0.72rem 0.75rem;
+  line-height: 20px;
+  max-width: 100%;
+  min-height: 40px;
+  padding: 8px;
+  width: 120px;
 }
 
-.statusRejected {
-  color: var(--payment-red);
-}
-
-.statusPending {
-  color: var(--payment-orange);
-}
-
-.statusConfirmed {
-  color: var(--payment-green);
-}
-
-@media (max-width: 1199.98px) {
-  .paymentStatusBadge {
-    font-size: 0.86rem;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .paymentStatusBadge {
-    min-width: 7.15rem;
-    width: auto;
-  }
-}
+.statusPending { color: var(--page-brand-orange); }
+.statusRejected { color: var(--itexsa-red); }
+.statusConfirmed { color: var(--itexsa-green); }

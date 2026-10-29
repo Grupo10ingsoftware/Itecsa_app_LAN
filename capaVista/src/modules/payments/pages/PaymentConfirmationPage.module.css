@@ -44,3 +44,10 @@
 }
 
 .results { display: grid; gap: var(--filter-layout-gap); min-width: 0; }
+
+.tableCard {
+  background: var(--page-white);
+  border: 1px solid var(--page-header-black);
+  border-radius: var(--page-radius);
+  min-width: 0;
+}

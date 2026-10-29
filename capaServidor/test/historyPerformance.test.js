@@ -4,7 +4,7 @@ import Repository from '../src/modules/history/repo/orderHistory.repo.js';
 import Service from '../src/modules/history/service/orderHistory.service.js';
 import BeforeRepository from './fixtures/opt05/orderHistory.before.repo.js';
 import BeforeService from './fixtures/opt05/orderHistory.before.service.js';
-import {orderListQuery} from '../src/modules/history/repo/historyRead.repo.js';
+import {orderListQuery,orderCountQuery} from '../src/modules/history/repo/historyRead.repo.js';
 import {encodeCursor,encodeHistoryEventCursor,decodeHistoryEventCursor} from '../src/shared/pagination.js';
 import {header,tracked,untracked,labels,children,eventRows} from './fixtures/opt05/historyFixture.js';
 process.env.APP_ENV='test';
@@ -37,6 +37,38 @@ test('detail header and event reads start concurrently',async()=>{
  const order=await new Repository({prisma:{$queryRaw:async q=>q.sql.includes('UNION ALL')?children:[header]}}).getById(1);
  const result=await new Service({repo:{getById:()=>wait(order),listEvents:()=>wait([])}}).getOrderHistory(1);
  assert.equal(count,2);assert.equal(result.items.length,3);assert.deepEqual(result.labels,['Alta','Urgente','Urgente']);
+});
+
+test('numbered history pages use bound offsets and the same filters for the real total',async()=>{
+ const filters={page:5,limit:10,status:'En producción',search:"ñ' OR 1=1",dateRange:{start:new Date('2026-01-01'),end:new Date('2026-11-01')}};
+ const page=orderListQuery(filters),count=orderCountQuery({...filters,cursor:{id:90}});
+ assert.match(page.sql,/ORDER BY p.id_pedido DESC LIMIT \?\s+OFFSET \?/);
+ assert.deepEqual(page.values.slice(-2),[11,40]);
+ assert.match(count.sql,/SELECT COUNT\(\*\) AS total/);assert.doesNotMatch(count.sql,/OFFSET|LIMIT|p.id_pedido </);
+ assert.deepEqual(count.values,page.values.slice(0,-2));
+ assert(!page.sql.includes(filters.search));assert(!count.sql.includes(filters.status));
+ const repo=new Repository({prisma:{$queryRaw:async q=>{assert.equal(q.sql,count.sql);return [{total:53n}];}}});
+ assert.equal(await repo.count(filters),53);
+});
+
+test('numbered page rows and filtered count run concurrently without changing legacy cursor responses',async()=>{
+ let calls=0,release;const gate=new Promise(resolve=>release=resolve);
+ const wait=async result=>{if(++calls===2)release();await gate;return result;};
+ const service=new Service({repo:{list:filters=>{assert.equal(filters.page,3);assert.equal(filters.limit,20);return wait([]);},count:filters=>{assert.equal(filters.status,'Cancelado');return wait(53);}}});
+ const page=await service.listOrders({page:3,limit:20,status:'Cancelado'});
+ assert.equal(calls,2);assert.equal(page.total,53);assert.equal(page.page,3);assert.deepEqual(page.items,[]);
+ const legacy=await new Service({repo:{list:async()=>[]}}).listOrders({limit:10});
+ assert.deepEqual(legacy,{items:[],pageInfo:{limit:10,nextCursor:null,hasMore:false}});
+});
+
+for(const page of [0,-1,1.5,'bad',Number.MAX_SAFE_INTEGER])test(`numbered page rejects invalid input without a read: ${page}`,async()=>{
+ const service=new Service({repo:new Proxy({},{get(){throw Error('must not read');}})});
+ await assert.rejects(service.listOrders({page,limit:50}),error=>error.statusCode===400);
+});
+
+test('history rejects ambiguous page plus cursor without reading',async()=>{
+ const service=new Service({repo:new Proxy({},{get(){throw Error('must not read');}})});
+ await assert.rejects(service.listOrders({page:1,cursor:encodeCursor({id:10})}),error=>error.statusCode===400);
 });
 
 for(const type of ['all','stage','payment','subprocess','calendar','general'])for(const allowed of [false,true])test(`events retain exact SQL, actor/observation projection and DTO: ${type}, finance=${allowed}`,async()=>{

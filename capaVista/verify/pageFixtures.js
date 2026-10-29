@@ -23,7 +23,7 @@ export const client = {
     if (pathname === '/admin/identity/users') return { users: [], total: 0, totalPages: 1 }
     if (pathname.includes('metrics')) return { production: { total: 0, products: [] }, dwellTime: { stages: [], subprocesses: [] }, sellerCompliance: [] }
     if (pathname === '/history/orders/123') return { salesNoteNumber: 'NV-123', client: { name: 'Cliente de prueba' }, seller: { name: 'Ana' }, items: [], events: [], pageInfo }
-    if (pathname === '/history/orders') return { items: [{ id: 123, salesNoteNumber: 'NV-123', clientName: 'Cliente de prueba' }], pageInfo }
+    if (pathname === '/history/orders') return { items: [{ id: 123, salesNoteNumber: 'NV-123', clientName: 'Cliente de prueba' }], total: 1, pageInfo }
     if (pathname === '/orders/payments') return { items: [], pageInfo, counts: {}, paymentStatuses: [] }
     if (pathname === '/orders/calendar-summary' || pathname === '/orders/kanban-summary') return { items: [], pageInfo }
     throw new Error(`Lectura sin fixture: ${url}`)

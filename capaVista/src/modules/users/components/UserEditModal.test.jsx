@@ -57,10 +57,10 @@ it('keeps pending as an existing status without offering it for active accounts'
   expect(screen.queryByRole('option', { name: 'Pendiente' })).toBeNull()
 })
 
-it('renders Editar in desktop and mobile lists', () => {
+it('renders Editar in the shared scrollable table for desktop and mobile', () => {
   render(<UserManagementTable currentPage={1} totalPages={1} totalUsers={1} users={[user]}
     onEditUser={vi.fn()} onViewMovements={vi.fn()} onPageChange={vi.fn()} />)
-  expect(screen.getAllByRole('button', { name: 'Editar' })).toHaveLength(2)
+  expect(screen.getAllByRole('button', { name: 'Editar' })).toHaveLength(1)
   expect(screen.queryByRole('button', { name: 'Consultar' })).toBeNull()
 })
 

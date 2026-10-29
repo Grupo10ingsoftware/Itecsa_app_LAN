@@ -1,5 +1,5 @@
 import FilterContent from '../../../shared/components/filters/FilterContent'
-import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import { useToast } from '../../../shared/notifications/useToast'
 import { operationFailureMessage, requiresContext, uncertainOperation } from '../../../shared/notifications/operationFeedback'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -12,6 +12,7 @@ import PaymentCredentialsModal from '../components/PaymentCredentialsModal'
 import PaymentFilters from '../components/PaymentFilters'
 import PaymentOrderMobileList from '../components/PaymentOrderMobileList'
 import PaymentOrdersTable from '../components/PaymentOrdersTable'
+import PaymentPagination from '../components/PaymentPagination'
 import { usePaymentsApi } from '../hooks/usePaymentsApi'
 import {
   getPaymentStatusIdByName,
@@ -27,6 +28,7 @@ const FILTERS = [
   { key: PAYMENT_STATUS.RECHAZADO, label: 'Rechazados' },
   { key: PAYMENT_STATUS.CONFIRMADO, label: 'Confirmados' },
 ]
+const COUNT_KEY_BY_STATUS = { Pendiente: 'pending', Rechazado: 'rejected', Confirmado: 'confirmed' }
 
 export default function PaymentConfirmationPage() {
   const { hasPermission } = useAuth()
@@ -42,8 +44,7 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
   const notify = useToast()
   const [orders, setOrders] = useState([])
   const [counters, setCounters] = useState({ pending: 0, rejected: 0, confirmed: 0 })
-  const [pageInfo, setPageInfo] = useState({ nextCursor: null, hasMore: false })
-  const [loadingMore, setLoadingMore] = useState(false)
+  const [{ page, pageSize }, setPagination] = useState({ page: 1, pageSize: 10 })
   const loadRequestId = useRef(0)
   const [paymentStatuses, setPaymentStatuses] = useState([])
   const [activeFilter, setActiveFilter] = useState(PAYMENT_STATUS.PENDIENTE)
@@ -66,9 +67,7 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
   const detailPreviewRequestId = useRef(0)
   const [previewCache] = useState(() => createPaymentPreviewCache(paymentsApi))
   const listController = useRef(null)
-  const moreController = useRef(null)
   const summaryController = useRef(null)
-  const morePending = useRef(false)
   const writePending = useRef(false)
   const mounted = useRef(true)
   const summaryScope = useRef(null)
@@ -86,7 +85,6 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
       actionRequests.current++
       detailRequests.current++
       listController.current?.abort()
-      moreController.current?.abort()
       summaryController.current?.abort()
       previewCache.clear()
     }
@@ -117,7 +115,6 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
   const loadPaymentData = useCallback(async (forceSummary = true) => {
     if (!canRead) { setIsLoading(false); return }
     listController.current?.abort()
-    moreController.current?.abort()
     summaryController.current?.abort()
     const controller = new AbortController()
     listController.current = controller
@@ -134,12 +131,10 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
       setPreviewState(null)
     }
     setIsLoading(true)
-    setLoadingMore(false)
-    morePending.current = false
     setLoadError(null)
 
     try {
-      const workspace = await paymentsApi.getPaymentWorkspace({ status: activeFilter, search: settledSearch, from: dateFrom, to: dateTo, limit: 50,
+      const workspace = await paymentsApi.getPaymentWorkspace({ status: activeFilter, search: settledSearch, from: dateFrom, to: dateTo, page, limit: pageSize,
         ...(includeSummary ? {} : { includeSummary: false }) }, { signal: controller.signal })
       if (controller.signal.aborted || !mounted.current || requestId !== loadRequestId.current) return
       const ordersResponse = workspace?.items
@@ -151,7 +146,11 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
         setPaymentStatuses(Array.isArray(statusesResponse) ? statusesResponse : [])
         summaryScope.current = { key: queryScope, expires: Date.now() + 30000 }
       }
-      setPageInfo(workspace?.pageInfo ?? { nextCursor: null, hasMore: false })
+      if (includeSummary) {
+        const key = COUNT_KEY_BY_STATUS[activeFilter]
+        const lastPage = Math.max(1, Math.ceil((workspace.counts?.[key] ?? 0) / pageSize))
+        if (page > lastPage) setPagination(current => ({ ...current, page: lastPage }))
+      }
     } catch (error) {
       if (controller.signal.aborted || !mounted.current || requestId !== loadRequestId.current) return
       summaryScope.current = null
@@ -164,33 +163,7 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
     } finally {
       if (!controller.signal.aborted && mounted.current && requestId === loadRequestId.current) setIsLoading(false)
     }
-  }, [activeFilter, canRead, dateFrom, dateTo, paymentsApi, settledSearch, queryScope, previewCache])
-
-  async function loadMorePayments() {
-    if (!pageInfo.hasMore || !pageInfo.nextCursor || morePending.current || isLoading || writePending.current) return
-    const requestId = loadRequestId.current
-    const controller = new AbortController()
-    moreController.current = controller
-    morePending.current = true
-    setLoadingMore(true)
-    try {
-      const workspace = await paymentsApi.getPaymentWorkspace({ status: activeFilter, search: settledSearch, from: dateFrom, to: dateTo, limit: 50, cursor: pageInfo.nextCursor, includeSummary: false }, { signal: controller.signal })
-      if (controller.signal.aborted || !mounted.current || requestId !== loadRequestId.current) return
-      setOrders((current) => {
-        const ids = new Set(current.map(item => item.id))
-        return [...current, ...normalizePaymentOrders(workspace.items).filter(item => {
-          if (ids.has(item.id)) return false
-          ids.add(item.id)
-          return true
-        })]
-      })
-      setPageInfo(workspace.pageInfo)
-    } catch (error) {
-      if (!controller.signal.aborted && mounted.current && requestId === loadRequestId.current) setLoadError(error?.payload?.message ?? 'No fue posible cargar más pedidos de pago.')
-    } finally {
-      if (!controller.signal.aborted && mounted.current && requestId === loadRequestId.current) { morePending.current = false; setLoadingMore(false) }
-    }
-  }
+  }, [activeFilter, canRead, dateFrom, dateTo, paymentsApi, settledSearch, queryScope, previewCache, page, pageSize])
 
   useEffect(() => {
     const requests = loadRequestId
@@ -198,18 +171,14 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
       loadPaymentData(false)
     }, 0)
 
-    return () => { window.clearTimeout(loadTimer); requests.current++; listController.current?.abort(); moreController.current?.abort(); summaryController.current?.abort() }
+    return () => { window.clearTimeout(loadTimer); requests.current++; listController.current?.abort(); summaryController.current?.abort() }
   }, [loadPaymentData, refreshKey])
 
   const filteredOrders = orders
 
   const getFilterCount = useCallback(
     (filterKey) => {
-      if (filterKey === PAYMENT_STATUS.PENDIENTE) return counters.pending
-      if (filterKey === PAYMENT_STATUS.RECHAZADO) return counters.rejected
-      if (filterKey === PAYMENT_STATUS.CONFIRMADO) return counters.confirmed
-
-      return 0
+      return counters[COUNT_KEY_BY_STATUS[filterKey]] ?? 0
     },
     [counters],
   )
@@ -226,12 +195,9 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
 
     writePending.current = true
     listController.current?.abort()
-    moreController.current?.abort()
     const requestId = ++loadRequestId.current
     const scope = queryScope
     setIsLoading(false)
-    setLoadingMore(false)
-    morePending.current = false
     setIsUpdatingPaymentStatus(true)
     setUpdateError(null)
 
@@ -257,11 +223,15 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
         const controller = new AbortController()
         summaryController.current = controller
         try {
-          const summary = await paymentsApi.getPaymentWorkspace({ summaryOnly: true, search: settledSearch, from: dateFrom, to: dateTo }, { signal: controller.signal })
+          const summary = await paymentsApi.getPaymentWorkspace({ status: activeFilter, page, limit: pageSize, search: settledSearch, from: dateFrom, to: dateTo }, { signal: controller.signal })
           if (!controller.signal.aborted && mounted.current && requestId === loadRequestId.current) {
+            setOrders(normalizePaymentOrders(summary.items))
             setCounters(summary.counts)
             setPaymentStatuses(summary.paymentStatuses)
             summaryScope.current = { key: scope, expires: Date.now() + 30000 }
+            const key = COUNT_KEY_BY_STATUS[activeFilter]
+            const lastPage = Math.max(1, Math.ceil((summary.counts?.[key] ?? 0) / pageSize))
+            if (page > lastPage) setPagination(current => ({ ...current, page: lastPage }))
           }
         } catch {
           if (!controller.signal.aborted && mounted.current) setLoadError('El pago fue actualizado, pero no se pudo reconciliar el resumen. Reintenta la lectura.')
@@ -299,7 +269,7 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
     paymentStatuses,
     paymentsApi,
     notify,
-    activeFilter, dateFrom, dateTo, settledSearch, queryScope, previewCache,
+    activeFilter, dateFrom, dateTo, settledSearch, queryScope, previewCache, page, pageSize,
   ])
 
   function applyFilters() {
@@ -308,6 +278,7 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
     setDateFrom(draftFilters.from)
     setDateTo(draftFilters.to)
     setEditingStatus({})
+    setPagination(current => current.page === 1 ? current : { ...current, page: 1 })
   }
 
   function clearFilters() {
@@ -317,6 +288,7 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
     setDateFrom('')
     setDateTo('')
     setEditingStatus({})
+    setPagination(current => current.page === 1 ? current : { ...current, page: 1 })
   }
 
   const getPaymentPreview = useCallback((orderId) => previewCache.get(orderId), [previewCache])
@@ -543,36 +515,52 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
             )}
             {updateError && !credentialsTransition && <div className="alert alert-danger mb-0" role="alert">{updateError}</div>}
 
-            {isLoading ? (
-              <LoadingIndicator context="pedidos de pago" />
-            ) : (
-              <>
-                <PaymentOrdersTable
-                  canUpdatePaymentStatus={canUpdatePaymentStatus}
-                  editingStatus={editingStatus}
-                  isUpdatingPaymentStatus={isUpdatingPaymentStatus}
-                  onCloseEditor={closePaymentEditor}
-                  onPrefetchDetails={prefetchPaymentPreview}
-                  onSelectStatus={openPaymentActionConfirmation}
-                  onToggleEditor={openPaymentEditor}
-                  onViewDetail={openPaymentDetail}
-                  orders={filteredOrders}
-                />
+            <div className={styles.tableCard}>
+              {isLoading ? (
+                <LoadingIndicator context="pedidos de pago" />
+              ) : (
+                <>
+                  <PaymentOrdersTable
+                    canUpdatePaymentStatus={canUpdatePaymentStatus}
+                    editingStatus={editingStatus}
+                    isUpdatingPaymentStatus={isUpdatingPaymentStatus}
+                    onCloseEditor={closePaymentEditor}
+                    onPrefetchDetails={prefetchPaymentPreview}
+                    onSelectStatus={openPaymentActionConfirmation}
+                    onToggleEditor={openPaymentEditor}
+                    onViewDetail={openPaymentDetail}
+                    orders={filteredOrders}
+                  />
 
-                <PaymentOrderMobileList
-                  canUpdatePaymentStatus={canUpdatePaymentStatus}
-                  editingStatus={editingStatus}
-                  isUpdatingPaymentStatus={isUpdatingPaymentStatus}
-                  onCloseEditor={closePaymentEditor}
-                  onPrefetchDetails={prefetchPaymentPreview}
-                  onSelectStatus={openPaymentActionConfirmation}
-                  onToggleEditor={openPaymentEditor}
-                  onViewDetail={openPaymentDetail}
-                  orders={filteredOrders}
-                />
-                {pageInfo.hasMore && <button disabled={loadingMore} onClick={loadMorePayments} type="button" aria-busy={loadingMore}><LoadingAction surface="light" busy={loadingMore} context="Cargar más pedidos">Cargar más pedidos</LoadingAction></button>}
-              </>
-            )}
+                  <PaymentOrderMobileList
+                    canUpdatePaymentStatus={canUpdatePaymentStatus}
+                    editingStatus={editingStatus}
+                    isUpdatingPaymentStatus={isUpdatingPaymentStatus}
+                    onCloseEditor={closePaymentEditor}
+                    onPrefetchDetails={prefetchPaymentPreview}
+                    onSelectStatus={openPaymentActionConfirmation}
+                    onToggleEditor={openPaymentEditor}
+                    onViewDetail={openPaymentDetail}
+                    orders={filteredOrders}
+                  />
+                </>
+              )}
+              <PaymentPagination integrated page={page} pageSize={pageSize} total={getFilterCount(activeFilter)}
+                visibleCount={isLoading ? 0 : filteredOrders.length}
+                disabled={isLoading || isUpdatingPaymentStatus || !canRead || Boolean(loadError)}
+                onPageChange={nextPage => {
+                  if (nextPage === page) return
+                  setIsLoading(true)
+                  setEditingStatus({})
+                  setPagination(current => ({ ...current, page: nextPage }))
+                }}
+                onPageSizeChange={nextSize => {
+                  if (nextSize === pageSize) return
+                  setIsLoading(true)
+                  setEditingStatus({})
+                  setPagination({ page: 1, pageSize: nextSize })
+                }} />
+            </div>
           </div>
         </FilterContent>
       </PageSurface>

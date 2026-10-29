@@ -196,6 +196,11 @@ class OrderService {
   async getPagedPaymentWorkspace(query = {}) {
     const limit = parseLimit(query.limit);
     const cursor = decodeCursor(query.cursor);
+    const pageNumber = query.page === undefined ? null : Number(query.page);
+    if (pageNumber !== null && (!Number.isSafeInteger(pageNumber) || pageNumber < 1 || !Number.isSafeInteger((pageNumber - 1) * limit))) {
+      throw new AppError(400, 'Pagina de pagos no valida');
+    }
+    if (pageNumber !== null && cursor) throw new AppError(400, 'No se puede combinar pagina y cursor');
     const search = String(query.search ?? '').trim().slice(0, 100) || null;
     const status = String(query.status ?? '').trim() || null;
     if (status && !['Pendiente', 'Rechazado', 'Confirmado'].includes(status)) throw new AppError(400, 'Estado de pago no valido');
@@ -209,7 +214,7 @@ class OrderService {
     const to = parseDate(query.to, true);
     if (from && to && from >= to) throw new AppError(400, 'Rango de fechas no valido');
     const [page, paymentStatuses] = await Promise.all([
-      this.repo.listPaymentViews({ limit, cursor, status, search, from, to,
+      this.repo.listPaymentViews({ limit, cursor, page: pageNumber, status, search, from, to,
         includeSummary: query.includeSummary !== 'false', summaryOnly: query.summaryOnly === 'true' }),
       query.includeSummary === 'false' ? [] : this.paymentRepo.getAll(),
     ]);
