@@ -16,6 +16,24 @@ for key in MYSQL_IMAGE API_IMAGE WEB_IMAGE DB_TOOLS_IMAGE KEYCLOAK_IMAGE; do
   IMAGES+=("$value")
 done
 [[ "${IMAGES[0]}" != *'@'* ]] || fail "MYSQL_IMAGE necesita una etiqueta local para sobrevivir a docker image load"
+verify_inventory() {
+  local image expected_id expected_revision extra current_id current_revision count=0
+  local -A seen=()
+  while read -r image expected_id expected_revision extra; do
+    [[ -n "$image" && -n "$expected_id" && -n "$expected_revision" && -z "$extra" ]] || fail "fila de inventario invalida"
+    [[ -z "${seen[$image]:-}" ]] || fail "imagen duplicada en inventario"
+    local configured=0
+    for expected in "${IMAGES[@]}"; do [[ "$image" != "$expected" ]] || configured=1; done
+    (( configured )) || fail "imagen ajena a la configuracion"
+    seen[$image]=1
+    count=$((count + 1))
+    current_id="$(docker image inspect --format '{{.Id}}' "$image")"
+    current_revision="$(docker image inspect --format '{{if .Config.Labels}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
+    [[ -n "$current_revision" ]] || current_revision="-"
+    [[ "$current_id" == "$expected_id" && "$current_revision" == "$expected_revision" ]] || fail "imagen cambiada: $image"
+  done < "$OUT_DIR/itecsa-images.txt"
+  [[ "$count" == 5 ]] || fail "el inventario debe incluir las cinco imagenes configuradas"
+}
 case "$ACTION" in
   pack)
     mkdir -p "$OUT_DIR"
@@ -34,17 +52,12 @@ case "$ACTION" in
   load)
     (cd "$OUT_DIR" && sha256sum -c itecsa-images.sha256)
     docker image load -i "$OUT_DIR/itecsa-images.tar"
-    for image in "${IMAGES[@]}"; do docker image inspect "$image" >/dev/null || fail "imagen no cargada: $image"; done
+    verify_inventory
     echo "OFFLINE_IMAGES: todas las imagenes cargadas"
     ;;
   verify)
     (cd "$OUT_DIR" && sha256sum -c itecsa-images.sha256)
-    while read -r image expected_id expected_revision; do
-      current_id="$(docker image inspect --format '{{.Id}}' "$image")"
-      current_revision="$(docker image inspect --format '{{if .Config.Labels}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
-      [[ -n "$current_revision" ]] || current_revision="-"
-      [[ "$current_id" == "$expected_id" && "$current_revision" == "$expected_revision" ]] || fail "imagen cambiada: $image"
-    done < "$OUT_DIR/itecsa-images.txt"
+    verify_inventory
     echo "OFFLINE_IMAGES: checksum y versiones verificados"
     ;;
   *) fail "uso: offline-images.sh pack|load|verify [deploy/mysql.env] [directorio]" ;;

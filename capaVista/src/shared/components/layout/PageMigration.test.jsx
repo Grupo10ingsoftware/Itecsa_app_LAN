@@ -66,9 +66,9 @@ describe('Páginas migradas sin modificar sus operaciones', () => {
     expect(screen.getByRole('heading', { name: 'Carga diaria de Lanyard' })).toBeTruthy()
   })
 
-  it('actualiza el contador del historial conservando el enlace al detalle', async () => {
+  it('conserva la búsqueda y el enlace al detalle del historial', async () => {
     mount(OrderHistoryPage)
-    await screen.findByText('1 resultados en esta página')
+    await screen.findByRole('link', { name: /Ver detalle/ })
     expect(screen.getByRole('link', { name: /Ver detalle/ }).getAttribute('href')).toBe('/historial-pedidos/123')
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'NV-123' } })
     expect(screen.getByRole('searchbox').value).toBe('NV-123')

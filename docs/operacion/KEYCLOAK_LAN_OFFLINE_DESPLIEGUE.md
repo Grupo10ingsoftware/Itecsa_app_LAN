@@ -53,7 +53,7 @@ Con la instalación vacía, rellenar `FIRST_USER_USERNAME`, `FIRST_USER_EMAIL`, 
 ./deploy/mysql/manage.sh first-user
 ```
 
-El comando exige que `Usuario` y `ExternalIdentity` estén vacías, crea el usuario Keycloak con `Soporte`, `itecsa_provision_id` y `UPDATE_PASSWORD`, y registra su vínculo MySQL. Si falla la transacción local, intenta retirar la cuenta remota. Borra `FIRST_USER_TEMP_PASSWORD` del archivo de entorno al terminar. La persona debe cambiar la clave en el primer ingreso y completar el flujo de PIN de la aplicación. El comando no es un mecanismo general de alta de usuarios.
+El comando exige que `Usuario` y `ExternalIdentity` estén vacías, crea el usuario Keycloak con `Soporte`, `itecsa_provision_id` y `UPDATE_PASSWORD`, y registra su vínculo MySQL. Si falla la transacción local, intenta retirar la cuenta remota. El operador debe borrar `FIRST_USER_TEMP_PASSWORD` del archivo de entorno al terminar; el comando no modifica ese archivo. La persona debe cambiar la clave en el primer ingreso y completar el flujo de PIN de la aplicación. El comando no es un mecanismo general de alta de usuarios.
 
 ## Respaldo y restauración
 

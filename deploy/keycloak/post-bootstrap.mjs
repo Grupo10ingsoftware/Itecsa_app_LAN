@@ -147,11 +147,20 @@ export async function bootstrap(env = process.env, fetcher = fetch) {
     operators = (await master('/users?username=' + operatorName + '&exact=true'))
       .filter(user => user.username === env.KEYCLOAK_OPERATOR_USERNAME);
     if (operators.length !== 1) fail('no se creo el administrador permanente');
-    const adminRole = await master('/roles/admin');
-    await master('/users/' + operators[0].id + '/role-mappings/realm', 'POST', [adminRole]);
   }
-  const permanentToken = await getToken(env.KEYCLOAK_OPERATOR_USERNAME, env.KEYCLOAK_OPERATOR_PASSWORD);
+  // Resume safely if a previous run created the operator but failed before
+  // assigning its role. Authenticate it before granting any missing privilege.
+  let permanentToken = await getToken(env.KEYCLOAK_OPERATOR_USERNAME, env.KEYCLOAK_OPERATOR_PASSWORD);
   if (!permanentToken) fail('el administrador permanente no puede iniciar sesion');
+  const operatorRolesPath = '/users/' + operators[0].id + '/role-mappings/realm';
+  const operatorRoles = await master(operatorRolesPath);
+  if (!operatorRoles.some(role => role.name === 'admin')) {
+    if (!temporaryActive) fail('administrador permanente sin rol admin');
+    const adminRole = await master('/roles/admin');
+    await master(operatorRolesPath, 'POST', [adminRole]);
+    permanentToken = await getToken(env.KEYCLOAK_OPERATOR_USERNAME, env.KEYCLOAK_OPERATOR_PASSWORD);
+    if (!permanentToken) fail('el administrador permanente no puede iniciar sesion');
+  }
   token = permanentToken;
   await master('/users/' + operators[0].id);
   if (temporaryActive) {
