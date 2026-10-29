@@ -1,3 +1,4 @@
+import FilterContent from '../../../shared/components/filters/FilterContent'
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useToast } from '../../../shared/notifications/useToast'
 import { operationFailureMessage, requiresContext, uncertainOperation } from '../../../shared/notifications/operationFeedback'
@@ -11,7 +12,6 @@ import PaymentCredentialsModal from '../components/PaymentCredentialsModal'
 import PaymentFilters from '../components/PaymentFilters'
 import PaymentOrderMobileList from '../components/PaymentOrderMobileList'
 import PaymentOrdersTable from '../components/PaymentOrdersTable'
-import PaymentSummaryCards from '../components/PaymentSummaryCards'
 import { usePaymentsApi } from '../hooks/usePaymentsApi'
 import {
   getPaymentStatusIdByName,
@@ -51,9 +51,9 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
   const [pendingTransition, setPendingTransition] = useState(null)
   const [credentialsTransition, setCredentialsTransition] = useState(null)
   const [previewState, setPreviewState] = useState(null)
-  const [searchTerm, setSearchTerm] = useState('')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+  const [draftFilters, setDraftFilters] = useState({ status: PAYMENT_STATUS.PENDIENTE, search: '', from: '', to: '' })
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState(null)
   const [updateError, setUpdateError] = useState(null)
@@ -74,7 +74,6 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
   const summaryScope = useRef(null)
   const [settledSearch, setSettledSearch] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
-  const searchPending = searchTerm.trim() !== settledSearch
   const queryScope = `${settledSearch}\n${dateFrom}\n${dateTo}`
   const currentScope = useRef(queryScope)
 
@@ -92,11 +91,6 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
       previewCache.clear()
     }
   }, [previewCache])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => setSettledSearch(searchTerm.trim()), 250)
-    return () => window.clearTimeout(timer)
-  }, [searchTerm])
 
   useEffect(() => {
     const refresh = () => {
@@ -173,7 +167,7 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
   }, [activeFilter, canRead, dateFrom, dateTo, paymentsApi, settledSearch, queryScope, previewCache])
 
   async function loadMorePayments() {
-    if (!pageInfo.hasMore || !pageInfo.nextCursor || morePending.current || isLoading || searchPending || writePending.current) return
+    if (!pageInfo.hasMore || !pageInfo.nextCursor || morePending.current || isLoading || writePending.current) return
     const requestId = loadRequestId.current
     const controller = new AbortController()
     moreController.current = controller
@@ -308,31 +302,22 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
     activeFilter, dateFrom, dateTo, settledSearch, queryScope, previewCache,
   ])
 
-  const handleFilterChange = useCallback((filterKey) => {
-    setActiveFilter(filterKey)
+  function applyFilters() {
+    setActiveFilter(draftFilters.status)
+    setSettledSearch(draftFilters.search.trim())
+    setDateFrom(draftFilters.from)
+    setDateTo(draftFilters.to)
     setEditingStatus({})
-  }, [])
+  }
 
-  const handleSearchChange = useCallback((nextSearchTerm) => {
-    setSearchTerm(nextSearchTerm)
-    setEditingStatus({})
-  }, [])
-
-  const handleDateFromChange = useCallback((nextDate) => {
-    setDateFrom(nextDate)
-    setEditingStatus({})
-  }, [])
-
-  const handleDateToChange = useCallback((nextDate) => {
-    setDateTo(nextDate)
-    setEditingStatus({})
-  }, [])
-
-  const clearDateRange = useCallback(() => {
+  function clearFilters() {
+    setDraftFilters({ status: PAYMENT_STATUS.PENDIENTE, search: '', from: '', to: '' })
+    setActiveFilter(PAYMENT_STATUS.PENDIENTE)
+    setSettledSearch('')
     setDateFrom('')
     setDateTo('')
     setEditingStatus({})
-  }, [])
+  }
 
   const getPaymentPreview = useCallback((orderId) => previewCache.get(orderId), [previewCache])
 
@@ -531,68 +516,65 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
       <PageSurface className={styles.dashboardShell}>
         <PageHeader title="Confirmacion de pago" />
 
-        <div className={styles.summaryBoundary}>
-          <PaymentSummaryCards counters={counters} />
-        </div>
+        <FilterContent>
+          <PaymentFilters
+            value={draftFilters}
+            filters={FILTERS}
+            getFilterCount={getFilterCount}
+            onChange={next => setDraftFilters(current => ({ ...current, ...next }))}
+            onApply={applyFilters}
+            onClear={clearFilters}
+            disabled={!canRead}
+            loading={isLoading}
+          />
 
-        <PaymentFilters
-          activeFilter={activeFilter}
-          dateFrom={dateFrom}
-          dateTo={dateTo}
-          filters={FILTERS}
-          getFilterCount={getFilterCount}
-          onClearDateRange={clearDateRange}
-          onDateFromChange={handleDateFromChange}
-          onDateToChange={handleDateToChange}
-          onFilterChange={handleFilterChange}
-          onSearchChange={handleSearchChange}
-          searchTerm={searchTerm}
-        />
+          <div className={styles.results}>
+            {loadError && (
+              <div className={`alert alert-danger ${styles.stateMessage}`} role="alert">
+                <span>{loadError}</span>
+                <button
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={loadPaymentData}
+                  type="button"
+                >
+                  Reintentar
+                </button>
+              </div>
+            )}
+            {updateError && !credentialsTransition && <div className="alert alert-danger mb-0" role="alert">{updateError}</div>}
 
-        {loadError && (
-          <div className={`alert alert-danger ${styles.stateMessage}`} role="alert">
-            <span>{loadError}</span>
-            <button
-              className="btn btn-sm btn-outline-danger"
-              onClick={loadPaymentData}
-              type="button"
-            >
-              Reintentar
-            </button>
+            {isLoading ? (
+              <LoadingIndicator context="pedidos de pago" />
+            ) : (
+              <>
+                <PaymentOrdersTable
+                  canUpdatePaymentStatus={canUpdatePaymentStatus}
+                  editingStatus={editingStatus}
+                  isUpdatingPaymentStatus={isUpdatingPaymentStatus}
+                  onCloseEditor={closePaymentEditor}
+                  onPrefetchDetails={prefetchPaymentPreview}
+                  onSelectStatus={openPaymentActionConfirmation}
+                  onToggleEditor={openPaymentEditor}
+                  onViewDetail={openPaymentDetail}
+                  orders={filteredOrders}
+                />
+
+                <PaymentOrderMobileList
+                  canUpdatePaymentStatus={canUpdatePaymentStatus}
+                  editingStatus={editingStatus}
+                  isUpdatingPaymentStatus={isUpdatingPaymentStatus}
+                  onCloseEditor={closePaymentEditor}
+                  onPrefetchDetails={prefetchPaymentPreview}
+                  onSelectStatus={openPaymentActionConfirmation}
+                  onToggleEditor={openPaymentEditor}
+                  onViewDetail={openPaymentDetail}
+                  orders={filteredOrders}
+                />
+                {pageInfo.hasMore && <button disabled={loadingMore} onClick={loadMorePayments} type="button" aria-busy={loadingMore}><LoadingAction surface="light" busy={loadingMore} context="Cargar más pedidos">Cargar más pedidos</LoadingAction></button>}
+              </>
+            )}
           </div>
-        )}
-        {updateError && !credentialsTransition && <div className="alert alert-danger" role="alert">{updateError}</div>}
-
-        {isLoading || searchPending ? (
-          <LoadingIndicator context="pedidos de pago" />
-        ) : (
-          <>
-            <PaymentOrdersTable
-              canUpdatePaymentStatus={canUpdatePaymentStatus}
-              editingStatus={editingStatus}
-              isUpdatingPaymentStatus={isUpdatingPaymentStatus}
-              onCloseEditor={closePaymentEditor}
-              onPrefetchDetails={prefetchPaymentPreview}
-              onSelectStatus={openPaymentActionConfirmation}
-              onToggleEditor={openPaymentEditor}
-              onViewDetail={openPaymentDetail}
-              orders={filteredOrders}
-            />
-
-            <PaymentOrderMobileList
-              canUpdatePaymentStatus={canUpdatePaymentStatus}
-              editingStatus={editingStatus}
-              isUpdatingPaymentStatus={isUpdatingPaymentStatus}
-              onCloseEditor={closePaymentEditor}
-              onPrefetchDetails={prefetchPaymentPreview}
-              onSelectStatus={openPaymentActionConfirmation}
-              onToggleEditor={openPaymentEditor}
-              onViewDetail={openPaymentDetail}
-              orders={filteredOrders}
-            />
-            {pageInfo.hasMore && <button disabled={loadingMore} onClick={loadMorePayments} type="button" aria-busy={loadingMore}><LoadingAction surface="light" busy={loadingMore} context="Cargar más pedidos">Cargar más pedidos</LoadingAction></button>}
-          </>
-        )}
+        </FilterContent>
       </PageSurface>
 
       <PaymentActionConfirmModal

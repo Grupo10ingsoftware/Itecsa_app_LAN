@@ -1,13 +1,11 @@
-.shell > [data-page-header-container] { margin-bottom: 1.25rem; }
 .totalCard { align-items: center; background: #111; border: 1px solid #27272a; border-radius: 1rem; box-shadow: 0 16px 32px rgba(15,23,42,.13); color: #fff; display: flex; gap: .75rem; min-width: 10rem; padding: .9rem 1rem; }
 .totalCard i { color: var(--page-brand-orange); font-size: 1.35rem; }
 .totalCard span { color: #cbd5e1; display: grid; font-size: .72rem; }
 .totalCard strong { color: #fff; font-size: 1.25rem; line-height: 1; }
-.shell > :global(section) { margin-bottom: 1rem; }
-.error { align-items: center; background: #fff1f2; border: 1px solid #fecdd3; border-radius: .85rem; color: #9f1239; display: flex; gap: .65rem; margin: 1rem 0; padding: .85rem 1rem; }
+.error { align-items: center; background: #fff1f2; border: 1px solid #fecdd3; border-radius: .85rem; color: #9f1239; display: flex; gap: .65rem; margin: 0; padding: .85rem 1rem; }
 .error span { flex: 1; }
 .error button { background: transparent; border: 0; color: #9f1239; font-weight: 800; text-decoration: underline; }
-.pagination { align-items: center; display: flex; gap: 1rem; justify-content: center; margin-top: 1.25rem; }
+.pagination { align-items: center; display: flex; gap: 1rem; justify-content: center; }
 .pagination button { align-items: center; background: #fff; border: 1px solid #dbe3ed; border-radius: .65rem; color: #334155; display: inline-flex; font-size: .8rem; font-weight: 750; gap: .35rem; padding: .55rem .8rem; }
 .pagination button:hover:not(:disabled) { border-color: var(--itexsa-orange); color: #c2410c; }
 .pagination button:disabled { cursor: not-allowed; opacity: .45; }

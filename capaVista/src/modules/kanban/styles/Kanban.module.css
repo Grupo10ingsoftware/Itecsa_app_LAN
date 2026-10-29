@@ -1,4 +1,3 @@
-.filtersShell,
 .kanbanWrapper {
   --kanban-border: #e5e7eb;
   --kanban-orange: #f97316;
@@ -9,47 +8,6 @@
   --kanban-yellow: #ca8a04;   /* ATRASADO */
 }
 
-.filtersShell {
-  background: #fff;
-  border: 1px solid var(--kanban-border);
-  border-radius: 0.85rem;
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.045);
-  overflow: hidden;
-}
-
-.filtersTopbar {
-  align-items: center;
-  background: #000;
-  color: #fff;
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-  min-height: 3.5rem;
-  padding: 0.9rem 1rem;
-}
-
-.filtersTopbar h2 {
-  color: #fff;
-  font-size: 0.92rem;
-  font-weight: 850;
-  letter-spacing: 0.055em;
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.filtersEyebrow {
-  color: var(--kanban-orange);
-  display: block;
-  font-size: 0.72rem;
-  font-weight: 850;
-  letter-spacing: 0.075em;
-  line-height: 1;
-  margin-bottom: 0.28rem;
-  text-transform: uppercase;
-}
-
-.filterToggleButton,
-.applyFilterButton,
 .resetFilterButton,
 .orderCardButton {
   align-items: center;
@@ -68,90 +26,9 @@
     transform 0.15s ease;
 }
 
-.filterToggleButton:hover,
-.applyFilterButton:hover,
 .resetFilterButton:hover,
 .orderCardButton:hover {
   transform: translateY(-1px);
-}
-
-.filterToggleButton {
-  background: rgba(var(--kanban-orange-rgb), 0.14);
-  border: 1px solid rgba(var(--kanban-orange-rgb), 0.38);
-  color: #fff;
-}
-
-.filterToggleButton:hover,
-.filterToggleButton:focus {
-  background: var(--kanban-orange);
-  border-color: var(--kanban-orange);
-  color: #111;
-  outline: none;
-}
-
-.filterCard {
-  animation: filterEnter 0.18s ease-out;
-  background: #fff;
-  padding: 1rem;
-}
-
-.filterGrid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.filterGrid label {
-  display: grid;
-  gap: 0.45rem;
-  margin: 0;
-}
-
-.filterGrid span {
-  color: var(--kanban-muted);
-  font-size: 0.78rem;
-  font-weight: 850;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
-}
-
-.filterGrid :global(.form-control),
-.filterGrid :global(.form-select) {
-  border: 1px solid #d7dee8;
-  border-radius: 0.55rem;
-  color: var(--kanban-text);
-  min-height: 3rem;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-.filterGrid :global(.form-control:focus),
-.filterGrid :global(.form-select:focus) {
-  border-color: var(--kanban-orange);
-  box-shadow: 0 0 0 0.22rem rgba(var(--kanban-orange-rgb), 0.18);
-}
-
-.filterActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: flex-end;
-  margin-top: 1rem;
-}
-
-.applyFilterButton {
-  background: #000;
-  border: 1px solid #000;
-  color: #fff;
-}
-
-.applyFilterButton:hover,
-.applyFilterButton:focus {
-  background: var(--kanban-orange);
-  border-color: var(--kanban-orange);
-  color: #111;
-  outline: none;
 }
 
 .resetFilterButton {
@@ -663,7 +540,6 @@
   .orderCard.nonDraggable:active {
     cursor: default !important;
   } 
-
 
 .kanbanError {
   background: #fff1f0;
@@ -1340,42 +1216,10 @@
   color: var(--kanban-muted) !important;
 }
 
-@keyframes filterEnter {
-  from {
-    opacity: 0;
-    transform: translateY(-0.4rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (max-width: 1199.98px) {
-  .filterGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 767.98px) {
-  .filtersTopbar {
-    align-items: flex-start;
-    flex-direction: column;
-  }
 
-  .filterToggleButton,
-  .applyFilterButton,
   .resetFilterButton {
     width: 100%;
-  }
-
-  .filterGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .filterActions {
-    justify-content: stretch;
   }
 
   .kanbanWrapper {

@@ -10,7 +10,36 @@ const message=(id,leido=true)=>({id_mensaje:id,Asunto:'Message '+id,contenido:'P
 let scope=0
 beforeEach(()=>{state.api={scopeId:++scope,openMessage:vi.fn().mockResolvedValue({message:message(1),markedAsRead:true}),getInbox:vi.fn().mockResolvedValue({messages:[message(1,false)],total:24,totalPages:2})}})
 afterEach(cleanup)
+function renderInbox() {
+ const view=render(<MemoryRouter><MessageInboxPage /></MemoryRouter>)
+ const toggle=screen.getByRole('button',{name:'Expandir filtros de mensajes'})
+ expect(toggle.getAttribute('aria-expanded')).toBe('false')
+ fireEvent.click(toggle)
+ return view
+}
 const detail=()=>render(<MemoryRouter initialEntries={['/mensajes/1']}><Routes><Route path="/mensajes/:messageId" element={<MessageDetailPage/>}/></Routes></MemoryRouter>)
+it('holds read, sort and date drafts until Apply; collapse and repeated Apply do not read or mark messages', async () => {
+ renderInbox()
+ await waitFor(() => expect(state.api.getInbox).toHaveBeenCalledTimes(1))
+ fireEvent.click(screen.getByRole('button', { name: 'Leídos' }))
+ fireEvent.click(screen.getByRole('button', { name: 'Más antiguos' }))
+ fireEvent.change(screen.getByLabelText('Desde'), { target: { value: '2026-01-01' } })
+ fireEvent.change(screen.getByLabelText('Hasta'), { target: { value: '2026-10-28' } })
+ fireEvent.click(screen.getByRole('button', { name: 'Contraer filtros de mensajes' }))
+ expect(state.api.getInbox).toHaveBeenCalledTimes(1)
+ fireEvent.click(screen.getByRole('button', { name: 'Expandir filtros de mensajes' }))
+ expect(screen.getByLabelText('Desde').value).toBe('2026-01-01')
+ fireEvent.click(screen.getByRole('button', { name: 'Aplicar filtros' }))
+ await waitFor(() => expect(state.api.getInbox).toHaveBeenCalledTimes(2))
+ expect(state.api.getInbox.mock.calls[1][0]).toMatchObject({ status: 'read', sort: 'oldest', from: '2026-01-01', to: '2026-10-28', page: 1 })
+ fireEvent.click(screen.getByRole('button', { name: 'Aplicar filtros' }))
+ expect(state.api.getInbox).toHaveBeenCalledTimes(2)
+ fireEvent.click(screen.getByRole('button', { name: 'Limpiar filtros' }))
+ await waitFor(() => expect(state.api.getInbox).toHaveBeenCalledTimes(3))
+ expect(state.api.getInbox.mock.calls[2][0]).toMatchObject({ status: 'all', sort: 'latest', from: '', to: '' })
+ expect(screen.queryByRole('searchbox')).toBeNull()
+ expect(state.api.openMessage).not.toHaveBeenCalled()
+})
 it('direct detail performs one explicit open, waits for confirmation and emits one invalidation',async()=>{
  const hold=deferred();state.api.openMessage.mockReturnValue(hold.promise);const changed=vi.fn();window.addEventListener('messages:changed',changed);
  const view=detail();await waitFor(()=>expect(state.api.openMessage).toHaveBeenCalledExactlyOnceWith('1'));
@@ -30,8 +59,8 @@ it('an account change cannot display or announce the old account open result',as
  await screen.findByText('Sin leer');await act(async()=>old.resolve({message:{...message(1),contenido:'OLD PRIVATE'},markedAsRead:true}));expect(screen.queryByText('OLD PRIVATE')).toBeNull();
 })
 it('filters from page two issue exactly one new request, reset page and abort the previous read',async()=>{
- render(<MemoryRouter><MessageInboxPage/></MemoryRouter>);fireEvent.click(await screen.findByText('Siguiente'));
+ renderInbox();fireEvent.click(await screen.findByText('Siguiente'));
  await waitFor(()=>expect(state.api.getInbox).toHaveBeenCalledTimes(2));
- fireEvent.click(screen.getByRole('button',{name:'No leídos'}));await waitFor(()=>expect(state.api.getInbox).toHaveBeenCalledTimes(3));
+ fireEvent.click(screen.getByRole('button',{name:'No leídos'}));expect(state.api.getInbox).toHaveBeenCalledTimes(2);fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}));await waitFor(()=>expect(state.api.getInbox).toHaveBeenCalledTimes(3));
  expect(state.api.getInbox.mock.calls[2][0]).toMatchObject({status:'unread',page:1,perPage:12});expect(state.api.getInbox.mock.calls[1][1].signal.aborted).toBe(true);
 })

@@ -26,8 +26,8 @@ export function createAdminUsersApi(apiClient) {
     return request
   }
   return {
-    listUsers: ({ page = 1, perPage = 10, search = '', estadoUsuario = '', rolUsuario = '' } = {}, options) =>
-      apiClient.get(base + buildQueryString({ page, perPage, search, estadoUsuario, rolUsuario }), options),
+    listUsers: ({ page = 1, perPage = 10, search = '', estadoUsuario = '', rolUsuario = '', department = '' } = {}, options) =>
+      apiClient.get(base + buildQueryString({ page, perPage, search, estadoUsuario, rolUsuario, department }), options),
     getMovements,
     getSummary: options => apiClient.get(base + '/summary', options),
     inspectUser: (subject, options) => apiClient.get('/admin/identity/identities/' + encodeURIComponent(subject), options),

@@ -6,13 +6,13 @@ const state = vi.hoisted(() => ({ api: null, allowed: true, canRevise: true, suc
 vi.mock('../hooks/usePaymentsApi', () => ({ usePaymentsApi: () => state.api }))
 vi.mock('../../../hooks/useAuth', () => ({ useAuth: () => ({ hasPermission: permission => state.allowed && (permission !== 'revise:payment-status' || state.canRevise) }) }))
 vi.mock('../../../shared/notifications/useToast', () => ({ useToast: () => ({ success: state.success, error: state.error, warning: state.warning }) }))
-vi.mock('../components/PaymentSummaryCards', () => ({ default: ({ counters }) => <output data-testid="counts">{JSON.stringify(counters)}</output> }))
 vi.mock('../components/PaymentFilters', () => ({ default: p => <div>
-  <input aria-label="Search" value={p.searchTerm} onChange={e => p.onSearchChange(e.target.value)} />
-  <input aria-label="From" value={p.dateFrom} onChange={e => p.onDateFromChange(e.target.value)} />
-  <input aria-label="To" value={p.dateTo} onChange={e => p.onDateToChange(e.target.value)} />
-  {['Pendiente', 'Confirmado', 'Rechazado'].map(name => <button key={name} onClick={() => p.onFilterChange(name)}>{name}</button>)}
-  <button onClick={p.onClearDateRange}>Clear dates</button>
+  <output data-testid="counts">{JSON.stringify({ pending: p.getFilterCount('Pendiente'), confirmed: p.getFilterCount('Confirmado'), rejected: p.getFilterCount('Rechazado') })}</output>
+  <input aria-label="Search" value={p.value.search} onChange={e => p.onChange({ search: e.target.value })} />
+  <input aria-label="From" value={p.value.from} onChange={e => p.onChange({ from: e.target.value })} />
+  <input aria-label="To" value={p.value.to} onChange={e => p.onChange({ to: e.target.value })} />
+  {['Pendiente', 'Confirmado', 'Rechazado'].map(name => <button key={name} onClick={() => p.onChange({ status: name })}>{name}</button>)}
+  <button onClick={p.onApply}>Apply</button><button onClick={p.onClear}>Clear filters</button>
 </div> }))
 vi.mock('../components/PaymentOrdersTable', () => ({ default: p => <section>{p.orders.map(o => <article key={o.id} data-testid={'row-' + o.id}>
   <span>{o.nvNumber}:{o.paymentStatus}</span>
@@ -54,20 +54,26 @@ async function openCredentials(action = 'Confirm 1') {
 it('changes state using page-only mode, preserving counters and catalog; dates refresh affected summary', async () => {
   render(<PaymentConfirmationPage />); await screen.findByTestId('row-1')
   fireEvent.click(screen.getByText('Confirmado'))
+  expect(state.api.getPaymentWorkspace).toHaveBeenCalledTimes(1)
+  fireEvent.click(screen.getByText('Apply'))
   await waitFor(() => expect(state.api.getPaymentWorkspace).toHaveBeenCalledTimes(2))
   expect(state.api.getPaymentWorkspace.mock.calls[1][0]).toMatchObject({ status: 'Confirmado', includeSummary: false })
   expect(screen.getByTestId('counts').textContent).toContain('10')
   fireEvent.change(screen.getByLabelText('From'), { target: { value: '2026-09-06' } })
+  expect(state.api.getPaymentWorkspace).toHaveBeenCalledTimes(2)
+  fireEvent.click(screen.getByText('Apply'))
   await waitFor(() => expect(state.api.getPaymentWorkspace).toHaveBeenCalledTimes(3))
   expect(state.api.getPaymentWorkspace.mock.calls[2][0].includeSummary).toBeUndefined()
 })
-it('debounces typing, clearing and pasted searches and resets the cursor', async () => {
+it('applies draft typing and clearing explicitly and resets the cursor', async () => {
   render(<PaymentConfirmationPage />); await screen.findByTestId('row-1')
   for (const value of ['a', 'ab', 'abc']) fireEvent.change(screen.getByLabelText('Search'), { target: { value } })
   expect(state.api.getPaymentWorkspace).toHaveBeenCalledTimes(1)
+  fireEvent.click(screen.getByText('Apply'))
   await waitFor(() => expect(state.api.getPaymentWorkspace).toHaveBeenCalledTimes(2))
   expect(state.api.getPaymentWorkspace.mock.calls[1][0]).toMatchObject({ search: 'abc', limit: 50 })
   fireEvent.change(screen.getByLabelText('Search'), { target: { value: '' } })
+  fireEvent.click(screen.getByText('Apply'))
   await waitFor(() => expect(state.api.getPaymentWorkspace).toHaveBeenCalledTimes(3))
   expect(state.api.getPaymentWorkspace.mock.calls[2][0].search).toBe('')
 })
@@ -86,7 +92,7 @@ it('aborts obsolete pagination and ignores its late response after filters chang
   state.api.getPaymentWorkspace.mockResolvedValueOnce(page([dto(1)], true)).mockReturnValueOnce(old.promise).mockResolvedValue(page([dto(2)]))
   render(<PaymentConfirmationPage />); fireEvent.click(await screen.findByText('Cargar más pedidos'))
   const signal = state.api.getPaymentWorkspace.mock.calls[1][1].signal
-  fireEvent.click(screen.getByText('Rechazado')); await screen.findByTestId('row-2')
+  fireEvent.click(screen.getByText('Rechazado')); fireEvent.click(screen.getByText('Apply')); await screen.findByTestId('row-2')
   expect(signal.aborted).toBe(true); await act(async () => old.resolve(page([dto(99)])))
   expect(screen.queryByTestId('row-99')).toBeNull()
 })
@@ -162,7 +168,7 @@ it('a failed write after filter changes reconciles the current filter instead of
   const hold = deferred(); state.api.updatePaymentStatus.mockReturnValue(hold.promise)
   state.api.getPaymentWorkspace.mockImplementation(async params => page(params.status === 'Confirmado' ? [dto(2, 'Confirmado')] : [dto(1)]))
   render(<PaymentConfirmationPage />); await openCredentials(); fireEvent.click(screen.getByText('Submit'))
-  fireEvent.click(screen.getByText('Confirmado')); await screen.findByTestId('row-2')
+  fireEvent.click(screen.getByText('Confirmado')); fireEvent.click(screen.getByText('Apply')); await screen.findByTestId('row-2')
   await act(async () => hold.reject({ code: 'NETWORK_ERROR' }))
   await waitFor(() => expect(state.api.getPaymentWorkspace).toHaveBeenCalledTimes(3))
   expect(state.api.getPaymentWorkspace.mock.calls.slice(1).map(([params]) => params.status)).toEqual(['Confirmado', 'Confirmado'])

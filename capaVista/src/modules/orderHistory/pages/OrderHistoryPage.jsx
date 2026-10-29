@@ -1,3 +1,5 @@
+import FilterContent from '../../../shared/components/filters/FilterContent'
+import OrderHistoryFilters from '../components/OrderHistoryFilters'
 import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -9,14 +11,7 @@ import PageShell, { PageSurface } from '../../../shared/components/layout/PageSh
 import PageHeader from '../../../shared/components/layout/PageHeader'
 import { historyScope, historyDateError, subscribeHistoryRead } from '../utils/historyReads'
 
-const STATUS_FILTERS = [
-  { label: 'Confirmación de Pago', value: 'Confirmación de Pago' },
-  { label: 'Listo para producción', value: 'Listo para Producción' },
-  { label: 'En producción', value: 'En producción' },
-  { label: 'Listo para despacho', value: 'Listo para Entrega' },
-  { label: 'Finalizado', value: 'Terminado' },
-  { label: 'Cancelado', value: 'Cancelado' },
-]
+const EMPTY_FILTERS = Object.freeze({ status: '', search: '', from: '', to: '' })
 
 function errorMessage(error) {
   return error?.payload?.message ?? 'No fue posible cargar el historial de pedidos.'
@@ -30,7 +25,7 @@ export default function OrderHistoryPage() {
 function OrderHistoryList({ api }) {
   const [orders, setOrders] = useState([])
   const [status, setStatus] = useState('')
-  const [searchInput, setSearchInput] = useState('')
+  const [draftFilters, setDraftFilters] = useState(EMPTY_FILTERS)
   const [search, setSearch] = useState('')
   const [dateRange, setDateRange] = useState({ from: '', to: '' })
   const [cursorStack, setCursorStack] = useState([null])
@@ -39,6 +34,7 @@ function OrderHistoryList({ api }) {
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
   const validationError = historyDateError(dateRange)
+  const draftError = historyDateError(draftFilters)
 
   useEffect(() => {
     if (validationError) return undefined
@@ -60,28 +56,20 @@ function OrderHistoryList({ api }) {
     setPageInfo({ nextCursor: null, hasMore: false })
   }
 
-  function updateDate(name, value) {
-    if (dateRange[name] === value) return
+  function applyFilters(next = draftFilters) {
+    if (historyDateError(next)) return
+    const nextSearch = next.search.trim()
+    if (next.status === status && nextSearch === search && next.from === dateRange.from && next.to === dateRange.to) return
     beginRead()
     setCursorStack([null])
-    setDateRange((current) => ({ ...current, [name]: value }))
-  }
-
-  function submitSearch(event) {
-    event.preventDefault()
-    const nextSearch = searchInput.trim()
-    if (nextSearch === search) return
-    beginRead()
-    setCursorStack([null])
+    setStatus(next.status)
     setSearch(nextSearch)
+    setDateRange({ from: next.from, to: next.to })
   }
 
-  function selectStatus(nextStatus) {
-    const resolvedStatus = status === nextStatus ? '' : nextStatus
-    if (resolvedStatus === status) return
-    beginRead()
-    setCursorStack([null])
-    setStatus(resolvedStatus)
+  function clearFilters() {
+    setDraftFilters(EMPTY_FILTERS)
+    applyFilters(EMPTY_FILTERS)
   }
 
   function nextPage() {
@@ -101,82 +89,52 @@ function OrderHistoryList({ api }) {
   return (
     <PageShell className={styles.page}>
       <PageSurface>
-      <PageHeader title="Historial de pedidos" actions={
-        <strong className={styles.resultCount}>{orders.length} resultados en esta página</strong>
-      } />
+        <PageHeader title="Historial de pedidos" actions={
+          <strong className={styles.resultCount}>{orders.length} resultados en esta página</strong>
+        } />
 
-      <section className={styles.panel}>
-        <div className={styles.statusFilters} aria-label="Filtros por estado">
-          <button className={!status ? styles.activeFilter : ''} onClick={() => selectStatus('')} type="button">Todos</button>
-          {STATUS_FILTERS.map((item) => (
-            <button className={status === item.value ? styles.activeFilter : ''} key={item.value} onClick={() => selectStatus(item.value)} type="button">
-              {item.label}
-            </button>
-          ))}
-        </div>
+        <FilterContent>
+          <OrderHistoryFilters value={draftFilters}
+            onChange={change => setDraftFilters(current => ({ ...current, ...change }))}
+            onApply={() => applyFilters()} onClear={clearFilters} error={draftError} loading={loading} />
+          <section className={styles.panel}>
+            {(validationError || error) && <div className={styles.error} role="alert"><p>{validationError || error}</p>{!validationError && <button onClick={() => { beginRead(); setAttempt(current => current + 1) }} type="button">Reintentar</button>}</div>}
+            {loading && !validationError ? (
+              <LoadingIndicator context="pedidos" />
+            ) : validationError || error ? null : orders.length === 0 ? (
+              <div className={styles.state}>{noRegisteredOrders ? 'No existen pedidos hasta el momento' : 'No se encontraron pedidos'}</div>
+            ) : (
+              <div className={styles.tableWrap}>
+                <table>
+                  <thead><tr><th>Nota de Venta</th><th>Cliente</th><th>Estado actual</th><th>Fecha creación</th><th>Acción</th></tr></thead>
+                  <tbody>
+                    {orders.map((order) => (
+                      <tr key={order.id}>
+                        <td><strong>{order.salesNoteNumber ?? `Pedido #${order.id}`}</strong></td>
+                        <td>{order.clientName ?? 'No disponible'}</td>
+                        <td><span className={styles.status}>{order.status ?? 'Sin estado'}</span></td>
+                        <td>{formatDate(order.createdAt)}</td>
+                        <td>
+                          <Link className={styles.detailButton} to={APP_ROUTES.ORDER_HISTORY_DETAIL.replace(':orderId', order.id)}>
+                            Ver detalle <i className="bi bi-arrow-right" aria-hidden="true" />
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
-        <form className={styles.search} onSubmit={submitSearch}>
-          <i className="bi bi-search" aria-hidden="true" />
-          <input
-            aria-label="Buscar pedidos"
-            onChange={(event) => setSearchInput(event.target.value)}
-            placeholder="Nota de Venta o nombre del cliente"
-            type="search"
-            value={searchInput}
-          />
-          <button type="submit">Buscar</button>
-        </form>
-
-        <div className={styles.dateFilters} aria-label="Rango de fecha de creacion">
-          <label>
-            <span>Desde</span>
-            <input max={dateRange.to || undefined} onChange={(event) => updateDate('from', event.target.value)} type="date" value={dateRange.from} />
-          </label>
-          <label>
-            <span>Hasta</span>
-            <input min={dateRange.from || undefined} onChange={(event) => updateDate('to', event.target.value)} type="date" value={dateRange.to} />
-          </label>
-          <button onClick={() => { if (!dateRange.from && !dateRange.to) return; beginRead(); setCursorStack([null]); setDateRange({ from: '', to: '' }) }} type="button">
-            <i className="bi bi-arrow-counterclockwise" aria-hidden="true" /> Restablecer fechas
-          </button>
-        </div>
-
-        {(validationError || error) && <div className={styles.error} role="alert"><p>{validationError || error}</p>{!validationError && <button onClick={() => { beginRead(); setAttempt(current => current + 1) }} type="button">Reintentar</button>}</div>}
-        {loading && !validationError ? (
-          <LoadingIndicator context="pedidos" />
-        ) : validationError || error ? null : orders.length === 0 ? (
-          <div className={styles.state}>{noRegisteredOrders ? 'No existen pedidos hasta el momento' : 'No se encontraron pedidos'}</div>
-        ) : (
-          <div className={styles.tableWrap}>
-            <table>
-              <thead><tr><th>Nota de Venta</th><th>Cliente</th><th>Estado actual</th><th>Fecha creación</th><th>Acción</th></tr></thead>
-              <tbody>
-                {orders.map((order) => (
-                  <tr key={order.id}>
-                    <td><strong>{order.salesNoteNumber ?? `Pedido #${order.id}`}</strong></td>
-                    <td>{order.clientName ?? 'No disponible'}</td>
-                    <td><span className={styles.status}>{order.status ?? 'Sin estado'}</span></td>
-                    <td>{formatDate(order.createdAt)}</td>
-                    <td>
-                      <Link className={styles.detailButton} to={APP_ROUTES.ORDER_HISTORY_DETAIL.replace(':orderId', order.id)}>
-                        Ver detalle <i className="bi bi-arrow-right" aria-hidden="true" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {(cursorStack.length > 1 || pageInfo.hasMore) && (
-          <nav className={styles.pagination} aria-label="Paginación">
-            <button disabled={loading || cursorStack.length === 1} onClick={previousPage} type="button">Anterior</button>
-            <span>Página {cursorStack.length}</span>
-            <button disabled={loading || !pageInfo.hasMore} onClick={nextPage} type="button">Siguiente</button>
-          </nav>
-        )}
-      </section>
+            {(cursorStack.length > 1 || pageInfo.hasMore) && (
+              <nav className={styles.pagination} aria-label="Paginación">
+                <button disabled={loading || cursorStack.length === 1} onClick={previousPage} type="button">Anterior</button>
+                <span>Página {cursorStack.length}</span>
+                <button disabled={loading || !pageInfo.hasMore} onClick={nextPage} type="button">Siguiente</button>
+              </nav>
+            )}
+          </section>
+        </FilterContent>
       </PageSurface>
     </PageShell>
   )

@@ -1,3 +1,4 @@
+import FilterContent from '../src/shared/components/filters/FilterContent'
 import { createRoot } from 'react-dom/client'
 import { useState } from 'react'
 import { AuthContext } from '../src/app/providers/authContext'
@@ -28,20 +29,24 @@ export function CalendarPreview() {
   const [monthDate, setMonthDate] = useState(new Date(2026, 9, 1))
   const [items, setItems] = useState(rows)
   const [draggedItemId, setDraggedItemId] = useState(null)
-  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [draftFilters, setDraftFilters] = useState({ search: '', status: '', productType: '' })
   const [filters, setFilters] = useState({ search: '', status: '', productType: '' })
   const visible = items.filter(item => (!filters.search || `${item.clientName} ${item.orderNumber}`.toLowerCase().includes(filters.search.toLowerCase()))
     && (!filters.status || item.status === filters.status) && (!filters.productType || item.productTypes.includes(filters.productType)))
   return <PageShell className={styles.page}><PageSurface className={styles.dashboardShell}>
-    <CalendarHeader isFiltersOpen={filtersOpen} onToggleFilters={() => setFiltersOpen(value => !value)} />
-    <div className={styles.content}>
-      {filtersOpen && <CalendarFilters filters={filters} onChange={next => setFilters(current => ({ ...current, ...next }))} onClear={() => setFilters({ search: '', status: '', productType: '' })} />}
+    <CalendarHeader />
+    <FilterContent>
+      <CalendarFilters filters={draftFilters} onChange={next => setDraftFilters(current => ({ ...current, ...next }))}
+        onApply={() => setFilters(draftFilters)} onClear={() => {
+          const empty = { search: '', status: '', productType: '' }
+          setDraftFilters(empty); setFilters(empty)
+        }} />
       <ProductionCalendarGrid allItems={items} items={visible} monthDate={monthDate} draggedItemId={draggedItemId}
         onDragStart={setDraggedItemId} onDragEnd={() => setDraggedItemId(null)} getOrderDetail={async id => items.find(item => item.id === id)}
         onChangeDeliveryDate={async (id, dueDate) => setItems(current => current.map(item => String(item.id) === String(id) ? { ...item, dueDate } : item))}
         toolbar={<CalendarToolbar monthDate={monthDate} onPreviousMonth={() => setMonthDate(date => new Date(date.getFullYear(), date.getMonth() - 1, 1))}
           onNextMonth={() => setMonthDate(date => new Date(date.getFullYear(), date.getMonth() + 1, 1))} onToday={() => { const now = new Date(); setMonthDate(new Date(now.getFullYear(), now.getMonth(), 1)) }} />} />
-    </div>
+    </FilterContent>
   </PageSurface></PageShell>
 }
 createRoot(document.getElementById('root')).render(<AuthContext.Provider value={auth}><ToastProvider><CalendarPreview /></ToastProvider></AuthContext.Provider>)

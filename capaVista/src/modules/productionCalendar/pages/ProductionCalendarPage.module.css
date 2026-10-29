@@ -13,25 +13,6 @@
   overflow: hidden;
 }
 
-.content {
-  display: grid;
-  min-width: 0;
-  gap: 1rem;
-  padding: 1rem;
-}
-
 .calendarPanel {
   min-width: 0;
-}
-
-@media (max-width: 1199.98px) {
-  .content {
-    padding: 1rem;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .content {
-    padding: 0.85rem;
-  }
 }

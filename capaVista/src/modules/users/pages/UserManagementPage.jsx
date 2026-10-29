@@ -8,8 +8,6 @@ import UserEditModal from '../components/UserEditModal'
 import UserManagementFilters from '../components/UserManagementFilters'
 import UserManagementTable from '../components/UserManagementTable'
 import UserMovementsModal from '../components/UserMovementsModal'
-import UserSummaryCards from '../components/UserSummaryCards'
-import { createLatestRequestTracker } from '../utils/latestRequestTracker'
 import { displayUserStatus } from '../../../config/userLifecycle.js'
 import styles from './UserManagementPage.module.css'
 import PageShell from '../../../shared/components/layout/PageShell'
@@ -17,16 +15,8 @@ import PageHeader from '../../../shared/components/layout/PageHeader'
 import { useToast } from '../../../shared/notifications/useToast'
 import { FEEDBACK_HANDLED, publicOperationMessage, requiresContext, uncertainOperation, operationFailureMessage } from '../../../shared/notifications/operationFeedback'
 
-const EMPTY_SUMMARY = Object.freeze({
-  totalUsuarios: 0,
-  vinculados: 0,
-  desvinculados: 0,
-  pendientes: 0,
-  pendientesRol: 0,
-})
-
 const DEFAULT_PAGE_SIZE = 10
-const SEARCH_DEBOUNCE_MS = 350
+const EMPTY_FILTERS = Object.freeze({ status: '', department: '', search: '' })
 
 function firstWord(value) {
   return String(value ?? '').trim().split(/\s+/).filter(Boolean)[0] ?? ''
@@ -91,23 +81,14 @@ export default function UserManagementPage() {
   const adminUsersApi = useAdminUsersApi()
   const latestRequestRef = useRef(0)
   const listController = useRef(null)
-  const summaryController = useRef(null)
   const preserveNextListMessage = useRef(false)
-  const latestSummaryRequestRef = useRef(createLatestRequestTracker())
   const [users, setUsers] = useState([])
   const [activeStatus, setActiveStatus] = useState('')
-  const [activeRole, setActiveRole] = useState('')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [activeDepartment, setActiveDepartment] = useState('')
+  const [draftFilters, setDraftFilters] = useState(EMPTY_FILTERS)
+  const [appliedSearch, setAppliedSearch] = useState('')
   const [page, setPage] = useState(1)
   const [totalUsers, setTotalUsers] = useState(0)
-  const [summary, setSummary] = useState(EMPTY_SUMMARY)
-  const [summaryState, setSummaryState] = useState({
-    error: '',
-    hasData: false,
-    isLoading: true,
-  })
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [actionMessage, setActionMessage] = useState(null)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -127,16 +108,6 @@ export default function UserManagementPage() {
   }, [adminUsersApi])
   const currentExternalUserId = identityUser?.sub ?? null
 
-  useEffect(() => {
-    if (searchTerm.trim() === debouncedSearchTerm) return
-    const debounceTimer = window.setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm.trim())
-      setPage(1)
-    }, SEARCH_DEBOUNCE_MS)
-
-    return () => window.clearTimeout(debounceTimer)
-  }, [searchTerm, debouncedSearchTerm])
-
   const loadUsers = useCallback(
     async ({ preserveMessage = false, requestedPage = page } = {}) => {
       const requestId = latestRequestRef.current + 1
@@ -154,9 +125,9 @@ export default function UserManagementPage() {
         const response = await adminUsersApi.listUsers({
           page: requestedPage,
           perPage: DEFAULT_PAGE_SIZE,
-          search: debouncedSearchTerm,
+          search: appliedSearch,
           estadoUsuario: activeStatus,
-          rolUsuario: activeRole,
+          department: activeDepartment,
         }, { signal: controller.signal })
 
         if (controller.signal.aborted || requestId !== latestRequestRef.current) {
@@ -191,40 +162,8 @@ export default function UserManagementPage() {
         }
       }
     },
-    [activeRole, activeStatus, adminUsersApi, currentExternalUserId, debouncedSearchTerm, page],
+    [activeDepartment, activeStatus, adminUsersApi, currentExternalUserId, appliedSearch, page],
   )
-
-  const loadSummary = useCallback(async () => {
-    const tracker = latestSummaryRequestRef.current
-    const requestId = tracker.begin()
-    summaryController.current?.abort()
-    const controller = new AbortController()
-    summaryController.current = controller
-    setSummaryState((current) => ({ ...current, error: '', isLoading: true }))
-
-    try {
-      const response = await adminUsersApi.getSummary({ signal: controller.signal })
-
-      if (controller.signal.aborted || !tracker.isLatest(requestId)) return
-
-      setSummary({
-        totalUsuarios: response.totalUsuarios ?? 0,
-        vinculados: response.vinculados ?? 0,
-        desvinculados: response.desvinculados ?? 0,
-        pendientes: response.pendientes ?? 0,
-        pendientesRol: response.pendientesRol ?? 0,
-      })
-      setSummaryState({ error: '', hasData: true, isLoading: false })
-    } catch (error) {
-      if (controller.signal.aborted || !tracker.isLatest(requestId)) return
-
-      setSummaryState((current) => ({
-        ...current,
-        error: getErrorText(error),
-        isLoading: false,
-      }))
-    }
-  }, [adminUsersApi])
 
   useEffect(() => {
     const requestTimer = window.setTimeout(() => {
@@ -240,36 +179,20 @@ export default function UserManagementPage() {
     }
   }, [loadUsers])
 
-  useEffect(() => {
-    const tracker = latestSummaryRequestRef.current
-    const requestTimer = window.setTimeout(() => {
-      loadSummary()
-    }, 0)
-
-    return () => {
-      window.clearTimeout(requestTimer)
-      tracker.invalidate()
-      summaryController.current?.abort()
-    }
-  }, [loadSummary])
-
   const totalPages = Math.max(1, Math.ceil(totalUsers / DEFAULT_PAGE_SIZE))
 
-  function handleStatusChange(status) {
-    setActiveStatus(status)
-    setPage(1)
-  }
-
-  function handleRoleChange(role) {
-    setActiveRole(role)
+  function handleApplyFilters() {
+    setActiveStatus(draftFilters.status)
+    setActiveDepartment(draftFilters.department)
+    setAppliedSearch(draftFilters.search.trim())
     setPage(1)
   }
 
   function handleClearFilters() {
+    setDraftFilters(EMPTY_FILTERS)
     setActiveStatus('')
-    setActiveRole('')
-    setSearchTerm('')
-    setDebouncedSearchTerm('')
+    setActiveDepartment('')
+    setAppliedSearch('')
     setPage(1)
   }
 
@@ -282,8 +205,7 @@ export default function UserManagementPage() {
       listController.current?.abort()
       preserveNextListMessage.current = true
       setPage(1)
-      await loadSummary()
-    } else await Promise.all([loadUsers({ preserveMessage: true }), loadSummary()])
+    } else await loadUsers({ preserveMessage: true })
   }
 
   async function handleSaveUser(updatedUser) {
@@ -341,20 +263,6 @@ export default function UserManagementPage() {
       <section className={styles.dashboardShell}>
         <PageHeader title="Gestion de usuarios" titleId="user-management-title" />
 
-        <UserSummaryCards
-          isLoading={summaryState.isLoading}
-          summary={summaryState.hasData ? summary : null}
-        />
-
-        {summaryState.error && (
-          <div className={`${styles.feedbackMessage} ${styles.feedbackdanger}`} role="alert">
-            <span>{summaryState.error} {summaryState.hasData ? 'Se conservan los ultimos valores disponibles.' : ''}</span>
-            <UserButton disabled={summaryState.isLoading} onClick={() => { void loadSummary() }} variant="secondary">
-              Reintentar resumen
-            </UserButton>
-          </div>
-        )}
-
         <div className={styles.content}>
           {actionMessage && (
             <div className={`${styles.feedbackMessage} ${styles[`feedback${actionMessage.type}`]}`} role="status">
@@ -367,19 +275,20 @@ export default function UserManagementPage() {
             </div>
           )}
 
-          <UserManagementFilters
-            activeRole={activeRole}
-            activeStatus={activeStatus}
-            isOpen={isFiltersOpen}
-            onClear={handleClearFilters}
-            onCreateUser={() => setIsCreateModalOpen(true)}
-            onRoleChange={handleRoleChange}
-            onSearchChange={setSearchTerm}
-            onStatusChange={handleStatusChange}
-            onToggle={() => setIsFiltersOpen((currentValue) => !currentValue)}
-            searchTerm={searchTerm}
-            summary={summaryState.hasData ? summary : null}
-          />
+          <div className={styles.filterToolbar}>
+            <UserManagementFilters
+              value={draftFilters}
+              onChange={(change) => setDraftFilters(current => ({ ...current, ...change }))}
+              onApply={handleApplyFilters}
+              onClear={handleClearFilters}
+              loading={isLoading}
+            />
+            <div className={styles.createUserActions}>
+              <UserButton icon="bi-plus-lg" onClick={() => setIsCreateModalOpen(true)} variant="primary">
+                Crear usuario
+              </UserButton>
+            </div>
+          </div>
 
           <UserManagementTable
             inspectingId={inspectingId}

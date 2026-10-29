@@ -1,3 +1,4 @@
+import FilterContent from '../../../shared/components/filters/FilterContent'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import CalendarFilters from '../components/CalendarFilters'
 import CalendarHeader from '../components/CalendarHeader'
@@ -92,7 +93,7 @@ function CalendarContent({ ordersCalendarApi }) {
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const currentMonth = useRef(monthDate)
   useEffect(() => { currentMonth.current = monthDate }, [monthDate])
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+  const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS)
   const [draggedItemId, setDraggedItemId] = useState(null)
   const [loadedMonth, setLoadedMonth] = useState(null)
   const [loadedPendingApi, setLoadedPendingApi] = useState(null)
@@ -191,7 +192,7 @@ function CalendarContent({ ordersCalendarApi }) {
   }
 
   function updateFilters(nextFilters) {
-    setFilters((currentFilters) => ({
+    setDraftFilters((currentFilters) => ({
       ...currentFilters,
       ...nextFilters,
     }))
@@ -213,19 +214,15 @@ function CalendarContent({ ordersCalendarApi }) {
   return (
     <PageShell className={styles.page}>
       <PageSurface className={styles.dashboardShell}>
-        <CalendarHeader
-          isFiltersOpen={isFiltersOpen}
-          onToggleFilters={() => setIsFiltersOpen((currentValue) => !currentValue)}
-        />
+        <CalendarHeader />
 
-        <div className={styles.content}>
-          {isFiltersOpen && (
-            <CalendarFilters
-              filters={filters}
-              onChange={updateFilters}
-              onClear={() => setFilters(DEFAULT_FILTERS)}
-            />
-          )}
+        <FilterContent>
+          <CalendarFilters
+            filters={draftFilters}
+            onChange={updateFilters}
+            onApply={() => setFilters(draftFilters)}
+            onClear={() => { setDraftFilters(DEFAULT_FILTERS); setFilters(DEFAULT_FILTERS) }}
+          />
 
           <section className={styles.calendarPanel}>
             <ProductionCalendarGrid
@@ -244,7 +241,7 @@ function CalendarContent({ ordersCalendarApi }) {
               }} />}
             />
           </section>
-        </div>
+        </FilterContent>
       </PageSurface>
     </PageShell>
   )
