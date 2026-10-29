@@ -11,7 +11,7 @@ import { normalizeOrder, normalizeStatus } from '../utils/kanbanOrderMapping.js'
 import { normalizeText, isItemReadyForDelivery, isPaymentConfirmed, hasOrderLabel, sortOrdersForColumn } from '../utils/kanbanOrderRules.js';
 import { DroppableColumn } from './DroppableColumn.jsx';
 import { MoveToProductionModal } from './MoveToProductionModal.jsx';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useEffectEvent, useRef } from 'react';
 import { useKanbanApi } from '../hooks/useKanbanApi';
 import { useAuth } from '../../../hooks/useAuth';
 import { applyOrderStagePatch } from '../utils/orderStagePatch';
@@ -23,6 +23,7 @@ import { DragDropProvider } from '@dnd-kit/react';
 import KanbanCard from './KanbanCard';
 import KanbanOffCanvas from './KanbanOffCanvas';
 import KanbanDetailBoundary from './KanbanDetailBoundary.jsx';
+import { hasValidProductionSchedule, PRODUCTION_SCHEDULE_REQUIRED_MESSAGE } from '../../../../../shared/productionScheduling.js';
 
 function rememberCardExpansion(current, orders) {
   const byOrder = { ...current.byOrder }
@@ -32,7 +33,7 @@ function rememberCardExpansion(current, orders) {
   return { ...current, byOrder }
 }
 
-function KanbanColumn({ filters, refreshKey = 0 }) {
+function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClearRequestedOrder }) {
   const notify = useToast()
   const [orders, setOrders] = useState([])
   const [cardExpansion, setCardExpansion] = useState({ byOrder: {}, byColumn: {} })
@@ -60,6 +61,34 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
   const kanbanApi = useKanbanApi()
   const { hasPermission } = useAuth()
   const canFinishProduction = hasPermission(PERMISSIONS.MOVE_ORDERS)
+  const canReadOrders = hasPermission(PERMISSIONS.VIEW_KANBAN_MODULE)
+  const isHistoricalDetail = Number(selectedOrder?.generalStepId) === 4 ||
+    ['terminado', 'cancelado'].includes(normalizeText(selectedOrder?.orderStatus))
+  const openRequestedOrder = useEffectEvent(() => {
+    closeOrderDetail(false)
+    if (requestedOrderId === null) return
+    if (!canReadOrders) {
+      notify.error('No tienes permiso para consultar pedidos.')
+      onClearRequestedOrder?.()
+      return
+    }
+    if (!/^[1-9]\d*$/.test(requestedOrderId) || !Number.isSafeInteger(Number(requestedOrderId))) {
+      notify.error('El identificador del pedido no es válido.')
+      onClearRequestedOrder?.()
+      return
+    }
+    void openOrderDetail({ id: Number(requestedOrderId) }, true)
+  })
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => openRequestedOrder(), 0)
+    const requests = detailRequestId
+    return () => {
+      window.clearTimeout(timer)
+      requests.current++
+      detailController.current?.abort()
+    }
+  }, [requestedOrderId, kanbanApi, canReadOrders])
 
   useEffect(() => {
     const requests = detailRequestId
@@ -254,6 +283,29 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
       return
     }
 
+    if (isMoveToProduction) {
+      const version = listRequestId.current
+      const controller = new AbortController()
+      moveController.current = controller
+      moveValidation.current = true
+      setValidatingMove(true)
+      try {
+        // Read the calendar's order date, not a line date or a stale board card.
+        const detail = await kanbanApi.getOrderDetail(order.id, { precheck: true, signal: controller.signal })
+        if (controller.signal.aborted || version !== listRequestId.current) return
+        if (!hasValidProductionSchedule(detail.dueDate)) {
+          notify.error(PRODUCTION_SCHEDULE_REQUIRED_MESSAGE)
+          return
+        }
+        transitionOrder = normalizeOrder(detail)
+      } catch {
+        if (!controller.signal.aborted && version === listRequestId.current) notify.error('No fue posible validar la programación del pedido.')
+        return
+      } finally {
+        if (moveController.current === controller) { moveValidation.current = false; setValidatingMove(false) }
+      }
+    }
+
     setPendingProductionMove({ order: transitionOrder, targetColumn, api: kanbanApi })
   }
 
@@ -264,31 +316,42 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
     setSelectedOrder(current => current?.id === updatedOrder.id ? updatedOrder : current)
   }
 
-  async function openOrderDetail(order) {
+  async function openOrderDetail(order, fromUrl = false) {
     setDetailScope(kanbanApi)
     const requestId = ++detailRequestId.current
     detailController.current?.abort()
     const controller = new AbortController()
     detailController.current = controller
-    setSelectedOrder(order)
+    // Resolve URL requests before exposing the detail and its permitted actions.
+    setSelectedOrder(fromUrl ? null : order)
     setDetailError(null)
     setDetailLoading(true)
     try {
       const detail = await kanbanApi.getOrderDetail(order.id, { signal: controller.signal })
-      if (requestId === detailRequestId.current) setSelectedOrder(normalizeOrder(detail))
+      if (controller.signal.aborted || requestId !== detailRequestId.current) return
+      const normalized = normalizeOrder(detail)
+      if (Number(normalized.id) !== Number(order.id)) throw new Error('Unexpected order detail')
+      setSelectedOrder(normalized)
     } catch (error) {
-      if (requestId === detailRequestId.current) setDetailError(error?.payload?.message ?? 'No fue posible cargar el detalle del pedido.')
+      if (controller.signal.aborted || requestId !== detailRequestId.current) return
+      if (fromUrl) {
+        closeOrderDetail()
+        notify.error(error?.status === 403 ? 'No tienes permiso para consultar este pedido.'
+          : error?.status === 404 ? 'El pedido no existe o ya no está disponible.'
+            : 'No fue posible cargar el detalle del pedido. Intenta nuevamente.')
+      } else setDetailError(error?.payload?.message ?? 'No fue posible cargar el detalle del pedido.')
     } finally {
       if (requestId === detailRequestId.current) setDetailLoading(false)
     }
   }
 
-  function closeOrderDetail() {
+  function closeOrderDetail(clearUrl = true) {
     detailRequestId.current += 1
     detailController.current?.abort()
     setSelectedOrder(null)
     setDetailError(null)
     setDetailLoading(false)
+    if (clearUrl && requestedOrderId !== null) onClearRequestedOrder?.()
   }
 
   async function handleToggleIndicator(orderId, indicator) {
@@ -400,6 +463,9 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
 
   return (
     <>
+      {detailScope === kanbanApi && detailLoading && selectedOrder === null && (
+        <LoadingIndicator scope="action" context="Consulta del pedido relacionado" />
+      )}
       {loadError && <div className={styles.kanbanError} role="alert">{loadError}</div>}
       {validatingMove && <LoadingIndicator scope="action" context="Validación del pedido antes del traslado" />}
       <DragDropProvider onDragEnd={handleDragEnd}>
@@ -473,12 +539,12 @@ function KanbanColumn({ filters, refreshKey = 0 }) {
         onClose={closeOrderDetail}
         onCompleteSubprocess={handleCompleteSubprocess}
         onFinishProduction={handleFinishProduction}
-        canFinishProduction={canFinishProduction}
-        canCompleteSubprocess={hasPermission(PERMISSIONS.UPDATE_SUBPROCESSES)}
-        canReview={hasPermission(PERMISSIONS.REVIEW_ORDERS)}
-        canRollbackSubprocess={hasPermission(PERMISSIONS.ROLLBACK_SUBPROCESSES)}
-        canCancelProduction={hasPermission(PERMISSIONS.CANCEL_ORDERS)}
-        canReevaluate={hasPermission(PERMISSIONS.REEVALUATE_ORDERS) && Number(selectedOrder?.generalStepId) === KANBAN_REVISION_STEP}
+        canFinishProduction={!isHistoricalDetail && canFinishProduction}
+        canCompleteSubprocess={!isHistoricalDetail && hasPermission(PERMISSIONS.UPDATE_SUBPROCESSES)}
+        canReview={!isHistoricalDetail && hasPermission(PERMISSIONS.REVIEW_ORDERS)}
+        canRollbackSubprocess={!isHistoricalDetail && hasPermission(PERMISSIONS.ROLLBACK_SUBPROCESSES)}
+        canCancelProduction={!isHistoricalDetail && hasPermission(PERMISSIONS.CANCEL_ORDERS)}
+        canReevaluate={!isHistoricalDetail && hasPermission(PERMISSIONS.REEVALUATE_ORDERS) && Number(selectedOrder?.generalStepId) === KANBAN_REVISION_STEP}
         onCancelProduction={handleCancelProduction}
         onRollbackSubprocess={handleRollbackSubprocess}
         onReevaluate={handleReevaluate}

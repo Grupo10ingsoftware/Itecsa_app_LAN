@@ -69,6 +69,7 @@ it('shows the matching tooltip on focus and hover', async () => {
   await waitFor(() => expect(screen.getByRole('tooltip').textContent).toBe('Expandir'))
 })
 it('retains expansion when a confirmed drag moves a card to another column', async () => {
+  state.api.getOrderDetail.mockResolvedValue({ ...order(1), dueDate: '2026-10-29' })
   render(<KanbanColumn />)
   await screen.findByRole('button', { name: 'Contraer tarjeta NV-1' })
   fireEvent.click(screen.getByRole('button', { name: 'Contraer tarjeta NV-1' }))

@@ -12,6 +12,7 @@ const ROUTE_ICONS_BY_PATH = Object.freeze({
   [APP_ROUTES.ORDERS_CREATE]: 'bi-receipt',
   [APP_ROUTES.ORDER_HISTORY]: 'bi-clock-history',
   [APP_ROUTES.PRODUCTION_CALENDAR]: 'bi-calendar3',
+  [APP_ROUTES.METRICS]: 'bi-bar-chart-fill',
 })
 
 export default function NavigationMenu({ onNavigate }) {

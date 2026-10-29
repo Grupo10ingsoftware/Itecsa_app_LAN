@@ -1,3 +1,4 @@
+vi.mock('../../../hooks/useAuth', () => ({ useAuth: () => ({ hasPermission: () => true }) }))
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach,beforeEach,expect,it,vi } from 'vitest'
 import { MemoryRouter,Route,Routes } from 'react-router-dom'

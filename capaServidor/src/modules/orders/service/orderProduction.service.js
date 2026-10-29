@@ -8,6 +8,7 @@ import {
 } from '../../../config/status.js';
 import { PERMISSIONS as P } from '../../../../../shared/authorization.js';
 import { authorizationForProvider } from '../../../../../shared/identityAuthorization.js';
+import { hasValidProductionSchedule, PRODUCTION_SCHEDULE_REQUIRED_MESSAGE } from '../../../../../shared/productionScheduling.js';
 
 export function toPrismaDate(value) {
   if (!value) return null;
@@ -96,6 +97,10 @@ export async function updGeneralStepOperation(service, orderId, stepId, options 
   if (!options.actor?.idUsuario) {
     const error = new AppError(403, "El usuario validado por PIN es obligatorio.");
     throw error;
+  }
+
+  if (isMoveToProduction && !hasValidProductionSchedule(order.fecha_estimada_termino)) {
+    throw new AppError(409, PRODUCTION_SCHEDULE_REQUIRED_MESSAGE, 'PRODUCTION_SCHEDULE_REQUIRED');
   }
 
   return service.runInTransaction(({ repo }) => repo.updateGeneralStep(

@@ -1,21 +1,28 @@
-.backLink { align-items: center; color: #64748b; display: inline-flex; font-size: .85rem; font-weight: 750; gap: .45rem; margin-bottom: 1rem; text-decoration: none; }
-.backLink:hover { color: #c2410c; }
-.messageCard { background: #fff; border: 1px solid #e5e7eb; border-radius: 1.15rem; box-shadow: 0 22px 55px rgba(15,23,42,.09); overflow: hidden; }
-.header { align-items: flex-start; background: linear-gradient(135deg,#101010,#222); color: #fff; display: flex; gap: 1rem; padding: 1.5rem; }
-.mailIcon { align-items: center; background: rgba(var(--itexsa-orange-rgb),.17); border: 1px solid rgba(var(--itexsa-orange-rgb),.4); border-radius: .9rem; color: var(--itexsa-orange); display: flex; flex: 0 0 3rem; font-size: 1.25rem; height: 3rem; justify-content: center; }
-.heading { flex: 1; min-width: 0; }
-.eyebrow { color: #fb923c; font-size: .68rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
-.heading h2 { font-size: clamp(1.35rem,3vw,2rem); font-weight: 850; letter-spacing: -.025em; margin: .25rem 0 .35rem; }
-.heading time { color: #aab4c3; font-size: .8rem; }
-.readBadge { align-items: center; background: rgba(34,197,94,.14); border: 1px solid rgba(34,197,94,.28); border-radius: 999px; color: #86efac; display: inline-flex; font-size: .7rem; font-weight: 800; gap: .3rem; padding: .35rem .6rem; }
-.content { color: #334155; font-size: 1rem; line-height: 1.8; min-height: 12rem; padding: clamp(1.5rem,4vw,2.5rem); white-space: pre-wrap; }
-.orderCard { align-items: center; background: #fff7ed; border: 1px solid #fed7aa; border-radius: .9rem; display: flex; gap: .85rem; margin: 0 clamp(1.5rem,4vw,2.5rem) 2rem; padding: .9rem 1rem; }
-.orderIcon { align-items: center; background: #fff; border-radius: .7rem; color: #c2410c; display: flex; flex: 0 0 2.5rem; height: 2.5rem; justify-content: center; }
-.orderCard div { display: grid; }
-.orderCard small { color: #9a3412; font-size: .68rem; font-weight: 800; text-transform: uppercase; }
-.orderCard strong { color: #7c2d12; }
-.orderCard span { color: #9a3412; font-size: .75rem; }
-.state { align-items: center; background: #fff; border: 1px solid #e5e7eb; border-radius: 1rem; color: #64748b; display: flex; flex-direction: column; gap: .8rem; justify-content: center; min-height: 20rem; padding: 2rem; text-align: center; }
-.state button { background: #111827; border: 0; border-radius: .65rem; color: #fff; font-weight: 750; padding: .55rem .9rem; }
-@media (max-width: 575.98px) { .header { flex-wrap: wrap; padding: 1.15rem; } .readBadge { margin-left: 4rem; } .content { padding: 1.35rem; } .orderCard { margin: 0 1.35rem 1.35rem; } }
+﻿.shell { background: var(--page-white); border: 1px solid var(--itexsa-border); border-radius: var(--page-radius); padding: clamp(1rem, 3vw, 2rem); }
 .shell > [data-page-header-container] { margin-bottom: 1rem; }
+.backLink { align-items: center; background: var(--page-white); border: 1px solid var(--itexsa-border); border-radius: .65rem; color: var(--itexsa-text); display: inline-flex; font-size: .85rem; font-weight: 750; gap: .65rem; margin-bottom: 1.4rem; min-height: 44px; padding: .4rem .9rem .4rem .4rem; text-decoration: none; }
+.backIcon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: .45rem; background: var(--page-background); }
+.backLink:hover { background: rgba(var(--page-brand-orange-rgb), .06); border-color: var(--page-brand-orange); color: var(--itexsa-text); }
+.backLink:focus-visible, .orderLink:focus-visible, .state button:focus-visible { outline: 3px solid var(--itexsa-text); outline-offset: 3px; }
+.messageCard { min-width: 0; color: var(--itexsa-text); }
+.header { background: var(--page-background); border: 2px solid var(--page-brand-orange); border-radius: .75rem; display: grid; gap: .7rem; padding: clamp(1rem, 3vw, 1.5rem); }
+.bannerUpper { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+.eyebrow { display: inline-flex; align-items: center; gap: .6rem; font-size: .7rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.mailIcon { display: grid; place-items: center; width: 29px; height: 29px; border: 1px solid var(--page-brand-orange); background: rgba(var(--page-brand-orange-rgb), .1); border-radius: .5rem; font-size: 1rem; flex-shrink: 0; }
+.header h2 { font-size: clamp(1.45rem, 4vw, 2.05rem); font-weight: 850; letter-spacing: -.025em; line-height: 1.2; margin: 0; overflow-wrap: anywhere; }
+.date { display: flex; align-items: baseline; gap: .45rem; font-size: .8rem; color: var(--itexsa-text); overflow-wrap: anywhere; }
+.readBadge { align-items: center; background: var(--itexsa-text); border-radius: 999px; color: var(--page-white); display: inline-flex; font-size: .7rem; font-weight: 800; gap: .3rem; padding: .4rem .65rem; }
+.contentSection { padding: 1.5rem 0; }
+.sectionHeading { color: var(--itexsa-text); font-size: .75rem; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; margin: 0 0 .65rem; }
+.content { color: var(--itexsa-text); font-size: .95rem; line-height: 1.8; margin: 0; max-width: 75ch; white-space: pre-wrap; overflow-wrap: anywhere; }
+.orderCard { align-items: center; background: var(--page-white); border: 1px solid var(--itexsa-border); border-radius: .75rem; display: flex; flex-wrap: wrap; gap: .85rem; padding: 1rem; }
+.orderIcon { align-items: center; background: rgba(var(--page-brand-orange-rgb), .1); border-radius: .65rem; color: var(--itexsa-text); display: flex; flex: 0 0 2.5rem; height: 2.5rem; justify-content: center; font-size: 1.25rem; }
+.orderMeta { display: grid; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.orderMeta small { color: var(--itexsa-text); font-size: .68rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.orderMeta strong { font-size: 1.05rem; }
+.orderMeta span { color: var(--itexsa-muted); font-size: .8rem; }
+.orderLink { align-items: center; justify-content: center; display: inline-flex; gap: .5rem; background: var(--page-header-black); color: var(--page-white); border: 1px solid var(--page-header-black); border-radius: .5rem; font-size: .8rem; font-weight: 800; min-height: 44px; padding: .6rem .85rem; text-decoration: none; }
+.orderLink:hover { background: var(--page-brand-orange); color: var(--page-header-black); }
+.state { align-items: center; background: var(--page-white); border: 1px solid var(--itexsa-border); border-radius: 1rem; color: var(--itexsa-text); display: flex; flex-direction: column; gap: .8rem; justify-content: center; min-height: 20rem; padding: 2rem; text-align: center; }
+.state button { background: var(--itexsa-text); border: 0; border-radius: .65rem; color: var(--page-white); font-weight: 750; min-height: 44px; padding: .55rem .9rem; }
+@media (max-width: 575.98px) { .orderLink { width: 100%; } .orderMeta { flex-basis: calc(100% - 3.5rem); } }

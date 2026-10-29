@@ -91,6 +91,7 @@ it('labels stay unchanged until confirmed; double clicks are blocked, with no li
   expect(state.api.getOrders).toHaveBeenCalledTimes(1)
 })
 it('label failure cannot roll back a concurrent confirmed stage change', async () => {
+  state.api.getOrderDetail.mockResolvedValue(order(1, { dueDate: '2026-10-29' }))
   const label = deferred(); state.api.setLabel.mockReturnValue(label.promise)
   state.api.moveOrder.mockResolvedValue({ id: 1, generalStepId: 2, orderStatus: 'En producción' })
   render(<KanbanColumn filters={{}} />); await screen.findByText('NV-1')
