@@ -1,10 +1,13 @@
+import { useId } from 'react'
+import { OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { KanbanDetailSection } from './KanbanDetailSection'
 import styles from '../styles/Kanban.module.css';
 import { getLanyardProgress, isLanyardItem, isLanyardPackagingBlocked, formatStatus } from '../utils/kanbanDetail.js';
 
 export function KanbanSubprocesses({ isInProduction, orderItems, canCompleteSubprocess, canRollbackSubprocess, openRollbackModal, openAuthModal }) {
+  const tooltipId = useId()
   return (
-    <section className={styles.detailSection}>
-      <h3>Subprocesos</h3>
+    <KanbanDetailSection title="Subprocesos" icon="gear">
       {!isInProduction && (
         <div className={styles.stepperNotice}>
           <i className="bi bi-lock-fill" aria-hidden="true" />
@@ -37,7 +40,7 @@ export function KanbanSubprocesses({ isInProduction, orderItems, canCompleteSubp
                   const canRollback = canRollbackSubprocess && isInProduction && isDone && index === currentProcessIndex - 1
 
                   return (
-                    <button
+                    <div
                       aria-current={isCurrent ? 'step' : undefined}
                       className={[
                         styles.subProcessStep,
@@ -47,14 +50,21 @@ export function KanbanSubprocesses({ isInProduction, orderItems, canCompleteSubp
                       ]
                         .filter(Boolean)
                         .join(' ')}
-                      disabled={!canRollback && (isLocked || isDone)}
                       key={process.id}
-                      onClick={() => canRollback ? openRollbackModal(item, process) : openAuthModal(item, process, index, currentProcessIndex)}
-                      type="button"
                     >
-                      <span className={styles.subProcessMarker}>
-                        {isDone ? <i className="bi bi-check-lg" aria-hidden="true" /> : index + 1}
-                      </span>
+                      <OverlayTrigger placement="right" trigger={['hover', 'focus']} overlay={
+                        <Tooltip id={tooltipId + '-' + item.id + '-' + process.id}>
+                          {canRollback ? 'Retroceder subproceso' : 'Marcar como completo'}
+                        </Tooltip>
+                      }>
+                        <button className={styles.subProcessMarker}
+                          aria-label={(canRollback ? 'Retroceder subproceso' : isDone ? 'Completado' : 'Marcar como completo') + ': ' + process.name}
+                          disabled={!canRollback && (isLocked || isDone)}
+                          onClick={() => canRollback ? openRollbackModal(item, process) : openAuthModal(item, process, index, currentProcessIndex)}
+                          type="button">
+                          {isDone ? <i className="bi bi-check-lg" aria-hidden="true" /> : index + 1}
+                        </button>
+                      </OverlayTrigger>
                       <span className={styles.subProcessContent}>
                         <span>{process.name}</span>
                         <strong>
@@ -67,7 +77,7 @@ export function KanbanSubprocesses({ isInProduction, orderItems, canCompleteSubp
                               : 'Bloqueado'}
                         </strong>
                       </span>
-                    </button>
+                    </div>
                   )
                 })}
               </div>
@@ -75,6 +85,6 @@ export function KanbanSubprocesses({ isInProduction, orderItems, canCompleteSubp
           )
         })}
       </div>
-    </section>
+    </KanbanDetailSection>
   )
 }

@@ -1,3 +1,4 @@
+import { useId, useState } from 'react'
 import styles from '../styles/Kanban.module.css'
 import { useDraggable } from '@dnd-kit/react'
 
@@ -46,7 +47,12 @@ function KanbanCard({
   canMove = false,
   onToggleIndicator,
   onOpenDetail,
+  expanded: controlledExpanded,
+  onExpandedChange,
 }) {
+  const [localExpanded, setLocalExpanded] = useState(true)
+  const expanded = controlledExpanded ?? localExpanded
+  const contentId = useId()
   const { ref } = useDraggable({
     id: salesNoteNumber,
     disabled: isMoveBlocked || !canMove,
@@ -83,12 +89,29 @@ function KanbanCard({
         .filter(Boolean)
         .join(' ')}
       ref={ref}
+      onPointerDownCapture={event => {
+        if (event.target.closest('button')) event.stopPropagation()
+      }}
+      onKeyDownCapture={event => {
+        if (event.target.closest('button')) event.stopPropagation()
+      }}
     >
       <div className={styles.orderCardHeader}>
         <div className={styles.orderIdentity}>
           <span>Pedido: {salesNoteNumber}</span>
           <span>Cliente: {displayClientName}</span>
         </div>
+        <button className={styles.cardExpandButton} type="button"
+          aria-label={(expanded ? 'Contraer' : 'Expandir') + ' tarjeta ' + salesNoteNumber}
+          aria-expanded={expanded} aria-controls={contentId}
+          onClick={event => {
+            event.stopPropagation()
+            if (onExpandedChange) onExpandedChange(!expanded)
+            else setLocalExpanded(!expanded)
+          }}>
+          <i className={'bi bi-chevron-' + (expanded ? 'up' : 'down')} aria-hidden="true" />
+        </button>
+      </div>
         <div className={styles.headerBadgesGroup}>
           {isMoveBlocked && (
             <span className={styles.lockedBadge} title="Pago pendiente">
@@ -148,8 +171,8 @@ function KanbanCard({
             </span>
           )}
         </div>
-      </div>
 
+      <div id={contentId} hidden={!expanded} className={styles.cardExpandedContent}>
       <div className={summaryItems.length > 1 ? styles.orderDetailsGrid : styles.orderDetailsStack}>
         {summaryItems.map((item) => (
           <dl className={styles.orderDetails} key={item.id}>
@@ -198,6 +221,7 @@ function KanbanCard({
         <i className="bi bi-eye" aria-hidden="true" />
         <span>Detalle</span>
       </button>
+      </div>
     </article>
   )
 }

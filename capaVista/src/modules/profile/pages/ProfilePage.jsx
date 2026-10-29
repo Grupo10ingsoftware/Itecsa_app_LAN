@@ -200,7 +200,7 @@ function ProfileContent({ authApi }) {
                 <div className="modal-body" aria-live="polite">
                   <h2 className="fs-5" id="pin-recovery-title">Para recuperar tu PIN, debes autenticarte nuevamente</h2>
                   <p>Redirigiendo al inicio de sesión seguro...</p>
-                  <LoadingIndicator scope="action" context="Recuperación de PIN" />
+                  <LoadingIndicator scope="dialog" context="Recuperación de PIN" />
                 </div>
                 <div className="modal-footer">
                   <button className="btn btn-outline-secondary" onClick={() => recoveryTask.current?.cancel()} type="button">Cancelar</button>

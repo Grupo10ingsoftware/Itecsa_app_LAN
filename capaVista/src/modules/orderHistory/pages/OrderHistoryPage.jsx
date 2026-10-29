@@ -43,7 +43,7 @@ function OrderHistoryList({ api }) {
   useEffect(() => {
     if (validationError) return undefined
     const cursor = cursorStack.at(-1)
-    return subscribeHistoryRead({ api, method: 'listOrders', params: { status, search, from: dateRange.from, to: dateRange.to, cursor, limit: 50 },
+    return subscribeHistoryRead({ api, method: 'listOrders', params: { status, search, from: dateRange.from, to: dateRange.to, cursor, limit: 15 },
       onSuccess: (result) => {
         setOrders(result.items ?? [])
         setPageInfo(result.pageInfo ?? { nextCursor: null, hasMore: false })
@@ -101,9 +101,7 @@ function OrderHistoryList({ api }) {
   return (
     <PageShell className={styles.page}>
       <PageSurface>
-      <PageHeader title="Historial de pedidos" actions={
-        <strong className={styles.resultCount}>{orders.length} resultados en esta página</strong>
-      } />
+      <PageHeader title="Historial de pedidos" />
 
       <section className={styles.panel}>
         <div className={styles.statusFilters} aria-label="Filtros por estado">

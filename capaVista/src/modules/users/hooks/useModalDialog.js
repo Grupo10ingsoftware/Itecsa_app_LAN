@@ -13,7 +13,7 @@ function getFocusableElements(container) {
   if (!container) return []
 
   return [...container.querySelectorAll(FOCUSABLE_SELECTOR)].filter(
-    (element) => element.getAttribute('aria-hidden') !== 'true' && !element.hidden,
+    (element) => !element.closest('[hidden], [inert], [aria-hidden="true"]'),
   )
 }
 
