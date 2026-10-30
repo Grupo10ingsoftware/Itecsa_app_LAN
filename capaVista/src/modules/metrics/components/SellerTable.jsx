@@ -31,7 +31,7 @@ export default function SellerTable({ rows, exportActions }) {
     </div>
     {filtered.length === 0 && <p className={styles.emptyState} role="status">{rows.length ? 'No hay vendedores que coincidan con la búsqueda.' : 'No hay vendedores o pedidos en el periodo seleccionado.'}</p>}
     <div className={styles.tableFooter}>
-      <small>La exportación incluye todos los vendedores del período.</small>
+     
       <span role="status">{filtered.length ? `${start + 1}–${Math.min(start + PAGE_SIZE, filtered.length)} de ${filtered.length}` : '0 resultados'}</span>
       {pages > 1 && <nav className={styles.pagination} aria-label="Paginación de vendedores">
         <button type="button" aria-label="Página anterior" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}><i className="bi bi-chevron-left" aria-hidden="true" /></button>

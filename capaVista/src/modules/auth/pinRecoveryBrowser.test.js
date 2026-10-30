@@ -56,7 +56,7 @@ it('lost context or unavailable original session fails closed without normal SSO
   expect((await continuePinRecovery(f.browser, f.options)).error).toBeTruthy()
   expect(f.options.resume).not.toHaveBeenCalled()
   const g = fixture(); g.options.resume.mockRejectedValue(Error('Original session revoked'))
-  expect((await continuePinRecovery(g.browser, g.options)).error).toBe('Original session revoked')
+  expect((await continuePinRecovery(g.browser, g.options)).error).toContain('Vuelve a iniciar')
   expect(g.api.finishPinRecovery).not.toHaveBeenCalled()
 })
 it('cancellation before start response cancels the late operation and does not navigate', async () => {
@@ -95,4 +95,33 @@ it('a failed finish never retries rotation automatically and removes callback se
   expect(f.api.finishPinRecovery).toHaveBeenCalledOnce()
   expect(f.browser.history.replaceState).toHaveBeenCalledWith(null, '', '/auth/pin-recovery/callback')
   expect(getPinRecoveryOutcome('original').recovered).toBe(false)
+})
+
+it('retains unconsumed context on 429 and allows only a timed explicit single-flight retry', async () => {
+  const f = fixture(), now = Date.now()
+  const clock = vi.spyOn(Date, 'now').mockReturnValue(now)
+  try {
+    f.options.resume.mockRejectedValueOnce(Object.assign(Error('Too many requests'), {
+      status: 429, payload: { retryAfterSeconds: 12 } }))
+    const result = await continuePinRecovery(f.browser, f.options)
+    expect(f.store.has(PIN_RECOVERY_CONTEXT)).toBe(true)
+    expect(f.api.finishPinRecovery).not.toHaveBeenCalled()
+    expect(await result.retry()).toBe(result)
+    expect(f.options.resume).toHaveBeenCalledOnce()
+    clock.mockReturnValue(now + 12001)
+    const first = result.retry(), second = result.retry()
+    expect(first).toBe(second)
+    expect(await first).toEqual({ session: f.session })
+    expect(f.options.resume).toHaveBeenCalledTimes(2)
+    expect(f.api.finishPinRecovery).toHaveBeenCalledOnce()
+    expect(f.store.size).toBe(0)
+  } finally { clock.mockRestore() }
+})
+
+it('distinguishes rate limiting at finish and keeps the original session without replay', async () => {
+  const f = fixture()
+  f.api.finishPinRecovery.mockRejectedValue({ status: 429 })
+  expect(await continuePinRecovery(f.browser, f.options)).toEqual({ session: f.session })
+  expect(getPinRecoveryOutcome('original').message).toContain('Demasiadas solicitudes')
+  expect(f.api.finishPinRecovery).toHaveBeenCalledOnce()
 })

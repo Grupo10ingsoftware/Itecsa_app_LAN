@@ -18,6 +18,7 @@ export const client = {
     if (pathname === '/messages/1') return message
     if (pathname === '/privacy/documents') return { documents: [], requestsEnabled: true }
     if (pathname === '/security/incident-reports/config') return { reportsEnabled: true, contactEmail: 'preview@example.test' }
+    if (pathname === '/auth/profile/movements') return { records: [], total: 0, page: 1, perPage: 10 }
     if (pathname === '/auth/profile') return { ...auth.user, records: [] }
     if (pathname === '/admin/identity/users/summary') return { totalUsuarios: 0, vinculados: 0, desvinculados: 0, pendientes: 0, pendientesRol: 0 }
     if (pathname === '/admin/identity/users') return { users: [], total: 0, totalPages: 1 }

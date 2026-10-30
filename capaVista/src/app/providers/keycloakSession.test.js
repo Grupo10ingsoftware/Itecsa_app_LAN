@@ -271,3 +271,15 @@ describe('Keycloak PIN recovery session', () => {
     expect(keycloak.clearToken).toHaveBeenCalled()
   })
 })
+
+it('exposes preferred_username independently of display name and email', async () => {
+  const { session, keycloak } = setup(true)
+  keycloak.tokenParsed = { ...keycloak.tokenParsed, name: 'Display Name', email: 'email@example.test' }
+  await session.init()
+  expect(session.getSnapshot().user.username).toBe('operator')
+  const missing = setup(true)
+  delete missing.keycloak.tokenParsed.preferred_username
+  missing.keycloak.tokenParsed.name = 'Display Name'
+  await missing.session.init()
+  expect(missing.session.getSnapshot().user.username).toBeUndefined()
+})

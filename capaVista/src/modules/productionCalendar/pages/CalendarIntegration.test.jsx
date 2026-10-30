@@ -69,10 +69,13 @@ it('confirmed overrides do not mask a later fresh server read', async () => {
 })
 
 it('a pending month response cannot restore an old date after the write is confirmed', async () => {
-  const pendingMonth = deferred()
-  mocks.api = { getOrders: vi.fn().mockImplementation(q => q.unscheduled ? Promise.resolve({ items: [], pageInfo: {} }) : pendingMonth.promise),
+  mocks.api = { getOrders: vi.fn().mockResolvedValue({ items: [], pageInfo: {} }),
     updateDeliveryDate: vi.fn().mockResolvedValue(item('2026-10-29')) }
   render(<ProductionCalendarPage />); await act(async () => {})
+  fireEvent.click(screen.getByTitle('Mes siguiente')); await act(async () => {})
+  const pendingMonth = deferred()
+  mocks.api.getOrders.mockImplementation(q => q.unscheduled ? Promise.resolve({ items: [], pageInfo: {} }) : pendingMonth.promise)
+  fireEvent.click(screen.getByTitle('Mes anterior')); await act(async () => {})
   fireEvent.click(screen.getByRole('button', { name: 'Confirmar fecha sintética' })); await act(async () => {})
   await act(async () => pendingMonth.resolve({ items: [item('2026-10-28')], pageInfo: {} }))
   expect(mocks.grid.items[0].dueDate).toBe('2026-10-29')
@@ -80,10 +83,13 @@ it('a pending month response cannot restore an old date after the write is confi
 })
 
 it('a late pending-tray response cannot resurrect an order that now has a date', async () => {
+  mocks.api = { getOrders: vi.fn().mockResolvedValue({ items: [], pageInfo: {} }),
+    updateDeliveryDate: vi.fn().mockResolvedValue(item('2026-10-29')) }
+  const view = render(<ProductionCalendarPage />); await act(async () => {})
   const tray = deferred()
   mocks.api = { getOrders: vi.fn().mockImplementation(q => q.unscheduled ? tray.promise : Promise.resolve({ items: [], pageInfo: {} })),
     updateDeliveryDate: vi.fn().mockResolvedValue(item('2026-10-29')) }
-  render(<ProductionCalendarPage />); await act(async () => {})
+  view.rerender(<ProductionCalendarPage />); await act(async () => {})
   fireEvent.click(screen.getByRole('button', { name: 'Confirmar fecha sintética' })); await act(async () => {})
   await act(async () => tray.resolve({ items: [item(null)], pageInfo: {} }))
   expect(mocks.grid.allItems.filter(x => x.id === 1)).toHaveLength(1)

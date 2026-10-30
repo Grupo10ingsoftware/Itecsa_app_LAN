@@ -143,14 +143,14 @@ export default function ProductionCalendarGrid({
   return (
     <>
       <div className={styles.calendarGridStack} aria-busy={isLoading}>
-        {!isLoading && <TransferOrdersTray
+        <TransferOrdersTray
           draggedItemId={draggedItemId}
           items={transferItems}
           onDragEnd={handleDragEnd}
           onDragStart={onDragStart}
           onDropTransferItem={handleDropTransferItem}
           onOpenDetail={openDetail}
-        />}
+        />
 
           <div className={styles.calendarLayout}>
             <section className={styles.calendarShell} aria-label="Calendario mensual de produccion">
@@ -185,13 +185,13 @@ export default function ProductionCalendarGrid({
             </div>
             </section>
 
-            {!isLoading && <PendingOrdersTray
+            <PendingOrdersTray
               draggedItemId={draggedItemId}
               items={pendingItems}
               onDragEnd={handleDragEnd}
               onDragStart={onDragStart}
               onOpenDetail={openDetail}
-            />}
+            />
           </div>
       </div>
 

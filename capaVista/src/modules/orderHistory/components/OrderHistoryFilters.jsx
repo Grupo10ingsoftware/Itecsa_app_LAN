@@ -6,7 +6,7 @@ const STATUS_FILTERS = [
   { label: 'Confirmación de Pago', value: 'Confirmación de Pago' },
   { label: 'Listo para producción', value: 'Listo para Producción' },
   { label: 'En producción', value: 'En producción' },
-  { label: 'Listo para despacho', value: 'Listo para Entrega' },
+  { label: 'Listo para entrega', value: 'Listo para Entrega' },
   { label: 'Finalizado', value: 'Terminado' },
   { label: 'Cancelado', value: 'Cancelado' },
 ]

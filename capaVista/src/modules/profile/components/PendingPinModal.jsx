@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import PinModal, { PinError } from '../../../shared/components/pin/PinModal'
+import PinModal from '../../../shared/components/pin/PinModal'
+import { useToast } from '../../../shared/notifications/useToast'
+import { publicOperationMessage } from '../../../shared/notifications/operationFeedback'
 import styles from '../../../shared/components/pin/PinModal.module.css'
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 
 // The secret lives only while the pending reception dialog is mounted.
 export default function PendingPinModal({ api, refreshSession, onAcknowledged }) {
+  const notify = useToast()
   const [pin, setPin] = useState('')
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
@@ -22,11 +25,11 @@ export default function PendingPinModal({ api, refreshSession, onAcknowledged })
       api.revealPin().then(({ pin: value }) => {
         if (current && !acknowledged.current) { setPin(value); setError('') }
       }).catch(failure => {
-        if (current) setError(failure?.payload?.message ?? 'No fue posible mostrar el PIN.')
+        if (current) { setError(true); notify.error(publicOperationMessage(failure, 'No fue posible mostrar el PIN.')) }
       })
     })
     return () => { current = false }
-  }, [api, attempt])
+  }, [api, attempt, notify])
 
   async function acknowledge() {
     if (pending.current) return
@@ -45,7 +48,7 @@ export default function PendingPinModal({ api, refreshSession, onAcknowledged })
       // Keep verification: a durable receipt alone does not grant session permissions.
       await refreshSession()
     } catch (failure) {
-      if (active.current) setError(failure?.payload?.message ?? 'No fue posible confirmar la recepcion del PIN.')
+      if (active.current) { setError(true); notify.error(publicOperationMessage(failure, 'No fue posible confirmar la recepcion del PIN.')) }
     } finally {
       pending.current = false
       if (active.current) setBusy(false)
@@ -60,7 +63,6 @@ export default function PendingPinModal({ api, refreshSession, onAcknowledged })
     </button>}>
     <div className={styles.secret}>{pin || (accepted ? 'PIN aceptado' : error ? 'PIN no disponible'
       : <LoadingIndicator scope="action" context="PIN operativo" />)}</div>
-    <PinError>{error}</PinError>
     {error && !pin && !accepted && <button className={styles.primary} type="button" onClick={() => {
       setError(''); setAttempt(value => value + 1)
     }}>Reintentar</button>}

@@ -1,12 +1,20 @@
+import { ApiClientError } from '../../../services/api/apiClient.js'
 import { runtimeConfig } from '../../../config/runtimeConfig.js'
 
 export async function resumePinRecoverySession(state) {
   const base = runtimeConfig.apiBaseUrl.replace(/\/$/, '')
   const response = await fetch(base + '/auth/pin/recovery/resume', {
+    signal: AbortSignal.timeout(15_000),
     method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ state }),
   })
-  if (!response.ok) throw Error('No fue posible restaurar la sesión original. Vuelve a iniciar sesión con tu cuenta.')
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null)
+    throw new ApiClientError(response.status === 429
+      ? 'Demasiadas solicitudes. Espera antes de reintentar la restauración de tu sesión.'
+      : 'No fue posible restaurar la sesión original. Vuelve a iniciar sesión con tu cuenta.',
+    { status: response.status, payload })
+  }
   return response.json()
 }
 

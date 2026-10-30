@@ -1,5 +1,6 @@
 import FilterContent from '../../../shared/components/filters/FilterContent'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import CalendarFilters from '../components/CalendarFilters'
 import CalendarHeader from '../components/CalendarHeader'
 import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
@@ -75,10 +76,19 @@ function normalizeCalendarOrder(order) {
 
 export default function ProductionCalendarPage() {
   const ordersCalendarApi = useOrdersCalendarApi()
-  return <CalendarContent key={calendarScope(ordersCalendarApi)} ordersCalendarApi={ordersCalendarApi} />
+  const [initialLoaded, setInitialLoaded] = useState(false)
+  const handleInitialLoaded = useCallback(() => setInitialLoaded(true), [])
+  return (
+    <CalendarContent
+      key={calendarScope(ordersCalendarApi)}
+      ordersCalendarApi={ordersCalendarApi}
+      initialLoaded={initialLoaded}
+      onInitialLoaded={handleInitialLoaded}
+    />
+  )
 }
 
-function CalendarContent({ ordersCalendarApi }) {
+function CalendarContent({ ordersCalendarApi, initialLoaded, onInitialLoaded }) {
   const notify = useToast()
   const active = useRef(false)
   const pendingReads = useRef(new Set())
@@ -98,6 +108,12 @@ function CalendarContent({ ordersCalendarApi }) {
   const [loadedMonth, setLoadedMonth] = useState(null)
   const [loadedPendingApi, setLoadedPendingApi] = useState(null)
   const isLoading = loadedMonth !== monthDate || loadedPendingApi !== ordersCalendarApi
+
+  useEffect(() => {
+    if (!initialLoaded && loadedMonth !== null && loadedPendingApi === ordersCalendarApi) {
+      onInitialLoaded?.()
+    }
+  }, [initialLoaded, loadedMonth, loadedPendingApi, ordersCalendarApi, onInitialLoaded])
 
   useEffect(() => {
     let isMounted = true
@@ -205,6 +221,10 @@ function CalendarContent({ ordersCalendarApi }) {
     for (const read of pendingReads.current) read.overrides.set(String(itemId), normalizedOrder)
     setCalendarItems(current => reconcileCalendarRead(current, overrides, monthRange(currentMonth.current)))
     setUnscheduledItems(current => reconcileCalendarRead(current, overrides, { unscheduled: true }))
+  }
+
+  if (!initialLoaded) {
+    return <LoadingIndicator scope="page" context="Calendario de producción" />
   }
 
   async function getOrderDetail(orderId) {

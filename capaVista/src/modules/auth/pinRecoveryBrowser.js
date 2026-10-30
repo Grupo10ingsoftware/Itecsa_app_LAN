@@ -45,15 +45,15 @@ export function continuePinRecovery(browser = window, {
   apiForSession = session => createAuthApi(createApiClient({ getAccessToken: async () => session.token })),
 } = {}) {
   if (returns.has(browser)) return returns.get(browser)
-  const work = (async () => {
-    const params = new URLSearchParams(browser.location.search)
-    browser.history.replaceState(null, '', browser.location.pathname)
+  const params = new URLSearchParams(browser.location.search)
+  browser.history.replaceState(null, '', browser.location.pathname)
+  const run = async () => {
     let context, session
     try {
       context = JSON.parse(browser.sessionStorage.getItem(PIN_RECOVERY_CONTEXT) || 'null')
-      browser.sessionStorage.removeItem(PIN_RECOVERY_CONTEXT)
       if (!context || typeof context.state !== 'string') throw Error('No hay una recuperación pendiente en esta pestaña.')
       session = await resume(context.state)
+      browser.sessionStorage.removeItem(PIN_RECOVERY_CONTEXT)
       const api = apiForSession(session)
       if (!Number.isFinite(context.expiresAt) || context.expiresAt <= Date.now() || params.get('state') !== context.state || params.get('error') || !params.get('code')) {
         await api.cancelPinRecovery(context.state).catch(() => {})
@@ -62,15 +62,31 @@ export function continuePinRecovery(browser = window, {
         try {
           await api.finishPinRecovery({ state: context.state, code: params.get('code') })
           outcome = { subject: session.subject, recovered: true, message: '' }
-        } catch {
-          outcome = { subject: session.subject, recovered: false, message: 'No fue posible validar la recuperación. Tu sesión original se ha conservado.' }
+        } catch (error) {
+          outcome = { subject: session.subject, recovered: false, message: error?.status === 429
+            ? 'Demasiadas solicitudes. Tu sesión original se ha conservado. Intenta recuperar el PIN más tarde.'
+            : 'No fue posible validar la recuperación. Tu sesión original se ha conservado.' }
         }
       }
       return { session }
     } catch (error) {
-      return { error: error.message || 'No fue posible restaurar la sesión original.' }
+      // Throttling happens before consumption: only an explicit retry may resume this bridge.
+      if (!session && error?.status === 429) {
+        const seconds = Number(error.payload?.retryAfterSeconds)
+        const retryAt = Date.now() + (Number.isFinite(seconds) && seconds > 0 ? seconds : 60) * 1000
+        let retryWork
+        const result = { error: error.message, retryAt, retry: () => {
+          if (Date.now() < retryAt) return Promise.resolve(result)
+          if (!retryWork) { retryWork = run(); returns.set(browser, retryWork) }
+          return retryWork
+        } }
+        return result
+      }
+      try { browser.sessionStorage.removeItem(PIN_RECOVERY_CONTEXT) } catch { /* Public metadata only. */ }
+      return { error: 'No fue posible restaurar la sesión original. Vuelve a iniciar sesión con tu cuenta.' }
     }
-  })()
+  }
+  const work = run()
   returns.set(browser, work)
   return work
 }

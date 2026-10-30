@@ -9,7 +9,8 @@ import PageShell from '../../../shared/components/layout/PageShell'
 import PageHeader from '../../../shared/components/layout/PageHeader'
 import { formatProfileDate } from '../utils/profileFormatters'
 import { displayUserStatus, isActiveUserStatus } from '../../../config/userLifecycle'
-import UserMovementsModal from '../../users/components/UserMovementsModal'
+import TablePagination from '../../../shared/components/pagination/TablePagination'
+import { publicOperationMessage } from '../../../shared/notifications/operationFeedback'
 import UserMovementsTable from '../../users/components/UserMovementsTable'
 import confirmationStyles from '../../../shared/styles/ConfirmationModal.module.css'
 import PendingPinModal from '../components/PendingPinModal'
@@ -40,9 +41,41 @@ function ProfileContent({ authApi }) {
 
   const [recoveryVerified, setRecoveryVerified] = useState(() => getPinRecoveryOutcome(user?.sub)?.recovered ?? false)
   useEffect(() => () => { recoveryTask.current?.cancel(); recoveryTask.current = null }, [user?.sub])
-  const [historyOpen, setHistoryOpen] = useState(false)
-  const historyApi = useMemo(() => ({ getMovements: (_subject, query, options) => authApi.getProfileMovements(query, options) }), [authApi])
-  const historyUser = { idUsuarioAutenticacionExterna: user?.sub }
+  const [historyPage, setHistoryPage] = useState(1)
+  const [historyAttempt, setHistoryAttempt] = useState(0)
+  const [history, setHistory] = useState(null)
+  useEffect(() => {
+    if (pinStatus !== 'active') return
+    let current = true
+    const controller = new AbortController()
+    // Discard StrictMode's first setup before issuing a read.
+    queueMicrotask(() => {
+      if (!current) return
+      authApi.getProfileMovements({ page: historyPage, perPage: 10 }, { signal: controller.signal })
+        .then(data => {
+          if (!current) return
+          const lastPage = Math.max(1, Math.ceil(data.total / 10))
+          if (historyPage > lastPage) { setHistoryPage(lastPage); return }
+          setHistory({ page: historyPage, attempt: historyAttempt, data })
+        }).catch(error => {
+          if (!current) return
+          setHistory({ page: historyPage, attempt: historyAttempt, error: true })
+          notify.error(publicOperationMessage(error, 'No fue posible cargar tu actividad. Intenta nuevamente.'))
+        })
+    })
+    return () => { current = false; controller.abort() }
+  }, [authApi, historyPage, historyAttempt, pinStatus, notify])
+  const currentHistory = history?.page === historyPage && history?.attempt === historyAttempt ? history : null
+  const historyLoading = pinStatus === 'active' && !currentHistory
+  const historyData = currentHistory?.data
+  const recoveryNoticeShown = useRef(false)
+  useEffect(() => {
+    const result = getPinRecoveryOutcome(user?.sub)
+    if (!result?.message || recoveryNoticeShown.current) return
+    recoveryNoticeShown.current = true
+    notify.error(result.message)
+    clearPinRecoveryOutcome()
+  }, [notify, user?.sub])
   const [profileData, setProfileData] = useState(null)
   const [profileAttempt, setProfileAttempt] = useState(0)
   useEffect(() => {
@@ -50,16 +83,17 @@ function ProfileContent({ authApi }) {
     authApi.getProfile().then((data) => {
       if (current) setProfileData({ subject: user?.sub, api: authApi, attempt: profileAttempt, data })
     }).catch((error) => {
-      if (current) setProfileData({ subject: user?.sub, api: authApi, attempt: profileAttempt,
-        error: error?.payload?.message ?? 'No fue posible cargar tu perfil.' })
+      if (current) {
+        setProfileData({ subject: user?.sub, api: authApi, attempt: profileAttempt, error: true })
+        notify.error(publicOperationMessage(error, 'No fue posible cargar tu perfil.'))
+      }
     })
     return () => { current = false }
-  }, [authApi, user?.sub, profileAttempt])
+  }, [authApi, user?.sub, profileAttempt, notify])
   const profileCurrent = profileData?.subject === user?.sub && profileData?.api === authApi && profileData?.attempt === profileAttempt
   const loadedProfile = profileCurrent ? profileData?.data : null
   const profileError = profileCurrent ? profileData?.error : ''
 
-  const [pinError, setPinError] = useState(() => getPinRecoveryOutcome(user?.sub)?.message ?? '')
   const [isPinBusy, setIsPinBusy] = useState(false)
   const [recoveryOpen, setRecoveryOpen] = useState(false)
   const profile = useMemo(() => {
@@ -70,6 +104,7 @@ function ProfileContent({ authApi }) {
     const status = loadedProfile?.estadoUsuario ?? user?.estadoUsuario
 
     return {
+      username: identityUser?.username,
       firstName,
       lastName,
       email,
@@ -82,7 +117,6 @@ function ProfileContent({ authApi }) {
 
   async function recoverPin() {
     if (recoveryTask.current || isPinBusy) return
-    setPinError('')
     setIsPinBusy(true)
     setRecoveryOpen(true)
     const task = beginPinRecovery(authApi)
@@ -90,7 +124,8 @@ function ProfileContent({ authApi }) {
     try {
       await task.result
     } catch (error) {
-      if (recoveryTask.current === task) setPinError(error?.payload?.message ?? error.message ?? 'No fue posible recuperar el PIN.')
+      if (recoveryTask.current === task) notify.error(publicOperationMessage(error,
+        error.message === 'Recuperación cancelada.' ? error.message : 'No fue posible iniciar la recuperación del PIN. Intenta nuevamente.'))
     } finally {
       if (recoveryTask.current === task) {
         recoveryTask.current = null
@@ -105,14 +140,8 @@ function ProfileContent({ authApi }) {
       <section className={styles.shell}>
         <PageHeader title="Mi perfil" titleId="profile-title" />
 
-        {profileError && (
-          <div className="alert alert-danger" role="alert">
-            {profileError}{' '}
-            <button type="button" className="btn btn-outline-danger btn-sm" onClick={() => {
-              setProfileAttempt((attempt) => attempt + 1)
-            }}>Reintentar</button>
-          </div>
-        )}
+        {profileError && <button type="button" className={styles.outlineButton}
+          onClick={() => setProfileAttempt(attempt => attempt + 1)}>Reintentar carga del perfil</button>}
 
         <section className={styles.profileGrid} aria-label="Datos del usuario">
           <aside className={styles.photoPanel}>
@@ -135,6 +164,7 @@ function ProfileContent({ authApi }) {
               <div><h2 id="personal-information-title">Información personal</h2></div>
             </header>
             <dl className={styles.infoList}>
+              <div><dt>Nombre de usuario</dt><dd>{getDisplayValue(profile.username)}</dd></div>
               <div><dt>Primer nombre</dt><dd>{getDisplayValue(profile.firstName)}</dd></div>
               <div><dt>Apellido paterno</dt><dd>{getDisplayValue(profile.lastName)}</dd></div>
               <div><dt>RUT</dt><dd>{getDisplayValue(profile.rut)}</dd></div>
@@ -163,7 +193,6 @@ function ProfileContent({ authApi }) {
           </section>
         </section>
 
-        {pinError && pinStatus === 'active' && !recoveryOpen && <div className="alert alert-danger" role="alert">{pinError}</div>}
 
         <section className={styles.movementsPanel} aria-labelledby="movements-title">
           <header className={styles.movementsHeader}>
@@ -171,18 +200,18 @@ function ProfileContent({ authApi }) {
               <span className={styles.cardIcon}><i className="bi bi-clock" aria-hidden="true" /></span>
               <div><h2 id="movements-title">Actividad reciente</h2><p>Últimos movimientos y cambios realizados en tu cuenta.</p></div>
             </div>
-            <button className={styles.outlineButton} type="button" disabled={!loadedProfile || pinStatus !== 'active'}
-              onClick={() => setHistoryOpen(true)}><i className="bi bi-calendar3" aria-hidden="true" />Ver historial completo</button>
           </header>
-          {!loadedProfile ? <>{profileError ? <p role="status">Actividad no disponible.</p> : <LoadingIndicator context="Actividad reciente" />}</>
-            : !loadedProfile.records?.length ? <p role="status">Aún no tienes registros asociados.</p>
-              : <UserMovementsTable records={loadedProfile.records} label="Actividad reciente del usuario" />}
+          <UserMovementsTable records={historyData?.records} label="Actividad reciente del usuario"
+            isLoading={historyLoading} error={Boolean(currentHistory?.error)}
+            onRetry={() => setHistoryAttempt(attempt => attempt + 1)}>
+          <TablePagination page={historyPage} pageSize={10} total={historyData?.total ?? history?.data?.total ?? 0}
+            visibleCount={historyData?.records?.length ?? 0} integrated
+            statusLabel={historyLoading ? 'Cargando resultados…' : currentHistory?.error ? 'Consulta no disponible' : undefined}
+            disabled={historyLoading || Boolean(currentHistory?.error) || pinStatus !== 'active'}
+            onPageChange={setHistoryPage} label="Paginación de actividad" />
+          </UserMovementsTable>
         </section>
       </section>
-
-      {historyOpen && pinStatus === 'active' && <UserMovementsModal key={user?.sub}
-        user={historyUser} api={historyApi} onClose={() => setHistoryOpen(false)} title="Historial completo"
-        description="Consulta el registro completo de movimientos de tu cuenta." />}
 
       {pinStatus === 'pending_acknowledgement' && <PendingPinModal api={authApi} refreshSession={refreshSession}
         onAcknowledged={() => {
