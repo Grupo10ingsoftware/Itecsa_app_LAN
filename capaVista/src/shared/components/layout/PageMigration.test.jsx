@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { render } from '../../../test/renderWithToast'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { auth, client } from '../../../../verify/pageFixtures.js'
@@ -36,6 +36,28 @@ function mount(Page, route = '/') {
 }
 
 describe('Páginas migradas sin modificar sus operaciones', () => {
+  it('mantiene los encabezados de pagos desde la primera carga y al volver a entrar', async () => {
+    const originalGet = client.get.bind(client)
+    const get = vi.spyOn(client, 'get')
+    for (let entry = 0; entry < 2; entry += 1) {
+      let resolve
+      const pending = new Promise(done => { resolve = done })
+      get.mockImplementation((url, ...args) => url.startsWith('/orders/payments?') ? pending : originalGet(url, ...args))
+      const view = mount(PaymentConfirmationPage)
+      const table = screen.getByRole('table')
+      expect(within(table).getAllByRole('columnheader').map(header => header.textContent))
+        .toEqual(['Pedido', 'Cliente', 'RUT', 'Fecha', 'Estado', 'Acciones'])
+      expect(table.getAttribute('aria-busy')).toBe('true')
+      expect(within(table).getByRole('status').closest('td').getAttribute('colspan')).toBe('6')
+      expect(screen.getByRole('combobox', { name: 'Filas por página' }).disabled).toBe(true)
+      await act(async () => { resolve(await originalGet('/orders/payments')) })
+      await waitFor(() => expect(table.getAttribute('aria-busy')).toBe('false'))
+      expect(screen.getByRole('table')).toBe(table)
+      expect(get.mock.calls.filter(([url]) => url.startsWith('/orders/payments?'))).toHaveLength(entry + 1)
+      view.unmount()
+    }
+  })
+
   it.each([
     [OrderCreatePage, 'REGISTRO DE PEDIDO'],
     [ProductionCalendarPage, 'Calendario'],

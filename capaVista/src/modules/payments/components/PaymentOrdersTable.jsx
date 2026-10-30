@@ -1,4 +1,5 @@
 import { formatPaymentDate } from '../utils/paymentDocuments'
+import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import PaymentRowActions from './PaymentRowActions'
 import PaymentStatusBadge from './PaymentStatusBadge'
 import styles from './PaymentOrdersTable.module.css'
@@ -6,6 +7,7 @@ import styles from './PaymentOrdersTable.module.css'
 export default function PaymentOrdersTable({
   canUpdatePaymentStatus,
   editingStatus,
+  isLoading = false,
   isUpdatingPaymentStatus = false,
   orders,
   onCloseEditor,
@@ -19,7 +21,7 @@ export default function PaymentOrdersTable({
       className={`d-none d-lg-block ${styles.desktopTableWrap}`}
       aria-label="Tabla de pagos"
     >
-      <table className={styles.paymentTable}>
+      <table className={styles.paymentTable} aria-busy={isLoading}>
         <colgroup>
           <col className={styles.colOrder} />
           <col className={styles.colClient} />
@@ -41,7 +43,13 @@ export default function PaymentOrdersTable({
         </thead>
 
         <tbody>
-          {orders.length > 0 ? (
+          {isLoading ? (
+            <tr>
+              <td className={styles.emptyState} colSpan="6">
+                <LoadingIndicator context="pedidos de pago" />
+              </td>
+            </tr>
+          ) : orders.length > 0 ? (
             orders.map((order) => (
               <tr key={order.id}>
                 <td className={styles.orderCell}>{order.nvNumber}</td>

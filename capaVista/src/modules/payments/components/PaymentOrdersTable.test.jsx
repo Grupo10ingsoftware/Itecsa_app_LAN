@@ -12,9 +12,9 @@ const orders = ['Pendiente', 'Confirmado', 'Rechazado'].map((paymentStatus, inde
 }))
 const callbacks = { onSelectStatus: vi.fn(), onPrefetchDetails: vi.fn(), onViewDetail: vi.fn() }
 
-function Table({ canUpdate = true, busy = false, items = orders }) {
+function Table({ canUpdate = true, busy = false, loading = false, items = orders }) {
   const [editingStatus, setEditingStatus] = useState({})
-  return <PaymentOrdersTable orders={items} editingStatus={editingStatus}
+  return <PaymentOrdersTable orders={items} editingStatus={editingStatus} isLoading={loading}
     canUpdatePaymentStatus={canUpdate} isUpdatingPaymentStatus={busy} {...callbacks}
     onToggleEditor={id => setEditingStatus(current => ({ [id]: !current[id] }))}
     onCloseEditor={() => setEditingStatus({})} />
@@ -89,4 +89,22 @@ it('keeps the empty state within all six columns', () => {
   const cell = screen.getByRole('cell')
   expect(cell.getAttribute('colspan')).toBe('6')
   expect(cell.textContent).toBe('No hay pedidos que coincidan con los filtros aplicados.')
+})
+
+it('keeps all column headers while loading and replaces old rows with a spanning loading row', () => {
+  const view = render(<Table loading />)
+  const table = screen.getByRole('table')
+  expect(table.getAttribute('aria-busy')).toBe('true')
+  expect(within(table).getAllByRole('columnheader').map(header => header.textContent))
+    .toEqual(['Pedido', 'Cliente', 'RUT', 'Fecha', 'Estado', 'Acciones'])
+  expect(within(table).getByRole('status').closest('td').getAttribute('colspan')).toBe('6')
+  expect(screen.queryByText(orders[0].nvNumber)).toBeNull()
+  expect(screen.queryByRole('button')).toBeNull()
+  expect(screen.queryByText('No hay pedidos que coincidan con los filtros aplicados.')).toBeNull()
+
+  view.rerender(<Table />)
+  expect(screen.getByRole('table')).toBe(table)
+  expect(table.getAttribute('aria-busy')).toBe('false')
+  expect(within(table).queryByRole('status')).toBeNull()
+  expect(screen.getByText(orders[0].nvNumber)).toBeTruthy()
 })

@@ -516,34 +516,33 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
             {updateError && !credentialsTransition && <div className="alert alert-danger mb-0" role="alert">{updateError}</div>}
 
             <div className={styles.tableCard}>
-              {isLoading ? (
-                <LoadingIndicator context="pedidos de pago" />
-              ) : (
-                <>
-                  <PaymentOrdersTable
-                    canUpdatePaymentStatus={canUpdatePaymentStatus}
-                    editingStatus={editingStatus}
-                    isUpdatingPaymentStatus={isUpdatingPaymentStatus}
-                    onCloseEditor={closePaymentEditor}
-                    onPrefetchDetails={prefetchPaymentPreview}
-                    onSelectStatus={openPaymentActionConfirmation}
-                    onToggleEditor={openPaymentEditor}
-                    onViewDetail={openPaymentDetail}
-                    orders={filteredOrders}
-                  />
+              <PaymentOrdersTable
+                canUpdatePaymentStatus={canUpdatePaymentStatus}
+                editingStatus={editingStatus}
+                isLoading={isLoading}
+                isUpdatingPaymentStatus={isUpdatingPaymentStatus}
+                onCloseEditor={closePaymentEditor}
+                onPrefetchDetails={prefetchPaymentPreview}
+                onSelectStatus={openPaymentActionConfirmation}
+                onToggleEditor={openPaymentEditor}
+                onViewDetail={openPaymentDetail}
+                orders={filteredOrders}
+              />
 
-                  <PaymentOrderMobileList
-                    canUpdatePaymentStatus={canUpdatePaymentStatus}
-                    editingStatus={editingStatus}
-                    isUpdatingPaymentStatus={isUpdatingPaymentStatus}
-                    onCloseEditor={closePaymentEditor}
-                    onPrefetchDetails={prefetchPaymentPreview}
-                    onSelectStatus={openPaymentActionConfirmation}
-                    onToggleEditor={openPaymentEditor}
-                    onViewDetail={openPaymentDetail}
-                    orders={filteredOrders}
-                  />
-                </>
+              {isLoading ? (
+                <div className="d-lg-none"><LoadingIndicator context="pedidos de pago" /></div>
+              ) : (
+                <PaymentOrderMobileList
+                  canUpdatePaymentStatus={canUpdatePaymentStatus}
+                  editingStatus={editingStatus}
+                  isUpdatingPaymentStatus={isUpdatingPaymentStatus}
+                  onCloseEditor={closePaymentEditor}
+                  onPrefetchDetails={prefetchPaymentPreview}
+                  onSelectStatus={openPaymentActionConfirmation}
+                  onToggleEditor={openPaymentEditor}
+                  onViewDetail={openPaymentDetail}
+                  orders={filteredOrders}
+                />
               )}
               <PaymentPagination integrated page={page} pageSize={pageSize} total={getFilterCount(activeFilter)}
                 visibleCount={isLoading ? 0 : filteredOrders.length}

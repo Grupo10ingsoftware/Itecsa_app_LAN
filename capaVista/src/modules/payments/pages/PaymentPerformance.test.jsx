@@ -14,7 +14,7 @@ vi.mock('../components/PaymentFilters', () => ({ default: p => <div>
   {['Pendiente', 'Confirmado', 'Rechazado'].map(name => <button key={name} onClick={() => p.onChange({ status: name })}>{name}</button>)}
   <button onClick={p.onApply}>Apply</button><button onClick={p.onClear}>Clear filters</button>
 </div> }))
-vi.mock('../components/PaymentOrdersTable', () => ({ default: p => <section>{p.orders.map(o => <article key={o.id} data-testid={'row-' + o.id}>
+vi.mock('../components/PaymentOrdersTable', () => ({ default: p => <section>{!p.isLoading && p.orders.map(o => <article key={o.id} data-testid={'row-' + o.id}>
   <span>{o.nvNumber}:{o.paymentStatus}</span>
   <button onMouseEnter={() => p.onPrefetchDetails(o)} onClick={() => p.onViewDetail(o)}>Detail {o.id}</button>
   <button disabled={p.isUpdatingPaymentStatus} onClick={() => p.onSelectStatus(o, 'Confirmado')}>Confirm {o.id}</button>
