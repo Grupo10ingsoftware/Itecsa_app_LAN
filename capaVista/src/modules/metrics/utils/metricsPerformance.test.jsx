@@ -49,7 +49,7 @@ it('initial StrictMode mounts issue one summary and local group interactions iss
  session.api = { getSummary: vi.fn().mockResolvedValue(summary()), getProductionPerformance: vi.fn() }
  render(<StrictMode><MetricsPage /></StrictMode>)
  await screen.findByText('Lanyard')
- fireEvent.click(screen.getByRole('button', { name: /Estadía por estado/ })); fireEvent.click(screen.getByRole('button', { name: 'Generar lista' }))
+ fireEvent.click(screen.getByRole('button', { name: /Estadía por estado/ })); fireEvent.click(screen.getByRole('button', { name: /Cumplimiento por vendedor/ }))
  expect(session.api.getSummary).toHaveBeenCalledTimes(1); expect(session.api.getProductionPerformance).not.toHaveBeenCalled()
 })
 
@@ -79,7 +79,7 @@ it('returning to a loaded period hides its previous data and exports until the f
  session.api = { getSummary: vi.fn().mockResolvedValueOnce(summary('Anterior')).mockReturnValueOnce(next.promise).mockReturnValueOnce(refresh.promise) }
  render(<MetricsPage />); await screen.findByText('Anterior')
  const initial = screen.getByLabelText('Mes').value
- fireEvent.click(screen.getByRole('button', { name: 'Generar lista' }))
+ fireEvent.click(screen.getByRole('button', { name: /Cumplimiento por vendedor/ }))
  expect(screen.getByRole('button', { name: 'Exportar' })).toBeTruthy()
  fireEvent.change(screen.getByLabelText('Mes'), { target: { value: initial === '2024-09' ? '2024-10' : '2024-09' } })
  await waitFor(() => expect(session.api.getSummary).toHaveBeenCalledTimes(2))
@@ -145,7 +145,7 @@ it('validates the existing inclusive 366-day limit locally and allows its bounda
 it('manual report stays single-flight, cancels on period/API change, and ignores old data', async () => {
  const request = deferred(), api = { getProductionPerformance: vi.fn(() => request.promise) }
  const view = render(<ProductionPerformance api={api} period={period} />)
- fireEvent.click(screen.getByRole('button', { name: /Rendimiento de producción/ })); const button = screen.getByRole('button', { name: 'Generar reporte' })
+ const button = screen.getByRole('button', { name: 'Generar reporte' })
  fireEvent.click(button); fireEvent.click(button); expect(api.getProductionPerformance).toHaveBeenCalledTimes(1)
  view.rerender(<ProductionPerformance api={api} period={{ from: '2024-10-01', to: '2024-10-31' }} />)
  expect(api.getProductionPerformance.mock.calls[0][0].signal.aborted).toBe(true)
@@ -155,9 +155,9 @@ it('manual report stays single-flight, cancels on period/API change, and ignores
 
 it('manual report permits explicit retry after errors and displays confirmed missing deadlines', async () => {
  const api = { getProductionPerformance: vi.fn().mockRejectedValueOnce(Error()).mockResolvedValue({ period, totalOrders: 2, deliveredOnTime: 1, deliveredLate: 0, missingDeadline: 1 }) }
- render(<ProductionPerformance api={api} period={period} />); fireEvent.click(screen.getByRole('button', { name: /Rendimiento de producción/ }))
+ render(<ProductionPerformance api={api} period={period} />)
  fireEvent.click(screen.getByRole('button', { name: 'Generar reporte' })); await screen.findByRole('alert')
- fireEvent.click(screen.getByRole('button', { name: 'Generar reporte' })); await screen.findByText(/Sin plazo solicitado: 1/)
+ fireEvent.click(screen.getByRole('button', { name: 'Generar reporte' })); await screen.findByText('sin fecha definida')
  expect(api.getProductionPerformance).toHaveBeenCalledTimes(2)
 })
 
@@ -197,7 +197,7 @@ it('downloads and print use loaded data without new HTTP; blocked popup is safe'
  vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: create, revokeObjectURL: revoke }))
  const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
  const open = vi.spyOn(window, 'open').mockReturnValue(null)
- render(<MetricsPage />); await screen.findByText('Lanyard'); fireEvent.click(screen.getByRole('button', { name: 'Generar lista' })); fireEvent.click(screen.getByRole('button', { name: 'Exportar' }))
+ render(<MetricsPage />); await screen.findByText('Lanyard'); fireEvent.click(screen.getByRole('button', { name: /Cumplimiento por vendedor/ })); fireEvent.click(screen.getByRole('button', { name: 'Exportar' }))
  fireEvent.click(screen.getByRole('button', { name: 'CSV' })); expect(click).toHaveBeenCalledTimes(1); expect(revoke).toHaveBeenCalledWith('blob:fixture')
  fireEvent.click(screen.getByRole('button', { name: 'Excel' })); expect(create.mock.calls[1][0].type).toBe('application/vnd.ms-excel')
  fireEvent.click(screen.getByRole('button', { name: 'PDF' })); expect(open).toHaveBeenCalledTimes(1)

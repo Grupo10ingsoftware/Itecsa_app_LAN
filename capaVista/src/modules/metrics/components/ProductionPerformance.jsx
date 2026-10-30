@@ -1,17 +1,18 @@
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useRef, useState } from 'react'
+import MetricsBarChart from './MetricsBarChart'
 import styles from '../pages/MetricsPage.module.css'
 import { getMetricsScope } from '../utils/metricsPage'
 
 export function PerformanceResult({ report }) {
   if (!report.totalOrders) return <p role="status" className={styles.emptyState}>No existen datos disponibles para generar el reporte en el período seleccionado.</p>
   return <div role="status">
-    <p>Período: {report.period.from} al {report.period.to}. Pedidos: {report.totalOrders}.</p>
-    <dl className={styles.performanceCounts}>
-      <div><dt>Pedidos entregados a tiempo</dt><dd>{report.deliveredOnTime}</dd></div>
-      <div><dt>Pedidos entregados fuera del plazo solicitado</dt><dd>{report.deliveredLate}</dd></div>
-    </dl>
-    {report.missingDeadline > 0 && <p>Sin plazo solicitado: {report.missingDeadline}. Estos pedidos no se incluyen en las dos categorías.</p>}
+    <p className={styles.reportPeriod}>Período: {report.period.from} al {report.period.to}. Pedidos: {report.totalOrders}.</p>
+    <MetricsBarChart label="Pedidos por cumplimiento del plazo" unit="pedidos" items={[
+      { label: 'A tiempo', value: report.deliveredOnTime, tone: 'onTime' },
+      { label: 'Fuera de plazo', value: report.deliveredLate },
+      { label: 'sin fecha definida', value: report.missingDeadline, tone: 'noDeadline' },
+    ]} />
   </div>
 }
 
@@ -20,7 +21,6 @@ export default function ProductionPerformance({ api, period }) {
 }
 
 function PerformanceRequest({ api, period }) {
-  const [open, setOpen] = useState(false)
   const [report, setReport] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -51,14 +51,14 @@ function PerformanceRequest({ api, period }) {
   }
 
   return <section className={styles.dwellSection} aria-labelledby="performance-title">
-    <button type="button" className={styles.dwellToggle} aria-expanded={open} aria-controls="performance-content" onClick={() => setOpen((value) => !value)}>
-      <span><strong id="performance-title">Rendimiento de producción</strong><small>Cumplimiento de los plazos solicitados de los pedidos.</small></span>
-      <i className={`bi ${open ? 'bi-chevron-up' : 'bi-chevron-down'}`} aria-hidden="true" />
-    </button>
-    <div id="performance-content" hidden={!open} className={styles.sellerContent}>
+    <header className={styles.performanceHeader}>
+      <div><h2 id="performance-title">Rendimiento de producción</h2><p>Cumplimiento de los plazos solicitados de los pedidos.</p></div>
       <button type="button" className={styles.generateButton} disabled={loading || !period.from || !period.to || period.from > period.to} onClick={generate} aria-busy={loading}>
         <LoadingAction busy={loading} announce={false} context="Generar reporte">Generar reporte</LoadingAction>
       </button>
+    </header>
+    <div className={styles.performanceContent}>
+      {!report && !loading && !error }
       {loading && <LoadingIndicator context="Procesando pedidos" />}
       {error && <p role="alert">{error}</p>}
       {report && <PerformanceResult report={report} />}

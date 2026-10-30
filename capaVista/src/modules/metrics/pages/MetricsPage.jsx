@@ -2,8 +2,9 @@ import LoadingIndicator from '../../../shared/components/loading/LoadingIndicato
 import { useEffect, useMemo, useState } from 'react'
 import { useMetricsApi } from '../hooks/useMetricsApi'
 import ProductionPerformance from '../components/ProductionPerformance'
+import MetricsBarChart from '../components/MetricsBarChart'
+import SellerTable from '../components/SellerTable'
 import {
-  buildProductionChart,
   createInitialPeriod,
   EMPTY_METRICS_SUMMARY,
   getPeriodQuery,
@@ -14,8 +15,6 @@ import styles from './MetricsPage.module.css'
 import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
 import PageHeader from '../../../shared/components/layout/PageHeader'
 import { buildSellerReport } from '../utils/reportFormatting'
-
-const PRODUCT_COLORS = ['#f97316', '#2563eb', '#248f55']
 
 function formatDuration(seconds) {
   const totalMinutes = Math.round(Number(seconds ?? 0) / 60)
@@ -30,7 +29,7 @@ export default function MetricsPage() {
   return <MetricsContent key={getMetricsScope(api)} api={api} />
 }
 
-function MetricsContent({ api }) {
+export function MetricsContent({ api }) {
   const [period, setPeriod] = useState(createInitialPeriod)
   const [requestVersion, setRequestVersion] = useState(0)
   const [requestResult, setRequestResult] = useState({
@@ -73,11 +72,6 @@ function MetricsContent({ api }) {
     })
   }, [api, canQuery, queryFrom, requestKey, queryTo])
 
-  const chart = useMemo(
-    () => buildProductionChart(summary.production, PRODUCT_COLORS),
-    [summary.production],
-  )
-
   const dwellGroups = [
     { key: 'stages', title: 'Etapas generales', items: summary.dwellTime?.stages ?? [] },
     { key: 'subprocesses', title: 'Subprocesos', items: summary.dwellTime?.subprocesses ?? [] },
@@ -89,7 +83,6 @@ function MetricsContent({ api }) {
   const visibleSubprocesses = activeSubprocessProduct === 'all'
     ? summary.dwellTime?.subprocesses ?? []
     : (summary.dwellTime?.subprocesses ?? []).filter((item) => item.productType === activeSubprocessProduct)
-  const pieGradient = chart.segments.length ? `conic-gradient(${chart.segments.map((item) => `${item.color} ${item.start}% ${item.end}%`).join(', ')})` : '#e5e7eb'
 
   function updatePeriod(name, value) {
     setSelectedSubprocessProduct('all')
@@ -123,19 +116,24 @@ function MetricsContent({ api }) {
       <div className={styles.content}>
         <section className={styles.periodFilters} aria-label="Periodo de métricas">
           <div className={styles.periodModes}>
-            <button className={period.mode === 'month' ? styles.activeMode : ''} onClick={() => updatePeriod('mode', 'month')} type="button">Mes específico</button>
-            <button className={period.mode === 'range' ? styles.activeMode : ''} onClick={() => updatePeriod('mode', 'range')} type="button">Rango de fechas</button>
+            <button aria-pressed={period.mode === 'month'} className={period.mode === 'month' ? styles.activeMode : ''} onClick={() => updatePeriod('mode', 'month')} type="button">Mes específico</button>
+            <button aria-pressed={period.mode === 'range'} className={period.mode === 'range' ? styles.activeMode : ''} onClick={() => updatePeriod('mode', 'range')} type="button">Rango de fechas</button>
           </div>
           {period.mode === 'month' ? <label><span>Mes</span><input onChange={(event) => updatePeriod('month', event.target.value)} type="month" value={period.month} /></label> : <><label><span>Desde</span><input onChange={(event) => updatePeriod('from', event.target.value)} type="date" value={period.from} /></label><label><span>Hasta</span><input min={period.from || undefined} onChange={(event) => updatePeriod('to', event.target.value)} type="date" value={period.to} /></label></>}
         </section>
 
-        {canQuery && <ProductionPerformance key={queryKey} api={api} period={{ from: queryFrom, to: queryTo }} />}
-
-        {!canQuery ? <div className={styles.emptyState} role="status">{validationMessage}</div> : loading ? <LoadingIndicator context="métricas" /> : error ? <div className={styles.emptyState} role="alert"><p>{error}</p><button className={styles.generateButton} onClick={() => setRequestVersion((current) => current + 1)} type="button">Reintentar</button></div> : <>
-          <section className={styles.productionSection} aria-labelledby="production-title">
-            <header className={styles.productionHeader}><div><span className={styles.panelEyebrow}></span><h2 id="production-title">Cantidad de producción generada</h2><p>Unidades producidas agrupadas por tipo de producto.</p></div></header>
-            <div className={styles.productionChart}><div aria-label={`Producción total: ${chart.total} unidades`} className={styles.pieChart} role="img" style={{ '--pie-gradient': pieGradient }}><div className={styles.pieChartCenter}><strong>{chart.total.toLocaleString('es-CL')}</strong><span>unidades</span></div></div><div className={styles.chartLegend}>{chart.segments.length === 0 ? <p className={styles.emptyState}>No hay producción registrada.</p> : chart.segments.map((item) => <div className={styles.legendItem} key={item.productType}><span className={styles.legendColor} style={{ background: item.color }} /><div><strong>{item.productType}</strong><span>{Number(item.quantity).toLocaleString('es-CL')} unidades · {Math.round(item.percentage)}%</span></div></div>)}</div></div>
-          </section>
+        {loading ? <LoadingIndicator scope="page" context="Dashboard de métricas" /> : <div className={styles.topGrid}>
+          {!canQuery ? <div className={styles.emptyState} role="status">{validationMessage}</div> : error ? <div className={styles.emptyState} role="alert"><p>{error}</p><button className={styles.generateButton} onClick={() => setRequestVersion((current) => current + 1)} type="button">Reintentar</button></div> : <section className={styles.productionSection} aria-labelledby="production-title">
+            <header className={styles.productionHeader}><div><h2 id="production-title">Cantidad de producción generada</h2><p>Unidades producidas agrupadas por tipo de producto.</p></div></header>
+            <p className={styles.chartTotal}>Total producido <strong>{Number(summary.production.total).toLocaleString('es-CL')}</strong> unidades</p>
+            {summary.production.products.length === 0 ? <p className={styles.emptyState} role="status">No hay producción registrada.</p> : <MetricsBarChart
+              label="Unidades producidas por producto" unit="unidades"
+              items={summary.production.products.map(item => ({ label: item.productType, value: item.quantity }))}
+            />}
+          </section>}
+          {canQuery && <ProductionPerformance key={queryKey} api={api} period={{ from: queryFrom, to: queryTo }} />}
+        </div>}
+        {canQuery && !loading && !error && <>
 
           <section className={styles.dwellSection} aria-labelledby="dwell-title">
             <button
@@ -162,7 +160,7 @@ function MetricsContent({ api }) {
                       <h3>{group.title}</h3>
                       {group.key === 'subprocesses' ? <label className={styles.productSelector}><span className={styles.visuallyHidden}>Producto</span><select onChange={(event) => setSelectedSubprocessProduct(event.target.value)} value={activeSubprocessProduct}><option value="all">Todos los productos</option>{subprocessProducts.map((product) => <option key={product} value={product}>{product}</option>)}</select></label> : <span>{items.length} indicadores</span>}
                     </header>
-                    {items.length === 0 ? <p className={styles.emptyState}>Sin registros para este producto.</p> : <div className={styles.dwellChart}>{items.map((item) => <div className={styles.dwellRow} key={`${group.key}-${item.productType ?? 'all'}-${item.name}`}><div className={styles.dwellLabel}><span>{item.name}</span><small>{item.productType ? `${item.productType} · ` : ''}{item.sampleSize} registros</small></div><div className={styles.dwellTrack}><span className={styles.dwellBar} style={{ width: `${Math.max((item.averageSeconds / maxDwell) * 100, 3)}%` }} /></div><strong>{formatDuration(item.averageSeconds)}</strong></div>)}</div>}
+                    {items.length === 0 ? <p className={styles.emptyState}>Sin registros para este producto.</p> : <div className={styles.dwellChart}>{items.map((item) => <div className={styles.dwellRow} key={`${group.key}-${item.productType ?? 'all'}-${item.name}`}><div className={styles.dwellLabel}><span>{item.name}</span><small>{item.productType ? `${item.productType} · ` : ''}{item.sampleSize} registros</small></div><div className={styles.dwellTrack}><span className={styles.dwellBar} style={{ width: `${(item.averageSeconds / maxDwell) * 100}%` }} /></div><strong>{formatDuration(item.averageSeconds)}</strong></div>)}</div>}
                   </article>
                 })}
               </div>
@@ -171,18 +169,17 @@ function MetricsContent({ api }) {
 
 
           <section className={styles.sellerSection} aria-labelledby="seller-title">
-            <header className={styles.sellerHeader}>
-              <div><span className={styles.panelEyebrow}></span><h2 id="seller-title">Cumplimiento por vendedor</h2><p>Genera y exporta la lista del periodo seleccionado.</p></div>
-              <button aria-controls="seller-content" aria-expanded={isSellerOpen} className={styles.generateButton} onClick={() => setIsSellerOpen((current) => !current)} type="button">{isSellerOpen ? 'Ocultar lista' : 'Generar lista'}</button>
-            </header>
+            <button aria-controls="seller-content" aria-expanded={isSellerOpen} className={styles.dwellToggle} onClick={() => setIsSellerOpen((current) => !current)} type="button">
+              <span><strong id="seller-title">Cumplimiento por vendedor</strong><small>Consulta y exporta la lista del periodo seleccionado.</small></span>
+              <i className={`bi ${isSellerOpen ? 'bi-chevron-up' : 'bi-chevron-down'}`} aria-hidden="true" />
+            </button>
             {isSellerOpen && <div className={styles.sellerContent} id="seller-content">
-              <div className={styles.sellerActions}>
-                <div className={styles.exportMenu}>
-                  <button className={styles.generateButton} onClick={() => setIsExportOpen((current) => !current)} type="button"><i className="bi bi-download" aria-hidden="true" />Exportar</button>
-                  {isExportOpen && <div className={styles.exportOptions}><button onClick={() => exportReport('csv')} type="button">CSV</button><button onClick={() => exportReport('excel')} type="button">Excel</button><button onClick={() => exportReport('pdf')} type="button">PDF</button></div>}
+              <SellerTable key={requestKey} rows={summary.sellerCompliance ?? []} exportActions={
+                <div className={styles.exportMenu} onKeyDown={event => { if (event.key === 'Escape') setIsExportOpen(false) }}>
+                  <button aria-expanded={isExportOpen} aria-controls="seller-export-options" className={styles.generateButton} onClick={() => setIsExportOpen((current) => !current)} type="button"><i className="bi bi-download" aria-hidden="true" />Exportar</button>
+                  {isExportOpen && <div id="seller-export-options" className={styles.exportOptions}><button onClick={() => exportReport('csv')} type="button">CSV</button><button onClick={() => exportReport('excel')} type="button">Excel</button><button onClick={() => exportReport('pdf')} type="button">PDF</button></div>}
                 </div>
-              </div>
-              <div className={styles.sellerTableWrapper}><table className={styles.sellerTable}><thead><tr><th>Vendedor</th><th>Notas de venta</th><th>Entregados a tiempo</th><th>Fuera de plazo</th><th>Con carga alta</th></tr></thead><tbody>{(summary.sellerCompliance ?? []).map((row) => <tr key={row.seller}><td><strong>{row.seller}</strong></td><td>{row.salesNotes}</td><td>{row.deliveredOnTime}</td><td>{row.deliveredLate}</td><td>{row.enteredDuringHighLoad}</td></tr>)}</tbody></table>{(summary.sellerCompliance ?? []).length === 0 && <p className={styles.emptyState}>No hay vendedores o pedidos en el periodo seleccionado.</p>}</div>
+              } />
             </div>}
           </section>
 
