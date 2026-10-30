@@ -71,6 +71,7 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
   const writePending = useRef(false)
   const mounted = useRef(true)
   const summaryScope = useRef(null)
+  const previewScope = useRef(null)
   const [settledSearch, setSettledSearch] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
   const queryScope = `${settledSearch}\n${dateFrom}\n${dateTo}`
@@ -120,9 +121,13 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
     listController.current = controller
     const requestId = ++loadRequestId.current
     currentScope.current = queryScope
-    const includeSummary = forceSummary || !summaryScope.current
+    let includeSummary = forceSummary || !summaryScope.current
       || summaryScope.current.key !== queryScope || Date.now() >= summaryScope.current.expires
-    previewCache.clear()
+    const nextPreviewScope = `${activeFilter}\n${queryScope}`
+    // Paging does not change preview data. Preserve its bounded 15s TTL while
+    // still invalidating on filters, explicit reload, focus, writes and session.
+    if (forceSummary || previewScope.current !== nextPreviewScope) previewCache.clear()
+    previewScope.current = nextPreviewScope
     if (!writePending.current) {
       previewRequestId.current++
       detailPreviewRequestId.current++
@@ -134,9 +139,18 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
     setLoadError(null)
 
     try {
-      const workspace = await paymentsApi.getPaymentWorkspace({ status: activeFilter, search: settledSearch, from: dateFrom, to: dateTo, page, limit: pageSize,
+      let workspace = await paymentsApi.getPaymentWorkspace({ status: activeFilter, search: settledSearch, from: dateFrom, to: dateTo, page, limit: pageSize,
         ...(includeSummary ? {} : { includeSummary: false }) }, { signal: controller.signal })
       if (controller.signal.aborted || !mounted.current || requestId !== loadRequestId.current) return
+      if (!includeSummary && workspace.items.length === 0) {
+        // Another actor may have resolved the last row since the cached count.
+        // Read only the summary, then reuse the existing page-clamping flow.
+        const summary = await paymentsApi.getPaymentWorkspace({ search: settledSearch, from: dateFrom, to: dateTo, page, limit: pageSize,
+          summaryOnly: true }, { signal: controller.signal })
+        if (controller.signal.aborted || !mounted.current || requestId !== loadRequestId.current) return
+        workspace = { ...workspace, counts: summary.counts, paymentStatuses: summary.paymentStatuses }
+        includeSummary = true
+      }
       const ordersResponse = workspace?.items
       const statusesResponse = workspace?.paymentStatuses
 
@@ -153,6 +167,7 @@ function PaymentWorkspace({ paymentsApi, canRead, canUpdatePaymentStatus, canRev
       }
     } catch (error) {
       if (controller.signal.aborted || !mounted.current || requestId !== loadRequestId.current) return
+      if ([401, 403].includes(error?.status)) previewCache.clear()
       summaryScope.current = null
       setOrders([])
       setPaymentStatuses([])

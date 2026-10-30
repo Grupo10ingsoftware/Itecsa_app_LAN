@@ -21,7 +21,7 @@ export function createSupportAudit({ repository = new SecurityAuditRepository(),
                 requestId: req.requestId,
                 outcome: res.statusCode < 400 ? "allowed" : "denied",
                 reasonCode: `HTTP_${res.statusCode}`,
-            }).catch((error) => logger.error("security_audit.write_failed", {
+            }, { returnRecord: false }).catch((error) => logger.error("security_audit.write_failed", {
                 requestId: req.requestId,
                 actorId: actorUserId,
                 code: error?.code ?? "AUDIT_WRITE_FAILED",

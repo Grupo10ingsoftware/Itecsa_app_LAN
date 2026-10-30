@@ -135,7 +135,7 @@ export default function PaymentActionConfirmModal({
               <DataItem label="Nota de Venta" value={order.nvNumber} />
               <DataItem label="Cliente" value={order.companyName} />
               <DataItem label="RUT" value={order.rut} />
-              <DataItem label="Vendedor" value={order.sellerEmail} />
+              <DataItem label="Vendedor" value={order.sellerName ?? order.sellerEmail} />
             </dl>
           </section>
 

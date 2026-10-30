@@ -1,6 +1,7 @@
 import { AppError } from "../../../errors/AppError.js";
 import PaymentRecordRepo from "../repo/paymentRecord.repo.js";
 import SalesNoteSourceService from "../../orders/service/salesNoteSource.service.js";
+import { paymentId } from './paymentId.js';
 
 function normalizeText(value) {
   return typeof value === "string" ? value.trim().toLocaleLowerCase("es") : "";
@@ -136,7 +137,7 @@ class PaymentRecordService {
       throw error;
     }
 
-    const record = await this.repo.getByOrderIdAndRecordId(orderId, paymentRecordId);
+    const record = await this.repo.getByOrderIdAndRecordId(paymentId(orderId), paymentId(paymentRecordId));
 
     if (!record) {
       const error = new AppError(404, "Registro de pago no encontrado");
@@ -152,17 +153,12 @@ class PaymentRecordService {
       throw error;
     }
 
-    const records = await this.repo.getByOrderId(orderId);
+    const records = await this.repo.getByOrderId(paymentId(orderId));
     return records.map(toPaymentRecordDTO);
   }
 
   async getConfirmationDetails(orderId) {
-    const parsedOrderId = Number(orderId);
-
-    if (!Number.isInteger(parsedOrderId) || parsedOrderId <= 0) {
-      const error = new AppError(400, "El ID del pedido no es valido");
-      throw error;
-    }
+    const parsedOrderId = paymentId(orderId);
 
     const order = await this.repo.getConfirmationSource(parsedOrderId);
 

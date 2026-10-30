@@ -1,0 +1,39 @@
+{
+  "capturedAt": "2026-10-30T18:51:31.367Z",
+  "checks": [
+    {
+      "name": "real_api_prisma_binary_types_and_bound_parameters",
+      "repetitions": 20,
+      "pass": true
+    },
+    {
+      "name": "real_interactive_transaction_rollback_propagates_then_connection_reusable",
+      "pass": true
+    },
+    {
+      "name": "40_shapes_evict_bounded_cache_and_read_only_commit",
+      "ms": 18424.008,
+      "diagnosticTransactionTimeoutMs": 60000,
+      "pass": true
+    },
+    {
+      "name": "destroy_one_exclusively_leased_application_connection_then_20_real_reads",
+      "pass": true,
+      "before": {
+        "total": 5,
+        "active": 0,
+        "idle": 5,
+        "queued": 0
+      },
+      "after": {
+        "total": 8,
+        "active": 0,
+        "idle": 8,
+        "queued": 0
+      },
+      "queriesRetriedByDiagnostic": 0
+    }
+  ],
+  "errors": [],
+  "sessionPreparedAfterEviction": 32
+}

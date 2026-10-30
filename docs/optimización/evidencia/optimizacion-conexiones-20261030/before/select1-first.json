@@ -1,0 +1,61 @@
+{
+  "samples": [
+    {
+      "id": "active-prisma-select1-0",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.273,
+          "ms": 218.862,
+          "connection": 5,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.251,
+          "ms": 218.907,
+          "before": {
+            "total": 9,
+            "active": 1,
+            "idle": 8,
+            "queued": 0
+          },
+          "after": {
+            "total": 8,
+            "active": 2,
+            "idle": 6,
+            "queued": 0
+          },
+          "connection": 5,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 438.18,
+          "ms": 219.19,
+          "connection": 5,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 219.165,
+          "ms": 438.213,
+          "connection": 5,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 657.649
+    }
+  ],
+  "pool": [
+    {
+      "total": 6,
+      "active": 1,
+      "idle": 5,
+      "queued": 0
+    }
+  ]
+}

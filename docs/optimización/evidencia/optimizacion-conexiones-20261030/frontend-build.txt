@@ -1,0 +1,69 @@
+
+> capavista@0.0.0 prebuild
+> node ../scripts/sync-loading-theme.mjs
+
+
+> capavista@0.0.0 build
+> vite build
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 587 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                     0.73 kB │ gzip:   0.38 kB
+dist/assets/bootstrap-icons-mSm7cUeB.woff2        134.04 kB
+dist/assets/bootstrap-icons-BeopsB42.woff         180.28 kB
+dist/assets/IncidentReportPage-DLwXzyIz.css         0.61 kB │ gzip:   0.32 kB
+dist/assets/PageHeader-v_1qdQm1.css                 1.58 kB │ gzip:   0.58 kB
+dist/assets/TablePagination-BdKKLLYR.css            1.67 kB │ gzip:   0.62 kB
+dist/assets/PasswordResetPage-BgFxd_ME.css          2.07 kB │ gzip:   0.81 kB
+dist/assets/OrderHistoryDetailPage-CLTXtgKJ.css     2.90 kB │ gzip:   0.98 kB
+dist/assets/OrderHistoryPage-kOM8-C7-.css           3.03 kB │ gzip:   0.93 kB
+dist/assets/MessageInboxPage-D3yFtG0U.css           3.68 kB │ gzip:   1.18 kB
+dist/assets/PinModal-CC43E9pC.css                   3.79 kB │ gzip:   1.29 kB
+dist/assets/MessageDetailPage-C8f1XTs9.css          4.10 kB │ gzip:   1.11 kB
+dist/assets/UserMovementsModal-Bb0l5StW.css         4.18 kB │ gzip:   1.31 kB
+dist/assets/ProfilePage-nPZG2KTM.css                4.35 kB │ gzip:   1.25 kB
+dist/assets/PrivacyPageHeader-OIEOwiWi.css          4.53 kB │ gzip:   1.28 kB
+dist/assets/FilterControls-Fhc-yNoZ.css             9.04 kB │ gzip:   2.13 kB
+dist/assets/MetricsPage-CtkQXqn7.css                9.83 kB │ gzip:   2.37 kB
+dist/assets/UserManagementPage-DLJOBDNq.css        16.90 kB │ gzip:   3.96 kB
+dist/assets/PaymentConfirmationPage-MQPOtxG1.css   17.28 kB │ gzip:   3.90 kB
+dist/assets/ProductionCalendarPage-BwjhY3IY.css    17.30 kB │ gzip:   3.51 kB
+dist/assets/OrderCreatePage-BwteUxA7.css           18.64 kB │ gzip:   3.99 kB
+dist/assets/KanbanBoardPage-1St2a-tJ.css           37.59 kB │ gzip:   7.29 kB
+dist/assets/index-qPKJJs3g.css                    334.31 kB │ gzip:  50.68 kB
+dist/assets/orderStagePresentation-Ds7B07QG.js      0.54 kB │ gzip:   0.35 kB
+dist/assets/usePrivacyDocuments-wGXl3Ph5.js         0.72 kB │ gzip:   0.43 kB
+dist/assets/PrivacyPageHeader-7jYLLU5p.js           0.84 kB │ gzip:   0.38 kB
+dist/assets/PasswordResetPage-D2uotJ6g.js           0.92 kB │ gzip:   0.53 kB
+dist/assets/PageHeader-Ccbv6fV3.js                  1.10 kB │ gzip:   0.46 kB
+dist/assets/FilterPanel-C6b-XLeM.js                 1.57 kB │ gzip:   0.73 kB
+dist/assets/TablePagination-BwhKx0fg.js             1.61 kB │ gzip:   0.80 kB
+dist/assets/historyReads-BPV9S_4A.js                2.50 kB │ gzip:   1.22 kB
+dist/assets/PinAuthorizationModal-B8nqi1Sr.js       2.77 kB │ gzip:   1.44 kB
+dist/assets/DocumentsPage-DARAw6yP.js               2.84 kB │ gzip:   1.21 kB
+dist/assets/createRequestId-BZ6D_PhU.js             3.33 kB │ gzip:   1.49 kB
+dist/assets/orderDto-DQoMXdZk.js                    3.66 kB │ gzip:   1.21 kB
+dist/assets/MessageDetailPage-UAlWkDgJ.js           4.04 kB │ gzip:   1.58 kB
+dist/assets/authorization-CE4vdsHe.js               4.31 kB │ gzip:   1.09 kB
+dist/assets/FilterControls-CMaWLEGN.js              5.35 kB │ gzip:   1.82 kB
+dist/assets/UserMovementsModal-CDNW8Nzg.js          5.36 kB │ gzip:   2.13 kB
+dist/assets/OrderHistoryPage-Bey0BXTe.js            5.52 kB │ gzip:   2.21 kB
+dist/assets/PinModal-DpgzA6Vw.js                    5.67 kB │ gzip:   2.38 kB
+dist/assets/MessageInboxPage-BE8OHGqP.js            5.76 kB │ gzip:   2.23 kB
+dist/assets/OrderHistoryDetailPage-CrF48Z3F.js      5.95 kB │ gzip:   2.20 kB
+dist/assets/DataRequestsPage-C5luXmCx.js            7.03 kB │ gzip:   2.64 kB
+dist/assets/jsx-runtime-DRxd8o7b.js                 8.56 kB │ gzip:   3.26 kB
+dist/assets/ProfilePage-CInXGwES.js                10.24 kB │ gzip:   3.26 kB
+dist/assets/IncidentReportPage-BftOU6P3.js         11.13 kB │ gzip:   4.27 kB
+dist/assets/MetricsPage-0MBLH9D4.js                19.86 kB │ gzip:   6.73 kB
+dist/assets/OrderCreatePage-BhFjJc8P.js            21.17 kB │ gzip:   6.24 kB
+dist/assets/ProductionCalendarPage-CROzHrYV.js     28.31 kB │ gzip:   7.92 kB
+dist/assets/PaymentConfirmationPage-DykDRIes.js    29.47 kB │ gzip:   9.38 kB
+dist/assets/UserManagementPage-Dr_HuIIS.js         34.10 kB │ gzip:  10.51 kB
+dist/assets/KanbanBoardPage-XlXv95tQ.js           190.08 kB │ gzip:  60.77 kB
+dist/assets/index-BgFUq4EH.js                     332.99 kB │ gzip: 106.72 kB
+
+✓ built in 1.03s

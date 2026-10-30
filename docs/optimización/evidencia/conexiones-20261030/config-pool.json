@@ -1,0 +1,39 @@
+{
+  "pools": [
+    {
+      "state": {
+        "total": 10,
+        "active": 0,
+        "idle": 10,
+        "queued": 0
+      },
+      "options": {
+        "connectionLimit": 10,
+        "minimumIdle": 10,
+        "acquireTimeout": 10000,
+        "idleTimeout": 1800,
+        "initializationTimeout": 9900,
+        "minDelayValidation": 500,
+        "pingTimeout": 250,
+        "resetAfterUse": false,
+        "noControlAfterUse": false,
+        "leakDetectionTimeout": 0
+      },
+      "connectionOptions": {
+        "connectTimeout": 8000,
+        "socketTimeout": 15000,
+        "prepareCacheLength": 0,
+        "pipelining": true
+      },
+      "tls": true
+    }
+  ],
+  "server": {
+    "requestTimeout": 15000,
+    "headersTimeout": 10000,
+    "keepAliveTimeout": 5000
+  },
+  "clientVersion": "7.10.0",
+  "adapterVersion": "7.10.0",
+  "driverVersion": "3.5.4"
+}

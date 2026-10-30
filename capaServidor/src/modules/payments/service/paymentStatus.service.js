@@ -1,5 +1,6 @@
 import { AppError } from "../../../errors/AppError.js";
 import PaymentStatusRepo from "../repo/paymentStatus.repo.js";
+import { paymentId } from './paymentId.js';
 
 class PaymentStatusService {
     constructor({ repo } = {}) {
@@ -7,7 +8,7 @@ class PaymentStatusService {
     }
 
     async getPaymentStatus(id) {
-        const paymentStatus = await this.repo.get(id);
+        const paymentStatus = await this.repo.get(paymentId(id));
 
         if (!paymentStatus) {
             const error = new AppError(404, "No se encontro el estado de pago solicitado");

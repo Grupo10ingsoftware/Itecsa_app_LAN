@@ -7,7 +7,10 @@ import OrderService from '../src/modules/orders/service/order.service.js';
 import OrderController from '../src/modules/orders/controller/orders.controller.js';
 import PaymentRecordService from '../src/modules/payments/service/paymentRecord.service.js';
 import PaymentStatusRepo from '../src/modules/payments/repo/paymentStatus.repo.js';
+import PaymentStatusService from '../src/modules/payments/service/paymentStatus.service.js';
 import { createOrderRouter } from '../src/modules/orders/routes/order.routes.js';
+import { createPaymentRecordRouter } from '../src/modules/payments/routes/paymentRecord.routes.js';
+import { createPaymentStatusRouter } from '../src/modules/payments/routes/paymentStatus.routes.js';
 import { createRequirePin } from '../src/middlewares/requirePin.js';
 import { PinServiceError } from '../src/modules/auth/service/pin.service.js';
 import { ROLES, ROLE_PERMISSIONS, ROLES_CLAIM, PERMISSIONS as P } from '../../shared/authorization.js';
@@ -39,6 +42,19 @@ test('one grouped count keeps zeroes, BigInt conversion and ignores selected sta
   assert.deepEqual(counts, { pending: 12, rejected: 0, confirmed: 3 });
   assert.ok(!query.values.includes(91)); assert.ok(!query.values.includes('Rechazado'));
   assert.match(query.sql, /SUM\(s.nombre_estado_pago = 'Pendiente'\)/);
+});
+
+test('count avoids the customer join without search, preserving dates and the global status universe', async () => {
+  const statements = [];
+  const client = { $queryRaw: async query => { statements.push(query); return []; } };
+  const from = new Date('2026-09-06'), to = new Date('2026-09-08');
+  assert.deepEqual(await readPaymentCounts(client, { from, to, status: 'Rechazado', page: 3, limit: 10 }),
+    { pending: 0, rejected: 0, confirmed: 0 });
+  assert.doesNotMatch(statements[0].sql, /Cliente|OFFSET|LIMIT/);
+  assert.deepEqual(statements[0].values, [from, to]);
+  await readPaymentCounts(client, { search: 'A&B', from, to });
+  assert.match(statements[1].sql, /LEFT JOIN Cliente c/);
+  assert.equal(statements[1].values.filter(value => value === '%A&B%').length, 4);
 });
 
 test('numbered payment pages bind their offset and preserve the selected filters', async () => {
@@ -103,6 +119,46 @@ test('catalog shares concurrent reads, retains five-minute TTL and retries failu
   let fails = true;
   const retry = new PaymentStatusRepo({ prisma: { estado_Pago: { findMany: async () => { if (fails) throw Error('Unavailable'); return []; } } } });
   await assert.rejects(retry.getAll()); fails = false; assert.deepEqual(await retry.getAll(), []);
+});
+
+test('payment read IDs reject malformed and out-of-range input before accessing the database', async () => {
+  let calls = 0;
+  const read = async () => { calls++; return null; };
+  const records = new PaymentRecordService({ repo: { getByOrderId: read, getByOrderIdAndRecordId: read, getConfirmationSource: read } });
+  const statuses = new PaymentStatusService({ repo: { get: read } });
+  for (const id of ['invalid', ' ', 0, -1, 1.5, 2147483648, Number.MAX_SAFE_INTEGER, null, undefined]) {
+    for (const work of [() => records.getPaymentRecordsByOrderId(id), () => records.getPaymentRecord(id, 1),
+      () => records.getPaymentRecord(1, id), () => records.getConfirmationDetails(id), () => statuses.getPaymentStatus(id)]) {
+      await assert.rejects(work(), { statusCode: 400 });
+    }
+  }
+  assert.equal(calls, 0);
+});
+
+test('all collection read routes protect customer data with the shared read capability', async t => {
+  let role = ROLES.ADMINISTRADOR, reads = 0;
+  const authenticate = (req, _res, next) => {
+    req.identityProvider = 'keycloak';
+    req.auth = { payload: { sub: 'synthetic', [ROLES_CLAIM]: [role], permissions: ROLE_PERMISSIONS[role] } };
+    next();
+  };
+  const read = (_req, res) => { reads++; res.json({ ok: true }); };
+  const app = express();
+  app.use('/orders/:orderId/payment-records', createPaymentRecordRouter({ authenticate, controller: {
+    getConfirmationDetails: read, getPaymentRecordsByOrderId: read, getPaymentRecord: read,
+  } }));
+  app.use('/orders', createOrderRouter({ authenticate, controller: { getPaymentWorkspace: read } }));
+  app.use('/payment-status', createPaymentStatusRouter({ authenticate, controller: { getPaymentStatuses: read, getPaymentStatus: read } }));
+  const server = app.listen(0, '127.0.0.1'); await new Promise(resolve => server.once('listening', resolve));
+  t.after(() => new Promise(resolve => { server.closeAllConnections(); server.close(resolve); }));
+  const origin = `http://127.0.0.1:${server.address().port}`;
+  const routes = ['/orders/payments', '/orders/1/payment-records/preview', '/orders/1/payment-records',
+    '/orders/1/payment-records/2', '/payment-status', '/payment-status/1'];
+  for (const route of routes) assert.equal((await fetch(origin + route)).status, 403);
+  assert.equal(reads, 0);
+  role = ROLES.COBRANZAS;
+  for (const route of routes) assert.equal((await fetch(origin + route)).status, 200);
+  assert.equal(reads, routes.length);
 });
 
 for (const target of [2, 3]) test(`pending decision ${target} preserves lock, audit, commit and distinct notifications`, async () => {

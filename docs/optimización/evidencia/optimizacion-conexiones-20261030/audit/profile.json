@@ -1,0 +1,3195 @@
+{
+  "client": [
+    {
+      "id": "audit-profile-1793386241320-0",
+      "ms": 897.809,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386242408-1",
+      "ms": 413.773,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386243043-2",
+      "ms": 585.017,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386243871-3",
+      "ms": 679.256,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386244770-4",
+      "ms": 638.606,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386245627-5",
+      "ms": 428.972,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386246247-6",
+      "ms": 460.308,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386246927-7",
+      "ms": 415.616,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386247569-8",
+      "ms": 426.672,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386248185-9",
+      "ms": 419.117,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386248824-10",
+      "ms": 445.526,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386249482-11",
+      "ms": 427.763,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386250137-12",
+      "ms": 400.732,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386250757-13",
+      "ms": 447.945,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386251426-14",
+      "ms": 418.183,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386252059-15",
+      "ms": 427.648,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386252679-16",
+      "ms": 459.545,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386253357-17",
+      "ms": 417.104,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386254019-18",
+      "ms": 427.066,
+      "status": 200,
+      "bytes": 1082
+    },
+    {
+      "id": "audit-profile-1793386254660-19",
+      "ms": 430.183,
+      "status": 200,
+      "bytes": 1082
+    }
+  ],
+  "server": [
+    {
+      "id": "audit-profile-1793386241320-0",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.067,
+          "ms": 0.014,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.932,
+          "ms": 0.016,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 7,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 220.126,
+          "ms": 219.026,
+          "connection": 7,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.951,
+          "ms": 438.207,
+          "connection": 7,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.781,
+          "ms": 438.472,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 439.273,
+          "ms": 0.033,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.369,
+          "ms": 438.94,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 439.316,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 439.565,
+          "ms": 0.017,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 5,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 660.511,
+          "ms": 220.06,
+          "connection": 5,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 439.585,
+          "ms": 440.992,
+          "connection": 5,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 881.827,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 9,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 881.931,
+          "ms": 189.747,
+          "connection": 9,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 881.844,
+          "ms": 189.838,
+          "connection": 9,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 881.087,
+      "status": 200,
+      "requestId": "b273e446-9803-416a-85d9-9b25db2e5f9a"
+    },
+    {
+      "id": "audit-profile-1793386242408-1",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.071,
+          "ms": 0.012,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.796,
+          "ms": 0.016,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 6,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 0.861,
+          "ms": 219.387,
+          "connection": 6,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.814,
+          "ms": 219.439,
+          "connection": 6,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.651,
+          "ms": 219.704,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 220.367,
+          "ms": 0.035,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.295,
+          "ms": 220.11,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 220.412,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 220.621,
+          "ms": 0.016,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 1,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 220.693,
+          "ms": 189.04,
+          "connection": 1,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 220.64,
+          "ms": 189.098,
+          "connection": 1,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 410.777,
+          "ms": 0.014,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 2,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 410.835,
+          "ms": 221.596,
+          "connection": 2,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 410.794,
+          "ms": 221.642,
+          "connection": 2,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 410.187,
+      "status": 200,
+      "requestId": "54e2fcb9-d93d-4297-b9fe-43619148aacd"
+    },
+    {
+      "id": "audit-profile-1793386243043-2",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.112,
+          "ms": 0.012,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 1.442,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 4,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 1.506,
+          "ms": 188.936,
+          "connection": 4,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 1.46,
+          "ms": 188.986,
+          "connection": 4,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 1.305,
+          "ms": 189.235,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 190.552,
+          "ms": 0.034,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.889,
+          "ms": 189.7,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 190.596,
+          "ms": 0.009,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 190.795,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 10,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 386.165,
+          "ms": 192.917,
+          "connection": 10,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 190.812,
+          "ms": 388.275,
+          "connection": 10,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 580.425,
+          "ms": 0.016,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 3,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 580.489,
+          "ms": 219.927,
+          "connection": 3,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 580.444,
+          "ms": 219.977,
+          "connection": 3,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 579.697,
+      "status": 200,
+      "requestId": "a849c72a-ceb4-467c-9801-ad9999acaace"
+    },
+    {
+      "id": "audit-profile-1793386243871-3",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.062,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.942,
+          "ms": 0.016,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 8,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 1.01,
+          "ms": 220.08,
+          "connection": 8,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.96,
+          "ms": 220.134,
+          "connection": 8,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.79,
+          "ms": 220.406,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 221.208,
+          "ms": 0.037,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.384,
+          "ms": 220.867,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 221.262,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 221.483,
+          "ms": 0.069,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 7,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 442.237,
+          "ms": 219.755,
+          "connection": 7,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 221.557,
+          "ms": 440.442,
+          "connection": 7,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 663.684,
+          "ms": 0.016,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 5,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 663.757,
+          "ms": 220.111,
+          "connection": 5,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 663.703,
+          "ms": 220.17,
+          "connection": 5,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 662.855,
+      "status": 200,
+      "requestId": "8b4c7d74-208b-44f8-b5bc-f77b32ae2800"
+    },
+    {
+      "id": "audit-profile-1793386244770-4",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.112,
+          "ms": 0.009,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.971,
+          "ms": 0.016,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 9,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 1.068,
+          "ms": 188.592,
+          "connection": 9,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.99,
+          "ms": 188.686,
+          "connection": 9,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.768,
+          "ms": 189.09,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 189.879,
+          "ms": 0.055,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.382,
+          "ms": 189.557,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 189.95,
+          "ms": 0.015,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 190.286,
+          "ms": 0.019,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 6,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 411.942,
+          "ms": 220.474,
+          "connection": 6,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 190.309,
+          "ms": 442.112,
+          "connection": 6,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 633.527,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 1,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 633.596,
+          "ms": 188.957,
+          "connection": 1,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 633.546,
+          "ms": 189.011,
+          "connection": 1,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 632.878,
+      "status": 200,
+      "requestId": "f0e435a0-1a3c-4f28-b5b5-ad55893a2b94"
+    },
+    {
+      "id": "audit-profile-1793386245627-5",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.089,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 1.077,
+          "ms": 0.019,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 2,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 1.163,
+          "ms": 219.007,
+          "connection": 2,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 1.099,
+          "ms": 219.078,
+          "connection": 2,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.86,
+          "ms": 219.445,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 220.32,
+          "ms": 0.044,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.449,
+          "ms": 219.919,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 220.377,
+          "ms": 0.012,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 220.633,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 4,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 220.71,
+          "ms": 189.383,
+          "connection": 4,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 220.65,
+          "ms": 189.446,
+          "connection": 4,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 411.185,
+          "ms": 0.016,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 10,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 411.25,
+          "ms": 192.213,
+          "connection": 10,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 411.205,
+          "ms": 192.261,
+          "connection": 10,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 410.563,
+      "status": 200,
+      "requestId": "70d89268-4ace-486f-9f95-490d47625462"
+    },
+    {
+      "id": "audit-profile-1793386246247-6",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.119,
+          "ms": 0.012,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 1.126,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 3,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 1.195,
+          "ms": 218.896,
+          "connection": 3,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 1.144,
+          "ms": 218.951,
+          "connection": 3,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.973,
+          "ms": 219.213,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 220.198,
+          "ms": 0.033,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.535,
+          "ms": 219.699,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 220.241,
+          "ms": 0.009,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 220.448,
+          "ms": 0.014,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 8,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 220.545,
+          "ms": 221.477,
+          "connection": 8,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 220.465,
+          "ms": 221.563,
+          "connection": 8,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 443.182,
+          "ms": 0.013,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 7,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 443.237,
+          "ms": 219.747,
+          "connection": 7,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 443.197,
+          "ms": 219.791,
+          "connection": 7,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 442.585,
+      "status": 200,
+      "requestId": "df2b294d-1de5-410e-b3ef-aad1189673e7"
+    },
+    {
+      "id": "audit-profile-1793386246927-7",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.074,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.884,
+          "ms": 0.013,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 5,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 0.946,
+          "ms": 219.518,
+          "connection": 5,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.899,
+          "ms": 219.569,
+          "connection": 5,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.734,
+          "ms": 219.833,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 220.58,
+          "ms": 0.036,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.336,
+          "ms": 220.283,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 220.626,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 220.827,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 9,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 220.898,
+          "ms": 189.615,
+          "connection": 9,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 220.845,
+          "ms": 189.675,
+          "connection": 9,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 411.916,
+          "ms": 0.017,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 6,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 411.991,
+          "ms": 220.219,
+          "connection": 6,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 411.936,
+          "ms": 220.278,
+          "connection": 6,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 411.125,
+      "status": 200,
+      "requestId": "1de81b16-5dad-47d3-b724-9df1a9096b99"
+    },
+    {
+      "id": "audit-profile-1793386247569-8",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.063,
+          "ms": 0.016,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.874,
+          "ms": 0.014,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 1,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 0.943,
+          "ms": 188.374,
+          "connection": 1,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.89,
+          "ms": 188.431,
+          "connection": 1,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.723,
+          "ms": 188.694,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 189.429,
+          "ms": 0.035,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.332,
+          "ms": 189.135,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 189.474,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 189.668,
+          "ms": 0.014,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 2,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 189.738,
+          "ms": 219.516,
+          "connection": 2,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 189.684,
+          "ms": 219.573,
+          "connection": 2,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 410.333,
+          "ms": 0.013,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 4,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 410.391,
+          "ms": 189.677,
+          "connection": 4,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 410.349,
+          "ms": 189.723,
+          "connection": 4,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 409.705,
+      "status": 200,
+      "requestId": "4e980b43-bb31-4936-bd86-396ef4a1529e"
+    },
+    {
+      "id": "audit-profile-1793386248185-9",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.054,
+          "ms": 0.009,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 1.019,
+          "ms": 0.016,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 10,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 1.103,
+          "ms": 191.985,
+          "connection": 10,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 1.039,
+          "ms": 192.054,
+          "connection": 10,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.816,
+          "ms": 192.392,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 193.221,
+          "ms": 0.035,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.374,
+          "ms": 192.886,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 193.267,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 193.47,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 3,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 193.542,
+          "ms": 219.427,
+          "connection": 3,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 193.488,
+          "ms": 219.487,
+          "connection": 3,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 414.124,
+          "ms": 0.012,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 8,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 414.187,
+          "ms": 220.645,
+          "connection": 8,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 414.138,
+          "ms": 220.698,
+          "connection": 8,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 413.454,
+      "status": 200,
+      "requestId": "bd0f60f6-2672-4ce3-9662-30e255cd810f"
+    },
+    {
+      "id": "audit-profile-1793386248824-10",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.068,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.909,
+          "ms": 0.013,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 7,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 0.971,
+          "ms": 219.217,
+          "connection": 7,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.925,
+          "ms": 219.269,
+          "connection": 7,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.769,
+          "ms": 219.542,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 220.324,
+          "ms": 0.036,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.393,
+          "ms": 219.971,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 220.37,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 220.588,
+          "ms": 0.014,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 5,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 220.661,
+          "ms": 220.216,
+          "connection": 5,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 220.604,
+          "ms": 220.276,
+          "connection": 5,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 441.924,
+          "ms": 0.012,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 9,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 441.978,
+          "ms": 189.561,
+          "connection": 9,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 441.939,
+          "ms": 189.605,
+          "connection": 9,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 441.342,
+      "status": 200,
+      "requestId": "7ee609b0-1413-426f-8ef0-8a8b5ae3c3b1"
+    },
+    {
+      "id": "audit-profile-1793386249482-11",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.076,
+          "ms": 0.021,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 1.121,
+          "ms": 0.023,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 6,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 1.196,
+          "ms": 219.461,
+          "connection": 6,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 1.147,
+          "ms": 219.513,
+          "connection": 6,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.971,
+          "ms": 219.783,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 220.766,
+          "ms": 0.034,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.467,
+          "ms": 220.337,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 220.811,
+          "ms": 0.009,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 221.068,
+          "ms": 0.017,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 1,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 221.154,
+          "ms": 188.877,
+          "connection": 1,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 221.088,
+          "ms": 188.947,
+          "connection": 1,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 411.154,
+          "ms": 0.013,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 2,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 411.212,
+          "ms": 219.683,
+          "connection": 2,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 411.169,
+          "ms": 219.731,
+          "connection": 2,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 410.493,
+      "status": 200,
+      "requestId": "9b07c84d-2b08-4540-afcc-ba8766686c34"
+    },
+    {
+      "id": "audit-profile-1793386250137-12",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.063,
+          "ms": 0.011,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.983,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 4,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 1.048,
+          "ms": 188.792,
+          "connection": 4,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 1,
+          "ms": 188.844,
+          "connection": 4,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.827,
+          "ms": 189.12,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 189.971,
+          "ms": 0.058,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.376,
+          "ms": 189.657,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 190.045,
+          "ms": 0.014,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 190.382,
+          "ms": 0.023,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 10,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 190.495,
+          "ms": 192.628,
+          "connection": 10,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 190.408,
+          "ms": 192.718,
+          "connection": 10,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 384.383,
+          "ms": 0.017,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 3,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 384.453,
+          "ms": 219.605,
+          "connection": 3,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 384.403,
+          "ms": 219.66,
+          "connection": 3,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 383.577,
+      "status": 200,
+      "requestId": "f460eec1-354d-4888-b5a1-d8fe2a4bc805"
+    },
+    {
+      "id": "audit-profile-1793386250757-13",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.053,
+          "ms": 0.009,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.865,
+          "ms": 0.012,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 8,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 0.926,
+          "ms": 220.22,
+          "connection": 8,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.879,
+          "ms": 220.271,
+          "connection": 8,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.727,
+          "ms": 220.531,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 221.272,
+          "ms": 0.098,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.308,
+          "ms": 221.065,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 221.381,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 221.587,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 7,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 221.661,
+          "ms": 219.479,
+          "connection": 7,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 221.604,
+          "ms": 219.541,
+          "connection": 7,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 442.374,
+          "ms": 0.016,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 5,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 442.448,
+          "ms": 220.696,
+          "connection": 5,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 442.393,
+          "ms": 220.756,
+          "connection": 5,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 441.68,
+      "status": 200,
+      "requestId": "075330de-6e03-40d3-9754-55d423f229a6"
+    },
+    {
+      "id": "audit-profile-1793386251426-14",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.078,
+          "ms": 0.01,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.913,
+          "ms": 0.013,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 9,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 0.974,
+          "ms": 188.498,
+          "connection": 9,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.928,
+          "ms": 188.548,
+          "connection": 9,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.776,
+          "ms": 188.783,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 189.569,
+          "ms": 0.032,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.349,
+          "ms": 189.256,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 189.611,
+          "ms": 0.008,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 189.834,
+          "ms": 0.018,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 6,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 189.925,
+          "ms": 220.297,
+          "connection": 6,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 189.856,
+          "ms": 220.369,
+          "connection": 6,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 411.369,
+          "ms": 0.017,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 1,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 411.439,
+          "ms": 189.007,
+          "connection": 1,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 411.388,
+          "ms": 189.064,
+          "connection": 1,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 410.618,
+      "status": 200,
+      "requestId": "9418fbfb-bfa7-4a44-8fd4-edb282a149f9"
+    },
+    {
+      "id": "audit-profile-1793386252059-15",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.127,
+          "ms": 0.014,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 1.038,
+          "ms": 0.014,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 2,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 1.101,
+          "ms": 219.249,
+          "connection": 2,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 1.054,
+          "ms": 219.3,
+          "connection": 2,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.895,
+          "ms": 219.556,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 220.464,
+          "ms": 0.036,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.464,
+          "ms": 220.039,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 220.511,
+          "ms": 0.009,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 220.704,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 4,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 220.774,
+          "ms": 189.387,
+          "connection": 4,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 220.72,
+          "ms": 189.444,
+          "connection": 4,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 411.353,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 10,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 411.424,
+          "ms": 192.451,
+          "connection": 10,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 411.372,
+          "ms": 192.507,
+          "connection": 10,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 410.607,
+      "status": 200,
+      "requestId": "3cdd33c7-687e-4678-b9cc-38b494793979"
+    },
+    {
+      "id": "audit-profile-1793386252679-16",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.062,
+          "ms": 0.009,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.885,
+          "ms": 0.013,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 3,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 0.946,
+          "ms": 218.802,
+          "connection": 3,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.9,
+          "ms": 218.852,
+          "connection": 3,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.749,
+          "ms": 219.12,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 219.881,
+          "ms": 0.036,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.324,
+          "ms": 219.596,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 219.963,
+          "ms": 0.014,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 220.215,
+          "ms": 0.019,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 8,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 220.312,
+          "ms": 220.923,
+          "connection": 8,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 220.238,
+          "ms": 221.001,
+          "connection": 8,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 442.313,
+          "ms": 0.014,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 7,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 442.371,
+          "ms": 219.399,
+          "connection": 7,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 442.329,
+          "ms": 219.447,
+          "connection": 7,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 441.688,
+      "status": 200,
+      "requestId": "f3ef8cf3-71b5-4c40-a7d2-885ffe203095"
+    },
+    {
+      "id": "audit-profile-1793386253357-17",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.067,
+          "ms": 0.009,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.954,
+          "ms": 0.013,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 5,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 1.017,
+          "ms": 219.439,
+          "connection": 5,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.969,
+          "ms": 219.491,
+          "connection": 5,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.817,
+          "ms": 219.736,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 220.566,
+          "ms": 0.045,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.368,
+          "ms": 220.247,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 220.62,
+          "ms": 0.009,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 220.825,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 9,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 220.896,
+          "ms": 189.31,
+          "connection": 9,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 220.842,
+          "ms": 189.369,
+          "connection": 9,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 411.611,
+          "ms": 0.014,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 6,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 411.674,
+          "ms": 220.47,
+          "connection": 6,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 411.628,
+          "ms": 220.521,
+          "connection": 6,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 410.842,
+      "status": 200,
+      "requestId": "12fa636c-aea3-4f5b-8a94-ff7a98ddcd67"
+    },
+    {
+      "id": "audit-profile-1793386254019-18",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.087,
+          "ms": 0.011,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.909,
+          "ms": 0.015,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 1,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 0.974,
+          "ms": 188.248,
+          "connection": 1,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.926,
+          "ms": 188.301,
+          "connection": 1,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.751,
+          "ms": 188.571,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 189.334,
+          "ms": 0.04,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.379,
+          "ms": 188.998,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 189.383,
+          "ms": 0.009,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 189.581,
+          "ms": 0.014,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 2,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 189.651,
+          "ms": 219.978,
+          "connection": 2,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 189.598,
+          "ms": 220.036,
+          "connection": 2,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 410.68,
+          "ms": 0.013,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 4,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 410.737,
+          "ms": 188.729,
+          "connection": 4,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 410.696,
+          "ms": 188.775,
+          "connection": 4,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 410.076,
+      "status": 200,
+      "requestId": "79b29bbc-16de-493f-9450-9daa1c5d7963"
+    },
+    {
+      "id": "audit-profile-1793386254660-19",
+      "route": "/api/auth/profile",
+      "events": [
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 0.071,
+          "ms": 0.013,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.932,
+          "ms": 0.013,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 10,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 0.995,
+          "ms": 192.081,
+          "connection": 10,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 0.948,
+          "ms": 192.135,
+          "connection": 10,
+          "kind": "SELECT",
+          "shape": "388a4d6f6ff7",
+          "postResponse": false
+        },
+        {
+          "name": "identity.findBySubject",
+          "atMs": 0.792,
+          "ms": 192.439,
+          "postResponse": false
+        },
+        {
+          "name": "throttle.consume",
+          "atMs": 193.256,
+          "ms": 0.074,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.checkJwt",
+          "atMs": 0.446,
+          "ms": 192.89,
+          "postResponse": false
+        },
+        {
+          "name": "middleware.anonymous-local",
+          "atMs": 193.343,
+          "ms": 0.016,
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 193.663,
+          "ms": 0.033,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 3,
+          "error": null,
+          "postResponse": false
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 193.772,
+          "ms": 219.367,
+          "connection": 3,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 193.7,
+          "ms": 219.444,
+          "connection": 3,
+          "kind": "SELECT",
+          "shape": "ecbe6e235997",
+          "postResponse": false
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 414.21,
+          "ms": 0.013,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 8,
+          "error": null,
+          "postResponse": true
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 414.266,
+          "ms": 221.463,
+          "connection": 8,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 414.225,
+          "ms": 221.508,
+          "connection": 8,
+          "kind": "INSERT",
+          "shape": "da1fb89e7277",
+          "postResponse": true
+        }
+      ],
+      "ms": 413.58,
+      "status": 200,
+      "requestId": "7399c1fa-b434-404a-8db9-227046fa3acb"
+    }
+  ],
+  "pool": [
+    {
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    }
+  ],
+  "correlation": "serialized; post-response audit drained before next request"
+}

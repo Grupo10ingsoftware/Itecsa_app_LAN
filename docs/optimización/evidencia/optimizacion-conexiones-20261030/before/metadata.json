@@ -1,0 +1,11 @@
+{
+  "capturedAt": "2026-10-30T18:41:26.243Z",
+  "phase": "before",
+  "pid": 25844,
+  "head": "554734f6c5aef2fdc075c0cd76e79ed14be0413d",
+  "node": "v24.19.0",
+  "clock": "performance.now",
+  "warmup": 5,
+  "normalSecurityAudits": true,
+  "serialHttpDrainsAudits": true
+}

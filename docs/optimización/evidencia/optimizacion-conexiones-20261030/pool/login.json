@@ -1,0 +1,13 @@
+{
+  "loginMs": 1808.385,
+  "profileStatus": 200,
+  "profileKeys": [
+    "apellidoPaterno",
+    "email",
+    "estadoUsuario",
+    "primerNombre",
+    "records",
+    "rolUsuario",
+    "rutUsuario"
+  ]
+}

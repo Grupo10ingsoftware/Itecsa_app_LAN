@@ -1,0 +1,677 @@
+✔ forced login, nonce, max_age=0 and server-held PKCE S256 (56.6341ms)
+✔ rejects another account and consumes failed operation (21.6821ms)
+✔ rejects nonce manipulation and consumes failed operation (42.5301ms)
+✔ rejects missing nonce and consumes failed operation (6.1243ms)
+✔ rejects wrong audience and consumes failed operation (23.1883ms)
+✔ rejects wrong issuer and consumes failed operation (7.4281ms)
+✔ rejects wrong authorized party and consumes failed operation (7.6213ms)
+✔ rejects expired token and consumes failed operation (6.5161ms)
+✔ rejects invalid signature and consumes failed operation (13.4061ms)
+✔ rejects missing auth_time and consumes failed operation (3.9482ms)
+✔ rejects SSO without new authentication and consumes failed operation (7.7203ms)
+✔ rejects future authentication and consumes failed operation (6.6596ms)
+✔ rejects provider rejects code and consumes failed operation (1.3365ms)
+✔ wrong password stays in Keycloak: no callback and no PIN update (0.6523ms)
+✔ state manipulation, changing session and changing actor fail before token exchange (1.16ms)
+✔ cancellation, OIDC cancellation and expiration cannot rotate (1.5834ms)
+✔ replay and simultaneous callbacks only rotate once (28.3374ms)
+✔ cancellation or expiration during exchange prevents rotation (16.7225ms)
+✔ new operation invalidates previous one and restart loses authorization (1.5163ms)
+✔ audit excludes codes, state, PKCE and tokens (24.1094ms)
+✔ controller refuses passwords, target accounts and unverified client claims (1.1905ms)
+✔ rate limits bind authenticated account and IP (0.4305ms)
+✔ recovered PIN requires acknowledgement, works afterward and rejects old PIN (1526.9599ms)
+✖ HTTP endpoints require original session and permission; removed password endpoint is absent (66.6656ms)
+✔ cancellation under PIN-generation delay is checked again at commit boundary (5.0673ms)
+✔ OPT08: hash failure leaves prior credential and consumes recovery without success (4.6698ms)
+✔ OPT08: sql failure leaves prior credential and consumes recovery without success (286.3224ms)
+✔ OPT08: finish waits for transaction commit; cancellation/replay cannot replace an in-progress commit (237.2423ms)
+✔ restores only original web-client session through a single-use HttpOnly session cookie (17.4874ms)
+✔ rejects changed account without replacing original identity (8.1388ms)
+✔ rejects changed session without replacing original identity (6.5243ms)
+✔ rejects changed client without replacing original identity (12.7392ms)
+✔ rejects changed audience without replacing original identity (11.0194ms)
+✔ rejects changed issuer without replacing original identity (8.2164ms)
+✔ rejects changed expired without replacing original identity (18.5909ms)
+✔ rejects forged token signature (4.249ms)
+✔ origin, cookie and state are all necessary; invalid requests cannot consume session bridge (6.3792ms)
+✔ parallel requests consume only once and expired bridges cannot resume (9.249ms)
+✔ cancellation destroys bridge; production cookies require HTTPS (0.7964ms)
+✔ renewed original ID token is preserved for SDK/logout (4.7528ms)
+✔ renewed original ID token is rejected when issued to recovery client (5.6654ms)
+✔ password generator satisfies all character groups at default and minimum lengths (23.033ms)
+✔ correct operator PIN creates user and returns initial password only once (191.9199ms)
+✔ wrong PIN uses existing validation and prevents all creation (128.2312ms)
+✔ locked PIN uses existing lockout and prevents all creation (67.0335ms)
+✔ create failure returns no password and preserves reconciliation state (120.0569ms)
+✔ password failure returns no password and preserves reconciliation state (132.5363ms)
+✔ verify failure returns no password and preserves reconciliation state (115.5667ms)
+✔ mysql failure returns no password and preserves reconciliation state (108.0655ms)
+✔ enable failure returns no password and preserves reconciliation state (119.7799ms)
+✔ finish failure returns no password and preserves reconciliation state (131.5241ms)
+✔ reconciliation after storage failure never regenerates or reveals a credential (174.2695ms)
+✔ a lost finish response confirms its committed journal instead of disabling the created account (122.0579ms)
+✔ creation persists the external checkpoint once before provisioning roles (114.4093ms)
+✔ two simultaneous preparations claim one operation and create only one external identity (168.2455ms)
+✔ reconciliation reuses an unchanged local account and preserves its binding and audit (1.5401ms)
+✔ reconciliation rejects changed local rol_usuario before audit or activation (0.6936ms)
+✔ reconciliation rejects changed local estado_usuario before audit or activation (0.2294ms)
+✔ reconciliation rejects changed local correo_usuario before audit or activation (0.2473ms)
+✔ reconciliation rejects changed local nombre_usuario before audit or activation (0.6057ms)
+✔ reconciliation rejects changed local apellido_usuario before audit or activation (0.1969ms)
+✔ reconciliation rejects changed local rut_usuario before audit or activation (0.2098ms)
+✔ administrative API receives temporary:true without exposing tokens in results (25.6091ms)
+✔ administrative communication errors are sanitized (1.2271ms)
+✔ credential confirmation requires both password metadata and UPDATE_PASSWORD (4.2706ms)
+✖ HTTP creation disables caching and returns PIN failures without creating a user (121.9851ms)
+✔ failure to confirm compensating disable is recorded without disclosing credentials (116.7464ms)
+✔ local persistence writes both Keycloak identifier and external binding inside a transaction (0.8512ms)
+✔ journal acquisition returns only the revision acknowledged by its conditional write, without rereading (0.4159ms)
+✔ journal completion does not report success until transaction commit and needs no row reread (1.5407ms)
+✔ journal insert keeps unique conflict replay and never ignores an unconfirmed insert (1.4018ms)
+✔ updates all five fields in Keycloak and MySQL using the operator PIN (5.1184ms)
+✔ synchronizes account access for Desvinculado (0.6909ms)
+✔ synchronizes account access for Activo (0.514ms)
+✔ rejects PIN_INVALID without modifying the user (1.0383ms)
+✔ rejects PIN_LOCKED without modifying the user (0.349ms)
+✔ blocks self editing and privileged role assignment (0.622ms)
+✔ rejects invalid input, missing email and an arbitrary lifecycle state (0.924ms)
+✔ restores previous data on attributes failure (0.7105ms)
+✔ restores previous data on role failure (0.4579ms)
+✔ restores previous data on save failure (0.5859ms)
+✔ retains local access blocking if remote compensation also fails (0.939ms)
+✔ a concurrent edit is rejected before external writes (0.3324ms)
+✔ two overlapping edits cannot write remote attributes for the same user (27.8047ms)
+✔ repository refuses edits of a locally linked provision in running (1.1334ms)
+✔ repository refuses edits of a locally linked provision in needs_reconciliation (0.2998ms)
+✔ repository permits ordinary editing with provision state null (0.9137ms)
+✔ repository permits ordinary editing with provision state created (0.2042ms)
+✔ update uses the locking read even when a plain binding read has an older snapshot (0.3795ms)
+✔ repository commits only the state owned by this update and records audit (0.5067ms)
+✔ an unconfirmed audit insert cannot report a successful user update (0.3842ms)
+✖ PATCH updates the authenticated target and rejects unexpected request fields (83.3099ms)
+✔ reads reuse only matching active middleware actor, with fresh fallback for internal callers (4.6532ms)
+✔ inspection waits for both independent remote reads and rejects inconsistent targets before history (7.7503ms)
+✔ actor is revalidated after remote username search despite trusted request identity (0.8703ms)
+✔ no-attribute update keeps PIN, three fresh actor reads, logout, verification and commit (1.9526ms)
+✔ name-only update sends only changed attribute and commits after logout and revalidation (1.1729ms)
+✔ revocation during PIN cannot reach update lock or any remote write (0.6664ms)
+✔ revocation during remote update is rejected before activation and success (0.6624ms)
+✔ parameterized page preserves wildcard input, role/status scope and independent canonical count (1.361ms)
+✔ history projection preserves date, relation presence, null defaults, priority and JavaScript trimming (1.8114ms)
+✔ client UUID discovery shares only in-flight lookup, clears failure and permits a later retry (1.8836ms)
+✔ credential reads are concurrent and both password metadata and required action remain mandatory (33.231ms)
+✔ role reads start after disabled guard; DELETE, POST, verification stay sequential (3.3752ms)
+✔ forbidden effective role still prevents DELETE/POST after concurrent reads (0.7178ms)
+✔ forbidden direct role still prevents DELETE/POST after concurrent reads (0.3553ms)
+✔ an already assigned role avoids DELETE/POST but still verifies effective privilege (0.5126ms)
+✔ deactivation avoids a duplicate disable and still confirms the final remote state (0.4453ms)
+✔ calendar: an audit failure rolls back both order and detail delivery dates (11.4538ms)
+✔ calendar: impossible dates cannot normalize into valid weekdays and write history (1.2836ms)
+✔ calendar: successful receipt waits for commit and does not hydrate the discarded graph (5.384ms)
+✔ calendar: competing changes retain a whole last-committed date and both historical events (1.1607ms)
+✔ calendar repository preserves default full return and uses a receipt only when explicitly requested (0.4552ms)
+✔ calendar read uses the shared page query without excluding terminal or unscheduled orders (4.5795ms)
+✔ API and CLI may use different accounts for the same TLS destination (2.6807ms)
+✔ TLS validates the explicitly selected database host (1.3481ms)
+✔ rejects a different CLI host, port or database without exposing secrets (2.3916ms)
+✔ requires a complete destination and an explicit URL for CLI (1.2036ms)
+✔ TLS requires a readable CA and strict CLI validation (2.4621ms)
+✔ unencrypted connections remain limited to the test environment (0.443ms)
+✔ laboratory API profile pins its address without receiving the migration URL (3.3555ms)
+✔ a selected missing environment file fails instead of falling back (0.8327ms)
+✔ changes only the CA path for the existing Docker secret (1.5279ms)
+✔ does not repair missing, weak or duplicated TLS settings (1.637ms)
+✔ does not add TLS or invent connection configuration (0.4519ms)
+✔ central pool policy bounds reuse and preserves strict TLS, timeouts and maximum capacity (2.565ms)
+✔ explicit rollback settings are supported without bypassing configuration validation (9.8345ms)
+✔ audit default contract still returns the created row; receipt mode persists identical fields once (1.4539ms)
+✔ audit receipt preserves incident metadata filtering and injected transaction client (0.4479ms)
+✔ audit receipt rejects missing persistence and propagates database failure without retry (0.8455ms)
+✔ support middleware retains finish timing, one event, confirmed receipt and safe error reporting (6.519ms)
+✔ header uses two parallel reads, preserves nulls, accessories and repeated labels without fan-out (7.3577ms)
+✔ list stays one bounded query for limit 1, with the same graph and keyset (1.5255ms)
+✔ list stays one bounded query for limit 10, with the same graph and keyset (0.3246ms)
+✔ list stays one bounded query for limit 50, with the same graph and keyset (0.3522ms)
+✔ list binds partial search, state, cursor and inclusive/exclusive creation dates (0.8138ms)
+✔ detail header and event reads start concurrently (1.6129ms)
+✔ numbered history pages use bound offsets and the same filters for the real total (2.1972ms)
+✔ numbered page rows and filtered count run concurrently without changing legacy cursor responses (0.9611ms)
+✔ numbered page rejects invalid input without a read: 0 (1.3371ms)
+✔ numbered page rejects invalid input without a read: -1 (0.446ms)
+✔ numbered page rejects invalid input without a read: 1.5 (0.2083ms)
+✔ numbered page rejects invalid input without a read: bad (0.1637ms)
+✔ numbered page rejects invalid input without a read: 9007199254740991 (0.1462ms)
+✔ history rejects ambiguous page plus cursor without reading (1.619ms)
+✔ events retain exact SQL, actor/observation projection and DTO: all, finance=false (8.8787ms)
+✔ events retain exact SQL, actor/observation projection and DTO: all, finance=true (1.4907ms)
+✔ events retain exact SQL, actor/observation projection and DTO: stage, finance=false (0.774ms)
+✔ events retain exact SQL, actor/observation projection and DTO: stage, finance=true (0.8118ms)
+✔ events retain exact SQL, actor/observation projection and DTO: payment, finance=false (0.7485ms)
+✔ events retain exact SQL, actor/observation projection and DTO: payment, finance=true (0.7866ms)
+✔ events retain exact SQL, actor/observation projection and DTO: subprocess, finance=false (0.7998ms)
+✔ events retain exact SQL, actor/observation projection and DTO: subprocess, finance=true (0.5811ms)
+✔ events retain exact SQL, actor/observation projection and DTO: calendar, finance=false (0.617ms)
+✔ events retain exact SQL, actor/observation projection and DTO: calendar, finance=true (0.6282ms)
+✔ events retain exact SQL, actor/observation projection and DTO: general, finance=false (0.5863ms)
+✔ events retain exact SQL, actor/observation projection and DTO: general, finance=true (0.4588ms)
+✔ list rejects invalid input before repository: {"limit":0} (0.3378ms)
+✔ list rejects invalid input before repository: {"limit":101} (0.2545ms)
+✔ list rejects invalid input before repository: {"cursor":"invalid"} (3.3843ms)
+✔ list rejects invalid input before repository: {"from":"2024-02-30"} (0.4119ms)
+✔ list rejects invalid input before repository: {"from":"2024-09-10","to":"2024-09-01"} (0.3389ms)
+✔ events reject invalid input before repository: 1 OR 1=1 {} (1.6398ms)
+✔ events reject invalid input before repository: 1 {"type":"all;DROP"} (0.3357ms)
+✔ events reject invalid input before repository: 1 {"cursor":"bad"} (0.2533ms)
+✔ events reject invalid input before repository: 1 {"limit":999} (0.199ms)
+✔ compound cursor includes ID to traverse timestamp ties and rejects the wrong cursor kind (23.9611ms)
+✖ history routes preserve JWT, fresh identity, capability/financial matrix, SQL redaction flags and safe errors (113.7684ms)
+✔ completing subprocess 1 keeps lock, conditional update, records and commit (8.5976ms)
+✔ completing subprocess 2 keeps lock, conditional update, records and commit (0.8619ms)
+✔ completing subprocess 3 keeps lock, conditional update, records and commit (0.6168ms)
+✔ internal callers retain hydrated return by default (1.8651ms)
+✔ completion rejects invalid current production condition {"stage":1} (1.1847ms)
+✔ completion rejects invalid current production condition {"payment":"Pendiente"} (0.6765ms)
+✔ completion rejects invalid current production condition {"finished":true} (0.5337ms)
+✔ wrong subprocess, missing detail and missing PIN actor cannot create history (0.8796ms)
+✔ two normal advances serialize and only one creates a subprocess record (178.0839ms)
+✔ Lanyard repeats before packaging below 100%, preserves completion at 100% (1.266ms)
+✔ rollback preserves observation, record and current state (finished=false) (1.5306ms)
+✔ rollback preserves observation, record and current state (finished=true) (0.4311ms)
+✔ rollback first step, skipped step, invalid stage, empty or excessive observation are rejected (0.9101ms)
+✔ complete: failure while creating audit record rolls back the conditional change (0.4689ms)
+✔ rollback: failure while creating audit record rolls back the conditional change (0.3562ms)
+✔ detail projection retains complete comments, subprocess names, dates and Lanyard progress (2.1337ms)
+✔ independent detail queries run concurrently, with no Cartesian history/flow join (0.4112ms)
+✔ large synthetic detail retains 200 items, 600 subprocesses and every comment with four fixed reads (3.9018ms)
+✔ summary binds cursor, wildcard search/product and date range before page limit (0.5198ms)
+✔ daily load selects last progress up to date and today separately, preserving zero/null and pending values (2.4122ms)
+✔ compact correction preserves persisted recipient and message, and cancellation passes compact flag (1.0379ms)
+✔ reevaluation resolves repeated product names/first subprocess only once, without dropping lines (2.0652ms)
+✔ controller waits for mutation commit, requests receipt and preserves public detail after writes (1.4801ms)
+✔ manual transition 1→2 preserves expected-state and PIN actor (5.4126ms)
+✔ manual transition 2→3 preserves expected-state and PIN actor (0.3658ms)
+✔ manual transition 3→4 preserves expected-state and PIN actor (0.2998ms)
+✔ backwards/skipped stages, payment mismatch, missing actor and unauthorized start cannot write (1.144ms)
+✔ ready-for-delivery preconditions stay under the order lock; missing/unfinished details block transition (1.1858ms)
+✔ compact transition preserves records and ready notification; conflict cannot duplicate history (0.971ms)
+✔ label operation preserves assignment/removal actor and audit before its compact JOIN response (0.968ms)
+✔ reevaluation never deletes a line with progress/history and rejects ambiguous source lines (2.112ms)
+✔ daily-load batch uses one upsert and last duplicate input, preserving previous-day accumulated amount (1.6556ms)
+✔ daily-load guards precede the batch upsert: {"product":"Tarjeta"} (0.6417ms)
+✔ daily-load guards precede the batch upsert: {"stage":1} (0.4589ms)
+✔ daily-load guards precede the batch upsert: {"quantity":40} (0.2491ms)
+✔ daily-load guards precede the batch upsert: {"quantity":0} (0.2292ms)
+✔ daily-load SQL failure cannot be followed by success/reload; invalid calendar dates are rejected (1.1311ms)
+✖ new precheck route keeps READ_ORDERS; mutation still requires PIN middleware (95.4033ms)
+✔ post-commit detail failure returns error without undoing or retrying a confirmed subprocess (8.8456ms)
+✔ all SQL reads bind the recipient; inbox retains numbered OFFSET, status, dates and deterministic ordering (4.067ms)
+✔ inbox keeps page and count inside the same existing transaction and preserves all DTO fields (1.3624ms)
+✔ notification snapshot counts beyond the page, maps empty/BigInt and keeps fixed one-query cost (1.5413ms)
+✔ compact view preserves the exact normalized 82-character excerpt and excludes private body/order (5.4634ms)
+✔ revision detects same-count replacement, visible content, read/hide and is bound to recipient (1.2925ms)
+✔ getMessage cannot access another recipient or invalid ID (1.1242ms)
+✔ markAsRead cannot access another recipient or invalid ID (0.3553ms)
+✔ hideNotification cannot access another recipient or invalid ID (0.3918ms)
+✔ openMessage cannot access another recipient or invalid ID (0.3588ms)
+✔ opening handles read/unread, read-only permission, idempotence and preserves hidden inbox messages (0.5837ms)
+✔ mark/hide repeated are idempotent; clear affects only current recipient and preserves read flags (0.679ms)
+✔ atomic scoped update and bulk clear never accept caller supplied recipient; mutation errors propagate (0.9316ms)
+✔ Fase 1 currentUser validation remains fail-closed and body/query cannot replace it (0.5972ms)
+✖ new open endpoint checks READ_MESSAGES and derives mark permission server-side, not body (106.8626ms)
+✔ synthetic 0 assignments keep a bounded page, complete count and one snapshot call (1.4017ms)
+✔ synthetic 1 assignments keep a bounded page, complete count and one snapshot call (0.3634ms)
+✔ synthetic 10 assignments keep a bounded page, complete count and one snapshot call (0.2512ms)
+✔ synthetic 50 assignments keep a bounded page, complete count and one snapshot call (0.1994ms)
+✔ synthetic 500 assignments keep a bounded page, complete count and one snapshot call (0.3096ms)
+✔ synthetic 5000 assignments keep a bounded page, complete count and one snapshot call (0.1769ms)
+✔ message creation preserves transactional assignments and rollback (null) (1.0914ms)
+✔ message creation preserves transactional assignments and rollback (message) (0.3253ms)
+✔ message creation preserves transactional assignments and rollback (recipients) (0.2924ms)
+✔ joined production keeps exact JS case, accents, null quantities and insertion order (4.3674ms)
+✔ duration exact equivalence: closed, repeats and reentry (0.9296ms)
+✔ duration exact equivalence: open, repeats and reentry (0.3041ms)
+✔ duration exact equivalence: missing, repeats and reentry (0.2299ms)
+✔ duration exact equivalence: equal, repeats and reentry (0.2475ms)
+✔ duration exact equivalence: negative, repeats and reentry (0.2037ms)
+✔ duration exact equivalence: fraction, repeats and reentry (0.194ms)
+✔ duration exact equivalence: midnight, repeats and reentry (0.1795ms)
+✔ duration exact equivalence: month, repeats and reentry (0.2327ms)
+✔ duration exact equivalence: Chile DST, repeats and reentry (0.4703ms)
+✔ duration exact equivalence: leap, repeats and reentry (0.2352ms)
+✔ joined dwell branches remain parallel and preserve repeated names by product (0.8229ms)
+✔ disjoint report rows do not multiply quantities; preserve first ready event including null entry (4.6778ms)
+✔ performance exact DTO: on-time (36.3862ms)
+✔ performance exact DTO: late (0.8546ms)
+✔ performance exact DTO: missing deadline (0.6172ms)
+✔ performance exact DTO: UTC before Chile month (0.5961ms)
+✔ performance exact DTO: DST before (0.4888ms)
+✔ performance exact DTO: DST after (0.5019ms)
+✔ performance exact DTO: latest outside month (0.4754ms)
+✔ performance exact DTO: missing event (0.477ms)
+✔ empty DTO and all three summary branches remain unchanged (0.4129ms)
+✔ invalid period rejected before SQL: 2024-02-30 (0.7914ms)
+✔ invalid period rejected before SQL: 2024-03-02 (0.1731ms)
+✔ invalid period rejected before SQL: 2023-01-01 (0.1879ms)
+✔ invalid period rejected before SQL: 2024-01-01' OR 1=1 (0.1436ms)
+✔ all SQL date and status values are parameters; latest-ready search is not range-restricted (0.3966ms)
+✔ report query selects the first exact ready event without skipping null entries or restricting its date (2.5783ms)
+✔ same complete summary for 0 orders and 0 ready reentries per order (3.7411ms)
+✔ same complete summary for 1 orders and 1 ready reentries per order (1.1492ms)
+✔ same complete summary for 30 orders and 50 ready reentries per order (10.5961ms)
+✔ same complete summary for 1000 orders and 20 ready reentries per order (126.6465ms)
+✖ both metrics routes enforce real JWT, fresh active identity, capabilities, quota and period validation (134.8994ms)
+✔ mysql-docker admite nombres configurados y verifica proyecto, UUID y TLS efectivos (4.6575ms)
+✔ mantenimiento bloquea escrituras y cierra sesiones API mediante el socket (2.2319ms)
+✔ mantenimiento solo rehabilita los privilegios de datos aprobados (0.937ms)
+✔ update valida versiones, bloquea escritores y respalda antes de migrar (1.0027ms)
+✔ restore autoriza el UUID destino sin confundirlo con la identidad fuente (0.7762ms)
+✔ el Compose autonomo no incluye Aiven ni publica MySQL (3.7849ms)
+✔ el bootstrap usa solo socket y envia contrasenas como valores parametrizados (6.8552ms)
+✔ el bootstrap rechaza un socket de otro hostname antes de administrar cuentas (0.9641ms)
+✔ DATABASE_URL codifica credenciales arbitrarias sin alterar el destino (2.4485ms)
+✔ la identidad efectiva rechaza Aiven y UUID distintos pese a la etiqueta lab (1.08ms)
+✔ la seleccion requiere confirmacion explicita y una URL heredada coincidente (1.377ms)
+✔ el preflight rechaza tablas de aplicacion sin historial Prisma coherente (0.7396ms)
+✔ el inicializador ejecuta migracion, seed y validacion en orden (4.52ms)
+✔ el despliegue autonomo ejecuta seed y catalogos con la cuenta migradora (1.0005ms)
+✔ la tarea de inicializacion fija exactamente la cadena Prisma provisional (14.1844ms)
+✔ el catalogo reutiliza valores existentes y no inventa capacidades (8.1ms)
+✔ el seed crea solo ausentes y una segunda ejecucion no escribe (5.4707ms)
+✔ el seed rechaza conflictos antes de crear registros (1.2825ms)
+✔ el seed rechaza una identidad de catalogo asignada a otro id (0.6867ms)
+✔ persisted graph equivalence {"lines":1,"accessories":0}, client=false (28.8426ms)
+✔ persisted graph equivalence {"lines":1,"accessories":0}, client=true (4.0408ms)
+✔ persisted graph equivalence {"lines":5,"accessories":3}, client=false (23.1679ms)
+✔ persisted graph equivalence {"lines":5,"accessories":3}, client=true (3.9523ms)
+✔ persisted graph equivalence {"lines":20,"accessories":30}, client=false (8.4457ms)
+✔ persisted graph equivalence {"lines":20,"accessories":30}, client=true (7.7546ms)
+✔ persisted graph equivalence {"lines":6,"types":["Yoyo","Lanyard","Tarjeta"],"accessories":8}, client=false (3.1046ms)
+✔ persisted graph equivalence {"lines":6,"types":["Yoyo","Lanyard","Tarjeta"],"accessories":8}, client=true (12.9412ms)
+✔ rollback leaves no order effects on order.findFirst (9.5409ms)
+✔ rollback leaves no order effects on client.create (0.8991ms)
+✔ rollback leaves no order effects on label.findMany (0.5017ms)
+✔ rollback leaves no order effects on order.create (0.515ms)
+✔ rollback leaves no order effects on label.create (0.4591ms)
+✔ rollback leaves no order effects on record.create (0.5606ms)
+✔ rollback leaves no order effects on stage.create (0.5476ms)
+✔ rollback leaves no order effects on raw.read (0.4967ms)
+✔ rollback leaves no order effects on detail.createMany (0.7069ms)
+✔ rollback leaves no order effects on accessory.createMany (0.6485ms)
+✔ rollback leaves no order effects on message.create (0.6667ms)
+✔ rollback leaves no order effects on assignment.createMany (0.9759ms)
+✔ rollback leaves no order effects on audit.create (4.5837ms)
+✔ rollback leaves no order effects on commit (0.866ms)
+✔ snapshot identity and repeated lines remain exact, accessories never become productive details (0.9946ms)
+✔ legacy full service return remains available and public consumers retain their contracts (1.1599ms)
+✔ snapshot schema compatibility is retained: false (2.2855ms)
+✔ snapshot schema compatibility is retained: true (1.7807ms)
+✔ creation boundary {"noSubprocess":true} (1.9517ms)
+✔ creation boundary {"noRecipients":true} (0.8192ms)
+✔ creation boundary {"missingLabel":true} (0.5168ms)
+✔ creation boundary {"missingType":true} (0.6374ms)
+✔ creation boundary {"shortBatch":true} (0.8271ms)
+✔ two administrators/model transactions cannot commit the same sales note and effects are not duplicated (1.4529ms)
+✔ UNIQUE conflict after a missed precheck is mapped to 409 and rolls back (1.4943ms)
+✔ service promise resolves only after commit, never while the graph is uncommitted (85.6177ms)
+✔ POST-supplied client, lines, quantities, actor, state and dates cannot override source or policy (1.4526ms)
+✔ source validation fails before transaction; direct actor fallback still requires linked identity (0.5753ms)
+✔ batches are all-or-fail and do not request skipDuplicates or generated-ID inference (0.551ms)
+✔ product projection is parameterized and missing catalog retains the 404 (0.3371ms)
+✔ source normalization preserves classification, line order, duplicates and untracked quantities (0.5728ms)
+✖ HTTP POST preserves JWT/capability/PIN gates, authoritative source, actor, 201 receipt and duplicate 409 (86.7863ms)
+✔ lookup handler still awaits the security observer and retains its best-effort failure policy (3.7491ms)
+✔ normalization exact DTO equivalence: 1 lines (3.6874ms)
+✔ normalization exact DTO equivalence: 5 lines (0.7292ms)
+✔ normalization exact DTO equivalence: 20 lines (0.4649ms)
+✔ normalization exact DTO equivalence: 1000 lines (17.8633ms)
+✔ fixture cold/warm/expiry/file-version/disabled/errors keep the original cache and Map guarantees (22.7527ms)
+✔ page binds all partial search fields, dates, status, cursor and limit without OFFSET (3.0236ms)
+✔ one grouped count keeps zeroes, BigInt conversion and ignores selected status/cursor (0.7119ms)
+✔ count avoids the customer join without search, preserving dates and the global status universe (0.8388ms)
+✔ numbered payment pages bind their offset and preserve the selected filters (0.4524ms)
+✔ numbered payment pages accept all UI sizes and reject invalid page numbers (1.6876ms)
+✔ page and grouped summary execute concurrently; partial modes do exactly requested work (0.8155ms)
+✔ workspace preserves default contract, inclusive UTC day and strict validation; page skips catalog (10.6883ms)
+✔ catalog shares concurrent reads, retains five-minute TTL and retries failures (0.7733ms)
+✔ payment read IDs reject malformed and out-of-range input before accessing the database (2.9088ms)
+✖ all collection read routes protect customer data with the shared read capability (79.2566ms)
+✔ pending decision 2 preserves lock, audit, commit and distinct notifications (4.1676ms)
+✔ pending decision 3 preserves lock, audit, commit and distinct notifications (9.1037ms)
+✔ concurrent decisions 2,2 serialize and never duplicate financial history (166.2008ms)
+✔ concurrent decisions 3,3 serialize and never duplicate financial history (111.4198ms)
+✔ concurrent decisions 2,3 serialize and never duplicate financial history (180.9806ms)
+✔ concurrent decisions 3,2 serialize and never duplicate financial history (124.7755ms)
+✔ confirmed-to-rejected revision at stage 1 preserves production consequences (1.1226ms)
+✔ confirmed-to-rejected revision at stage 2 preserves production consequences (0.4553ms)
+✔ confirmed-to-rejected revision at stage 3 preserves production consequences (0.3437ms)
+✔ revision requires special capability and reason; resolved payments cannot return to pending (0.9125ms)
+✔ SQL failure order-update rolls back decision, stage, audit and durable notifications (0.3415ms)
+✔ SQL failure audit-insert rolls back decision, stage, audit and durable notifications (0.2609ms)
+✔ SQL failure decision-insert rolls back decision, stage, audit and durable notifications (0.2806ms)
+✔ SQL failure message-insert rolls back decision, stage, audit and durable notifications (0.3277ms)
+✔ SQL failure recipient-insert rolls back decision, stage, audit and durable notifications (0.2547ms)
+✔ preview keeps snapshot products exact and fetches source only when necessary (0.6995ms)
+✔ payment controller waits for committed service result and keeps public DTO (0.5114ms)
+✖ HTTP partial reads keep auth/capability; every payment mutation still requires a fresh valid PIN (11.4139ms)
+✔ adapter reuses its supplied pool and retains the binary protocol under sequential/concurrent reads (3.6092ms)
+✔ transactions keep the reserved connection, commit/rollback and release without leaking listeners (4.2942ms)
+✔ pool acquisition and socket failures surface, and subsequent reads can recover (1.8358ms)
+✔ identity query uses the injected transaction client without acquiring a second pool (2.0143ms)
+✔ identity JOIN binds provider/issuer/subject, preserves nulls, Unicode and numeric IDs (5.2793ms)
+✔ middleware refuses removed or missing binding (0.6611ms)
+✔ middleware refuses inconsistent subject (0.3348ms)
+✔ middleware refuses disabled (0.3665ms)
+✔ middleware refuses updating (0.2327ms)
+✔ middleware refuses changed role (0.2116ms)
+✔ middleware preserves first-access revalidation and rejects revocation during activation (0.6879ms)
+✔ middleware validates provider, roles, permissions and missing sessions before lookup (0.7014ms)
+✔ all six message operations reuse only the separately supplied current request actor (2.3113ms)
+✔ non-HTTP message callers still resolve identity and preserve missing user errors (0.618ms)
+✔ controller uses req.currentUser and never actor fields from body or query (0.8341ms)
+✔ message ownership remains enforced with a reused actor (0.4771ms)
+✔ parallel and subsequent requests resolve separately; revocation and role changes cannot use an earlier actor (14.5966ms)
+✖ real JWT signature, issuer, audience, expiry and capabilities guard the optimized message flow (218.7367ms)
+✖ simultaneous HTTP requests, account changes, role changes, unlink and logout do not reuse previous identities (195.7296ms)
+✖ HTTP message ownership and actor injection cannot bypass the validated request user (89.6927ms)
+✖ HTTP quota still returns 429 and isolates actors under concurrent requests (109.5995ms)
+✖ consumer routers keep identity and authorization gates across profile, users, production, payments, history, metrics, calendar, sales, privacy and incidents (94.7371ms)
+✔ SQL-mode quota retains its transactional increment, hashed actor and counters (serialized DB double) (3.7903ms)
+✔ PIN keeps independent locked lookup, accumulated attempts and concurrent lockout after request identity reuse (1348.7163ms)
+✔ production completion records actor, timestamp and stage without delivering or deleting the order (6.7778ms)
+✔ finishing a ready order selects Terminado and records exactly one closure under concurrent requests (1.0166ms)
+✔ finishing an order still requires PIN, permission and completed subprocesses (0.6234ms)
+✔ rejects completion: pending (0.6206ms)
+✔ rejects completion: no-details (0.8787ms)
+✔ rejects completion: no-processes (0.4363ms)
+✔ rejects completion: invalid-current (0.394ms)
+✔ rejects completion: lanyard-incomplete (2.6136ms)
+✔ rejects completion: cancelled (0.9062ms)
+✔ rejects completion: finished (0.7649ms)
+✔ rejects completion: payment (0.3372ms)
+✔ requires PIN actor and rejects a stale transition without writing history (0.7961ms)
+✔ completion respects the existing capability policy (0.7034ms)
+✔ Developer can finish a ready order using existing permissions and a validated PIN actor (0.3578ms)
+✔ concurrent completion attempts only persist one transition and history entry (0.7704ms)
+✔ active Kanban keeps ready-for-delivery and excludes terminal orders; calendar stays available (1.6471ms)
+✖ HTTP registration and completion require capability and a fresh PIN on every request (97.8522ms)
+✔ missing/invalid calendar date blocks without stage, audit or transaction writes: null (10.9568ms)
+✔ missing/invalid calendar date blocks without stage, audit or transaction writes: undefined (1.4456ms)
+✔ missing/invalid calendar date blocks without stage, audit or transaction writes:  (0.3911ms)
+✔ missing/invalid calendar date blocks without stage, audit or transaction writes: invalid (0.4369ms)
+✔ missing/invalid calendar date blocks without stage, audit or transaction writes: 2026-02-30 (3.1209ms)
+✔ missing/invalid calendar date blocks without stage, audit or transaction writes: 2026-10-31 (0.4728ms)
+✔ missing/invalid calendar date blocks without stage, audit or transaction writes: Invalid Date (0.392ms)
+✔ estimated line delivery does not schedule the order (0.4275ms)
+✔ valid calendar date follows the locked transition and existing audit flow (1.8819ms)
+✔ revalidates date inside transaction before any writes if schedule changed after service read (0.8135ms)
+✔ repository rejects an unscheduled start even without the service precheck (1.1236ms)
+✔ payment, start permission and PIN actor guards retain priority (0.821ms)
+✔ transition read exposes the actual order-level calendar date (0.4634ms)
+✔ shared date validation accepts persisted dates and ISO DTOs, rejects impossible dates and weekends (0.2677ms)
+✖ direct HTTP move cannot bypass programming, permissions or PIN, and never writes on rejection (112.829ms)
+✔ recent activity preserves frozen DTO, null fallbacks and type priority even with overlapping children (3.7921ms)
+✔ list and count start independently; empty/deep page retains the exact total (0.6338ms)
+✔ page/count bind identical search and owner predicates:  (0.5536ms)
+✔ page/count bind identical search and owner predicates: Estado de pago: Parcial (0.4489ms)
+✔ page/count bind identical search and owner predicates: Etapa del pedido: Diseño (0.2156ms)
+✔ page/count bind identical search and owner predicates: Subproceso:  (0.273ms)
+✔ page/count bind identical search and owner predicates: 12 (0.2481ms)
+✔ page/count bind identical search and owner predicates: 999999999999999999999 (0.2503ms)
+✔ page/count bind identical search and owner predicates: %_\' OR 1=1 -- (0.2943ms)
+✔ page/count bind identical search and owner predicates: ñ (0.3632ms)
+✔ invalid owner never issues SQL; database failures remain failures (6.0409ms)
+✔ PIN reveal decrypts only pending data, without reading hash, salt or profile columns (9.1197ms)
+✔ acknowledge is durable and repeatable; accepted data cannot be revealed again (13.3668ms)
+✔ failed receipt never clears pending data; disabled users cannot reveal, acknowledge or rotate (2.5504ms)
+✔ status provisioning reads fresh state and preserves pending/active distinction (1.1199ms)
+✖ profile JWT/capabilities, fresh identity, roles, own-user SQL and no-store survive optimization (137.3077ms)
+✔ department is optional and accepts only the three public keys (1.7552ms)
+✔ Producción uses both actual roles in SQL and count before pagination (2.0384ms)
+✔ Cobranzas uses both actual roles in SQL and count before pagination (0.3889ms)
+✔ Ventas uses both actual roles in SQL and count before pagination (0.3168ms)
+✔ department never bypasses existing administrative authorization (1.5098ms)
+ℹ tests 433
+ℹ suites 0
+ℹ pass 415
+ℹ fail 18
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5192.2641
+
+✖ failing tests:
+
+test at src\modules\auth\service\pinRecovery.test.js:179:1
+✖ HTTP endpoints require original session and permission; removed password endpoint is absent (66.6656ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21082
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21082
+    }
+  }
+
+test at src\modules\users\service\userCreation.test.js:252:1
+✖ HTTP creation disables caching and returns PIN failures without creating a user (121.9851ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21076
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21076
+    }
+  }
+
+test at src\modules\users\service\userUpdate.test.js:211:1
+✖ PATCH updates the authenticated target and rejects unexpected request fields (83.3099ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21063
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21063
+    }
+  }
+
+test at test\historySecurity.test.js:17:1
+✖ history routes preserve JWT, fresh identity, capability/financial matrix, SQL redaction flags and safe errors (113.7684ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21066
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21066
+    }
+  }
+
+test at test\kanbanWorkflows.test.js:119:1
+✖ new precheck route keeps READ_ORDERS; mutation still requires PIN middleware (95.4033ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21065
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21065
+    }
+  }
+
+test at test\messagePerformance.test.js:120:1
+✖ new open endpoint checks READ_MESSAGES and derives mark permission server-side, not body (106.8626ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21070
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21070
+    }
+  }
+
+test at test\metricsSecurity.test.js:16:1
+✖ both metrics routes enforce real JWT, fresh active identity, capabilities, quota and period validation (134.8994ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21073
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21073
+    }
+  }
+
+test at test\orderCreationSecurity.test.js:17:1
+✖ HTTP POST preserves JWT/capability/PIN gates, authoritative source, actor, 201 receipt and duplicate 409 (86.7863ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21080
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21080
+    }
+  }
+
+test at test\paymentPerformance.test.js:138:1
+✖ all collection read routes protect customer data with the shared read capability (79.2566ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21078
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21078
+    }
+  }
+
+test at test\paymentPerformance.test.js:244:1
+✖ HTTP partial reads keep auth/capability; every payment mutation still requires a fresh valid PIN (11.4139ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21091
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21091
+    }
+  }
+
+test at test\phase1Security.test.js:91:1
+✖ real JWT signature, issuer, audience, expiry and capabilities guard the optimized message flow (218.7367ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21089
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21089
+    }
+  }
+
+test at test\phase1Security.test.js:109:1
+✖ simultaneous HTTP requests, account changes, role changes, unlink and logout do not reuse previous identities (195.7296ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21095
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21095
+    }
+  }
+
+test at test\phase1Security.test.js:121:1
+✖ HTTP message ownership and actor injection cannot bypass the validated request user (89.6927ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21102
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21102
+    }
+  }
+
+test at test\phase1Security.test.js:138:1
+✖ HTTP quota still returns 429 and isolates actors under concurrent requests (109.5995ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21105
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21105
+    }
+  }
+
+test at test\phase1Security.test.js:145:1
+✖ consumer routers keep identity and authorization gates across profile, users, production, payments, history, metrics, calendar, sales, privacy and incidents (94.7371ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21111
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21111
+    }
+  }
+
+test at test\productionCompletion.test.js:166:1
+✖ HTTP registration and completion require capability and a fresh PIN on every request (97.8522ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21083
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21083
+    }
+  }
+
+test at test\productionScheduling.test.js:82:1
+✖ direct HTTP move cannot bypass programming, permissions or PIN, and never writes on rejection (112.829ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21086
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21086
+    }
+  }
+
+test at test\profileSecurity.test.js:14:1
+✖ profile JWT/capabilities, fresh identity, roles, own-user SQL and no-store survive optimization (137.3077ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:21093
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 21093
+    }
+  }

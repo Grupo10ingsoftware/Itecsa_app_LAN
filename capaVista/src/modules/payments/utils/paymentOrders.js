@@ -59,6 +59,7 @@ export function normalizePaymentOrder(order) {
       ? order.clientRut.trim()
       : 'RUT no disponible',
     sellerEmail: null,
+    sellerName: null,
     trackedProducts: [],
     paymentStatus: normalizeStatusName(order?.paymentStatus),
     createdAt: order?.createdAt ?? null,
@@ -84,6 +85,7 @@ export function mergePaymentPreview(order, preview) {
     companyName: textOrNull(preview.companyName) ?? order.companyName,
     rut: textOrNull(preview.rut) ?? order.rut,
     sellerEmail: textOrNull(preview.sellerEmail) ?? order.sellerEmail,
+    sellerName: textOrNull(preview.sellerName) ?? order.sellerName,
     trackedProducts:
       previewProducts.length > 0 ? previewProducts : order.trackedProducts,
   }

@@ -1,0 +1,613 @@
+{
+  "pairs": [
+    {
+      "id": "pair-0",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.396,
+          "ms": 191.649,
+          "connection": 2,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.374,
+          "ms": 191.687,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 2,
+          "error": null
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 0.728,
+          "ms": 218.285,
+          "connection": 11,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.719,
+          "ms": 218.309,
+          "before": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 11,
+          "error": null
+        }
+      ],
+      "ms": 656.685
+    },
+    {
+      "id": "pair-1",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.29,
+          "ms": 219.575,
+          "connection": 7,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.273,
+          "ms": 219.609,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 7,
+          "error": null
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 0.557,
+          "ms": 220.425,
+          "connection": 9,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.548,
+          "ms": 220.44,
+          "before": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 9,
+          "error": null
+        }
+      ],
+      "ms": 660.583
+    },
+    {
+      "id": "pair-2",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.215,
+          "ms": 191.308,
+          "connection": 1,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.204,
+          "ms": 191.334,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 1,
+          "error": null
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 0.384,
+          "ms": 219.08,
+          "connection": 3,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.377,
+          "ms": 219.102,
+          "before": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 3,
+          "error": null
+        }
+      ],
+      "ms": 438.6
+    },
+    {
+      "id": "pair-3",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.198,
+          "ms": 219.036,
+          "connection": 5,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.189,
+          "ms": 219.066,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 5,
+          "error": null
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 0.332,
+          "ms": 219.286,
+          "connection": 12,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.327,
+          "ms": 219.299,
+          "before": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 12,
+          "error": null
+        }
+      ],
+      "ms": 657.351
+    },
+    {
+      "id": "pair-4",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.213,
+          "ms": 213.281,
+          "connection": 4,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.202,
+          "ms": 213.307,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 4,
+          "error": null
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 0.375,
+          "ms": 219.675,
+          "connection": 8,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.369,
+          "ms": 219.699,
+          "before": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 8,
+          "error": null
+        }
+      ],
+      "ms": 661.373
+    },
+    {
+      "id": "pair-5",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.428,
+          "ms": 191.44,
+          "connection": 2,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.416,
+          "ms": 191.472,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 2,
+          "error": null
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 0.591,
+          "ms": 218.558,
+          "connection": 11,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.585,
+          "ms": 218.579,
+          "before": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 11,
+          "error": null
+        }
+      ],
+      "ms": 437.802
+    },
+    {
+      "id": "pair-6",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.204,
+          "ms": 219.008,
+          "connection": 7,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.194,
+          "ms": 219.034,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 7,
+          "error": null
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 0.348,
+          "ms": 220.147,
+          "connection": 9,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.342,
+          "ms": 220.164,
+          "before": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 9,
+          "error": null
+        }
+      ],
+      "ms": 440.466
+    },
+    {
+      "id": "pair-7",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.183,
+          "ms": 191.334,
+          "connection": 1,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.174,
+          "ms": 191.357,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 1,
+          "error": null
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 0.365,
+          "ms": 218.982,
+          "connection": 3,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.349,
+          "ms": 219.004,
+          "before": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 3,
+          "error": null
+        }
+      ],
+      "ms": 438.338
+    },
+    {
+      "id": "pair-8",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.21,
+          "ms": 218.567,
+          "connection": 5,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.201,
+          "ms": 218.599,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 5,
+          "error": null
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 0.35,
+          "ms": 218.746,
+          "connection": 12,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.345,
+          "ms": 218.757,
+          "before": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 12,
+          "error": null
+        }
+      ],
+      "ms": 438.139
+    },
+    {
+      "id": "pair-9",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.196,
+          "ms": 213.751,
+          "connection": 4,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.186,
+          "ms": 213.79,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 4,
+          "error": null
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 0.335,
+          "ms": 219.26,
+          "connection": 8,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.329,
+          "ms": 219.272,
+          "before": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 2,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 8,
+          "error": null
+        }
+      ],
+      "ms": 439.029
+    }
+  ],
+  "pool": [
+    {
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    }
+  ],
+  "correlation": "events grouped by simultaneous pair, not individual SQL request"
+}
