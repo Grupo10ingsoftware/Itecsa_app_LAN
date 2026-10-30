@@ -109,7 +109,7 @@ export class KeycloakIdentityAdministrationService {
     try { binding = await this.repository.beginUpdate(this.management.config.issuer, subject, actorId, context.role); }
     catch (error) {
       if (error.code === 'IDENTITY_TARGET_FORBIDDEN' || error.code === 'IDENTITY_ACTOR_CHANGED') reject(error.code, 403);
-      if (error.code === 'IDENTITY_UPDATE_BUSY') reject(error.code, 409);
+      if (['IDENTITY_UPDATE_BUSY', 'IDENTITY_PROVISION_INCOMPLETE'].includes(error.code)) reject(error.code, 409);
       reject('IDENTITY_STORAGE_UNAVAILABLE', 503);
     }
     const original = { role: binding.Usuario.rol_usuario, localState: binding.Usuario.estado_usuario };
@@ -132,7 +132,9 @@ export class KeycloakIdentityAdministrationService {
         reject('IDENTITY_UPDATE_NOT_CONFIRMED');
       }
       if (await this.authorize(context, { revalidate: true }) !== actorId) reject('IDENTITY_ADMIN_FORBIDDEN', 403);
-      await this.management.setEnabled(subject, enabled);
+      // The disabled state was already written before logout. Keep the final
+      // readback even when there is no activation to perform.
+      if (enabled || verified.enabled !== false) await this.management.setEnabled(subject, enabled);
       if ((await this.management.getUser(subject)).enabled !== enabled) reject('IDENTITY_UPDATE_NOT_CONFIRMED');
       finishAttempted = true;
       await this.repository.finishUpdate(binding, localUpdate(input), actorId);
@@ -215,6 +217,7 @@ export class KeycloakIdentityAdministrationService {
   async execute(context, operation, actorId, reconcile) {
     let ownedSubject;
     try {
+      let checkpointed = false;
       let external = await this.management.findByUsername(operation.username);
       if (external && (!reconcile || external.attributes?.itecsa_provision_id?.[0] !== operation.id)) {
         reject('IDENTITY_USERNAME_EXISTS');
@@ -223,6 +226,7 @@ export class KeycloakIdentityAdministrationService {
         if (reconcile) reject('IDENTITY_EXTERNAL_OUTCOME_UNKNOWN');
         const subject = await this.management.createDisabled({ ...operation.input, operationId: operation.id });
         await this.repository.checkpoint(operation, subject);
+        checkpointed = true;
         external = await this.management.getUser(subject);
       }
       if (external?.attributes?.itecsa_provision_id?.[0] === operation.id) {
@@ -234,7 +238,7 @@ export class KeycloakIdentityAdministrationService {
       }
       if (!matchesPreparation(external, operation)
         || (operation.external_subject && operation.external_subject !== external.id)) reject('IDENTITY_EXTERNAL_OUTCOME_UNKNOWN');
-      await this.repository.checkpoint(operation, external.id);
+      if (!checkpointed) await this.repository.checkpoint(operation, external.id);
       await this.management.replaceRole(external.id, operation.input.role);
       const verified = await this.management.getUser(external.id);
       if (!matchesPreparation(verified, operation)) reject('IDENTITY_EXTERNAL_OUTCOME_UNKNOWN');
@@ -248,7 +252,16 @@ export class KeycloakIdentityAdministrationService {
       const stored = await this.repository.complete(operation, external.id, actorId, context.subject, context.role);
       await this.management.setEnabled(external.id, true);
       if (!(await this.management.getUser(external.id)).enabled) reject('IDENTITY_ACTIVATION_NOT_CONFIRMED');
-      const completed = await this.repository.finish(stored);
+      let completed;
+      try { completed = await this.repository.finish(stored); }
+      catch (error) {
+        // A transport failure can follow a successful commit. Confirm this exact
+        // revision and binding before compensating or returning a credential.
+        const confirmed = await this.repository.operation(stored.id);
+        if (confirmed?.id !== stored.id || confirmed.issuer !== stored.issuer || confirmed.state !== 'created' || confirmed.revision !== stored.revision
+          || confirmed.external_subject !== stored.external_subject || confirmed.local_user_id !== stored.local_user_id) throw error;
+        completed = confirmed;
+      }
       return { ...result(completed), ...(temporaryPassword ? { temporaryPassword, mustChangePassword: true } : {}) };
     } catch (error) {
       let disableFailed = false;

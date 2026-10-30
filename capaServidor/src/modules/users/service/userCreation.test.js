@@ -131,6 +131,89 @@ test('reconciliation after storage failure never regenerates or reveals a creden
   assert.equal(f.state().passwordSetCount, 1);
 });
 
+test('a lost finish response confirms its committed journal instead of disabling the created account', async () => {
+  const f = fixture();
+  const finish = f.repository.finish;
+  f.repository.finish = async operation => { await finish(operation); throw Error('lost response after commit'); };
+  const response = await f.service.prepare(context, input);
+  assert.equal(response.outcome, 'user_created');
+  assert.equal(response.temporaryPassword, f.state().password);
+  assert.equal(f.state().external.enabled, true);
+  assert.equal(f.events.includes('disable'), false);
+  assert.equal(f.state().passwordSetCount, 1);
+});
+
+test('creation persists the external checkpoint once before provisioning roles', async () => {
+  const f = fixture();
+  const checkpoint = f.repository.checkpoint;
+  let checkpoints = 0;
+  f.repository.checkpoint = async (...args) => { checkpoints++; await checkpoint(...args); };
+  assert.equal((await f.service.prepare(context, input)).outcome, 'user_created');
+  assert.equal(checkpoints, 1);
+});
+
+test('two simultaneous preparations claim one operation and create only one external identity', async () => {
+  const f = fixture(); let creations = 0;
+  let release, started;
+  const gate = new Promise(resolve => { release = resolve; });
+  const entered = new Promise(resolve => { started = resolve; });
+  f.repository.acquire = async snapshot => {
+    const operation = f.state().operation;
+    if (operation.state !== 'pending' || operation.revision !== snapshot.revision) return null;
+    operation.state = 'running'; operation.revision++;
+    return { ...operation };
+  };
+  const create = f.management.createDisabled;
+  f.management.createDisabled = async values => { creations++; started(); await gate; return create(values); };
+  const first = f.service.prepare(context, input);
+  await entered;
+  const second = await f.service.prepare(context, input);
+  release();
+  const responses = [await first, second];
+  assert.equal(creations, 1);
+  assert.equal(responses.filter(response => response.outcome === 'user_created').length, 1);
+  assert.equal(responses.filter(response => response.temporaryPassword).length, 1);
+  assert.ok(responses.every(response => response.operationId === operationId));
+});
+
+test('reconciliation reuses an unchanged local account and preserves its binding and audit', async () => {
+  let audits = 0;
+  const tx = {
+    $queryRaw: async () => [{ subject: context.subject, provider: 'keycloak', issuer,
+      rol_usuario: context.role, estado_usuario: 'Activo' }],
+    usuario: { findFirst: async ({ where }) => {
+      assert.equal(where.ExternalIdentity.is.username, input.username);
+      return { id_usuario: 2, rol_usuario: input.role, estado_usuario: 'Pendiente', correo_usuario: input.email,
+        rut_usuario: input.rut, nombre_usuario: input.firstName, apellido_usuario: input.lastName };
+    } },
+    securityAuditEvent: { createMany: async () => { audits++; return { count: 1 }; } },
+    identityProvisionOperation: { updateMany: async () => ({ count: 1 }), findUnique: async () => ({ state: 'running', local_user_id: 2 }) },
+  };
+  const repository = new KeycloakIdentityRepository({ prisma: { $transaction: fn => fn(tx) } });
+  const response = await repository.complete({ id: operationId, issuer, username: input.username, input, revision: 1, local_user_id: 2 },
+    'new-user', 1, context.subject, context.role);
+  assert.equal(response.local_user_id, 2);
+  assert.equal(audits, 1);
+});
+
+for (const patch of [{ rol_usuario: ROLES.COBRANZAS }, { estado_usuario: 'Desvinculado' },
+  { correo_usuario: 'changed@example.test' }, { nombre_usuario: 'Otro' }, { apellido_usuario: 'Otro' }, { rut_usuario: 'other' }]) {
+  test(`reconciliation rejects changed local ${Object.keys(patch)[0]} before audit or activation`, async () => {
+    const local = { id_usuario: 2, rol_usuario: input.role, estado_usuario: 'Pendiente',
+      correo_usuario: input.email, nombre_usuario: input.firstName, apellido_usuario: input.lastName,
+      rut_usuario: input.rut, ...patch };
+    const tx = {
+      $queryRaw: async () => [{ subject: context.subject, provider: 'keycloak', issuer,
+        rol_usuario: context.role, estado_usuario: 'Activo' }],
+      usuario: { findFirst: async () => local },
+      securityAuditEvent: { createMany: () => assert.fail('must not commit changed identity') },
+    };
+    const repository = new KeycloakIdentityRepository({ prisma: { $transaction: fn => fn(tx) } });
+    await assert.rejects(repository.complete({ id: operationId, issuer, input, revision: 1, local_user_id: 2 },
+      'new-user', 1, context.subject, context.role), /IDENTITY_BINDING_CONFLICT/);
+  });
+}
+
 const env = { AUTH_PROVIDER: 'keycloak', APP_ENV: 'test', KEYCLOAK_ISSUER: issuer,
   KEYCLOAK_ROLE_CLIENT_ID: 'roles', KEYCLOAK_ADMIN_CLIENT_ID: 'admin', KEYCLOAK_ADMIN_CLIENT_SECRET: 'test-only' };
 
@@ -211,9 +294,9 @@ test('local persistence writes both Keycloak identifier and external binding ins
   const tx = {
     $queryRaw: async () => [{ subject: context.subject, provider: 'keycloak', issuer,
       rol_usuario: context.role, estado_usuario: 'Activo' }],
-    usuario: { create: async ({ data }) => { user = data; return { id_usuario: 2 }; } },
-    externalIdentity: { create: async ({ data }) => { binding = data; } },
-    securityAuditEvent: { create: async () => ({}) },
+    usuario: { create: async ({ data, select }) => { assert.deepEqual(select, { id_usuario: true }); user = data; return { id_usuario: 2 }; } },
+    externalIdentity: { createMany: async ({ data }) => { binding = data[0]; return { count: 1 }; } },
+    securityAuditEvent: { createMany: async () => ({ count: 1 }) },
     identityProvisionOperation: { updateMany: async () => ({ count: 1 }), findUnique: async () => ({ state: 'running' }) },
   };
   let transactions = 0;
@@ -225,4 +308,63 @@ test('local persistence writes both Keycloak identifier and external binding ins
   assert.equal(binding.user_id, 2);
   assert.equal(user.rut_usuario, input.rut);
   assert.equal(user.estado_usuario, 'Pendiente');
+});
+
+test('journal acquisition returns only the revision acknowledged by its conditional write, without rereading', async () => {
+  const operation = { id: operationId, revision: 3, state: 'pending', issuer, input, local_user_id: null, last_error: 'previous' };
+  let writes = 0;
+  const repository = new KeycloakIdentityRepository({ prisma: { identityProvisionOperation: {
+    updateMany: async ({ where }) => {
+      assert.equal(where.revision, 3);
+      assert.equal(where.state, 'pending');
+      return { count: ++writes === 1 ? 1 : 0 };
+    },
+    findUnique: () => assert.fail('no journal reread needed after successful CAS'),
+  } } });
+  const acquired = await repository.acquire(operation, false);
+  assert.deepEqual(acquired, { ...operation, revision: 4, state: 'running', last_error: null });
+  assert.equal(await repository.acquire(operation, false), null);
+  assert.equal(operation.revision, 3);
+});
+
+test('journal completion does not report success until transaction commit and needs no row reread', async () => {
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  let returned = false;
+  const operation = { id: operationId, issuer, revision: 4, state: 'running', external_subject: 'target', local_user_id: 2 };
+  const repository = new KeycloakIdentityRepository({ prisma: { $transaction: async fn => {
+    const value = await fn({ identityProvisionOperation: {
+      updateMany: async ({ where }) => { assert.equal(where.state, 'running'); assert.equal(where.revision, 4); return { count: 1 }; },
+      findUnique: () => assert.fail('no journal reread inside final transaction'),
+    } });
+    await gate;
+    return value;
+  } } });
+  const pending = repository.finish(operation).then(value => { returned = true; return value; });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(returned, false);
+  release();
+  assert.deepEqual(await pending, { ...operation, state: 'created' });
+  const rejected = new KeycloakIdentityRepository({ prisma: { $transaction: async fn => {
+    await fn({ identityProvisionOperation: { updateMany: async () => ({ count: 1 }) } });
+    throw Error('commit failed');
+  } } });
+  await assert.rejects(rejected.finish(operation), /commit failed/);
+});
+
+test('journal insert keeps unique conflict replay and never ignores an unconfirmed insert', async () => {
+  let inserted;
+  const prior = { id: operationId, issuer, username: input.username, state: 'created', payload_digest: 'digest' };
+  const model = { createMany: async options => { inserted = options; return { count: 1 }; },
+    findUnique: async ({ where }) => { assert.deepEqual(where.issuer_username, { issuer, username: input.username }); return prior; } };
+  const repository = new KeycloakIdentityRepository({ prisma: { identityProvisionOperation: model } });
+  const claimed = await repository.claim({ issuer, input, digest: 'digest', actorId: 1 });
+  assert.equal(claimed.state, 'pending');
+  assert.equal(claimed.revision, 0);
+  assert.equal(inserted.skipDuplicates, undefined);
+  assert.equal(inserted.data[0].payload_digest, 'digest');
+  model.createMany = async () => { throw { code: 'P2002' }; };
+  assert.deepEqual(await repository.claim({ issuer, input, digest: 'digest', actorId: 1 }), prior);
+  model.createMany = async () => ({ count: 0 });
+  await assert.rejects(repository.claim({ issuer, input, digest: 'digest', actorId: 1 }), /IDENTITY_STORAGE_NOT_CONFIRMED/);
 });

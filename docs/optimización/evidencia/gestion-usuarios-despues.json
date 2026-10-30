@@ -1,0 +1,4428 @@
+{
+  "run": "gestion-usuarios",
+  "reference": "887a9c0-final-working-tree",
+  "variant": "after",
+  "capturedAt": "2026-10-30T05:55:14.108Z",
+  "node": "v24.19.0",
+  "environment": "SYNTHETIC / real administration+management services / fake fetch and DB+PIN / 5ms per IO / fresh cold fixture each sample",
+  "excludes": [
+    "real network",
+    "MySQL",
+    "real PIN hashing",
+    "real Keycloak",
+    "HTTP middleware",
+    "UI/render"
+  ],
+  "samples": {
+    "inspect_after": {
+      "n": 30,
+      "minMs": 61.239,
+      "medianMs": 62.326,
+      "p95Ms": 63.864,
+      "meanMs": 62.937,
+      "maxMs": 79.937,
+      "values": [
+        {
+          "ms": 79.937,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.803,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.857,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.331,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.37,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 61.239,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.192,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.938,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 63.015,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 61.996,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.978,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.339,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.249,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.602,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 61.802,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 61.719,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.179,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 61.976,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.174,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.32,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.309,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 61.982,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 63.864,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 61.294,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.864,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.479,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 61.725,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.089,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.915,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 62.585,
+          "actorReads": 0,
+          "repositoryCalls": 1,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        }
+      ]
+    },
+    "movements_after": {
+      "n": 30,
+      "minMs": 76.629,
+      "medianMs": 77.623,
+      "p95Ms": 78.97,
+      "meanMs": 77.791,
+      "maxMs": 80.187,
+      "values": [
+        {
+          "ms": 76.975,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.787,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 78.205,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 78.416,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 76.629,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 78.112,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.582,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.357,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 80.187,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 76.78,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 76.788,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.375,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 78.882,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.028,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 78.97,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.532,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.49,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 78.288,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.072,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 78.25,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.585,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.504,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.66,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 78.092,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 78.376,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.773,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 78.077,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.474,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 77.214,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        },
+        {
+          "ms": 78.256,
+          "actorReads": 0,
+          "repositoryCalls": 2,
+          "checkpoints": 0,
+          "httpCalls": 4,
+          "calls": {
+            "POST token": 1,
+            "GET user": 1,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1
+          }
+        }
+      ]
+    },
+    "create_after": {
+      "n": 30,
+      "minMs": 345.266,
+      "medianMs": 358.976,
+      "p95Ms": 361.647,
+      "meanMs": 358.755,
+      "maxMs": 362.016,
+      "values": [
+        {
+          "ms": 359.707,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 359.436,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 358.44,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 359.688,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 360.793,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 358.589,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 359.032,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 359.948,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 358.472,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 358.891,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 345.266,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 358.802,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 361.543,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 359.46,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 361.647,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 359.421,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 359.674,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 361.179,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 362.016,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 358.661,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 356.371,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 356.022,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 361.606,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 358.371,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 356.393,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 360.856,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 357.799,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 358.167,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 358.921,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 357.465,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 17,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "POST users": 1,
+            "GET user": 5,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "PUT password": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        }
+      ]
+    },
+    "reconcile_after": {
+      "n": 30,
+      "minMs": 308.779,
+      "medianMs": 311.128,
+      "p95Ms": 313.465,
+      "meanMs": 311.435,
+      "maxMs": 313.588,
+      "values": [
+        {
+          "ms": 310.375,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 309.935,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 311.017,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 311.012,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 311.924,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 308.965,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 309.89,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 311.239,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 311.631,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 313.21,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 310.529,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 309.975,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 313.465,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 312.492,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 313.096,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 312.85,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 312.15,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 311.31,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 313.588,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 310.73,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 312.579,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 313.414,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 310.521,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 310.51,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 308.779,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 310.975,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 309.95,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 313.425,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 310.895,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 312.626,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 14,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "POST roleMapping": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        }
+      ]
+    },
+    "reconcile-assigned_after": {
+      "n": 30,
+      "minMs": 293.895,
+      "medianMs": 296.19,
+      "p95Ms": 299.067,
+      "meanMs": 296.4,
+      "maxMs": 299.384,
+      "values": [
+        {
+          "ms": 296.925,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 296.002,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 294.714,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 295.402,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 294.896,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 297.42,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 298.243,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 295.842,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 295.685,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 294.587,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 294.528,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 298.011,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 296.049,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 295.929,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 296.576,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 295.225,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 296.331,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 299.067,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 295.481,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 297.25,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 296.376,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 298.33,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 297.005,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 297.39,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 298.539,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 293.895,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 299.384,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 294.745,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 295.759,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        },
+        {
+          "ms": 296.405,
+          "actorReads": 3,
+          "repositoryCalls": 8,
+          "checkpoints": 1,
+          "httpCalls": 13,
+          "calls": {
+            "POST token": 1,
+            "GET users": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 3,
+            "GET roleRepresentation": 1,
+            "GET credentialMetadata": 1,
+            "PUT user": 1
+          }
+        }
+      ]
+    },
+    "update-name_after": {
+      "n": 30,
+      "minMs": 230.312,
+      "medianMs": 234.226,
+      "p95Ms": 236.187,
+      "meanMs": 234.381,
+      "maxMs": 238.414,
+      "values": [
+        {
+          "ms": 230.312,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 234.92,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 235.797,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 235.511,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 234.03,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 232.973,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 233.808,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 233.937,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 233.843,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 233.798,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 233.099,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 233.979,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 234.566,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 233.362,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 233.698,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 235.098,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 234.166,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 235.352,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 235.04,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 233.901,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 236.187,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 235.05,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 234.917,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 234.542,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 235.55,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 235.38,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 238.414,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 232.968,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 234.287,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 232.949,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 10,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 3,
+            "POST logout": 1
+          }
+        }
+      ]
+    },
+    "update-role_after": {
+      "n": 30,
+      "minMs": 293.23,
+      "medianMs": 296.158,
+      "p95Ms": 301.075,
+      "meanMs": 296.982,
+      "maxMs": 320.761,
+      "values": [
+        {
+          "ms": 296.741,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 320.761,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 298.593,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 295.669,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 293.23,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 295.646,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 296.162,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 296.983,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 296.576,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 295.492,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 296.815,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 295.566,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 296.055,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 296.153,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 296.887,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 296.898,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 297.006,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 294.912,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 294.885,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 295.225,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 296.822,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 297.268,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 295.658,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 294.927,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 295.057,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 301.075,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 294.148,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 296.274,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 296.928,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        },
+        {
+          "ms": 295.058,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 16,
+          "calls": {
+            "POST token": 1,
+            "GET user": 4,
+            "GET clientUuid": 1,
+            "GET roleMapping": 4,
+            "PUT user": 2,
+            "POST logout": 1,
+            "GET roleRepresentation": 1,
+            "DELETE roleMapping": 1,
+            "POST roleMapping": 1
+          }
+        }
+      ]
+    },
+    "update-state_after": {
+      "n": 30,
+      "minMs": 197.246,
+      "medianMs": 202.662,
+      "p95Ms": 204.281,
+      "meanMs": 202.668,
+      "maxMs": 204.65,
+      "values": [
+        {
+          "ms": 201.867,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 203.109,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 203.681,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.102,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.903,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.764,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.603,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.768,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 201.799,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 201.671,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 203.766,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.067,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 201.909,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 203.914,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.143,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 204.65,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 204.281,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.78,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 204.042,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.092,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 203.99,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.605,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.393,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 201.719,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.72,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.23,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 203.524,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 204.162,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 202.542,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 197.246,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 8,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 1,
+            "POST logout": 1
+          }
+        }
+      ]
+    },
+    "update-noop_after": {
+      "n": 30,
+      "minMs": 206.126,
+      "medianMs": 218.835,
+      "p95Ms": 222.741,
+      "meanMs": 218.449,
+      "maxMs": 224.35,
+      "values": [
+        {
+          "ms": 220.315,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 220.732,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 218.172,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 220.714,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 216.356,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 220.542,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 219.242,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 218.373,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 219.126,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 220.241,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 219.634,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 219.281,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 222.741,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 206.126,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 216.192,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 218.639,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 224.35,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 217.58,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 216.713,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 219.626,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 216.121,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 218.504,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 219.325,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 217.668,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 216.049,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 218.003,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 216.145,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 217.083,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 219.031,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        },
+        {
+          "ms": 220.854,
+          "actorReads": 3,
+          "repositoryCalls": 5,
+          "checkpoints": 0,
+          "httpCalls": 9,
+          "calls": {
+            "POST token": 1,
+            "GET user": 3,
+            "GET clientUuid": 1,
+            "GET roleMapping": 1,
+            "PUT user": 2,
+            "POST logout": 1
+          }
+        }
+      ]
+    }
+  }
+}
