@@ -1,7 +1,9 @@
 import { useAuth } from "../../../hooks/useAuth";
 import { useEffect, useRef, useState } from 'react'
 import { getRoleLabel, manageableRoles } from '../../../config/roles'
-import PinModal, { PinField, PinError } from '../../../shared/components/pin/PinModal'
+import PinModal from '../../../shared/components/pin/PinModal'
+import PinAuthorizationModal from '../../../shared/components/pin/PinAuthorizationModal'
+import { useToast } from '../../../shared/notifications/useToast'
 import pinStyles from '../../../shared/components/pin/PinModal.module.css'
 import { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import editStyles from './UserEditModal.module.css'
@@ -28,9 +30,8 @@ export default function UserEditModal(props) {
 function UserEditForm({ isCurrentUser = false, onClose, onSave, onUnlink, onCredentials, user, readOnly = false }) {
   const [values, setValues] = useState(() => (user ? createFormState(user) : null))
   const { user: actor, provider } = useAuth()
-  const [pin, setPin] = useState('')
-  const [pinError, setPinError] = useState('')
-  const [saveError, setSaveError] = useState('')
+  const [authorization, setAuthorization] = useState(null)
+  const notify = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const firstInputRef = useRef(null)
   const pending = useRef(false)
@@ -39,46 +40,54 @@ function UserEditForm({ isCurrentUser = false, onClose, onSave, onUnlink, onCred
 
   function close() {
     if (pending.current) return
-    setPin('')
     onClose()
   }
 
   const canSubmit = Object.values(values).every(value => String(value).trim().length > 0)
-    && /^\d{6}$/.test(pin) && !(isCurrentUser && values.rolUsuario !== user.rolUsuario)
+    && !(isCurrentUser && values.rolUsuario !== user.rolUsuario)
 
   function handleChange({ target: { name, value } }) {
     setValues(current => ({ ...current, [name]: value }))
   }
 
-  async function handleSubmit(event) {
+  function normalized(form) {
+    return { ...form, nombreUsuario: form.nombreUsuario.trim(), apellidoUsuario: form.apellidoUsuario.trim(),
+      correoUsuario: form.correoUsuario.trim().toLowerCase() }
+  }
+
+  function handleSubmit(event) {
     event.preventDefault()
-    if (readOnly || pending.current) return
-    const trimmedPin = pin.trim()
-    setPin('')
+    if (readOnly || pending.current || authorization) return
     const errors = [...validatePersonName(values.nombreUsuario, 'El nombre'),
       ...validatePersonName(values.apellidoUsuario, 'El apellido'), ...validateEmail(values.correoUsuario)]
     if (!manageableRoles(actor?.rolUsuario).includes(values.rolUsuario)) errors.push('No puedes asignar ese rol.')
-    if (errors.length) { setSaveError(errors[0]); return }
-    if (!/^\d{6}$/.test(trimmedPin)) { setPinError('Ingrese un PIN valido de 6 digitos.'); return }
-    if (isCurrentUser && values.rolUsuario !== (user.rolUsuario ?? '')) return
+    if (errors.length) { notify.error(errors[0]); return }
+    if (!canSubmit) return
+    const changes = normalized(values)
+    const original = normalized(createFormState(user))
+    if (!Object.keys(changes).some(key => changes[key] !== original[key])) return
+    setAuthorization(changes)
+  }
+
+  async function authorize({ pin }) {
+    if (pending.current) return
     pending.current = true
     setIsSubmitting(true)
-    setSaveError('')
     try {
-      await onSave({ ...user, nombreUsuario: values.nombreUsuario.trim(), apellidoUsuario: values.apellidoUsuario.trim(),
-        correoUsuario: values.correoUsuario.trim().toLowerCase(), rolUsuario: values.rolUsuario,
-        estadoUsuario: values.estadoUsuario, pin: trimmedPin })
+      return await onSave({ ...user, ...authorization, pin })
     } catch (error) {
-      if (active.current) {
-        const message = error?.message || 'No fue posible guardar los cambios. Intenta nuevamente.'
-        if (error?.cause?.payload?.code?.startsWith('PIN_')) setPinError(message)
-        else setSaveError(message)
-      }
+      if (active.current) notify.error(error?.message || 'No fue posible guardar los cambios. Intenta nuevamente.')
     } finally {
       pending.current = false
       if (active.current) setIsSubmitting(false)
     }
   }
+
+  if (authorization) return <PinAuthorizationModal title="Autorizar cambios de usuario"
+    description="Ingresa tu PIN personal para guardar los cambios."
+    contextKey={user.idUsuarioAutenticacionExterna ?? user.id}
+    onConfirm={authorize} onCancel={() => setAuthorization(null)} isSubmitting={isSubmitting}
+    feedbackMode="toast" disableUntilValid confirmLabel="Guardar cambios" />
 
   return <PinModal title={readOnly ? 'Consultar usuario' : 'Editar usuario'}
     description={readOnly ? 'Consulta la identidad. La edicion y las acciones de cuenta aun no estan habilitadas.' : 'Modifica la informacion del usuario en el sistema.'}
@@ -86,10 +95,10 @@ function UserEditForm({ isCurrentUser = false, onClose, onSave, onUnlink, onCred
     actions={<>
       {!readOnly && provider === 'keycloak' && onCredentials && <button type="button" className={pinStyles.secondary}
         disabled={isSubmitting || isCurrentUser || !['Activo', 'Vinculado', 'Pendiente'].includes(user.estadoUsuario)}
-        onClick={() => { setPin(''); onCredentials(user) }}>Establecer credenciales</button>}
+        onClick={() => { onCredentials(user) }}>Establecer credenciales</button>}
       {!readOnly && onUnlink && <button type="button" className={pinStyles.secondary}
         disabled={isSubmitting || isCurrentUser || user.estadoUsuario === 'Desvinculado'}
-        onClick={() => { setPin(''); onUnlink(user) }}>Desvincular</button>}
+        onClick={() => { onUnlink(user) }}>Desvincular</button>}
       <button type="button" className={pinStyles.secondary} disabled={isSubmitting} onClick={close}>{readOnly ? 'Cerrar' : 'Cancelar'}</button>
       {!readOnly && <button className={pinStyles.primary} disabled={isSubmitting || !canSubmit} type="submit" aria-busy={isSubmitting}>
         <LoadingAction busy={isSubmitting} surface="light" context="Guardar cambios">Guardar cambios</LoadingAction>
@@ -200,8 +209,5 @@ function UserEditForm({ isCurrentUser = false, onClose, onSave, onUnlink, onCred
             </label>
 
           </div>
-          {!readOnly && <PinField label="PIN de autorizacion" value={pin} disabled={isSubmitting} error={pinError}
-            onChange={value => { setPin(value); setPinError('') }} />}
-          <PinError>{saveError}</PinError>
     </PinModal>
 }

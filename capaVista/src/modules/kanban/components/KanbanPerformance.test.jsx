@@ -6,7 +6,10 @@ import { createKanbanApi } from '../api/kanbanApi'
 const state = vi.hoisted(() => ({ api: null, drag: null, success: vi.fn(), error: vi.fn() }))
 vi.mock('../hooks/useKanbanApi', () => ({ useKanbanApi: () => state.api }))
 vi.mock('../../../hooks/useAuth', () => ({ useAuth: () => ({ hasPermission: () => true }) }))
-vi.mock('../../../shared/notifications/useToast', () => ({ useToast: () => ({ success: state.success, error: state.error, warning: vi.fn() }) }))
+vi.mock('../../../shared/notifications/useToast', () => {
+  const notify = { success: state.success, error: state.error, warning: vi.fn() }
+  return { useToast: () => notify }
+})
 vi.mock('@dnd-kit/react', () => ({ DragDropProvider: ({ children, onDragEnd }) => { state.drag = onDragEnd; return children } }))
 vi.mock('./DroppableColumn.jsx', () => ({ DroppableColumn: ({ children }) => <section>{children}</section> }))
 vi.mock('./KanbanCard', () => ({ default: props => <article data-testid={'card-' + props.id} data-step={props.generalStepId}>
@@ -41,7 +44,8 @@ it('renders confirmed cards without waiting for a slow catalog, retaining fallba
   render(<KanbanColumn filters={{}} />)
   expect(await screen.findByText('NV-1')).toBeTruthy()
   await act(async () => { statuses.reject(Error('unavailable')) })
-  expect(screen.getByText('NV-1')).toBeTruthy(); expect(screen.getByRole('alert').textContent).toContain('estados')
+  expect(screen.getByText('NV-1')).toBeTruthy()
+  expect(state.error).toHaveBeenCalledExactlyOnceWith('No fue posible cargar los estados del Kanban.')
 })
 it('cancels obsolete list/page requests and discards their late data', async () => {
   const more = deferred(), next = deferred()

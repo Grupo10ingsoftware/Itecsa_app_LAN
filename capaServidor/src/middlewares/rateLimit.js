@@ -46,9 +46,10 @@ export function createPinRecoveryRateLimit({ throttle = securityThrottle } = {})
         rules(req) {
             const subject = req.auth?.payload?.sub;
             if (!subject) throw new Error('La cuota PIN requiere una identidad autenticada.');
+            const phase = req.path?.endsWith('/finish') ? '-finish' : '';
             return [
-                { scope: 'pin-recovery-ip', subject: clientAddress(req), limit: 20, windowMs: 15 * 60_000 },
-                { scope: 'pin-recovery-account', subject, limit: 5, windowMs: 15 * 60_000 },
+                { scope: 'pin-recovery-ip' + phase, subject: clientAddress(req), limit: 20, windowMs: 15 * 60_000 },
+                { scope: 'pin-recovery-account' + phase, subject, limit: 5, windowMs: 15 * 60_000 },
             ];
         },
     });

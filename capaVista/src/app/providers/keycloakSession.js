@@ -28,7 +28,7 @@ export function createKeycloakSession(keycloak, browser, onRedirect = () => {}, 
       || now() - lastVerificationAt >= SESSION_REVALIDATION_INTERVAL_MS
     if (revalidate) { lastVerificationAt = now(); verifiedAuthorization = authorization }
     notify({ isLoading: resuming, isAuthenticated: true, error: null, sessionKey: generation, verificationKey: snapshot.verificationKey + Number(revalidate),
-      user: { sub: claims.sub, name: claims.name || claims.preferred_username,
+      user: { sub: claims.sub, username: typeof claims.preferred_username === 'string' ? claims.preferred_username : undefined, name: claims.name || claims.preferred_username,
         ...(typeof claims.email === 'string' && claims.email ? { email: claims.email } : {}), picture: claims.picture } })
   }
   const getAccessToken = async (minValidity = 30) => {

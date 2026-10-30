@@ -91,3 +91,14 @@ for (const valid of [true, false]) {
         else await assert.rejects(f.service.resume(f.req, f.res), { code: 'PIN_RECOVERY_INVALID' });
     });
 }
+
+test('bridge diagnostics distinguish missing cookie and missing context without recording secrets', async t => {
+    const f = fixture(t);
+    await assert.rejects(f.service.resume({ ...f.req, headers: {} }, f.res));
+    assert.equal(f.logs.at(-1)[1].code, 'BRIDGE_COOKIE_MISSING');
+    f.advance(600001);
+    await assert.rejects(f.service.resume(f.req, f.res));
+    assert.equal(f.logs.at(-1)[1].code, 'BRIDGE_MISSING_OR_EXPIRED');
+    const serialized = JSON.stringify(f.logs);
+    for (const secret of [state, f.cookies[0].value, 'original-refresh']) assert.ok(!serialized.includes(secret));
+});

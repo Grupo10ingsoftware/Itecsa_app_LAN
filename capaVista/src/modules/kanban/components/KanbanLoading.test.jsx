@@ -92,7 +92,7 @@ describe('carga de Kanban y acciones locales', () => {
     api.getOrders.mockRejectedValue(Error('fixture'))
     render(<KanbanColumn filters={{}} />)
     await waitFor(() => expect(screen.queryByRole('status')).toBeNull())
-    expect(screen.getByText('No fue posible cargar las ordenes.')).toBeTruthy()
+    expect(screen.getByText('No fue posible cargar las órdenes.').closest('[data-toast-viewport]')).toBeTruthy()
   })
   it('muestra la validación previa al traslado e impide duplicarla mientras espera', async () => {
     const validation = deferred()

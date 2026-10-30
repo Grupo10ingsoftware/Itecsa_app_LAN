@@ -27,7 +27,7 @@ function mountList() {
 it.each([
  ['Todos', ''], ['Confirmación de Pago', 'Confirmación de Pago'],
  ['Listo para producción', 'Listo para Producción'], ['En producción', 'En producción'],
- ['Listo para despacho', 'Listo para Entrega'], ['Finalizado', 'Terminado'], ['Cancelado', 'Cancelado'],
+ ['Listo para entrega', 'Listo para Entrega'], ['Finalizado', 'Terminado'], ['Cancelado', 'Cancelado'],
 ])('applies combined search, creation dates and the existing %s state, then clears all criteria', async (label, status) => {
  session.api={listOrders:vi.fn().mockResolvedValue(list())};mountList();await screen.findByText('SYN-1')
  fireEvent.change(screen.getByRole('searchbox'),{target:{value:'  NV-001  '}})

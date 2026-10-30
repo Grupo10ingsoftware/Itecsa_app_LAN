@@ -53,12 +53,18 @@ export class PinRecoveryNavigationService {
         const name = this.cookieName(req.body?.state), entry = this.entries.get(name);
         const cookie = String(req.headers.cookie ?? '').split(';').map(part => part.trim())
             .find(part => part.startsWith(name + '='))?.slice(name.length + 1);
-        if (!entry || !cookie || cookie.length > 100 || !timingSafeEqual(hash(cookie), entry.secretHash)) throw invalid();
+        if (!entry || !cookie || cookie.length > 100 || !timingSafeEqual(hash(cookie), entry.secretHash)) {
+            this.logger.info('pin_recovery.session_resumed', { outcome: 'denied',
+                code: !entry ? 'BRIDGE_MISSING_OR_EXPIRED' : !cookie ? 'BRIDGE_COOKIE_MISSING' : 'BRIDGE_COOKIE_INVALID' });
+            throw invalid();
+        }
         // Consume synchronously before contacting Keycloak: parallel resumptions cannot restore twice.
         this.entries.delete(name);
         res.clearCookie(name, this.cookieOptions());
+        let stage = 'CONFIGURATION';
         try {
             const config = pinRecoveryConfiguration(this.env);
+            stage = 'TOKEN_REFRESH';
             const response = await this.fetchImpl(config.tokenEndpoint, {
                 method: 'POST', redirect: 'error', signal: AbortSignal.timeout(8000),
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -66,6 +72,7 @@ export class PinRecoveryNavigationService {
                     refresh_token: entry.refreshToken }),
             });
             if (!response.ok) throw invalid();
+            stage = 'TOKEN_RESPONSE';
             const tokens = await response.json();
             if (typeof tokens.access_token !== 'string' || typeof tokens.refresh_token !== 'string') throw invalid();
             let key = this.resolveKey;
@@ -73,9 +80,12 @@ export class PinRecoveryNavigationService {
                 if (!this.keys.has(config.jwksUri)) this.keys.set(config.jwksUri, createRemoteJWKSet(new URL(config.jwksUri), { timeoutDuration: 5000 }));
                 key = this.keys.get(config.jwksUri);
             }
+            stage = 'TOKEN_VALIDATION';
             const { payload } = await jwtVerify(tokens.access_token, key, { issuer: config.issuer, audience: config.audience,
                 algorithms: ['RS256'], requiredClaims: ['sub', 'sid', 'azp', 'exp'], currentDate: new Date(this.now()) });
+            stage = 'ORIGINAL_SESSION_MISMATCH';
             if (payload.sub !== entry.sub || payload.sid !== entry.sid || payload.azp !== this.env.KEYCLOAK_CLIENT_ID || payload.typ !== 'Bearer') throw invalid();
+            stage = 'ID_TOKEN_VALIDATION';
             if (tokens.id_token !== undefined) {
                 const { payload: identity } = await jwtVerify(tokens.id_token, key, { issuer: config.issuer,
                     audience: this.env.KEYCLOAK_CLIENT_ID, algorithms: ['RS256'], requiredClaims: ['sub', 'exp'], currentDate: new Date(this.now()) });
@@ -85,7 +95,7 @@ export class PinRecoveryNavigationService {
             return { token: tokens.access_token, refreshToken: tokens.refresh_token,
                 ...(tokens.id_token ? { idToken: tokens.id_token } : {}), subject: entry.sub, sid: entry.sid };
         } catch {
-            this.logger.info('pin_recovery.session_resumed', { actorId: entry.sub, outcome: 'denied' });
+            this.logger.info('pin_recovery.session_resumed', { actorId: entry.sub, outcome: 'denied', code: stage });
             throw invalid();
         }
     }

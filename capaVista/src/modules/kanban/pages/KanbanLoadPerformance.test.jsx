@@ -5,7 +5,10 @@ import KanbanBoardPage from './KanbanBoardPage'
 const state = vi.hoisted(() => ({ api: null, allowed: true, success: vi.fn(), error: vi.fn() }))
 vi.mock('../hooks/useKanbanApi', () => ({ useKanbanApi: () => state.api }))
 vi.mock('../../../hooks/useAuth', () => ({ useAuth: () => ({ hasPermission: () => state.allowed }) }))
-vi.mock('../../../shared/notifications/useToast', () => ({ useToast: () => ({ success: state.success, error: state.error }) }))
+vi.mock('../../../shared/notifications/useToast', () => {
+  const notify = { success: state.success, error: state.error }
+  return { useToast: () => notify }
+})
 vi.mock('../components/KanbanColumn', () => ({ default: props => <output data-testid="refresh">{props.refreshKey}</output> }))
 const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no }); return { promise, resolve, reject } }
 const load = (dailyQuantity = 100) => ({ date: '2026-10-27', capacity: 1200, percentage: 10, lanyardsInProduction: dailyQuantity,

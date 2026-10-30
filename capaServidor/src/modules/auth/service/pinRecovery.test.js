@@ -6,6 +6,7 @@ import { PinRecoveryService } from './pinRecovery.service.js';
 import { PinService } from './pin.service.js';
 import { PinRecoveryNavigationService } from './pinRecoveryNavigation.service.js';
 import { createPinRecoveryHandler } from '../controller/auth.controller.js';
+import { MemoryThrottleService } from '../../security/service/securityThrottle.service.js';
 import { createPinRecoveryRateLimit } from '../../../middlewares/rateLimit.js';
 import { createSafeLogger } from '../../../shared/safeLogger.js';
 import { createAuthRouter } from '../routes/auth.routes.js';
@@ -268,4 +269,25 @@ test('OPT08: finish waits for transaction commit; cancellation/replay cannot rep
     await assert.rejects(f.finish(), rejected); assert.equal(writes, 1);
     releaseCommit(); assert.deepEqual(await result, { pinStatus: 'pending_acknowledgement' });
     assert(user.pin_hash.startsWith('scrypt$v2$N=32768,r=8,p=3$')); assert.equal(user.pin_accepted_at, null);
+});
+
+test('five complete recovery attempts fit the quota; the sixth start and finish remain blocked', async () => {
+    const middleware = createPinRecoveryRateLimit({ throttle: new MemoryThrottleService() });
+    async function attempt(action) {
+        let allowed = false;
+        const res = { set() {}, status(code) { this.code = code; return this; }, json(payload) { this.payload = payload; } };
+        await middleware({ path: '/pin/recovery/' + action, ip: '127.0.0.1', auth: { payload: actor } }, res,
+            () => { allowed = true; });
+        return { allowed, res };
+    }
+    for (let count = 0; count < 5; count++) {
+        assert.equal((await attempt('start')).allowed, true);
+        assert.equal((await attempt('finish')).allowed, true);
+    }
+    for (const action of ['start', 'finish']) {
+        const { allowed, res } = await attempt(action);
+        assert.equal(allowed, false);
+        assert.equal(res.code, 429);
+        assert.ok(res.payload.retryAfterSeconds > 0);
+    }
 });

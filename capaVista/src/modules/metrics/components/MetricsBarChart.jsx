@@ -14,7 +14,7 @@ export default function MetricsBarChart({ items, label, unit }) {
       <ul className={styles.chartColumns} style={{ '--chart-columns': items.length }}>
         {items.map(item => <li className={styles.chartColumn} key={item.label}>
           <div className={styles.barArea}>
-            <div
+              <div
               className={`${styles.verticalBar} ${styles[item.tone] ?? ''}`}
               style={{
                 height: `${Number(item.value) / ceiling * 100}%`,

@@ -46,7 +46,6 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
   const [detailLoading, setDetailLoading] = useState(false)
   const [detailError, setDetailError] = useState(null)
   const detailRequestId = useRef(0)
-  const [loadError, setLoadError] = useState(null)
   const [pageInfo, setPageInfo] = useState({ nextCursor: null, hasMore: false })
   const [loadingMore, setLoadingMore] = useState(false)
   const listRequestId = useRef(0)
@@ -114,10 +113,9 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
       setLoadingMore(false)
       morePending.current = false
       try {
-        setLoadError(null)
 
         const orderWork = kanbanApi.getOrders({
-          limit: 50,
+          limit: 100,
           search: filters?.salesNoteNumber || filters?.clientName || '',
           productType: filters?.productType || '',
         }, { signal: controller.signal }).then(result => {
@@ -133,7 +131,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
           setCardExpansion(current => rememberCardExpansion(current, normalizedOrders))
           setPageInfo(result?.pageInfo ?? { nextCursor: null, hasMore: false })
         }).catch(() => {
-          if (!controller.signal.aborted && id === listRequestId.current) setLoadError('No fue posible cargar las ordenes.')
+          if (!controller.signal.aborted && id === listRequestId.current) notify.error('No fue posible cargar las órdenes.')
         }).finally(() => {
           if (!controller.signal.aborted && id === listRequestId.current) setLoading(false)
         })
@@ -148,14 +146,14 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
           setColumns(normalizedStatuses.length > 0 ? normalizedStatuses : baseColumns)
         }).catch(() => {
           if (!controller.signal.aborted && id === listRequestId.current) {
-            setLoadError((current) => current || 'No fue posible cargar los estados del kanban.')
+            notify.error('No fue posible cargar los estados del Kanban.')
             setColumns(baseColumns)
           }
         })
         await Promise.allSettled([orderWork, statusWork])
       } catch {
         if (id !== listRequestId.current) return
-        setLoadError('No fue posible cargar las ordenes.')
+        notify.error('No fue posible cargar las órdenes.')
         setColumns(baseColumns)
       } finally {
         if (id === listRequestId.current) setLoading(false)
@@ -169,7 +167,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
       moreController.current?.abort()
       moveController.current?.abort()
     }
-  }, [filters?.clientName, filters?.salesNoteNumber, filters?.productType, kanbanApi, refreshKey])
+  }, [filters?.clientName, filters?.salesNoteNumber, filters?.productType, kanbanApi, refreshKey, notify])
 
   async function loadMoreOrders() {
     if (!pageInfo.hasMore || !pageInfo.nextCursor || loading || morePending.current) return
@@ -201,7 +199,9 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
       setCardExpansion(current => rememberCardExpansion(current, nextOrders))
       setPageInfo(result.pageInfo ?? { nextCursor: null, hasMore: false })
     } catch {
-      if (id === listRequestId.current) setLoadError('No fue posible cargar más ordenes.')
+      if (!controller.signal.aborted && id === listRequestId.current) {
+        notify.error('No fue posible cargar más órdenes.')
+      }
     } finally {
       if (id === listRequestId.current) { morePending.current = false; setLoadingMore(false) }
     }
@@ -468,7 +468,6 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
       {detailScope === kanbanApi && detailLoading && selectedOrder === null && (
         <LoadingIndicator scope="action" context="Consulta del pedido relacionado" />
       )}
-      {loadError && <div className={styles.kanbanError} role="alert">{loadError}</div>}
       {validatingMove && <LoadingIndicator scope="action" context="Validación del pedido antes del traslado" />}
       <DragDropProvider onDragEnd={handleDragEnd}>
         <div className={styles.kanbanWrapper}>

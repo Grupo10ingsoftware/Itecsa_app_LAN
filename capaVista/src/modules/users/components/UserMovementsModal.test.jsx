@@ -1,15 +1,10 @@
-import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, expect, it, vi } from 'vitest'
+import { act, cleanup, fireEvent, screen } from '@testing-library/react'
+import { render } from '../../../test/renderWithToast'
 import UserMovementsModal from './UserMovementsModal'
 import { createAdminUsersApi } from '../api/adminUsersApi'
 const deferred = () => { let resolve; const promise = new Promise(done => { resolve = done }); return { promise, resolve } }
 const user = { idUsuarioAutenticacionExterna: 'a', nombreCompleto: 'Ana Soto' }
-beforeEach(() => {
-  if (!HTMLDialogElement.prototype.showModal) Object.defineProperty(HTMLDialogElement.prototype, 'showModal', { configurable: true, writable: true, value() {} })
-  if (!HTMLDialogElement.prototype.close) Object.defineProperty(HTMLDialogElement.prototype, 'close', { configurable: true, writable: true, value() {} })
-  vi.spyOn(HTMLDialogElement.prototype, 'showModal').mockImplementation(function () { this.open = true })
-  vi.spyOn(HTMLDialogElement.prototype, 'close').mockImplementation(function () { this.open = false })
-})
 afterEach(() => { cleanup(); vi.restoreAllMocks() })
 it('aborts history on target change and unmount; late history cannot appear for another user', async () => {
   const old = deferred(), next = deferred(), api = { getMovements: vi.fn().mockReturnValueOnce(old.promise).mockReturnValueOnce(next.promise) }
@@ -39,4 +34,17 @@ it('aborting a signaled reader cannot poison a shared unsignaled reader', async 
   const controller = new AbortController(); const owned = api.getMovements('a', {}, { signal: controller.signal })
   expect(shared).toBe(sharedAgain); expect(owned).not.toBe(shared); expect(apiClient.get).toHaveBeenCalledTimes(2)
   controller.abort(); pending.resolve({ records: [], total: 0 }); expect((await shared).total).toBe(0); await owned
+})
+
+it('keeps headers on failure, exposes Toast above the modal, and preserves Escape dismissal', async () => {
+  const onClose = vi.fn()
+  const api = { getMovements: vi.fn().mockRejectedValue(Error('offline')) }
+  render(<UserMovementsModal user={user} api={api} onClose={onClose} />)
+  await screen.findByText('No fue posible consultar los movimientos. Intenta nuevamente.')
+  expect(screen.getAllByRole('columnheader')).toHaveLength(3)
+  expect(screen.getByRole('dialog').tagName).toBe('SECTION')
+  expect(document.querySelector('[data-toast-viewport]').closest('[aria-hidden="true"], [inert]')).toBeNull()
+  expect(screen.getByRole('button', { name: 'Siguiente' }).disabled).toBe(true)
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(onClose).toHaveBeenCalledOnce()
 })
