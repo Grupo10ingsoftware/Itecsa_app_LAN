@@ -93,10 +93,32 @@ export class KeycloakIdentityRepository {
       if (error?.code !== 'P2002') throw error;
       const existing = await this.client.identityProvisionOperation.findUnique({ where: { issuer_username: { issuer, username: input.username } } });
       if (!existing) throw error;
+      // Retry only a definitively rejected, resource-free preparation. Pending
+      // operations and their payloads must never be overwritten.
+      if (existing.state === 'failed' && !existing.external_subject && !existing.local_user_id
+        && ['IDENTITY_EMAIL_EXISTS', 'IDENTITY_USERNAME_EXISTS', 'IDENTITY_RUT_EXISTS'].includes(existing.last_error)) {
+        const reset = await this.client.identityProvisionOperation.updateMany({
+          where: { id: existing.id, revision: existing.revision, state: 'failed', external_subject: null, local_user_id: null },
+          data: { input, payload_digest: digest, state: 'pending', last_error: null, actor_user_id: actorId, revision: { increment: 1 } },
+        });
+        if (reset.count === 1) return { ...existing, input, payload_digest: digest, state: 'pending', last_error: null,
+          actor_user_id: actorId, revision: existing.revision + 1 };
+        return this.operation(existing.id);
+      }
       return existing;
     }
   }
   operation(id) { return this.client.identityProvisionOperation.findUnique({ where: { id } }); }
+  operationByUsername(issuer, username) {
+    return this.client.identityProvisionOperation.findUnique({ where: { issuer_username: { issuer, username } } });
+  }
+  async creationConflict(input) {
+    const email = await this.client.usuario.findFirst({ where: { correo_usuario: input.email }, select: { id_usuario: true } });
+    if (email) return 'IDENTITY_EMAIL_EXISTS';
+    const formattedRut = input.rut.replace(/^(\d{1,2})(\d{3})(\d{3})-/, '$1.$2.$3-');
+    const rut = await this.client.usuario.findFirst({ where: { rut_usuario: { in: [input.rut, formattedRut] } }, select: { id_usuario: true } });
+    return rut ? 'IDENTITY_RUT_EXISTS' : null;
+  }
   async acquire(operation, reconcile) {
     const result = await this.client.identityProvisionOperation.updateMany({
       where: { id: operation.id, revision: operation.revision, state: reconcile ? 'needs_reconciliation' : 'pending' },

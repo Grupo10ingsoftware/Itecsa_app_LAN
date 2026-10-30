@@ -7,6 +7,7 @@ export default function UserCreateModal({ isOpen, onClose, onCreated }) {
   const modalRef = useRef(null)
   const titleRef = useRef(null)
   const [isBusy, setIsBusy] = useState(false)
+  const [recovery, setRecovery] = useState(null)
 
   useModalDialog({
     canClose: !isBusy,
@@ -56,6 +57,8 @@ export default function UserCreateModal({ isOpen, onClose, onCreated }) {
             onBusyChange={setIsBusy}
             onCancel={onClose}
             onCreated={onCreated}
+            recovery={recovery}
+            onRecoveryChange={setRecovery}
           />
         </div>
       </section>

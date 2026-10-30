@@ -101,12 +101,12 @@ it('initial filters never reset a quick page change', async () => {
   fireEvent.click(screen.getByText('Next')); await tick(400)
   expect(table().page).toBe(2); expect(state.api.listUsers.mock.calls.map(([query]) => query.page)).toEqual([1, 2])
 })
-it('partial creation from page 2 preserves reconciliation warning during the page reload', async () => {
+it('creation callbacks refresh the table without duplicating feedback owned by the form', async () => {
   renderUsers(); await tick()
   fireEvent.click(screen.getByText('Next')); await tick()
   fireEvent.click(screen.getByText('Crear usuario')); fireEvent.click(screen.getByText('Partial creation')); await tick()
   expect(state.api.listUsers.mock.calls.map(([query]) => query.page)).toEqual([1, 2, 1])
-  expect(screen.getByText(/Preparacion incompleta.*reference/)).toBeTruthy()
+  expect(screen.queryByText(/Preparacion incompleta.*reference/)).toBeNull()
   expect(screen.getByText('Partial creation')).toBeTruthy(); expect(state.success).not.toHaveBeenCalled()
 })
 it('waits for Apply, aborts previous filter and ignores its late response', async () => {

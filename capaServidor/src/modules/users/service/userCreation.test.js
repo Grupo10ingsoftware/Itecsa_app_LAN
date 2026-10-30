@@ -35,6 +35,8 @@ function fixture({ failure, pinLocked = false } = {}) {
   const check = stage => { events.push(stage); if (stage === failure) throw new Error('simulated failure'); };
   const repository = {
     actor: async () => actor,
+    creationConflict: async () => null,
+    operationByUsername: async () => operation ? { ...operation } : null,
     claim: async ({ input: values, digest }) => {
       check('claim');
       operation ??= { id: operationId, issuer, username: values.username, input: values,
@@ -45,12 +47,13 @@ function fixture({ failure, pinLocked = false } = {}) {
     checkpoint: async (_operation, subject) => { operation.external_subject = subject; },
     complete: async () => { check('mysql'); operation.local_user_id = 2; return { ...operation }; },
     finish: async () => { check('finish'); operation.state = 'created'; return { ...operation }; },
-    fail: async (_operation, code) => { operation.state = 'needs_reconciliation'; operation.last_error = code; },
+    fail: async (_operation, code, { terminal }) => { operation.state = terminal ? 'failed' : 'needs_reconciliation'; operation.last_error = code; },
     operation: async () => ({ ...operation }),
   };
   const management = {
     config: { issuer },
     findByUsername: async () => { check('find'); return external ? structuredClone(external) : null; },
+    findByEmail: async () => null,
     createDisabled: async values => {
       check('create');
       external = { ...values, id: 'new-user', enabled: false, attributes: { itecsa_provision_id: [values.operationId] } };
@@ -101,6 +104,110 @@ test('wrong PIN uses existing validation and prevents all creation', async () =>
   await assert.rejects(f.service.prepare({ ...context, pin: '654321' }, input), { code: 'PIN_INVALID' });
   assert.deepEqual(f.events, ['pin']);
   assert.equal(f.state().operation, undefined);
+});
+
+for (const code of ['IDENTITY_EMAIL_EXISTS', 'IDENTITY_USERNAME_EXISTS', 'IDENTITY_RUT_EXISTS']) {
+  test(`${code} is a terminal rejection only before resources are created`, async () => {
+    const f = fixture();
+    if (code === 'IDENTITY_USERNAME_EXISTS') f.management.findByUsername = async () => ({ id: 'other', username: input.username });
+    else f.repository.creationConflict = async () => code;
+    const response = await f.service.prepare(context, input);
+    assert.equal(response.outcome, 'failed');
+    assert.equal(response.code, code);
+    assert.equal(response.recoverable, false);
+    assert.equal(f.events.includes('create'), false);
+    assert.equal(response.operationId, operationId);
+  });
+}
+
+test('email registered only in Keycloak is rejected before the POST', async () => {
+  const f = fixture();
+  f.management.findByEmail = async () => ({ id: 'other', email: input.email });
+  const response = await f.service.prepare(context, input);
+  assert.equal(response.code, 'IDENTITY_EMAIL_EXISTS');
+  assert.equal(response.outcome, 'failed');
+  assert.equal(f.events.includes('create'), false);
+});
+
+test('a confirmed duplicate POST rejection is safe but a transport failure remains uncertain', async () => {
+  for (const error of [new KeycloakServiceError('IDENTITY_EMAIL_EXISTS', { status: 409 }),
+    new KeycloakServiceError('KEYCLOAK_NETWORK_ERROR', { ambiguous: true })]) {
+    const f = fixture();
+    f.management.createDisabled = async () => { throw error; };
+    const response = await f.service.prepare(context, input);
+    assert.equal(response.outcome, error.status === 409 ? 'failed' : 'needs_reconciliation');
+    assert.equal(response.code, error.code);
+  }
+});
+
+test('a duplicate discovered after external creation retains reconciliation and disables the identity', async () => {
+  const f = fixture();
+  f.repository.complete = async () => { throw { code: 'P2002', meta: { target: ['rut_usuario'] } }; };
+  const response = await f.service.prepare(context, input);
+  assert.equal(response.outcome, 'needs_reconciliation');
+  assert.equal(response.code, 'IDENTITY_RUT_EXISTS');
+  assert.equal(response.externalSubject, 'new-user');
+  assert.equal(f.state().external.enabled, false);
+});
+
+test('checkpoint failure preserves the reference and compensates the identity already created', async () => {
+  const f = fixture();
+  f.repository.checkpoint = async () => { throw Error('lost checkpoint'); };
+  const response = await f.service.prepare(context, input);
+  assert.equal(response.outcome, 'needs_reconciliation');
+  assert.equal(response.operationId, operationId);
+  assert.ok(f.events.includes('disable'));
+});
+
+test('status lookup cannot confirm a different payload or disclose credentials', async () => {
+  const f = fixture();
+  assert.equal(await f.service.creationStatus(context, input), null);
+  await f.service.prepare(context, input);
+  const response = await f.service.creationStatus(context, input);
+  assert.equal(response.outcome, 'user_created');
+  assert.equal(response.temporaryPassword, undefined);
+  const mismatch = await f.service.creationStatus(context, { ...input, email: 'different@example.com' });
+  assert.equal(mismatch.outcome, 'identity_conflict');
+  assert.equal(mismatch.operationId, operationId);
+  const duplicate = await f.service.prepare(context, { ...input, email: 'different@example.com' });
+  assert.equal(duplicate.outcome, 'failed');
+  assert.equal(duplicate.code, 'IDENTITY_USERNAME_EXISTS');
+  assert.equal(duplicate.externalSubject, undefined);
+  assert.equal(f.state().operation.state, 'created');
+  assert.equal(f.events.filter(event => event === 'create').length, 1);
+  await assert.rejects(f.service.creationStatus({ ...context, role: ROLES.VENTAS, permissions: [] }, input));
+});
+
+test('reconciliation never labels a foreign identity as a correctable username duplicate', async () => {
+  const f = fixture({ failure: 'mysql' });
+  await f.service.prepare(context, input);
+  f.management.findByUsername = async () => ({ id: 'other', attributes: {} });
+  const response = await f.service.reconcile(context, operationId);
+  assert.equal(response.outcome, 'needs_reconciliation');
+  assert.equal(response.code, 'KEYCLOAK_IDENTITY_CONFLICT');
+});
+
+test('only resource-free terminal duplicate journals can be reclaimed with corrected input', async () => {
+  for (const variation of [{}, { state: 'needs_reconciliation' }, { external_subject: 'partial' }, { last_error: 'KEYCLOAK_NETWORK_ERROR' }]) {
+    const prior = { id: operationId, state: 'failed', revision: 3, external_subject: null, local_user_id: null,
+      last_error: 'IDENTITY_EMAIL_EXISTS', ...variation };
+    let resets = 0;
+    const repository = new KeycloakIdentityRepository({ prisma: { identityProvisionOperation: {
+      createMany: async () => { throw { code: 'P2002' }; }, findUnique: async () => prior,
+      updateMany: async ({ where, data }) => {
+        resets++;
+        assert.equal(where.state, 'failed');
+        assert.equal(where.revision, 3);
+        assert.equal(where.external_subject, null);
+        assert.equal(where.local_user_id, null);
+        assert.equal(data.payload_digest, 'corrected');
+        return { count: 1 };
+      },
+    } } });
+    const response = await repository.claim({ issuer, input, digest: 'corrected', actorId: 1 });
+    assert.equal(resets, Object.keys(variation).length ? 0 : 1);
+    assert.equal(response.state, resets ? 'pending' : prior.state);
+  }
 });
 
 test('locked PIN uses existing lockout and prevents all creation', async () => {
@@ -217,6 +324,37 @@ for (const patch of [{ rol_usuario: ROLES.COBRANZAS }, { estado_usuario: 'Desvin
 const env = { AUTH_PROVIDER: 'keycloak', APP_ENV: 'test', KEYCLOAK_ISSUER: issuer,
   KEYCLOAK_ROLE_CLIENT_ID: 'roles', KEYCLOAK_ADMIN_CLIENT_ID: 'admin', KEYCLOAK_ADMIN_CLIENT_SECRET: 'test-only' };
 
+for (const [kind, code] of [['email', 'IDENTITY_EMAIL_EXISTS'], ['username', 'IDENTITY_USERNAME_EXISTS'],
+  ['unknown', 'KEYCLOAK_IDENTITY_CONFLICT'], ['owned', 'KEYCLOAK_IDENTITY_CONFLICT'], ['lookup-failed', 'KEYCLOAK_IDENTITY_CONFLICT']]) {
+  test(`Keycloak POST 409 is classified using exact lookups: ${kind}`, async () => {
+    let posts = 0;
+    const service = new KeycloakManagementService({ env, fetcher: async (url, options) => {
+      if (url.endsWith('/token')) return Response.json({ access_token: 'test-token', token_type: 'Bearer', expires_in: 60 });
+      if (options.method === 'POST') { posts++; return Response.json({ errorMessage: 'Do not expose upstream text' }, { status: 409 }); }
+      if (kind === 'lookup-failed') throw Error('connection lost');
+      const query = new URL(url).searchParams;
+      assert.equal(query.get('exact'), 'true');
+      if (query.has('username')) return Response.json(['username', 'owned'].includes(kind)
+        ? [{ id: 'existing', username: input.username, attributes: kind === 'owned' ? { itecsa_provision_id: [operationId] } : {} }] : []);
+      return Response.json(kind === 'email' ? [{ id: 'existing', email: input.email }] : []);
+    } });
+    await assert.rejects(service.createDisabled({ ...input, operationId }), { code });
+    assert.equal(posts, 1);
+  });
+}
+
+test('ambiguous Keycloak POST is never retried or reclassified through duplicate lookups', async () => {
+  let posts = 0;
+  const service = new KeycloakManagementService({ env, fetcher: async (url, options) => {
+    if (url.endsWith('/token')) return Response.json({ access_token: 'test-token', token_type: 'Bearer', expires_in: 60 });
+    assert.equal(options.method, 'POST');
+    posts++;
+    throw Error('lost response');
+  } });
+  await assert.rejects(service.createDisabled({ ...input, operationId }), { code: 'KEYCLOAK_NETWORK_ERROR', ambiguous: true });
+  assert.equal(posts, 1);
+});
+
 test('administrative API receives temporary:true without exposing tokens in results', async () => {
   const requests = [];
   const service = new KeycloakManagementService({ env, fetcher: async (url, options) => {
@@ -274,6 +412,34 @@ test('HTTP creation disables caching and returns PIN failures without creating a
   assert.equal((await accepted.json()).temporaryPassword.length, 16);
   const replay = await create(context.pin);
   assert.equal((await replay.json()).temporaryPassword, undefined);
+});
+
+test('HTTP duplicate results retain classification and status lookup is non-mutating', async t => {
+  const f = fixture();
+  f.repository.creationConflict = async () => 'IDENTITY_EMAIL_EXISTS';
+  const app = express();
+  app.use(express.json());
+  app.use(createKeycloakIdentityPreparationRouter({ service: f.service, authenticate: (req, _res, next) => {
+    req.identityProvider = 'keycloak';
+    req.auth = { payload: { sub: context.subject, [ROLES_CLAIM]: [context.role], permissions: context.permissions } };
+    next();
+  } }));
+  const server = await new Promise(resolve => { const listening = app.listen(0, '127.0.0.1', () => resolve(listening)); });
+  t.after(() => { server.closeAllConnections(); server.close(); });
+  const post = (path, body) => fetch(`http://127.0.0.1:${server.address().port}${path}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  });
+  const rejection = await post('/identities/prepare', { pin: context.pin, identity: input });
+  assert.equal(rejection.status, 409);
+  const payload = await rejection.json();
+  assert.equal(payload.code, 'IDENTITY_EMAIL_EXISTS');
+  assert.equal(payload.outcome, 'failed');
+  assert.equal(payload.operationId, operationId);
+  const count = f.events.length;
+  const status = await post('/operations/status', { identity: input });
+  assert.equal(status.headers.get('cache-control'), 'no-store');
+  assert.deepEqual(await status.json(), payload);
+  assert.equal(f.events.length, count);
 });
 
 test('failure to confirm compensating disable is recorded without disclosing credentials', async () => {

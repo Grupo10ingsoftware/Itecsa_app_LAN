@@ -32,6 +32,11 @@ export function createAdminUsersApi(apiClient) {
     getSummary: options => apiClient.get(base + '/summary', options),
     inspectUser: (subject, options) => apiClient.get('/admin/identity/identities/' + encodeURIComponent(subject), options),
     reconcile: ({ operationId, pin }) => apiClient.post('/admin/identity/operations/' + encodeURIComponent(operationId) + '/reconcile', { pin }),
+    creationStatus: ({ username, nombreUsuario, apellidoUsuario, correoUsuario, rutUsuario, rolUsuario }) =>
+      apiClient.post('/admin/identity/operations/status', { identity: {
+        username, firstName: nombreUsuario.trim(), lastName: apellidoUsuario.trim(), email: correoUsuario.trim().toLowerCase(),
+        rut: rutUsuario.trim(), role: rolUsuario,
+      } }),
     createUser: ({ username, nombreUsuario, apellidoUsuario, correoUsuario, rutUsuario, rolUsuario, pin }) =>
       apiClient.post('/admin/identity/identities/prepare', { pin, identity: {
         username, firstName: nombreUsuario, lastName: apellidoUsuario, email: correoUsuario, rut: rutUsuario, role: rolUsuario,
