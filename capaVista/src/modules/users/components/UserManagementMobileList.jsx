@@ -3,6 +3,7 @@ import { getRoleLabel } from '../../../config/roles'
 import UserButton from './UserButton'
 import UserStatusBadge from './UserStatusBadge'
 import styles from '../pages/UserManagementPage.module.css'
+import tableStyles from './UserManagementTable.module.css'
 
 export default function UserManagementMobileList({ isLoading, inspectingId, onEditUser, onViewMovements, users, readOnly = false }) {
   if (isLoading) {
@@ -26,12 +27,15 @@ export default function UserManagementMobileList({ isLoading, inspectingId, onEd
       {users.map((user) => (
         <article className={styles.mobileUserCard} key={user.id}>
           <header>
-            <strong>{user.nombreListado}</strong>
-            {user.username && <small>{user.username}</small>}
+            <strong>{user.nombreCompleto || user.nombreListado || 'Usuario sin nombre'}</strong>
             {user.identityBindingConflict && <small>Vinculo pendiente de conciliacion</small>}
             <UserStatusBadge status={user.estadoUsuario} />
           </header>
           <dl>
+            <div>
+              <dt>Usuario</dt>
+              <dd>{user.username || 'No disponible'}</dd>
+            </div>
             <div>
               <dt>RUT</dt>
               <dd>{user.rutUsuario}</dd>
@@ -46,15 +50,15 @@ export default function UserManagementMobileList({ isLoading, inspectingId, onEd
             </div>
           </dl>
           <footer className={styles.userActions}>
-            <UserButton icon="bi-pencil-fill" busy={inspectingId === user.id} disabled={!user.idUsuarioAutenticacionExterna}
-                      onClick={() => onEditUser(user)} variant="secondary">
+            <UserButton className={tableStyles.actionButton} busy={inspectingId === user.id} disabled={!user.idUsuarioAutenticacionExterna}
+                      onClick={() => onEditUser(user)} variant="primary">
               {readOnly ? 'Consultar' : 'Editar'}
             </UserButton>
             <UserButton
-              icon="bi-clock-history"
+              className={tableStyles.actionButton}
               disabled={!user.idUsuarioAutenticacionExterna}
                       onClick={() => onViewMovements(user)}
-              variant="secondary"
+              variant="primary"
             >
               Movimientos
             </UserButton>

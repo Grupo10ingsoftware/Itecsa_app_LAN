@@ -158,7 +158,7 @@ function ManageButton({
         }}
         type="button"
        aria-busy={busy}>
-        <LoadingAction busy={busy} surface="light" context="Actualizar pago">Gestionar</LoadingAction>
+        <LoadingAction busy={busy} surface="dark" context="Actualizar pago">Gestionar</LoadingAction>
       </button>
 
       {isOpen && !disabled && (

@@ -1,4 +1,4 @@
-import styles from '../pages/UserManagementPage.module.css'
+import styles from './UserStatusBadge.module.css'
 import { displayUserStatus } from '../../../config/userLifecycle.js'
 
 const STATUS_CLASS = Object.freeze({
@@ -15,7 +15,6 @@ export default function UserStatusBadge({ status }) {
 
   return (
     <span className={`${styles.statusBadge} ${statusClass}`}>
-      <span className={styles.statusDot} aria-hidden="true" />
       {label || 'Sin estado'}
     </span>
   )

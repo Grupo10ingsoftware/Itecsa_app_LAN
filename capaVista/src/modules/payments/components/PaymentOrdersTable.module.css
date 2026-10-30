@@ -1,136 +1,70 @@
 .desktopTableWrap {
   max-width: 100%;
-  overflow: visible;
+  min-width: 0;
   width: 100%;
 }
 
 .paymentTable {
-  border-collapse: collapse;
-  min-width: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--page-font-family);
+  margin: 0;
   table-layout: fixed;
   width: 100%;
 }
 
-.paymentTable > :not(caption) > * > * {
-  background-color: transparent;
-  border-bottom: 1px solid var(--payment-border);
-  padding: 0.95rem 0.75rem;
+.paymentTable th,
+.paymentTable td {
   text-align: center;
   vertical-align: middle;
 }
 
 .paymentTable thead th {
-  background: #f8fafc;
-  color: #334155;
-  font-size: 0.84rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-align: center;
+  background: var(--page-header-black);
+  color: var(--page-white);
+  font-size: 14px;
+  font-weight: 600;
+  height: 48px;
+  line-height: 20px;
+  padding: 12px 8px;
   text-transform: uppercase;
-  white-space: nowrap;
 }
 
-.paymentTable tbody tr:hover td:not(.actionsCell) {
-  background: rgba(249, 115, 22, 0.035);
+.paymentTable thead th:first-child { border-radius: var(--page-radius) 0 0 0; }
+.paymentTable thead th:last-child { border-radius: 0 var(--page-radius) 0 0; }
+
+.paymentTable tbody td {
+  border-bottom: 1px solid var(--page-border);
+  color: var(--payment-text);
+  line-height: 24px;
+  overflow-wrap: anywhere;
+  padding: calc(0.95rem + 4px) 8px;
 }
 
-.colOrder {
-  width: 16.6667%;
-}
+.paymentTable tbody tr:nth-child(odd) td { background: var(--page-background); }
+.paymentTable tbody tr:nth-child(even) td { background: var(--page-white); }
+.paymentTable tbody td:first-child { border-radius: var(--filter-control-radius) 0 0 var(--filter-control-radius); }
+.paymentTable tbody td:last-child { border-radius: 0 var(--filter-control-radius) var(--filter-control-radius) 0; }
 
-.colDate {
-  width: 16.6667%;
-}
-
-.colClient {
-  width: 16.6667%;
-}
-
-.colRut {
-  width: 16.6667%;
-}
-
-.colPaymentStatus {
-  width: 16.6667%;
-}
-
-.colActions {
-  width: 16.6667%;
-}
+.colOrder { width: 12%; }
+.colClient { width: 25%; }
+.colRut { width: 16%; }
+.colDate { width: 14%; }
+.colPaymentStatus { width: 17%; }
+.colActions { width: 16%; }
 
 .orderCell {
-  color: #111;
   font-size: 1.08rem;
   font-weight: 800;
   letter-spacing: 0.01em;
-  overflow-wrap: anywhere;
 }
 
-.dateCell {
-  color: var(--payment-text);
-  font-size: 0.88rem;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-}
+.clientCell { font-size: 1rem; font-weight: 500; }
+.rutCell, .dateCell { font-size: 0.88rem; font-variant-numeric: tabular-nums; }
+.actionsCell { overflow: visible; position: relative; }
 
-.clientCell {
-  color: #111;
-  font-size: 1rem;
-  font-weight: 500;
-  overflow-wrap: anywhere;
-}
-
-.paymentTable th.rutColumn,
-.paymentTable td.rutCell {
-  padding-left: 0.35rem;
-  padding-right: 0.35rem;
-  text-align: center;
-}
-
-.rutCell {
-  color: var(--payment-text);
-  font-size: 0.88rem;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.actionsColumn,
-.actionsCell {
-  background: #f6f7f9 !important;
-  text-align: center !important;
-}
-
-.actionsCell {
-  overflow: visible;
-  position: relative;
-}
-
-.emptyState {
+.paymentTable tbody .emptyState {
   color: var(--payment-muted);
   font-size: 1rem;
-  padding: 2rem !important;
-  text-align: center !important;
-}
-
-@media (max-width: 1399.98px) {
-  .paymentTable > :not(caption) > * > * {
-    padding-left: 0.62rem;
-    padding-right: 0.62rem;
-  }
-}
-
-@media (max-width: 1199.98px) {
-  .paymentTable > :not(caption) > * > * {
-    padding-left: 0.45rem;
-    padding-right: 0.45rem;
-  }
-
-  .paymentTable thead th {
-    font-size: 0.78rem;
-  }
-
-  .clientCell,
-  .orderCell {
-    font-size: 0.92rem;
-  }
+  padding: 2rem;
 }

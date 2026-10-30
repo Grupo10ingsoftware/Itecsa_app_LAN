@@ -1,3 +1,4 @@
+import FilterContent from '../../../shared/components/filters/FilterContent'
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -185,42 +186,38 @@ export default function KanbanBoardPage() {
   return (
     <PageShell className={styles.page}>
       <PageSurface className={styles.dashboardShell}>
-        <PageHeader title="Kanban" actions={
-          <div className={styles.heroActions}>
+        <PageHeader title="Kanban" />
+
+        <FilterContent>
+          <div className={styles.filterToolbar}>
+            <KanbanFilters
+              onApplyFilters={(nextFilters) => setAppliedFilters(nextFilters)}
+              onClearFilters={() => setAppliedFilters({})}
+            />
             <aside className={`${styles.capacityMeter} ${styles[loadLevel]}`} aria-label="Carga Operativa">
-              <div className={styles.capacityHeader}>
-                <span>Carga Operativa</span>
-                <div className={styles.capacityHeaderActions}>
-                  <strong>{isLoadingCapacity ? <LoadingIndicator scope="action" surface="dark" context="Carga operativa" /> : `${operationalLoad.percentage}%`}</strong>
-                  {canManageProductionLoad && (
-                    <button aria-label="Configurar carga operativa" disabled={isLoadingCapacity} onClick={() => setCapacityApi(api)} title="Configurar carga operativa" type="button">
-                      <i className="bi bi-sliders" aria-hidden="true" />
-                    </button>
-                  )}
+              <div className={styles.capacityProgress}>
+                <div className={styles.capacityTrack} role="progressbar" aria-label="Carga operativa del día"
+                  aria-valuemin={0} aria-valuemax={100} aria-valuenow={isLoadingCapacity ? undefined : Math.min(operationalLoad.percentage, 100)}
+                  aria-valuetext={isLoadingCapacity ? 'Cargando' : `${operationalLoad.percentage}%`}>
+                  <span className={styles.capacityFill} style={{ width: progressWidth }} />
+                </div>
+                <div className={styles.capacityNumbers}>
+                  <strong>{operationalLoad.lanyardsInProduction}</strong> / {operationalLoad.capacity} lanyards por día
                 </div>
               </div>
-              <div className={styles.capacityNumbers}>
-                <strong>{operationalLoad.lanyardsInProduction}</strong>
-                <span>/ {operationalLoad.capacity} lanyards por dia</span>
-              </div>
-              <div className={styles.capacityTrack} aria-hidden="true">
-                <span className={styles.capacityFill} style={{ width: progressWidth }} />
-              </div>
-              <p>Solo pedidos lanyard en En produccion.</p>
+              <strong className={styles.capacityPercentage}>{isLoadingCapacity ? <LoadingIndicator scope="action" surface="dark" context="Carga operativa" /> : `${operationalLoad.percentage}%`}</strong>
+              {canManageProductionLoad && (
+                <button className={styles.capacitySettings} aria-label="Configurar carga operativa" disabled={isLoadingCapacity} onClick={() => setCapacityApi(api)} title="Configurar carga operativa" type="button">
+                  <i className="bi bi-gear" aria-hidden="true" />
+                </button>
+              )}
             </aside>
           </div>
-        } />
-
-        <div className={styles.content}>
-          <KanbanFilters
-            onApplyFilters={(nextFilters) => setAppliedFilters(nextFilters)}
-            onClearFilters={() => setAppliedFilters({})}
-          />
           <KanbanColumn filters={appliedFilters} refreshKey={kanbanRefreshKey}
             requestedOrderId={requestedOrderId}
             onClearRequestedOrder={clearRequestedOrder}
           />
-        </div>
+        </FilterContent>
       </PageSurface>
       {isCapacityOpen && (
         <div className={styles.modalLayer} role="presentation">

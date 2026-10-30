@@ -1,3 +1,4 @@
+import { FilterSearch } from '../../../shared/components/filters/FilterControls'
 import LoadingIndicator from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useRef, useState } from 'react'
 import UserMovementsTable from './UserMovementsTable'
@@ -55,12 +56,10 @@ export default function UserMovementsModal({ user, api, onClose, title = 'Movimi
     </header>
     <div className={styles.body}>
       <form className={styles.filters} onSubmit={event => { event.preventDefault(); setQuery({ ...query, page: 1, search: search.trim() }) }}>
-        <label className={styles.search}><i className="bi bi-search" aria-hidden="true" /><span className="visually-hidden">Buscar por identificador o detalle</span>
-          <input type="search" value={search} maxLength={120} placeholder="Buscar por identificador o detalle…"
-            onChange={event => setSearch(event.target.value)} /></label>
-        <button className={styles.button} type="submit">Buscar</button>
+        <FilterSearch label="Buscar por identificador o detalle" searchLabel="Buscar" value={search}
+          maxLength={120} placeholder="Buscar por identificador o detalle…" onChange={setSearch} />
         <button className={styles.button} type="button" onClick={() => { setSearch(''); setQuery({ ...query, page: 1, search: '' }) }}>
-          <i className="bi bi-arrow-clockwise" aria-hidden="true" /> Limpiar filtros
+          Limpiar filtros
         </button>
       </form>
       <div className={styles.scroll} aria-busy={loading}>

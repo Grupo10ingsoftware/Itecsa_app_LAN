@@ -257,16 +257,32 @@ export default class OrderHistoryService {
     async listOrders(query = {}) {
         const limit = parseLimit(query.limit);
         const cursor = decodeCursor(query.cursor);
+        const page = positiveInteger(query.page, null, "page");
+        if (page !== null && (!Number.isSafeInteger(page) || !Number.isSafeInteger((page - 1) * limit))) {
+            throw httpError(400, "page está fuera del rango permitido.");
+        }
+        if (page !== null && cursor) throw httpError(400, "Usa page o cursor, no ambos.");
         const status = String(query.status ?? "").trim();
         const search = String(query.search ?? "").trim();
         const selectedDateRange = dateRangeFromQuery(query.from, query.to);
-        const orders = await this.repo.list({
+        const filters = {
             status: status || null,
             search: search || null,
             dateRange: selectedDateRange ?? dateRangeFromSearch(search),
             cursor,
             limit,
-        });
+        };
+
+        // Numbered pages include the filtered total; legacy cursor callers keep
+        // their bounded, single-query read and existing response shape.
+        if (page !== null) {
+            const [orders, total] = await Promise.all([
+                this.repo.list({ ...filters, page }),
+                this.repo.count(filters),
+            ]);
+            return { ...pageResult(orders, limit, mapSummary), total, page };
+        }
+        const orders = await this.repo.list(filters);
 
         return pageResult(orders, limit, mapSummary);
     }

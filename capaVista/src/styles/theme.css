@@ -40,6 +40,16 @@
   --page-title-small: 24px;
   --page-title-medium: 36px;
   --page-title-large: 48px;
+  --filter-header-min-height: 59px;
+  --filter-layout-gap: 1rem;
+  --filter-layout-padding: 1rem;
+  --filter-layout-padding-small: 0.85rem;
+  --filter-control-height: 44px;
+  --filter-control-radius: 8px;
+  --filter-space: 16px;
+  --filter-group-space: 24px;
+  --filter-font-size: 14px;
+  --filter-heading-size: 18px;
   --itexsa-border: #e5e7eb;
   --itexsa-orange: #f97316;
   --itexsa-orange-rgb: 249, 115, 22;

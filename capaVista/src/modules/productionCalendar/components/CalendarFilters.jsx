@@ -1,41 +1,18 @@
 import { PRODUCTION_STATUSES } from '../config/productionCalendar.config'
-import styles from './CalendarFilters.module.css'
+import FilterPanel from '../../../shared/components/filters/FilterPanel'
+import { FilterRow, FilterSearch, FilterSelect } from '../../../shared/components/filters/FilterControls'
 
-export default function CalendarFilters({ filters, onChange, onClear }) {
+const STATUSES = [{ value: '', label: 'Todos' }, ...Object.values(PRODUCTION_STATUSES).map(value => ({ value, label: value }))]
+const PRODUCTS = ['', 'Lanyard', 'Tarjeta', 'Yoyo'].map(value => ({ value, label: value || 'Todos' }))
+
+export default function CalendarFilters({ filters, onChange, onApply, onClear }) {
   return (
-    <section className={styles.filtersCard} aria-label="Filtros de calendario">
-      <label>
-        <span>Buscar</span>
-        <input
-          onChange={(event) => onChange({ search: event.target.value })}
-          placeholder="NV, cliente o producto"
-          type="search"
-          value={filters.search}
-        />
-      </label>
-      <label>
-        <span>Estado</span>
-        <select onChange={(event) => onChange({ status: event.target.value })} value={filters.status}>
-          <option value="">Todos</option>
-          {Object.values(PRODUCTION_STATUSES).map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        <span>Producto</span>
-        <select onChange={(event) => onChange({ productType: event.target.value })} value={filters.productType}>
-          <option value="">Todos</option>
-          <option value="Lanyard">Lanyard</option>
-          <option value="Tarjeta">Tarjeta</option>
-          <option value="Yoyo">Yoyo</option>
-        </select>
-      </label>
-      <button className={styles.clearButton} onClick={onClear} type="button">
-        Limpiar filtros
-      </button>
-    </section>
+    <FilterPanel label="Filtros de calendario" onApply={onApply} onClear={onClear}>
+      <FilterRow divided>
+        <FilterSelect label="Estado" value={filters.status} options={STATUSES} onChange={status => onChange({ status })} />
+        <FilterSelect label="Producto" value={filters.productType} options={PRODUCTS} onChange={productType => onChange({ productType })} />
+        <FilterSearch label="Buscar en el calendario" placeholder="NV, cliente o producto" value={filters.search} onChange={search => onChange({ search })} />
+      </FilterRow>
+    </FilterPanel>
   )
 }

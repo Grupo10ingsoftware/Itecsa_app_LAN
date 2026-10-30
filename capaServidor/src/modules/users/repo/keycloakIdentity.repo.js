@@ -1,3 +1,4 @@
+import { departmentRoles } from '../../../../../shared/userDepartments.js';
 import { identityUserWhere } from '../../../database/identityBinding.js';
 import { Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
@@ -6,9 +7,10 @@ import { isActiveUserStatus, ACTIVE_USER_STATUSES, USER_STATUS } from '../../../
 import { ADMIN_ROLES, ASSIGNABLE_ROLES } from '../../../../../shared/keycloakAuthorization.js';
 import { UserMovementsRepository } from './userMovements.repo.js';
 
-function listPredicate(issuer, { search = '', estadoUsuario = '', rolUsuario = '' } = {}) {
+function listPredicate(issuer, { search = '', estadoUsuario = '', rolUsuario = '', department = '' } = {}) {
   const conditions = [Prisma.sql`e.provider = 'keycloak'`, Prisma.sql`e.issuer = ${issuer}`,
     Prisma.sql`u.rol_usuario IN (${Prisma.join([...ASSIGNABLE_ROLES])})`];
+  if (department) conditions.push(Prisma.sql`u.rol_usuario IN (${Prisma.join([...departmentRoles(department)])})`);
   if (rolUsuario) conditions.push(Prisma.sql`u.rol_usuario = ${rolUsuario}`);
   if (estadoUsuario) conditions.push(ACTIVE_USER_STATUSES.includes(estadoUsuario)
     ? Prisma.sql`u.estado_usuario IN (${Prisma.join([...ACTIVE_USER_STATUSES])})`
@@ -25,9 +27,10 @@ function listPredicate(issuer, { search = '', estadoUsuario = '', rolUsuario = '
 export class KeycloakIdentityRepository {
   constructor({ prisma } = {}) { this.prisma = prisma; }
   get client() { return this.prisma ?? getPrismaClient(); }
-  userScope(issuer, { search = '', estadoUsuario = '', rolUsuario = '' } = {}) {
+  userScope(issuer, { search = '', estadoUsuario = '', rolUsuario = '', department = '' } = {}) {
     const where = { rol_usuario: { in: [...ASSIGNABLE_ROLES] }, ExternalIdentity: { is: { provider: 'keycloak', issuer } } };
-    if (rolUsuario) where.rol_usuario = { equals: rolUsuario, in: [...ASSIGNABLE_ROLES] };
+    if (department) where.rol_usuario.in = ASSIGNABLE_ROLES.filter(role => departmentRoles(department).includes(role));
+    if (rolUsuario) where.rol_usuario.equals = rolUsuario;
     if (estadoUsuario) where.estado_usuario = ACTIVE_USER_STATUSES.includes(estadoUsuario)
       ? { in: [...ACTIVE_USER_STATUSES] } : estadoUsuario;
     if (search) where.OR = ['nombre_usuario', 'apellido_usuario', 'correo_usuario', 'rut_usuario'].map(field => ({ [field]: { contains: search } }))

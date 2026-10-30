@@ -1,3 +1,4 @@
+import FilterContent from '../../../shared/components/filters/FilterContent'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { APP_ROUTES } from '../../../config/routes'
@@ -6,7 +7,7 @@ import MessageFilters from '../components/MessageFilters'
 import MessageList from '../components/MessageList'
 import { useMessagesApi } from '../hooks/useMessagesApi'
 import styles from './MessageInboxPage.module.css'
-import PageShell from '../../../shared/components/layout/PageShell'
+import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
 import PageHeader from '../../../shared/components/layout/PageHeader'
 
 const DEFAULT_FILTERS = Object.freeze({ status: 'all', sort: 'latest', from: '', to: '' })
@@ -26,6 +27,7 @@ export default function MessageInboxPage() {
 function InboxSession({ api }) {
   const navigate = useNavigate()
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
+  const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS)
   const [page, setPage] = useState(1)
   const [result, setResult] = useState({ messages: [], total: 0, totalPages: 0 })
   const [isLoading, setIsLoading] = useState(true)
@@ -67,7 +69,7 @@ function InboxSession({ api }) {
   }, [loadInbox])
 
   function handleFiltersChange(nextFilters) {
-    setFilters(nextFilters)
+    if (Object.keys(DEFAULT_FILTERS).some(key => filters[key] !== nextFilters[key])) setFilters(nextFilters)
     setPage(1)
   }
 
@@ -79,8 +81,8 @@ function InboxSession({ api }) {
   }
 
   return (
-    <PageShell maxWidth="78rem" aria-labelledby="message-inbox-title">
-      <section className={styles.shell}>
+    <PageShell aria-labelledby="message-inbox-title">
+      <PageSurface>
         <PageHeader title="Bandeja de entrada" titleId="message-inbox-title" actions={
           <div className={styles.totalCard} aria-label={`${result.total} mensajes encontrados`}>
             <i className="bi bi-envelope-paper" aria-hidden="true" />
@@ -88,34 +90,38 @@ function InboxSession({ api }) {
           </div>
         } />
 
-        <MessageFilters
-          filters={filters}
-          onChange={handleFiltersChange}
-          onClear={() => handleFiltersChange({ ...DEFAULT_FILTERS })}
-        />
+        <FilterContent>
+          <MessageFilters
+            filters={draftFilters}
+            onChange={setDraftFilters}
+            onApply={() => handleFiltersChange(draftFilters)}
+            onClear={() => { setDraftFilters(DEFAULT_FILTERS); handleFiltersChange(DEFAULT_FILTERS) }}
+            loading={isLoading}
+          />
 
-        {error && (
-          <div className={styles.error} role="alert">
-            <i className="bi bi-exclamation-triangle" aria-hidden="true" />
-            <span>{error}</span>
-            <button onClick={loadInbox} type="button">Reintentar</button>
-          </div>
-        )}
+          {error && (
+            <div className={styles.error} role="alert">
+              <i className="bi bi-exclamation-triangle" aria-hidden="true" />
+              <span>{error}</span>
+              <button onClick={loadInbox} type="button">Reintentar</button>
+            </div>
+          )}
 
-        {!error && <MessageList isLoading={isLoading} messages={result.messages} onOpen={handleOpen} openingId={openingId} />}
+          {!error && <MessageList isLoading={isLoading} messages={result.messages} onOpen={handleOpen} openingId={openingId} />}
 
-        {!isLoading && !error && result.totalPages > 1 && (
-          <nav aria-label="Paginación de mensajes" className={styles.pagination}>
-            <button disabled={page === 1} onClick={() => setPage((current) => current - 1)} type="button">
-              <i className="bi bi-chevron-left" aria-hidden="true" /> Anterior
-            </button>
-            <span>Página <strong>{page}</strong> de {result.totalPages}</span>
-            <button disabled={page >= result.totalPages} onClick={() => setPage((current) => current + 1)} type="button">
-              Siguiente <i className="bi bi-chevron-right" aria-hidden="true" />
-            </button>
-          </nav>
-        )}
-      </section>
+          {!isLoading && !error && result.totalPages > 1 && (
+            <nav aria-label="Paginación de mensajes" className={styles.pagination}>
+              <button disabled={page === 1} onClick={() => setPage((current) => current - 1)} type="button">
+                <i className="bi bi-chevron-left" aria-hidden="true" /> Anterior
+              </button>
+              <span>Página <strong>{page}</strong> de {result.totalPages}</span>
+              <button disabled={page >= result.totalPages} onClick={() => setPage((current) => current + 1)} type="button">
+                Siguiente <i className="bi bi-chevron-right" aria-hidden="true" />
+              </button>
+            </nav>
+          )}
+        </FilterContent>
+      </PageSurface>
     </PageShell>
   )
 }

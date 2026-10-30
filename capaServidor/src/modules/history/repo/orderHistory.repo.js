@@ -1,5 +1,5 @@
 import getPrismaClient from "../../../database/prisma.js";
-import { orderListQuery, orderHeaderQuery, orderChildrenQuery } from './historyRead.repo.js';
+import { orderListQuery, orderCountQuery, orderHeaderQuery, orderChildrenQuery } from './historyRead.repo.js';
 
 const CALENDARIZATION_DESCRIPTION_PREFIX = "Fecha de termino definida para ";
 
@@ -96,8 +96,13 @@ export default class OrderHistoryRepository {
         return this.prisma;
     }
 
-    async list({ status, search, dateRange, cursor, limit }) {
-        const rows = await this.client.$queryRaw(orderListQuery({ status, search, dateRange, cursor, limit }));
+    async count(filters) {
+        const rows = await this.client.$queryRaw(orderCountQuery(filters));
+        return Number(rows[0]?.total ?? 0);
+    }
+
+    async list({ status, search, dateRange, cursor, limit, page }) {
+        const rows = await this.client.$queryRaw(orderListQuery({ status, search, dateRange, cursor, limit, page }));
         return rows.map(row => ({
             id_pedido: Number(row.id_pedido),
             numero_nota_venta: row.numero_nota_venta,

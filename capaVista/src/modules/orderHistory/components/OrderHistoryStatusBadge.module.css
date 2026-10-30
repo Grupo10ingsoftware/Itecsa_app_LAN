@@ -1,0 +1,24 @@
+.badge {
+  --status-color: #475569;
+  align-items: center;
+  background: var(--page-white);
+  border: 1px solid var(--status-color);
+  border-radius: var(--filter-control-radius);
+  color: var(--status-color);
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 20px;
+  min-height: 40px;
+  padding: 8px;
+  width: 200px;
+}
+
+/* Darker text/border shades keep the reference hues legible on white. */
+.badge[data-tone='payment'] { --status-color: #946800; }
+.badge[data-tone='ready'] { --status-color: #c74600; }
+.badge[data-tone='production'] { --status-color: #0063df; }
+.badge[data-tone='delivery'] { --status-color: #00833f; }
+.badge[data-tone='review'] { --status-color: #d40012; }
+.badge[data-tone='finished'] { --status-color: #007d9c; }

@@ -66,10 +66,12 @@ describe('Páginas migradas sin modificar sus operaciones', () => {
     expect(screen.getByRole('heading', { name: 'Carga diaria de Lanyard' })).toBeTruthy()
   })
 
-  it('conserva la búsqueda y el enlace al detalle del historial', async () => {
+  it('muestra el rango del historial en el footer conservando el enlace al detalle', async () => {
     mount(OrderHistoryPage)
-    await screen.findByRole('link', { name: /Ver detalle/ })
+    await screen.findByText('Mostrando 1 a 1 de 1 resultados')
+    expect(screen.getByRole('combobox', { name: 'Filas por página' }).value).toBe('10')
     expect(screen.getByRole('link', { name: /Ver detalle/ }).getAttribute('href')).toBe('/historial-pedidos/123')
+    fireEvent.click(screen.getByRole('button', { name: 'Expandir filtros del historial' }))
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'NV-123' } })
     expect(screen.getByRole('searchbox').value).toBe('NV-123')
   })
@@ -118,20 +120,24 @@ describe('Páginas migradas sin modificar sus operaciones', () => {
     await screen.findByRole('heading', { level: 1, name: 'Bandeja de entrada' })
   })
 
-  it('conserva el aviso y reintento de resumen de usuarios', async () => {
-    const original = client.get.bind(client)
-    let fail = true
-    vi.spyOn(client, 'get').mockImplementation(url => {
-      if (fail && url === '/admin/identity/users/summary') return Promise.reject(new Error('Fallo sintético'))
-      return original(url)
-    })
+  it('muestra usuarios sin tarjetas ni consultas de resumen', async () => {
+    const get = vi.spyOn(client, 'get')
     mount(UserManagementPage)
-    const retry = await screen.findByRole('button', { name: 'Reintentar resumen' })
-    expect(retry.closest('[role="alert"]')).toBeTruthy()
-    fail = false
-    fireEvent.click(retry)
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Reintentar resumen' })).toBeNull())
-    expect(screen.getByRole('button', { name: /Crear usuario/ })).toBeTruthy()
+    await waitFor(() => expect(get).toHaveBeenCalled())
+    expect(get.mock.calls.some(([url]) => url === '/admin/identity/users/summary')).toBe(false)
+    expect(screen.queryByRole('region', { name: 'Resumen de usuarios' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Reintentar resumen' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /Crear usuario/ }))
+    expect(screen.getByRole('dialog', { name: 'Creacion de usuario' })).toBeTruthy()
+  })
+
+  it('muestra pagos sin tarjetas y conserva los estados en sus filtros', async () => {
+    mount(PaymentConfirmationPage)
+    expect(screen.queryByRole('region', { name: 'Resumen de pagos' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Expandir filtros de pago' }))
+    expect(await screen.findByRole('button', { name: /Pendientes/ })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Rechazados/ })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Confirmados/ })).toBeTruthy()
   })
 
   it.each([

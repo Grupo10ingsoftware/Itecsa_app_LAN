@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
+import CalendarFilters from '../../../modules/productionCalendar/components/CalendarFilters'
 import CalendarHeader from '../../../modules/productionCalendar/components/CalendarHeader'
 import OrderCreateHeader from '../../../modules/orders/components/OrderCreateHeader'
 
@@ -12,16 +12,16 @@ it('el piloto de pedidos solo muestra el título funcional', () => {
   expect(screen.queryByText('Ventas')).toBeNull()
 })
 
-it('el piloto del calendario conserva callback y ambos estados del botón', () => {
-  const onToggle = vi.fn()
-  function Calendar() {
-    const [open, setOpen] = useState(false)
-    return <CalendarHeader isFiltersOpen={open} onToggleFilters={() => { onToggle(); setOpen(!open) }} />
-  }
-  render(<Calendar />)
+it('el calendario usa el panel compartido y colapsar conserva el borrador sin aplicar', () => {
+  const onApply = vi.fn()
+  render(<><CalendarHeader /><CalendarFilters
+    filters={{ status: '', productType: '', search: 'Cliente' }}
+    onChange={vi.fn()} onClear={vi.fn()} onApply={onApply} /></>)
   expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Calendario')
-  fireEvent.click(screen.getByRole('button', { name: 'Mostrar filtros' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Ocultar filtros' }))
-  expect(onToggle).toHaveBeenCalledTimes(2)
-  expect(screen.queryByText('Produccion')).toBeNull()
+  expect(screen.queryByRole('searchbox')).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Expandir filtros de calendario' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Contraer filtros de calendario' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Expandir filtros de calendario' }))
+  expect(screen.getByRole('searchbox').value).toBe('Cliente')
+  expect(onApply).not.toHaveBeenCalled()
 })

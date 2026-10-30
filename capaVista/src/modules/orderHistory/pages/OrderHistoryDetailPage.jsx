@@ -1,3 +1,4 @@
+import { FilterSelect } from '../../../shared/components/filters/FilterControls'
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
@@ -125,9 +126,8 @@ function OrderHistoryDetail({ api, orderId }) {
 
           <section className={styles.timelineSection}>
             <header><div><span>Actividad</span><h2>Eventos del pedido</h2></div>
-              <select aria-label="Filtrar por tipo de registro" onChange={(event) => selectType(event.target.value)} value={type}>
-                {EVENT_TYPES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-              </select>
+              <FilterSelect label="Filtrar por tipo de registro" onChange={selectType} value={type}
+                options={EVENT_TYPES.map(([value, label]) => ({ value, label }))} />
             </header>
             {loading ? <LoadingIndicator context="Actualizando eventos" /> : order.events.length === 0 ? <div className={styles.empty}>No existen registros para este filtro.</div> : (
               <ol className={styles.timeline}>{order.events.map(event => <HistoryEvent key={event.id} event={event} />)}</ol>

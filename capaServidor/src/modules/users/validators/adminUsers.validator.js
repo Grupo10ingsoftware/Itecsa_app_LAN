@@ -1,3 +1,4 @@
+import { USER_DEPARTMENTS } from '../../../../../shared/userDepartments.js';
 import { FUNCTIONAL_ROLES } from '../../../config/roles.js';
 import { USER_STATUS_FILTERS } from '../../../config/userLifecycle.js';
 const LIST_USER_STATUSES = new Set(USER_STATUS_FILTERS);
@@ -27,6 +28,11 @@ export function validateListUsersQuery(query = {}) {
     const rolUsuario =
         typeof query.rolUsuario === "string" ? query.rolUsuario.trim() : "";
 
+    if (query.department !== undefined && (typeof query.department !== 'string' ||
+        (query.department !== '' && !USER_DEPARTMENTS.some(item => item.value === query.department)))) {
+        return invalidRequest("El departamento no es valido.");
+    }
+
     if (estadoUsuario && !LIST_USER_STATUSES.has(estadoUsuario)) {
         return invalidRequest("El estadoUsuario no es valido.");
     }
@@ -43,6 +49,7 @@ export function validateListUsersQuery(query = {}) {
             search,
             estadoUsuario,
             rolUsuario,
+            ...(query.department ? { department: query.department } : {}),
         },
     };
 }

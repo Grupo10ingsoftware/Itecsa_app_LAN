@@ -15,9 +15,38 @@ afterEach(()=>{cleanup();vi.clearAllMocks()})
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b});return {promise,resolve,reject}}
 const event=(id=1,title=`Evento ${id}`)=>({id,title,type:'stage',typeLabel:'Etapa general',occurredAt:'2024-09-08T04:00:00Z',responsible:'Ana ñ',description:'Corrección conservada',durationSeconds:1})
 const info=(cursor=null)=>({limit:50,nextCursor:cursor,hasMore:!!cursor})
-const list=(name='SYN-1',cursor=null)=>({items:[{id:1,salesNoteNumber:name,clientName:'Cliente ñ',status:'Cancelado',createdAt:'2024-09-01'}],pageInfo:info(cursor)})
+const list=(name='SYN-1',total=1)=>({items:[{id:1,salesNoteNumber:name,clientName:'Cliente ñ',status:'Cancelado',createdAt:'2024-09-01'}],total})
 const detail=(name='SYN-1',cursor=null)=>({id:1,salesNoteNumber:name,client:{name:'Cliente ñ'},seller:{name:'Ana'},status:'Cancelado',paymentStatus:'Pendiente',createdAt:'2024-09-01',estimatedCompletionAt:null,items:[],labels:[],events:[event()],pageInfo:info(cursor)})
-const mountList=()=>render(<StrictMode><MemoryRouter><List /></MemoryRouter></StrictMode>)
+function mountList() {
+ const view=render(<StrictMode><MemoryRouter><List /></MemoryRouter></StrictMode>)
+ const toggle=screen.getByRole('button',{name:'Expandir filtros del historial'})
+ expect(toggle.getAttribute('aria-expanded')).toBe('false')
+ fireEvent.click(toggle)
+ return view
+}
+it.each([
+ ['Todos', ''], ['Confirmación de Pago', 'Confirmación de Pago'],
+ ['Listo para producción', 'Listo para Producción'], ['En producción', 'En producción'],
+ ['Listo para despacho', 'Listo para Entrega'], ['Finalizado', 'Terminado'], ['Cancelado', 'Cancelado'],
+])('applies combined search, creation dates and the existing %s state, then clears all criteria', async (label, status) => {
+ session.api={listOrders:vi.fn().mockResolvedValue(list())};mountList();await screen.findByText('SYN-1')
+ fireEvent.change(screen.getByRole('searchbox'),{target:{value:'  NV-001  '}})
+ fireEvent.change(screen.getByLabelText('Desde'),{target:{value:'2026-01-01'}})
+ fireEvent.change(screen.getByLabelText('Hasta'),{target:{value:'2026-10-28'}})
+ fireEvent.click(screen.getByRole('button',{name:label,exact:true}))
+ fireEvent.click(screen.getByRole('button',{name:'Contraer filtros del historial'}))
+ expect(session.api.listOrders).toHaveBeenCalledTimes(1)
+ fireEvent.click(screen.getByRole('button',{name:'Expandir filtros del historial'}))
+ expect(screen.getByRole('searchbox').value).toBe('  NV-001  ')
+ fireEvent.click(screen.getByRole('button',{name:'Buscar pedidos'}))
+ await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(2))
+ expect(session.api.listOrders.mock.calls[1][0]).toMatchObject({status,search:'NV-001',from:'2026-01-01',to:'2026-10-28',page:1,limit:10})
+ await screen.findByText('SYN-1')
+ fireEvent.click(screen.getByRole('button',{name:'Limpiar filtros'}))
+ await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(3))
+ expect(session.api.listOrders.mock.calls[2][0]).toMatchObject({status:'',search:'',from:'',to:'',page:1})
+ expect(screen.getByRole('searchbox').value).toBe('')
+})
 function Navigation(){const navigate=useNavigate();return <><button onClick={()=>navigate('/h/1')}>Ir uno</button><button onClick={()=>navigate('/h/2')}>Ir dos</button></>}
 const mountDetail=()=>render(<StrictMode><MemoryRouter initialEntries={['/h/1']}><Navigation/><Routes><Route path="/h/:orderId" element={<Detail/>}/></Routes></MemoryRouter></StrictMode>)
 
@@ -36,28 +65,52 @@ it('shares pending reads only within one API, cancels the last listener and neve
  const stopC=subscribeHistoryRead({api,method:'listOrders',params,onSuccess:vi.fn(),onError:vi.fn()});await Promise.resolve();expect(api.listOrders).toHaveBeenCalledTimes(2);stopC();await Promise.resolve();expect(api.listOrders.mock.calls[1][0].signal.aborted).toBe(true)
 })
 
-it('list StrictMode makes one initial read, keeps explicit search and skips no-op date reset',async()=>{
+it('list StrictMode makes one initial read, keeps explicit search and skips unchanged Apply',async()=>{
  session.api={listOrders:vi.fn().mockResolvedValue(list())};mountList();await screen.findByText('SYN-1');expect(session.api.listOrders).toHaveBeenCalledTimes(1)
  fireEvent.change(screen.getByRole('searchbox'),{target:{value:'  ñ parcial  '}});expect(session.api.listOrders).toHaveBeenCalledTimes(1)
- fireEvent.click(screen.getByRole('button',{name:'Buscar'}));await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(2));expect(session.api.listOrders.mock.calls[1][0].search).toBe('ñ parcial');expect(session.api.listOrders.mock.calls[1][0].cursor).toBeNull()
- await screen.findByText('SYN-1');fireEvent.click(screen.getByRole('button',{name:/Restablecer fechas/}));fireEvent.click(screen.getByRole('button',{name:'Buscar'}));expect(session.api.listOrders).toHaveBeenCalledTimes(2)
+ fireEvent.click(screen.getByRole('button',{name:'Buscar pedidos'}));await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(2));expect(session.api.listOrders.mock.calls[1][0].search).toBe('ñ parcial');expect(session.api.listOrders.mock.calls[1][0].page).toBe(1)
+ await screen.findByText('SYN-1');fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}));expect(session.api.listOrders).toHaveBeenCalledTimes(2)
 })
 
-it('list preserves cursor stack, guards double pagination and resets cursor on filters',async()=>{
- const second=deferred();session.api={listOrders:vi.fn().mockResolvedValueOnce(list('Primera','c2')).mockReturnValueOnce(second.promise).mockResolvedValue(list('Fresca','c2'))};mountList();await screen.findByText('Primera')
- const next=screen.getByRole('button',{name:'Siguiente'});fireEvent.click(next);fireEvent.click(next);await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(2));expect(session.api.listOrders.mock.calls[1][0].cursor).toBe('c2');expect(screen.queryByText('Primera')).toBeNull()
- await act(async()=>second.resolve(list('Segunda','c3')));fireEvent.click(screen.getByRole('button',{name:'Anterior'}));await screen.findByText('Fresca');expect(session.api.listOrders.mock.calls[2][0].cursor).toBeNull()
- fireEvent.click(screen.getByRole('button',{name:'Cancelado'}));await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(4));expect(session.api.listOrders.mock.calls[3][0]).toMatchObject({status:'Cancelado',cursor:null,limit:15})
+it('list supports numbered jumps, guards double pagination and resets the page on filters',async()=>{
+ const second=deferred();session.api={listOrders:vi.fn().mockResolvedValueOnce(list('Primera',50)).mockReturnValueOnce(second.promise).mockResolvedValue(list('Fresca',50))};mountList();await screen.findByText('Primera')
+ const next=screen.getByRole('button',{name:'Página 5'});fireEvent.click(next);fireEvent.click(next);await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(2));expect(session.api.listOrders.mock.calls[1][0]).toMatchObject({page:5,limit:10});expect(screen.queryByText('Primera')).toBeNull()
+ await act(async()=>second.resolve(list('Última',50)));fireEvent.click(screen.getByRole('button',{name:'Página anterior'}));await screen.findByText('Fresca');expect(session.api.listOrders.mock.calls[2][0].page).toBe(4)
+ fireEvent.click(screen.getByRole('button',{name:'Cancelado'}));fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}));await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(4));expect(session.api.listOrders.mock.calls[3][0]).toMatchObject({status:'Cancelado',page:1,limit:10})
+})
+
+it('changes page size from 10 through 50, keeps the actual total and resets to 10 on remount',async()=>{
+ session.api={listOrders:vi.fn().mockImplementation(async ({page,limit})=>({items:Array.from({length:Math.min(limit,53-(page-1)*limit)},(_,i)=>({id:i+1,salesNoteNumber:`NV-${(page-1)*limit+i+1}`})),total:53}))}
+ const view=mountList();await screen.findByText('Mostrando 1 a 10 de 53 resultados')
+ for(const size of [20,30,40,50]){
+  fireEvent.change(screen.getByRole('combobox',{name:'Filas por página'}),{target:{value:String(size)}})
+  await screen.findByText(`Mostrando 1 a ${size} de 53 resultados`)
+  expect(session.api.listOrders.mock.calls.at(-1)[0]).toMatchObject({page:1,limit:size})
+ }
+ fireEvent.click(screen.getByRole('button',{name:'Página siguiente'}));await screen.findByText('Mostrando 51 a 53 de 53 resultados')
+ expect(screen.getByRole('button',{name:'Página siguiente'}).disabled).toBe(true)
+ view.unmount();mountList();await screen.findByText('Mostrando 1 a 10 de 53 resultados')
+ expect(screen.getByRole('combobox',{name:'Filas por página'}).value).toBe('10')
+})
+
+it('keeps the footer for empty results and returns to the last valid page if the total shrinks',async()=>{
+ session.api={listOrders:vi.fn().mockResolvedValueOnce(list('Primera',50)).mockResolvedValueOnce({items:[],total:13}).mockResolvedValueOnce(list('Última válida',13)).mockResolvedValue({items:[],total:0})}
+ mountList();await screen.findByText('Primera');fireEvent.click(screen.getByRole('button',{name:'Página 5'}));await screen.findByText('Última válida')
+ expect(session.api.listOrders.mock.calls.map(([params])=>params.page)).toEqual([1,5,2])
+ fireEvent.change(screen.getByRole('searchbox'),{target:{value:'Sin coincidencias'}});fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}))
+ await screen.findByText('Mostrando 0 a 0 de 0 resultados')
+ expect(screen.getByRole('button',{name:'Página anterior'}).disabled).toBe(true)
+ expect(screen.getByRole('button',{name:'Página siguiente'}).disabled).toBe(true)
 })
 
 it('rapid list filters abort abandoned reads, reject late results and keep the latest selection',async()=>{
  const old=deferred(),fresh=deferred();session.api={listOrders:vi.fn().mockReturnValueOnce(old.promise).mockReturnValueOnce(fresh.promise)};mountList();await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(1))
- fireEvent.click(screen.getByRole('button',{name:'Cancelado'}));await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(2));expect(session.api.listOrders.mock.calls[0][0].signal.aborted).toBe(true)
+ fireEvent.click(screen.getByRole('button',{name:'Cancelado'}));fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}));await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(2));expect(session.api.listOrders.mock.calls[0][0].signal.aborted).toBe(true)
  await act(async()=>fresh.resolve(list('Nuevo')));await act(async()=>old.resolve(list('Obsoleto')));expect(screen.getByText('Nuevo')).toBeTruthy();expect(screen.queryByText('Obsoleto')).toBeNull()
 })
 
 it('list error retry stays on the same filters and does not present stale rows as current',async()=>{
- session.api={listOrders:vi.fn().mockResolvedValueOnce(list('Anterior')).mockRejectedValueOnce({payload:{message:'Error de red'}}).mockResolvedValue(list('Reintentada'))};mountList();await screen.findByText('Anterior');fireEvent.click(screen.getByRole('button',{name:'Cancelado'}));await screen.findByRole('alert');expect(screen.queryByText('Anterior')).toBeNull()
+ session.api={listOrders:vi.fn().mockResolvedValueOnce(list('Anterior')).mockRejectedValueOnce({payload:{message:'Error de red'}}).mockResolvedValue(list('Reintentada'))};mountList();await screen.findByText('Anterior');fireEvent.click(screen.getByRole('button',{name:'Cancelado'}));fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}));await screen.findByRole('alert');expect(screen.queryByText('Anterior')).toBeNull()
  fireEvent.click(screen.getByRole('button',{name:'Reintentar'}));await screen.findByText('Reintentada');expect(session.api.listOrders).toHaveBeenCalledTimes(3);expect(session.api.listOrders.mock.calls[2][0].status).toBe('Cancelado')
 })
 
@@ -68,9 +121,9 @@ it('list API change removes previous-session data immediately and refetches',asy
 
 it('validates reversed creation dates locally, accepts partial and open ranges without a new cap',async()=>{
  session.api={listOrders:vi.fn().mockResolvedValue(list())};mountList();await screen.findByText('SYN-1')
- fireEvent.change(screen.getByLabelText('Desde'),{target:{value:'2024-09-10'}});await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(2))
+ fireEvent.change(screen.getByLabelText('Desde'),{target:{value:'2024-09-10'}});fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}));await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(2))
  fireEvent.change(screen.getByLabelText('Hasta'),{target:{value:'2024-09-01'}});expect(screen.getByRole('alert').textContent).toContain('posterior');expect(session.api.listOrders).toHaveBeenCalledTimes(2)
- fireEvent.change(screen.getByLabelText('Hasta'),{target:{value:'2025-12-31'}});await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(3))
+ fireEvent.change(screen.getByLabelText('Hasta'),{target:{value:'2025-12-31'}});fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}));await waitFor(()=>expect(session.api.listOrders).toHaveBeenCalledTimes(3))
  expect(historyDateError({from:'2024-02-30',to:''})).toBeTruthy();expect(historyDateError({from:'2024-02-29',to:''})).toBe('');expect(historyDateError({from:'',to:'2024-09-01'})).toBe('')
 })
 
@@ -114,37 +167,4 @@ it('formatters preserve UTC dates, local datetimes, DST boundaries and duration/
  for(const value of [null,undefined,'bad','2024-02-29','2024-09-08T03:59:59Z','2024-09-08T04:00:00Z','2025-01-01T00:00:00Z']){expect(formatDate(value)).toBe(beforeFormat.formatDate(value));expect(formatDateTime(value)).toBe(beforeFormat.formatDateTime(value))}
  for(const value of [null,undefined,'bad',0,1,59,60,3600,-1,0.5])expect(formatDuration(value)).toBe(beforeFormat.formatDuration(value))
  const a=[event(3),event(2)],result=appendHistoryEvents(a,[event(2),event(1),event(1)]);expect(result.map(e=>e.id)).toEqual([3,2,1]);expect(result[0]).toBe(a[0]);expect(a).toHaveLength(2)
-})
-
-it('requests 15 orders per cursor page, navigates back without duplicates and omits the header counter', async () => {
- const rows=Array.from({length:31},(_,i)=>({id:i+1,salesNoteNumber:`PAGE-${i+1}`,clientName:'Cliente',status:'Cancelado'}))
- session.api={listOrders:vi.fn(async ({cursor,limit})=>{
-  const offset=Number(cursor??0)
-  const items=rows.slice(offset,offset+limit)
-  return {items,pageInfo:{hasMore:offset+limit<rows.length,nextCursor:offset+limit<rows.length?String(offset+limit):null}}
- })}
- mountList()
- await screen.findByText('PAGE-1')
- expect(screen.getAllByRole('row')).toHaveLength(16)
- expect(screen.queryByText(/resultados en esta página/)).toBeNull()
- expect(screen.getByRole('heading',{name:'Historial de pedidos'})).toBeTruthy()
- fireEvent.click(screen.getByRole('button',{name:'Siguiente'}))
- await screen.findByText('PAGE-16')
- expect(screen.getAllByRole('row')).toHaveLength(16)
- expect(screen.queryByText('PAGE-1')).toBeNull()
- expect(screen.getByText('Página 2')).toBeTruthy()
- fireEvent.click(screen.getByRole('button',{name:'Siguiente'}))
- await screen.findByText('PAGE-31')
- expect(screen.getAllByRole('row')).toHaveLength(2)
- expect(screen.getByRole('button',{name:'Siguiente'}).disabled).toBe(true)
- fireEvent.click(screen.getByRole('button',{name:'Anterior'}))
- await screen.findByText('PAGE-16')
- expect(screen.getAllByRole('row')).toHaveLength(16)
- expect(session.api.listOrders.mock.calls.map(([params])=>params.cursor)).toEqual([null,'15','30','15'])
- expect(session.api.listOrders.mock.calls.every(([params])=>params.limit===15)).toBe(true)
- fireEvent.change(screen.getByRole('searchbox'),{target:{value:'Nueva búsqueda'}})
- fireEvent.click(screen.getByRole('button',{name:'Buscar'}))
- await waitFor(()=>expect(session.api.listOrders.mock.calls.at(-1)[0]).toMatchObject({cursor:null,limit:15,search:'Nueva búsqueda'}))
- await screen.findByText('PAGE-1')
- expect(screen.getByText('Página 1')).toBeTruthy()
 })

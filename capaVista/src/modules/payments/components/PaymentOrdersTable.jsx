@@ -19,7 +19,7 @@ export default function PaymentOrdersTable({
       className={`d-none d-lg-block ${styles.desktopTableWrap}`}
       aria-label="Tabla de pagos"
     >
-      <table className={`table table-hover align-middle mb-0 ${styles.paymentTable}`}>
+      <table className={styles.paymentTable}>
         <colgroup>
           <col className={styles.colOrder} />
           <col className={styles.colClient} />
@@ -31,12 +31,12 @@ export default function PaymentOrdersTable({
 
         <thead>
           <tr>
-            <th>Pedido</th>
-            <th>Cliente</th>
-            <th className={styles.rutColumn}>RUT</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th className={styles.actionsColumn}>Acciones</th>
+            <th scope="col">Pedido</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">RUT</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
           </tr>
         </thead>
 

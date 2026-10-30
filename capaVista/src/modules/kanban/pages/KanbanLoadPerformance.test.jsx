@@ -1,18 +1,17 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import KanbanBoardPage from './KanbanBoardPage'
-const state = vi.hoisted(() => ({ api: null, success: vi.fn(), error: vi.fn() }))
+const state = vi.hoisted(() => ({ api: null, allowed: true, success: vi.fn(), error: vi.fn() }))
 vi.mock('../hooks/useKanbanApi', () => ({ useKanbanApi: () => state.api }))
-vi.mock('../../../hooks/useAuth', () => ({ useAuth: () => ({ hasPermission: () => true }) }))
+vi.mock('../../../hooks/useAuth', () => ({ useAuth: () => ({ hasPermission: () => state.allowed }) }))
 vi.mock('../../../shared/notifications/useToast', () => ({ useToast: () => ({ success: state.success, error: state.error }) }))
 vi.mock('../components/KanbanColumn', () => ({ default: props => <output data-testid="refresh">{props.refreshKey}</output> }))
-vi.mock('../components/KanbanFilters', () => ({ default: () => null }))
 const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no }); return { promise, resolve, reject } }
 const load = (dailyQuantity = 100) => ({ date: '2026-10-27', capacity: 1200, percentage: 10, lanyardsInProduction: dailyQuantity,
   details: [{ detailId: 2, salesNoteNumber: 'SYNTHETIC', quantity: 1000, accumulatedQuantity: 300,
     dailyQuantity, remainingQuantity: 700, progressPercentage: 30 }] })
-beforeEach(() => { vi.clearAllMocks(); state.api = { getProductionLoad: vi.fn().mockResolvedValue(load()), updateProductionLoad: vi.fn() } })
+beforeEach(() => { vi.clearAllMocks(); state.allowed = true; state.api = { getProductionLoad: vi.fn().mockResolvedValue(load()), updateProductionLoad: vi.fn() } })
 afterEach(cleanup)
 it('saving a daily batch waits for confirmation, then refreshes the board exactly once', async () => {
   const pending = deferred(); state.api.updateProductionLoad.mockReturnValue(pending.promise)
@@ -26,7 +25,47 @@ it('saving a daily batch waits for confirmation, then refreshes the board exactl
   expect(state.success).not.toHaveBeenCalled()
   await act(async () => { pending.resolve(load(200)) })
   expect(screen.queryByRole('dialog')).toBeNull(); expect(screen.getByTestId('refresh').textContent).toBe('1')
+  expect(within(screen.getByRole('complementary', { name: 'Carga Operativa' })).getByText('200')).toBeTruthy()
   expect(state.api.getProductionLoad).toHaveBeenCalledTimes(1)
+})
+it.each([0, 75, 130])('shows the real load %s outside the banner without coupling settings to filters', async percentage => {
+  state.api.getProductionLoad.mockResolvedValue({ ...load(321), capacity: 987, percentage })
+  render(<MemoryRouter><KanbanBoardPage /></MemoryRouter>)
+  const meter = screen.getByRole('complementary', { name: 'Carga Operativa' })
+  const button = within(meter).getByRole('button', { name: 'Configurar carga operativa' })
+  await waitFor(() => expect(button.disabled).toBe(false))
+  expect(meter.closest('[data-page-header]')).toBeNull()
+  expect(screen.getByRole('banner').textContent).toBe('Kanban')
+  expect(meter.textContent).toContain('321 / 987 lanyards por día')
+  expect(within(meter).getByText(`${percentage}%`)).toBeTruthy()
+  const progress = within(meter).getByRole('progressbar')
+  expect(progress.getAttribute('aria-valuenow')).toBe(String(Math.min(percentage, 100)))
+  expect(progress.getAttribute('aria-valuetext')).toBe(`${percentage}%`)
+  expect(progress.firstElementChild.style.width).toBe(`${Math.min(percentage, 100)}%`)
+  const toggle = screen.getByRole('button', { name: 'Expandir filtros del tablero' })
+  expect(toggle.getAttribute('aria-expanded')).toBe('false')
+  fireEvent.click(button)
+  expect(screen.getByRole('dialog', { name: 'Carga diaria de Lanyard' })).toBeTruthy()
+  expect(toggle.getAttribute('aria-expanded')).toBe('false')
+  fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+  fireEvent.click(toggle)
+  fireEvent.click(button)
+  expect(toggle.getAttribute('aria-expanded')).toBe('true')
+  fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+  expect(state.api.getProductionLoad).toHaveBeenCalledTimes(1)
+  expect(state.api.updateProductionLoad).not.toHaveBeenCalled()
+})
+it('retains the configuration permission and disables settings while the load is pending', async () => {
+  const pending = deferred(); state.api.getProductionLoad.mockReturnValue(pending.promise)
+  const view = render(<MemoryRouter><KanbanBoardPage /></MemoryRouter>)
+  const button = screen.getByRole('button', { name: 'Configurar carga operativa' })
+  expect(button.disabled).toBe(true)
+  fireEvent.click(button); expect(screen.queryByRole('dialog')).toBeNull()
+  await act(async () => { pending.resolve(load()) })
+  expect(button.disabled).toBe(false)
+  state.allowed = false; view.rerender(<MemoryRouter><KanbanBoardPage /></MemoryRouter>)
+  expect(screen.queryByRole('button', { name: 'Configurar carga operativa' })).toBeNull()
+  expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('10')
 })
 it('uncertain write remains in its dialog and does not refresh or retry', async () => {
   state.api.updateProductionLoad.mockRejectedValue({ status: 503, code: 'NETWORK_ERROR' })
