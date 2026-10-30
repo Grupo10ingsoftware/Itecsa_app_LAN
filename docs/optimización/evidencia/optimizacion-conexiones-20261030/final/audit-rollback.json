@@ -1,0 +1,17 @@
+{
+  "capturedAt": "2026-10-30T18:56:32.302Z",
+  "checks": [
+    {
+      "returnRecord": false,
+      "insertedInTransaction": 1,
+      "persistedAfterRollback": 0,
+      "pass": true
+    },
+    {
+      "returnRecord": true,
+      "insertedInTransaction": 1,
+      "persistedAfterRollback": 0,
+      "pass": true
+    }
+  ]
+}

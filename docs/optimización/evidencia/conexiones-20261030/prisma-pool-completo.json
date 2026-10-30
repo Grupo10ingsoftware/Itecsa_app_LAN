@@ -1,0 +1,1010 @@
+{
+  "samples": [
+    {
+      "id": "active-prisma-select1-0",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.878,
+          "ms": 219.808,
+          "connection": 11,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.691,
+          "ms": 220.139,
+          "before": {
+            "total": 9,
+            "active": 0,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 11,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 441.042,
+          "ms": 219.718,
+          "connection": 11,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 220.84,
+          "ms": 439.924,
+          "connection": 11,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 661.112
+    },
+    {
+      "id": "active-prisma-select1-1",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.206,
+          "ms": 256.153,
+          "connection": 12,
+          "kind": "",
+          "shape": "e3b0c44298fc",
+          "error": "ER_PING_TIMEOUT"
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 256.386,
+          "ms": 219.424,
+          "connection": 13,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.189,
+          "ms": 475.666,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 9,
+            "active": 1,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 13,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 695.498,
+          "ms": 219.851,
+          "connection": 13,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 475.859,
+          "ms": 439.5,
+          "connection": 13,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 915.578
+    },
+    {
+      "id": "active-prisma-select1-2",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.178,
+          "ms": 218.627,
+          "connection": 14,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.158,
+          "ms": 218.685,
+          "before": {
+            "total": 9,
+            "active": 0,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 9,
+            "active": 1,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 14,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 437.665,
+          "ms": 218.933,
+          "connection": 14,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 218.848,
+          "ms": 437.754,
+          "connection": 14,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 656.807
+    },
+    {
+      "id": "active-prisma-select1-3",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.178,
+          "ms": 220.657,
+          "connection": 15,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.159,
+          "ms": 220.706,
+          "before": {
+            "total": 9,
+            "active": 0,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 9,
+            "active": 1,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 15,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 442.52,
+          "ms": 221.07,
+          "connection": 15,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 220.87,
+          "ms": 442.725,
+          "connection": 15,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 663.818
+    },
+    {
+      "id": "active-prisma-select1-4",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.179,
+          "ms": 262.824,
+          "connection": 16,
+          "kind": "",
+          "shape": "e3b0c44298fc",
+          "error": "ER_PING_TIMEOUT"
+        },
+        {
+          "name": "driver.ping",
+          "atMs": 263.023,
+          "ms": 187.863,
+          "connection": 17,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.157,
+          "ms": 450.777,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 9,
+            "active": 1,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 17,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 638.997,
+          "ms": 187.429,
+          "connection": 17,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 450.939,
+          "ms": 375.492,
+          "connection": 17,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 826.65
+    },
+    {
+      "id": "active-prisma-select1-5",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.174,
+          "ms": 218.939,
+          "connection": 18,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.154,
+          "ms": 218.987,
+          "before": {
+            "total": 9,
+            "active": 0,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 9,
+            "active": 1,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 18,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 439.111,
+          "ms": 219.206,
+          "connection": 18,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 219.145,
+          "ms": 439.177,
+          "connection": 18,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 658.542
+    },
+    {
+      "id": "active-prisma-select1-6",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.169,
+          "ms": 218.66,
+          "connection": 19,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.154,
+          "ms": 218.705,
+          "before": {
+            "total": 9,
+            "active": 0,
+            "idle": 9,
+            "queued": 0
+          },
+          "after": {
+            "total": 9,
+            "active": 1,
+            "idle": 8,
+            "queued": 0
+          },
+          "connection": 19,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 437.518,
+          "ms": 219.22,
+          "connection": 19,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 218.864,
+          "ms": 437.879,
+          "connection": 19,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 656.987
+    },
+    {
+      "id": "active-prisma-select1-7",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.174,
+          "ms": 218.91,
+          "connection": 20,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.159,
+          "ms": 218.958,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 20,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 438.854,
+          "ms": 219.012,
+          "connection": 20,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 219.122,
+          "ms": 438.749,
+          "connection": 20,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 658.084
+    },
+    {
+      "id": "active-prisma-select1-8",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.175,
+          "ms": 219.083,
+          "connection": 11,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.16,
+          "ms": 219.127,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 11,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 438.702,
+          "ms": 219.613,
+          "connection": 11,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 219.291,
+          "ms": 439.028,
+          "connection": 11,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 658.541
+    },
+    {
+      "id": "active-prisma-select1-9",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.174,
+          "ms": 219.053,
+          "connection": 13,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.16,
+          "ms": 219.115,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 13,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 439.043,
+          "ms": 219.707,
+          "connection": 13,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 219.28,
+          "ms": 439.474,
+          "connection": 13,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 658.967
+    },
+    {
+      "id": "active-prisma-select1-10",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.168,
+          "ms": 218.397,
+          "connection": 14,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.155,
+          "ms": 218.461,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 14,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 437.391,
+          "ms": 217.935,
+          "connection": 14,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 218.623,
+          "ms": 436.707,
+          "connection": 14,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 655.551
+    },
+    {
+      "id": "active-prisma-select1-11",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.188,
+          "ms": 218.705,
+          "connection": 21,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.175,
+          "ms": 218.741,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 21,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 438.442,
+          "ms": 219.146,
+          "connection": 21,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 218.921,
+          "ms": 438.672,
+          "connection": 21,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 657.789
+    },
+    {
+      "id": "active-prisma-select1-12",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.157,
+          "ms": 220.701,
+          "connection": 15,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.143,
+          "ms": 220.739,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 15,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 441.509,
+          "ms": 220.765,
+          "connection": 15,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 220.887,
+          "ms": 441.391,
+          "connection": 15,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 662.475
+    },
+    {
+      "id": "active-prisma-select1-13",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.145,
+          "ms": 187.208,
+          "connection": 17,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.133,
+          "ms": 187.242,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 17,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 375.458,
+          "ms": 187.673,
+          "connection": 17,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 187.38,
+          "ms": 375.755,
+          "connection": 17,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 563.339
+    },
+    {
+      "id": "active-prisma-select1-14",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.168,
+          "ms": 218.642,
+          "connection": 18,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.156,
+          "ms": 218.678,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 18,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 438.015,
+          "ms": 219.198,
+          "connection": 18,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 218.838,
+          "ms": 438.38,
+          "connection": 18,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 657.434
+    },
+    {
+      "id": "active-prisma-select1-15",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.199,
+          "ms": 219.198,
+          "connection": 22,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.186,
+          "ms": 219.234,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 22,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 439.468,
+          "ms": 219.844,
+          "connection": 22,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 219.425,
+          "ms": 439.892,
+          "connection": 22,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 659.525
+    },
+    {
+      "id": "active-prisma-select1-16",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.166,
+          "ms": 218.571,
+          "connection": 19,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.152,
+          "ms": 218.612,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 19,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 437.555,
+          "ms": 219.066,
+          "connection": 19,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 218.771,
+          "ms": 437.854,
+          "connection": 19,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 656.847
+    },
+    {
+      "id": "active-prisma-select1-17",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.156,
+          "ms": 218.847,
+          "connection": 20,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.143,
+          "ms": 218.882,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 20,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 438.796,
+          "ms": 219.144,
+          "connection": 20,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 219.03,
+          "ms": 438.913,
+          "connection": 20,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 658.191
+    },
+    {
+      "id": "active-prisma-select1-18",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.167,
+          "ms": 218.993,
+          "connection": 11,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.155,
+          "ms": 219.026,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 11,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 438.616,
+          "ms": 219.604,
+          "connection": 11,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 219.186,
+          "ms": 439.039,
+          "connection": 11,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 658.452
+    },
+    {
+      "id": "active-prisma-select1-19",
+      "events": [
+        {
+          "name": "driver.ping",
+          "atMs": 0.19,
+          "ms": 219.243,
+          "connection": 13,
+          "kind": "",
+          "shape": "e3b0c44298fc"
+        },
+        {
+          "name": "pool.acquire",
+          "atMs": 0.174,
+          "ms": 219.283,
+          "before": {
+            "total": 10,
+            "active": 0,
+            "idle": 10,
+            "queued": 0
+          },
+          "after": {
+            "total": 10,
+            "active": 1,
+            "idle": 9,
+            "queued": 0
+          },
+          "connection": 13,
+          "error": null
+        },
+        {
+          "name": "driver.executePromise",
+          "atMs": 439.496,
+          "ms": 219.858,
+          "connection": 13,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        },
+        {
+          "name": "driver.prepareExecute",
+          "atMs": 219.466,
+          "ms": 439.895,
+          "connection": 13,
+          "kind": "SELECT",
+          "shape": "90ca954a9feb"
+        }
+      ],
+      "ms": 659.616
+    }
+  ],
+  "pool": [
+    {
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    }
+  ]
+}

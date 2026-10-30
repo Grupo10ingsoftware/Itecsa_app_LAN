@@ -92,6 +92,7 @@ export default function UserManagementPage() {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
   const [totalUsers, setTotalUsers] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const [listRevision, setListRevision] = useState(0)
   const [actionMessage, setActionMessage] = useState(null)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [movementsUser, setMovementsUser] = useState(null)
@@ -184,7 +185,7 @@ export default function UserManagementPage() {
       latestRequestRef.current++
       listController.current?.abort()
     }
-  }, [loadUsers])
+  }, [loadUsers, listRevision])
 
   const totalPages = Math.max(1, Math.ceil(totalUsers / pageSize))
 
@@ -203,16 +204,17 @@ export default function UserManagementPage() {
     setPage(1)
   }
 
-  async function refreshAfterMutation(message, { resetPage = false } = {}) {
+  function refreshAfterMutation(message, { resetPage = false } = {}) {
     if (message.type === 'success') notify.success(message.text)
     else setActionMessage(message)
-    if (resetPage && page !== 1) {
-      // The page effect owns this single reload; do not also fetch the old page.
-      latestRequestRef.current++
-      listController.current?.abort()
-      preserveNextListMessage.current = true
-      setPage(1)
-    } else await loadUsers({ preserveMessage: true })
+    // The effect reloads with current filters, including changes made while the
+    // mutation was pending. A captured loadUsers closure can contain old filters.
+    latestRequestRef.current++
+    listController.current?.abort()
+    preserveNextListMessage.current = true
+    setIsLoading(true)
+    if (resetPage) setPage(1)
+    setListRevision(current => current + 1)
   }
 
   async function handleSaveUser(updatedUser) {
@@ -221,7 +223,7 @@ export default function UserManagementPage() {
     try {
       await adminUsersApi.updateUser(updatedUser)
       setEditingUser(null)
-      await refreshAfterMutation({ type: 'success', text: 'Usuario actualizado correctamente.' })
+      refreshAfterMutation({ type: 'success', text: 'Usuario actualizado correctamente.' })
     } catch (error) {
       if (requiresContext(error) || uncertainOperation(error)) {
         // The dialog owns correctable PIN/session/reconciliation feedback.
@@ -232,9 +234,9 @@ export default function UserManagementPage() {
     }
   }
 
-  async function handleCreatedUser(user) {
+  function handleCreatedUser(user) {
     if (user.outcome === 'user_created') setIsCreateModalOpen(false)
-    await refreshAfterMutation({ type: user.outcome === 'user_created' ? 'success' : 'warning',
+    refreshAfterMutation({ type: user.outcome === 'user_created' ? 'success' : 'warning',
       text: user.outcome === 'user_created'
         ? 'Usuario creado. Deberá cambiar su contraseña temporal al iniciar sesión.'
         : 'Preparacion incompleta. No repitas el alta con otro nombre. Referencia: ' + user.operationId + '.' }, { resetPage: true })

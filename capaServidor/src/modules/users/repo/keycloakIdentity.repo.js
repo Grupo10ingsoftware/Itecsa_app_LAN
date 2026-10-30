@@ -23,6 +23,19 @@ function listPredicate(issuer, { search = '', estadoUsuario = '', rolUsuario = '
   return Prisma.join(conditions, ' AND ');
 }
 
+function mapBinding(row) {
+  if (!row) return null;
+  const { id_usuario, rol_usuario, estado_usuario, correo_usuario, nombre_usuario, apellido_usuario, ...binding } = row;
+  return { ...binding, Usuario: { id_usuario, rol_usuario, estado_usuario, correo_usuario, nombre_usuario, apellido_usuario } };
+}
+
+async function insertOne(model, data) {
+  // These writes have no generated fields consumed by this workflow. Keep
+  // constraints and transaction ownership, without hydrating the inserted row.
+  const inserted = await model.createMany({ data: [data] });
+  if (inserted.count !== 1) throw Error('IDENTITY_STORAGE_NOT_CONFIRMED');
+}
+
 // Explicit external bindings preserve local keys and actor ownership.
 export class KeycloakIdentityRepository {
   constructor({ prisma } = {}) { this.prisma = prisma; }
@@ -70,9 +83,12 @@ export class KeycloakIdentityRepository {
       select: { id_usuario: true, rol_usuario: true, estado_usuario: true } });
   }
   async claim({ issuer, input, digest, actorId }) {
+    const operation = { id: randomUUID(), issuer, username: input.username, input,
+      payload_digest: digest, state: 'pending', revision: 0, actor_user_id: actorId,
+      external_subject: null, local_user_id: null, last_error: null };
     try {
-      return await this.client.identityProvisionOperation.create({ data: { id: randomUUID(), issuer,
-        username: input.username, input, payload_digest: digest, state: 'pending', actor_user_id: actorId } });
+      await insertOne(this.client.identityProvisionOperation, operation);
+      return operation;
     } catch (error) {
       if (error?.code !== 'P2002') throw error;
       const existing = await this.client.identityProvisionOperation.findUnique({ where: { issuer_username: { issuer, username: input.username } } });
@@ -86,7 +102,9 @@ export class KeycloakIdentityRepository {
       where: { id: operation.id, revision: operation.revision, state: reconcile ? 'needs_reconciliation' : 'pending' },
       data: { state: 'running', revision: { increment: 1 }, last_error: null },
     });
-    return result.count === 1 ? this.operation(operation.id) : null;
+    // The conditional write owns this revision. All returned business fields
+    // are already known; rereading the same row adds a round trip, not a guard.
+    return result.count === 1 ? { ...operation, state: 'running', revision: operation.revision + 1, last_error: null } : null;
   }
   async checkpoint(operation, subject) {
     const result = await this.client.identityProvisionOperation.updateMany({
@@ -102,9 +120,9 @@ export class KeycloakIdentityRepository {
         data: { state: terminal ? 'failed' : 'needs_reconciliation', last_error: code },
       });
       if (result.count !== 1) throw Error('IDENTITY_OPERATION_CONFLICT');
-      await tx.securityAuditEvent.create({ data: { event_type: 'identity.preparation', actor_user_id: actorId,
+      await insertOne(tx.securityAuditEvent, { event_type: 'identity.preparation', actor_user_id: actorId,
         action: 'prepare', resource_type: 'identity_operation', resource_id: operation.id, request_id: operation.id,
-        outcome: terminal ? 'rejected' : 'pending', reason_code: code } });
+        outcome: terminal ? 'rejected' : 'pending', reason_code: code });
     });
   }
   async complete(operation, subject, actorId, actorSubject, actorRole) {
@@ -115,23 +133,32 @@ export class KeycloakIdentityRepository {
         throw Object.assign(Error('El actor cambio durante la preparacion.'), { code: 'IDENTITY_ACTOR_CHANGED' });
       }
       const input = operation.input;
+      if (operation.local_user_id) await tx.$queryRaw`SELECT id_usuario FROM Usuario WHERE id_usuario=${operation.local_user_id} FOR UPDATE`;
       const user = operation.local_user_id
         ? await tx.usuario.findFirst({ where: { id_usuario: operation.local_user_id, id_keycloak: subject,
-          ExternalIdentity: { is: { provider: 'keycloak', issuer: operation.issuer, subject } } } })
+          ExternalIdentity: { is: { provider: 'keycloak', issuer: operation.issuer, subject, username: operation.username } } },
+        select: { id_usuario: true, rol_usuario: true, estado_usuario: true, correo_usuario: true,
+          rut_usuario: true, nombre_usuario: true, apellido_usuario: true } })
         : await tx.usuario.create({ data: { id_keycloak: subject, correo_usuario: input.email, rut_usuario: input.rut ?? null,
-        nombre_usuario: input.firstName, apellido_usuario: input.lastName, rol_usuario: input.role, estado_usuario: 'Pendiente' } });
+        nombre_usuario: input.firstName, apellido_usuario: input.lastName, rol_usuario: input.role, estado_usuario: 'Pendiente' },
+        select: { id_usuario: true } });
       if (!user) throw Error('IDENTITY_BINDING_CONFLICT');
-      if (!operation.local_user_id) await tx.externalIdentity.create({ data: { provider: 'keycloak', issuer: operation.issuer, subject,
-        username: input.username, user_id: user.id_usuario } });
-      await tx.securityAuditEvent.create({ data: { event_type: 'identity.preparation', actor_user_id: actorId,
+      // A partially provisioned account may have been edited since the failure.
+      // Reconciliation must never activate it using stale journal privileges.
+      if (operation.local_user_id && (user.estado_usuario !== 'Pendiente' || user.rol_usuario !== input.role
+        || user.correo_usuario !== input.email || user.rut_usuario !== (input.rut ?? null)
+        || user.nombre_usuario !== input.firstName || user.apellido_usuario !== input.lastName)) throw Error('IDENTITY_BINDING_CONFLICT');
+      if (!operation.local_user_id) await insertOne(tx.externalIdentity, { provider: 'keycloak', issuer: operation.issuer, subject,
+        username: input.username, user_id: user.id_usuario });
+      await insertOne(tx.securityAuditEvent, { event_type: 'identity.preparation', actor_user_id: actorId,
         action: 'prepare', resource_type: 'identity_operation', resource_id: operation.id, request_id: operation.id,
-        outcome: 'prepared' } });
+        outcome: 'prepared' });
       const result = await tx.identityProvisionOperation.updateMany({
         where: { id: operation.id, revision: operation.revision, state: 'running' },
         data: { external_subject: subject, local_user_id: user.id_usuario },
       });
       if (result.count !== 1) throw Error('IDENTITY_OPERATION_CONFLICT');
-      return this.operationUsing(tx, operation.id);
+      return { ...operation, state: 'running', external_subject: subject, local_user_id: user.id_usuario };
     });
   }
   async finish(operation) {
@@ -142,29 +169,38 @@ export class KeycloakIdentityRepository {
         data: { state: 'created' },
       });
       if (updated.count !== 1) throw Error('IDENTITY_OPERATION_CONFLICT');
-      return this.operationUsing(tx, operation.id);
+      return { ...operation, state: 'created' };
     });
   }
-  operationUsing(client, id) { return client.identityProvisionOperation.findUnique({ where: { id } }); }
   async beginUpdate(issuer, subject, actorId, actorRole) {
     return this.client.$transaction(async tx => {
       const actors = await tx.usuario.findFirst({ where: { id_usuario: actorId, rol_usuario: actorRole,
         estado_usuario: { in: [...ACTIVE_USER_STATUSES] } }, select: { id_usuario: true } });
       if (!actors) throw Object.assign(Error('Actor no autorizado'), { code: 'IDENTITY_ACTOR_CHANGED' });
-      await tx.$queryRaw`SELECT u.id_usuario FROM Usuario u JOIN ExternalIdentity e ON e.user_id = u.id_usuario WHERE e.provider='keycloak' AND e.issuer=${issuer} AND e.subject=${subject} FOR UPDATE`;
-      const binding = await tx.externalIdentity.findUnique({
-        where: { provider_issuer_subject: { provider: 'keycloak', issuer, subject } },
-        include: { Usuario: { select: { id_usuario: true, rol_usuario: true, estado_usuario: true,
-          correo_usuario: true, nombre_usuario: true, apellido_usuario: true } } },
-      });
-      if (!binding || !ASSIGNABLE_ROLES.includes(binding.Usuario.rol_usuario) || binding.user_id === actorId) {
+      const locked = await tx.$queryRaw`SELECT e.id_external_identity, e.provider, e.issuer, e.subject,
+        e.username, e.user_id, u.id_usuario, u.rol_usuario, u.estado_usuario, u.correo_usuario,
+        u.nombre_usuario, u.apellido_usuario, p.state AS provision_state
+        FROM Usuario u JOIN ExternalIdentity e ON e.user_id = u.id_usuario
+        LEFT JOIN IdentityProvisionOperation p ON p.issuer = e.issuer AND p.username = e.username AND p.local_user_id = u.id_usuario
+        WHERE e.provider='keycloak' AND e.issuer=${issuer} AND e.subject=${subject} FOR UPDATE`;
+      // Use the current locking read. A following ordinary ORM read can still
+      // see the transaction's older snapshot under REPEATABLE READ.
+      const { provision_state, ...row } = locked[0] ?? {};
+      const binding = locked.length ? mapBinding(row) : null;
+      if (!binding || binding.Usuario.id_usuario !== binding.user_id
+        || !ASSIGNABLE_ROLES.includes(binding.Usuario.rol_usuario) || binding.user_id === actorId) {
         throw Object.assign(Error('Usuario no editable'), { code: 'IDENTITY_TARGET_FORBIDDEN' });
       }
       if (binding.Usuario.estado_usuario?.startsWith('Actualizando:')) {
         throw Object.assign(Error('Actualizacion en curso'), { code: 'IDENTITY_UPDATE_BUSY' });
       }
+      if (['running', 'needs_reconciliation'].includes(provision_state)) {
+        throw Object.assign(Error('Provision pendiente de conciliacion'), { code: 'IDENTITY_PROVISION_INCOMPLETE' });
+      }
       const updateState = 'Actualizando:' + randomUUID().replaceAll('-', '').slice(0, 16);
-      await tx.usuario.update({ where: { id_usuario: binding.user_id }, data: { estado_usuario: updateState } });
+      const updated = await tx.usuario.updateMany({ where: { id_usuario: binding.user_id,
+        estado_usuario: binding.Usuario.estado_usuario }, data: { estado_usuario: updateState } });
+      if (updated.count !== 1) throw Object.assign(Error('La cuenta cambio'), { code: 'IDENTITY_UPDATE_BUSY' });
       return { ...binding, updateState };
     });
   }
@@ -173,8 +209,8 @@ export class KeycloakIdentityRepository {
       const updated = await tx.usuario.updateMany({ where: { id_usuario: binding.user_id, estado_usuario: binding.updateState,
         ExternalIdentity: { is: { provider: 'keycloak', issuer: binding.issuer, subject: binding.subject } } }, data });
       if (updated.count !== 1) throw Object.assign(Error('La cuenta cambio'), { code: 'IDENTITY_UPDATE_CONFLICT' });
-      await tx.securityAuditEvent.create({ data: { event_type: 'identity.update', actor_user_id: actorId,
-        action: 'update', resource_type: 'user', resource_id: String(binding.user_id), outcome } });
+      await insertOne(tx.securityAuditEvent, { event_type: 'identity.update', actor_user_id: actorId,
+        action: 'update', resource_type: 'user', resource_id: String(binding.user_id), outcome });
     });
   }
   async binding(issuer, subject) {
@@ -182,8 +218,6 @@ export class KeycloakIdentityRepository {
       e.username, e.user_id, u.id_usuario, u.rol_usuario, u.estado_usuario, u.correo_usuario,
       u.nombre_usuario, u.apellido_usuario FROM ExternalIdentity e JOIN Usuario u ON u.id_usuario = e.user_id
       WHERE e.provider = 'keycloak' AND e.issuer = ${issuer} AND e.subject = ${subject} LIMIT 1`;
-    if (!rows.length) return null;
-    const { id_usuario, rol_usuario, estado_usuario, correo_usuario, nombre_usuario, apellido_usuario, ...binding } = rows[0];
-    return { ...binding, Usuario: { id_usuario, rol_usuario, estado_usuario, correo_usuario, nombre_usuario, apellido_usuario } };
+    return mapBinding(rows[0]);
   }
 }

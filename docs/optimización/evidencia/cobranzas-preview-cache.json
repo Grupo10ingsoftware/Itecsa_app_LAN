@@ -1,0 +1,159 @@
+{
+  "capturedAt": "2026-10-30T14:49:23.366Z",
+  "phase": "after",
+  "fixture": "COB-TEST-1793360400000",
+  "environment": "Windows Node to Aiven MySQL; strict TLS; pool 10; no Keycloak writes",
+  "methodology": "10 warm sequential samples; p95 withheld; service/SQL only until HTTP harness; no browser claim",
+  "samples": {
+    "preview_cache_warm": {
+      "n": 10,
+      "p50Ms": 0.005,
+      "p95Ms": null,
+      "maxMs": 0.01,
+      "values": [
+        {
+          "ms": 0.01,
+          "sql": [],
+          "bytes": 243,
+          "rows": null,
+          "requestsHttp": 0
+        },
+        {
+          "ms": 0.004,
+          "sql": [],
+          "bytes": 243,
+          "rows": null,
+          "requestsHttp": 0
+        },
+        {
+          "ms": 0.005,
+          "sql": [],
+          "bytes": 243,
+          "rows": null,
+          "requestsHttp": 0
+        },
+        {
+          "ms": 0.008,
+          "sql": [],
+          "bytes": 243,
+          "rows": null,
+          "requestsHttp": 0
+        },
+        {
+          "ms": 0.006,
+          "sql": [],
+          "bytes": 243,
+          "rows": null,
+          "requestsHttp": 0
+        },
+        {
+          "ms": 0.004,
+          "sql": [],
+          "bytes": 243,
+          "rows": null,
+          "requestsHttp": 0
+        },
+        {
+          "ms": 0.005,
+          "sql": [],
+          "bytes": 243,
+          "rows": null,
+          "requestsHttp": 0
+        },
+        {
+          "ms": 0.008,
+          "sql": [],
+          "bytes": 243,
+          "rows": null,
+          "requestsHttp": 0
+        },
+        {
+          "ms": 0.006,
+          "sql": [],
+          "bytes": 243,
+          "rows": null,
+          "requestsHttp": 0
+        },
+        {
+          "ms": 0.002,
+          "sql": [],
+          "bytes": 243,
+          "rows": null,
+          "requestsHttp": 0
+        }
+      ]
+    }
+  },
+  "checks": [
+    "live_http_preview_warmup_then_10_cache_hits_no_http_no_sql"
+  ],
+  "plans": {},
+  "errors": [],
+  "server": {
+    "version": "8.4.8",
+    "requireSecureTransport": false,
+    "tlsSession": true
+  },
+  "fixtureIds": {
+    "customer": 75,
+    "actor": 51,
+    "orders": [
+      202,
+      201,
+      200,
+      199,
+      198,
+      197,
+      196,
+      195,
+      194,
+      193,
+      192,
+      191,
+      190,
+      189,
+      188,
+      187,
+      186,
+      185,
+      184,
+      183,
+      182,
+      181,
+      180,
+      179,
+      178,
+      177,
+      176,
+      175,
+      174,
+      173,
+      172,
+      171,
+      170,
+      169,
+      168,
+      167,
+      166,
+      165,
+      164
+    ]
+  },
+  "httpHarness": {
+    "authority": "synthetic local RS256/JWKS",
+    "identity": "existing active Aiven DB binding, same role for all series",
+    "includes": [
+      "real JWT validation",
+      "real active identity SQL",
+      "capabilities",
+      "routers/controllers/DTO",
+      "memory quota 120/min"
+    ],
+    "excludes": [
+      "operational Keycloak login/session",
+      "browser/render",
+      "global support audit",
+      "SQL throttle persistence"
+    ]
+  }
+}

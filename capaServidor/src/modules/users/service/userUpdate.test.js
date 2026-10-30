@@ -11,6 +11,7 @@ import { createKeycloakIdentityPreparationRouter } from '../routes/keycloakIdent
 const context = { provider: 'keycloak', subject: 'operator', role: ROLES.SOPORTE,
   permissions: [PERMISSIONS.MANAGE_USERS], pin: '123456' };
 const input = { firstName: 'Maria', lastName: 'Soto', email: 'MARIA@example.com', role: ROLES.COBRANZAS, state: 'Activo' };
+const bindingRow = ({ Usuario, ...binding }) => ({ ...binding, ...Usuario });
 
 function fixture({ fail, pinError, localState = 'Activo', role = ROLES.VENTAS } = {}) {
   const events = [];
@@ -129,17 +130,82 @@ test('a concurrent edit is rejected before external writes', async () => {
   assert.equal(f.events.includes('disable'), false);
 });
 
+test('two overlapping edits cannot write remote attributes for the same user', async () => {
+  const f = fixture(); let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  f.management.logout = async () => { await gate; };
+  const first = f.service.update(context, 'target', input);
+  await new Promise(resolve => setImmediate(resolve));
+  await assert.rejects(f.service.update(context, 'target', { ...input, firstName: 'Otro' }), { code: 'IDENTITY_UPDATE_BUSY' });
+  release();
+  assert.equal((await first).outcome, 'user_updated');
+  assert.equal(f.external.firstName, input.firstName);
+  assert.equal(f.events.filter(event => event === 'attributes').length, 1);
+});
+
+for (const state of ['running', 'needs_reconciliation']) {
+  test(`repository refuses edits of a locally linked provision in ${state}`, async () => {
+    const f = fixture();
+    const repository = new KeycloakIdentityRepository({ prisma: { $transaction: fn => fn({
+      $queryRaw: async (sql, ...values) => {
+        assert.match(sql.join('?'), /LEFT JOIN IdentityProvisionOperation/);
+        assert.match(sql.join('?'), /p.local_user_id = u.id_usuario/);
+        assert.deepEqual(values, ['issuer', 'target']);
+        return [{ ...bindingRow(f.binding), provision_state: state }];
+      },
+      usuario: { findFirst: async () => ({ id_usuario: 1 }), updateMany: () => assert.fail('must preserve pending provision') },
+      externalIdentity: { findUnique: async () => f.binding },
+    }) } });
+    await assert.rejects(repository.beginUpdate('issuer', 'target', 1, context.role), { code: 'IDENTITY_PROVISION_INCOMPLETE' });
+  });
+}
+
+for (const state of [null, 'created']) {
+  test(`repository permits ordinary editing with provision state ${state}`, async () => {
+    const f = fixture(); let writes = 0;
+    const repository = new KeycloakIdentityRepository({ prisma: { $transaction: fn => fn({
+      $queryRaw: async () => [{ ...bindingRow(f.binding), provision_state: state }],
+      usuario: { findFirst: async () => ({ id_usuario: 1 }), updateMany: async () => { writes++; return { count: 1 }; } },
+      externalIdentity: { findUnique: async () => f.binding },
+    }) } });
+    const binding = await repository.beginUpdate('issuer', 'target', 1, context.role);
+    assert.match(binding.updateState, /^Actualizando:/);
+    assert.equal(writes, 1);
+  });
+}
+
+test('update uses the locking read even when a plain binding read has an older snapshot', async () => {
+  const f = fixture();
+  const repository = new KeycloakIdentityRepository({ prisma: { $transaction: fn => fn({
+    $queryRaw: async () => [{ ...bindingRow(f.binding), estado_usuario: 'Actualizando:another', provision_state: null }],
+    usuario: { findFirst: async () => ({ id_usuario: 1 }), updateMany: async () => ({ count: 1 }) },
+    externalIdentity: { findUnique: async () => f.binding },
+  }) } });
+  await assert.rejects(repository.beginUpdate('issuer', 'target', 1, context.role), { code: 'IDENTITY_UPDATE_BUSY' });
+});
+
 test('repository commits only the state owned by this update and records audit', async () => {
   let where, audit;
   const repository = new KeycloakIdentityRepository({ prisma: { $transaction: fn => fn({
     usuario: { updateMany: async options => { where = options.where; return { count: 1 }; } },
-    securityAuditEvent: { create: async ({ data }) => { audit = data; } },
+    securityAuditEvent: { createMany: async ({ data }) => { audit = data[0]; return { count: 1 }; } },
   }) } });
   await repository.finishUpdate({ user_id: 2, subject: 'target', issuer: 'issuer', updateState: 'Actualizando:unique' },
     { estado_usuario: 'Activo' }, 1);
   assert.equal(where.estado_usuario, 'Actualizando:unique');
   assert.equal(audit.actor_user_id, 1);
   assert.equal(audit.outcome, 'updated');
+});
+
+test('an unconfirmed audit insert cannot report a successful user update', async () => {
+  const repository = new KeycloakIdentityRepository({ prisma: { $transaction: fn => fn({
+    usuario: { updateMany: async () => ({ count: 1 }) },
+    securityAuditEvent: { createMany: async ({ skipDuplicates }) => {
+      assert.equal(skipDuplicates, undefined); return { count: 0 };
+    } },
+  }) } });
+  await assert.rejects(repository.finishUpdate({ user_id: 2, subject: 'target', issuer: 'issuer', updateState: 'Actualizando:test' },
+    { estado_usuario: 'Activo' }, 1), /IDENTITY_STORAGE_NOT_CONFIRMED/);
 });
 
 test('PATCH updates the authenticated target and rejects unexpected request fields', async t => {
@@ -162,4 +228,8 @@ test('PATCH updates the authenticated target and rejects unexpected request fiel
   assert.equal(accepted.headers.get('cache-control'), 'no-store');
   const rejected = await send({ pin: context.pin, identity: input, password: 'unexpected' });
   assert.equal(rejected.status, 400);
+  f.repository.beginUpdate = async () => { throw Object.assign(Error(), { code: 'IDENTITY_PROVISION_INCOMPLETE' }); };
+  const incomplete = await send({ pin: context.pin, identity: input });
+  assert.equal(incomplete.status, 409);
+  assert.equal((await incomplete.json()).code, 'IDENTITY_PROVISION_INCOMPLETE');
 });

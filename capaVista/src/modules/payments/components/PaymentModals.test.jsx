@@ -3,6 +3,7 @@ import { afterEach, expect, it, vi } from 'vitest'
 import { render } from '../../../test/renderWithToast'
 import PaymentCredentialsModal from './PaymentCredentialsModal'
 import PaymentActionConfirmModal from './PaymentActionConfirmModal'
+import { mergePaymentPreview, normalizePaymentOrder } from '../utils/paymentOrders'
 
 afterEach(cleanup)
 const order = { id: 1, nvNumber: 'SYNTH-001', paymentStatus: 'Confirmado', companyName: 'Synthetic', rut: 'Synthetic',
@@ -36,4 +37,12 @@ it('action dialog keeps full product information and prevents PIN progression wh
   expect(screen.getByText('Synthetic product')).toBeTruthy(); expect(screen.getByText('0')).toBeTruthy()
   expect(action.disabled).toBe(false)
   fireEvent.click(action); expect(props.onValidate).toHaveBeenCalledTimes(1)
+})
+
+it('displays the actual preview seller name and keeps the legacy email fallback', () => {
+  const merged = mergePaymentPreview(normalizePaymentOrder({ id: 1 }), { sellerName: ' Vendedor Ficticio ' })
+  const view = render(<PaymentActionConfirmModal mode="detail" order={merged} onCancel={vi.fn()} />)
+  expect(screen.getByText('Vendedor Ficticio')).toBeTruthy()
+  view.rerender(<PaymentActionConfirmModal mode="detail" order={{ ...merged, sellerName: null, sellerEmail: 'ficticio@example.invalid' }} onCancel={vi.fn()} />)
+  expect(screen.getByText('ficticio@example.invalid')).toBeTruthy()
 })

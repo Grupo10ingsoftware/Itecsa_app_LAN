@@ -189,8 +189,12 @@ export class KeycloakManagementService {
     if (effective.length > 1 || effective.some(value => !ASSIGNABLE_ROLES.includes(value.name))) throw new KeycloakServiceError('KEYCLOAK_TARGET_FORBIDDEN', { status: 403 });
     if (direct.some(value => !ASSIGNABLE_ROLES.includes(value.name))) throw new KeycloakServiceError('KEYCLOAK_TARGET_FORBIDDEN', { status: 403 });
     const path = '/users/' + segment(subject) + '/role-mappings/clients/' + await this.roleClient();
-    if (direct.length) await this.request(path, { method: 'DELETE', expected: [204], body: direct.map(value => ({ id: value.id, name: value.name })) });
-    await this.request(path, { method: 'POST', expected: [204], body: [target] });
+    const alreadyAssigned = effective.length === 1 && effective[0].name === role
+      && direct.length === 1 && direct[0].id === target.id && direct[0].name === role;
+    if (!alreadyAssigned) {
+      if (direct.length) await this.request(path, { method: 'DELETE', expected: [204], body: direct.map(value => ({ id: value.id, name: value.name })) });
+      await this.request(path, { method: 'POST', expected: [204], body: [target] });
+    }
     const verified = await this.roles(subject);
     if (verified.length !== 1 || verified[0].name !== role) throw new KeycloakServiceError('KEYCLOAK_ROLE_NOT_CONFIRMED', { ambiguous: true });
   }

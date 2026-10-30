@@ -22,6 +22,7 @@ export function createKeycloakIdentityPreparationRouter({ authenticate = checkJw
       if (error instanceof IdentityAdministrationError || error instanceof KeycloakServiceError) {
         const messages = {
           IDENTITY_UPDATE_BUSY: 'Otro cambio de este usuario esta en curso. Actualiza e intenta nuevamente.',
+          IDENTITY_PROVISION_INCOMPLETE: 'La creacion de esta cuenta requiere conciliacion antes de editarla.',
           IDENTITY_UPDATE_REQUIRES_REVIEW: 'La actualizacion quedo incompleta y el acceso permanece bloqueado. Requiere revision administrativa.',
           IDENTITY_INPUT_INVALID: 'Revisa el nombre, apellido, correo, rol y estado ingresados.',
         };

@@ -1,0 +1,112 @@
+{
+  "sessions": [
+    {
+      "connection": 2,
+      "cacheEnabled": true,
+      "serverPrepared": 9,
+      "counters": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 50,
+        "Com_stmt_prepare": 9
+      }
+    },
+    {
+      "connection": 11,
+      "cacheEnabled": true,
+      "serverPrepared": 9,
+      "counters": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 31,
+        "Com_stmt_prepare": 9
+      }
+    },
+    {
+      "connection": 7,
+      "cacheEnabled": true,
+      "serverPrepared": 9,
+      "counters": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 41,
+        "Com_stmt_prepare": 9
+      }
+    },
+    {
+      "connection": 9,
+      "cacheEnabled": true,
+      "serverPrepared": 9,
+      "counters": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 33,
+        "Com_stmt_prepare": 9
+      }
+    },
+    {
+      "connection": 1,
+      "cacheEnabled": true,
+      "serverPrepared": 8,
+      "counters": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 50,
+        "Com_stmt_prepare": 8
+      }
+    },
+    {
+      "connection": 3,
+      "cacheEnabled": true,
+      "serverPrepared": 8,
+      "counters": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 38,
+        "Com_stmt_prepare": 8
+      }
+    },
+    {
+      "connection": 5,
+      "cacheEnabled": true,
+      "serverPrepared": 10,
+      "counters": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 41,
+        "Com_stmt_prepare": 10
+      }
+    },
+    {
+      "connection": 12,
+      "cacheEnabled": true,
+      "serverPrepared": 8,
+      "counters": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 34,
+        "Com_stmt_prepare": 8
+      }
+    },
+    {
+      "connection": 4,
+      "cacheEnabled": true,
+      "serverPrepared": 9,
+      "counters": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 44,
+        "Com_stmt_prepare": 9
+      }
+    },
+    {
+      "connection": 8,
+      "cacheEnabled": true,
+      "serverPrepared": 9,
+      "counters": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 34,
+        "Com_stmt_prepare": 9
+      }
+    }
+  ],
+  "pools": [
+    {
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    }
+  ]
+}

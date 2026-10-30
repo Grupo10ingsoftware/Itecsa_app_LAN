@@ -1,0 +1,196 @@
+{
+  "before": {
+    "total": 10,
+    "active": 0,
+    "idle": 10,
+    "queued": 0
+  },
+  "after": {
+    "total": 8,
+    "active": 0,
+    "idle": 8,
+    "queued": 0
+  },
+  "timeline": [
+    {
+      "ms": 1003.658,
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    },
+    {
+      "ms": 2012.684,
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    },
+    {
+      "ms": 3025.188,
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    },
+    {
+      "ms": 4038.36,
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    },
+    {
+      "ms": 5052.427,
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    },
+    {
+      "ms": 6066.825,
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    },
+    {
+      "ms": 7077.632,
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    },
+    {
+      "ms": 8079.508,
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    },
+    {
+      "ms": 9092.515,
+      "total": 9,
+      "active": 0,
+      "idle": 9,
+      "queued": 0
+    },
+    {
+      "ms": 10103.762,
+      "total": 8,
+      "active": 0,
+      "idle": 8,
+      "queued": 0
+    },
+    {
+      "ms": 11115.613,
+      "total": 7,
+      "active": 0,
+      "idle": 7,
+      "queued": 0
+    },
+    {
+      "ms": 12117.997,
+      "total": 7,
+      "active": 0,
+      "idle": 7,
+      "queued": 0
+    },
+    {
+      "ms": 13129.506,
+      "total": 6,
+      "active": 0,
+      "idle": 6,
+      "queued": 0
+    },
+    {
+      "ms": 14139.622,
+      "total": 5,
+      "active": 0,
+      "idle": 5,
+      "queued": 0
+    },
+    {
+      "ms": 15150.754,
+      "total": 4,
+      "active": 0,
+      "idle": 4,
+      "queued": 0
+    },
+    {
+      "ms": 16162.923,
+      "total": 5,
+      "active": 0,
+      "idle": 5,
+      "queued": 0
+    },
+    {
+      "ms": 17163.613,
+      "total": 6,
+      "active": 0,
+      "idle": 6,
+      "queued": 0
+    },
+    {
+      "ms": 18163.369,
+      "total": 6,
+      "active": 0,
+      "idle": 6,
+      "queued": 0
+    },
+    {
+      "ms": 19177.07,
+      "total": 7,
+      "active": 0,
+      "idle": 7,
+      "queued": 0
+    },
+    {
+      "ms": 20183.046,
+      "total": 8,
+      "active": 0,
+      "idle": 8,
+      "queued": 0
+    }
+  ],
+  "events": [
+    {
+      "event": "connection-established",
+      "atMs": 10072.992
+    },
+    {
+      "event": "connection-established",
+      "atMs": 11398.379
+    },
+    {
+      "event": "connection-established",
+      "atMs": 12721.366
+    },
+    {
+      "event": "connection-established",
+      "atMs": 14435.269
+    },
+    {
+      "event": "ER_SOCKET_TIMEOUT",
+      "activeCommand": false,
+      "atMs": 15011.086
+    },
+    {
+      "event": "connection-established",
+      "atMs": 15730.159
+    },
+    {
+      "event": "connection-established",
+      "atMs": 17052.936
+    },
+    {
+      "event": "connection-established",
+      "atMs": 18208.488
+    },
+    {
+      "event": "connection-established",
+      "atMs": 19532.04
+    }
+  ],
+  "writesExecuted": 0
+}

@@ -1,0 +1,1542 @@
+{
+  "capturedAt": "2026-10-30T19:05:30.860Z",
+  "percentile": "nearest rank, only n>=20; empirical small sample",
+  "phases": {
+    "before": {
+      "routes": {
+        "users": {
+          "client": {
+            "n": 20,
+            "medianMs": 1311.423,
+            "p95Ms": 1339.461,
+            "maxMs": 1345.763
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 1305.134,
+            "p95Ms": 1322.608,
+            "maxMs": 1328.727
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 60,
+            "medianMs": 218.433,
+            "p95Ms": 220.467,
+            "maxMs": 220.84
+          },
+          "binaryDriver": {
+            "n": 60,
+            "medianMs": 438.121,
+            "p95Ms": 442.529,
+            "maxMs": 443.93
+          },
+          "execute": {
+            "n": 60,
+            "medianMs": 219.01,
+            "p95Ms": 221.331,
+            "maxMs": 224.425
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 657.898,
+            "p95Ms": 663.27,
+            "maxMs": 663.708
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 658.346,
+            "p95Ms": 663.735,
+            "maxMs": 664.17
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 1312.885,
+            "p95Ms": 1323.721,
+            "maxMs": 1323.989
+          },
+          "pings": 60,
+          "errors": [],
+          "observedSqlPerRequest": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "driverTraceComplete": true,
+          "postCommands": {
+            "BEGIN": 20,
+            "INSERT": 20,
+            "SELECT": 20,
+            "COMMIT": 20
+          }
+        },
+        "payments": {
+          "client": {
+            "n": 20,
+            "medianMs": 1333.11,
+            "p95Ms": 1342.575,
+            "maxMs": 1342.712
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 1318.49,
+            "p95Ms": 1325.554,
+            "maxMs": 1326.416
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 60,
+            "medianMs": 218.294,
+            "p95Ms": 220.674,
+            "maxMs": 220.84
+          },
+          "binaryDriver": {
+            "n": 60,
+            "medianMs": 437.996,
+            "p95Ms": 442.767,
+            "maxMs": 445.274
+          },
+          "execute": {
+            "n": 60,
+            "medianMs": 219.053,
+            "p95Ms": 221.616,
+            "maxMs": 222.742
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 657.813,
+            "p95Ms": 663.963,
+            "maxMs": 666.475
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 658.207,
+            "p95Ms": 664.361,
+            "maxMs": 666.907
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 1286.545,
+            "p95Ms": 1319.0160000000003,
+            "maxMs": 1319.6460000000004
+          },
+          "pings": 60,
+          "errors": [],
+          "observedSqlPerRequest": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "driverTraceComplete": true,
+          "postCommands": {
+            "BEGIN": 20,
+            "INSERT": 20,
+            "SELECT": 20,
+            "COMMIT": 20
+          }
+        },
+        "profile": {
+          "client": {
+            "n": 20,
+            "medianMs": 1318.887,
+            "p95Ms": 1339.13,
+            "maxMs": 1343.01
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 1304.715,
+            "p95Ms": 1322.038,
+            "maxMs": 1326.637
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 40,
+            "medianMs": 218.099,
+            "p95Ms": 220.556,
+            "maxMs": 220.848
+          },
+          "binaryDriver": {
+            "n": 40,
+            "medianMs": 437.817,
+            "p95Ms": 443.45,
+            "maxMs": 445.525
+          },
+          "execute": {
+            "n": 40,
+            "medianMs": 219.087,
+            "p95Ms": 221.558,
+            "maxMs": 223.294
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 656.407,
+            "p95Ms": 662.853,
+            "maxMs": 664.07
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 656.841,
+            "p95Ms": 663.309,
+            "maxMs": 664.489
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 1313.912,
+            "p95Ms": 1325.9470000000001,
+            "maxMs": 1329.7479999999996
+          },
+          "pings": 40,
+          "errors": [],
+          "observedSqlPerRequest": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "driverTraceComplete": true,
+          "postCommands": {
+            "BEGIN": 20,
+            "INSERT": 20,
+            "SELECT": 20,
+            "COMMIT": 20
+          }
+        },
+        "select1": {
+          "client": {
+            "n": 20,
+            "medianMs": 655.638,
+            "p95Ms": 662.613,
+            "maxMs": 663.092
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 655.638,
+            "p95Ms": 662.613,
+            "maxMs": 663.092
+          },
+          "acquisition": {
+            "n": 20,
+            "medianMs": 218.257,
+            "p95Ms": 220.467,
+            "maxMs": 220.552
+          },
+          "binaryDriver": {
+            "n": 20,
+            "medianMs": 437.162,
+            "p95Ms": 441.775,
+            "maxMs": 442.135
+          },
+          "execute": {
+            "n": 22,
+            "medianMs": 218.572,
+            "p95Ms": 220.902,
+            "maxMs": 221.041
+          },
+          "identity": {
+            "n": 0
+          },
+          "auth": {
+            "n": 0
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 0
+          },
+          "pings": 20,
+          "errors": [],
+          "observedSqlPerRequest": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "driverTraceComplete": true,
+          "postCommands": {}
+        }
+      },
+      "configuration": {
+        "pools": [
+          {
+            "state": {
+              "total": 10,
+              "active": 0,
+              "idle": 10,
+              "queued": 0
+            },
+            "options": {
+              "connectionLimit": 10,
+              "minimumIdle": 10,
+              "acquireTimeout": 10000,
+              "idleTimeout": 1800,
+              "initializationTimeout": 9900,
+              "minDelayValidation": 500,
+              "pingTimeout": 250,
+              "resetAfterUse": false,
+              "noControlAfterUse": false,
+              "leakDetectionTimeout": 0
+            },
+            "connectionOptions": {
+              "connectTimeout": 8000,
+              "socketTimeout": 15000,
+              "prepareCacheLength": 0,
+              "pipelining": true
+            },
+            "tls": true
+          }
+        ],
+        "server": {
+          "requestTimeout": 15000,
+          "headersTimeout": 10000,
+          "keepAliveTimeout": 5000
+        },
+        "clientVersion": "7.10.0",
+        "adapterVersion": "7.10.0",
+        "driverVersion": "3.5.4"
+      },
+      "survivingSessionCounters": {
+        "connections": 10,
+        "prepare": 396,
+        "execute": 396,
+        "close": 396,
+        "preparedRetained": null
+      }
+    },
+    "cache": {
+      "routes": {
+        "users": {
+          "client": {
+            "n": 20,
+            "medianMs": 898.55,
+            "p95Ms": 1336.884,
+            "maxMs": 1338.921
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 881.74,
+            "p95Ms": 1320.06,
+            "maxMs": 1321.955
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 60,
+            "medianMs": 218.813,
+            "p95Ms": 220.327,
+            "maxMs": 220.584
+          },
+          "binaryDriver": {
+            "n": 0
+          },
+          "execute": {
+            "n": 0
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 439.853,
+            "p95Ms": 658.456,
+            "maxMs": 660.281
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 440.412,
+            "p95Ms": 659.072,
+            "maxMs": 660.781
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 858.457,
+            "p95Ms": 1152.366,
+            "maxMs": 1317.7600000000002
+          },
+          "pings": 60,
+          "errors": [],
+          "observedSqlPerRequest": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "driverTraceComplete": false,
+          "postCommands": {
+            "BEGIN": 20,
+            "INSERT": 20,
+            "SELECT": 20,
+            "COMMIT": 20
+          }
+        },
+        "payments": {
+          "client": {
+            "n": 20,
+            "medianMs": 897.556,
+            "p95Ms": 1119.558,
+            "maxMs": 1119.786
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 880.773,
+            "p95Ms": 1102.91,
+            "maxMs": 1103.257
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 60,
+            "medianMs": 218.781,
+            "p95Ms": 220.232,
+            "maxMs": 220.395
+          },
+          "binaryDriver": {
+            "n": 0
+          },
+          "execute": {
+            "n": 0
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 438.769,
+            "p95Ms": 441.452,
+            "maxMs": 441.877
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 439.231,
+            "p95Ms": 442.295,
+            "maxMs": 442.826
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 856.698,
+            "p95Ms": 879.2190000000003,
+            "maxMs": 879.4209999999997
+          },
+          "pings": 60,
+          "errors": [],
+          "observedSqlPerRequest": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "driverTraceComplete": false,
+          "postCommands": {
+            "BEGIN": 20,
+            "INSERT": 20,
+            "SELECT": 20,
+            "COMMIT": 20
+          }
+        },
+        "profile": {
+          "client": {
+            "n": 20,
+            "medianMs": 884.655,
+            "p95Ms": 1123.854,
+            "maxMs": 1250.38
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 875.192,
+            "p95Ms": 1107.982,
+            "maxMs": 1234.926
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 40,
+            "medianMs": 218.68,
+            "p95Ms": 220.181,
+            "maxMs": 220.663
+          },
+          "binaryDriver": {
+            "n": 0
+          },
+          "execute": {
+            "n": 0
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 438.444,
+            "p95Ms": 443.275,
+            "maxMs": 575.84
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 438.912,
+            "p95Ms": 443.695,
+            "maxMs": 576.326
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 878.534,
+            "p95Ms": 883.9060000000002,
+            "maxMs": 889.308
+          },
+          "pings": 40,
+          "errors": [],
+          "observedSqlPerRequest": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "driverTraceComplete": false,
+          "postCommands": {
+            "BEGIN": 20,
+            "INSERT": 20,
+            "SELECT": 20,
+            "COMMIT": 20
+          }
+        },
+        "select1": {
+          "client": {
+            "n": 20,
+            "medianMs": 383.564,
+            "p95Ms": 657.689,
+            "maxMs": 697.587
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 383.564,
+            "p95Ms": 657.689,
+            "maxMs": 697.587
+          },
+          "acquisition": {
+            "n": 20,
+            "medianMs": 191.625,
+            "p95Ms": 219.053,
+            "maxMs": 478.688
+          },
+          "binaryDriver": {
+            "n": 6,
+            "medianMs": 191.77,
+            "maxMs": 438.079
+          },
+          "execute": {
+            "n": 4,
+            "medianMs": 191.333,
+            "maxMs": 191.858
+          },
+          "identity": {
+            "n": 0
+          },
+          "auth": {
+            "n": 0
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 0
+          },
+          "pings": 15,
+          "errors": [
+            {
+              "name": "driver.ping",
+              "code": "ER_PING_TIMEOUT"
+            }
+          ],
+          "observedSqlPerRequest": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "driverTraceComplete": false,
+          "postCommands": {}
+        }
+      },
+      "configuration": {
+        "pools": [
+          {
+            "state": {
+              "total": 10,
+              "active": 0,
+              "idle": 10,
+              "queued": 0
+            },
+            "options": {
+              "connectionLimit": 10,
+              "minimumIdle": 10,
+              "acquireTimeout": 10000,
+              "idleTimeout": 1800,
+              "initializationTimeout": 9900,
+              "minDelayValidation": 500,
+              "pingTimeout": 250,
+              "resetAfterUse": false,
+              "noControlAfterUse": false,
+              "leakDetectionTimeout": 0
+            },
+            "connectionOptions": {
+              "connectTimeout": 8000,
+              "socketTimeout": 15000,
+              "prepareCacheLength": 32,
+              "pipelining": true
+            },
+            "tls": true
+          }
+        ],
+        "server": {
+          "requestTimeout": 15000,
+          "headersTimeout": 10000,
+          "keepAliveTimeout": 5000
+        },
+        "clientVersion": "7.10.0",
+        "adapterVersion": "7.10.0",
+        "driverVersion": "3.5.4"
+      },
+      "survivingSessionCounters": {
+        "connections": 10,
+        "prepare": 88,
+        "execute": 396,
+        "close": 0,
+        "preparedRetained": 88
+      }
+    },
+    "pool": {
+      "routes": {
+        "users": {
+          "client": {
+            "n": 20,
+            "medianMs": 586.966,
+            "p95Ms": 1298.403,
+            "maxMs": 1337.688
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 570.7,
+            "p95Ms": 1281.894,
+            "maxMs": 1320.225
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 60,
+            "medianMs": 0.018,
+            "p95Ms": 283.094,
+            "maxMs": 284.245
+          },
+          "binaryDriver": {
+            "n": 45,
+            "medianMs": 220.942,
+            "p95Ms": 440.673,
+            "maxMs": 568.553
+          },
+          "execute": {
+            "n": 37,
+            "medianMs": 220.251,
+            "p95Ms": 284.786,
+            "maxMs": 284.894
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 284.342,
+            "p95Ms": 661.822,
+            "maxMs": 852.854
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 284.767,
+            "p95Ms": 662.53,
+            "maxMs": 853.39
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 879.756,
+            "p95Ms": 1320.3740000000003,
+            "maxMs": 1700.396
+          },
+          "pings": 15,
+          "errors": [],
+          "observedSqlPerRequest": [
+            3,
+            0,
+            0,
+            0,
+            1,
+            2,
+            1,
+            2,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "driverTraceComplete": false,
+          "postCommands": {
+            "BEGIN": 20,
+            "INSERT": 20,
+            "SELECT": 20,
+            "COMMIT": 20
+          }
+        },
+        "payments": {
+          "client": {
+            "n": 20,
+            "medianMs": 516.969,
+            "p95Ms": 871.317,
+            "maxMs": 1013.21
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 504.795,
+            "p95Ms": 854.588,
+            "maxMs": 1009.717
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 60,
+            "medianMs": 0.015,
+            "p95Ms": 0.037,
+            "maxMs": 219.578
+          },
+          "binaryDriver": {
+            "n": 59,
+            "medianMs": 220.466,
+            "p95Ms": 566.764,
+            "maxMs": 568.341
+          },
+          "execute": {
+            "n": 52,
+            "medianMs": 220.118,
+            "p95Ms": 284.331,
+            "maxMs": 284.473
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 221.104,
+            "p95Ms": 284.8,
+            "maxMs": 439.826
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 221.522,
+            "p95Ms": 285.256,
+            "maxMs": 440.265
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 856.278,
+            "p95Ms": 1134.49,
+            "maxMs": 1141.8560000000002
+          },
+          "pings": 1,
+          "errors": [],
+          "observedSqlPerRequest": [
+            2,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "driverTraceComplete": false,
+          "postCommands": {
+            "BEGIN": 20,
+            "INSERT": 20,
+            "SELECT": 20,
+            "COMMIT": 20
+          }
+        },
+        "profile": {
+          "client": {
+            "n": 20,
+            "medianMs": 969.28,
+            "p95Ms": 1229.217,
+            "maxMs": 1439.711
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 952.447,
+            "p95Ms": 1212.433,
+            "maxMs": 1422.45
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 40,
+            "medianMs": 219.055,
+            "p95Ms": 283.75,
+            "maxMs": 283.922
+          },
+          "binaryDriver": {
+            "n": 0
+          },
+          "execute": {
+            "n": 0
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 438.732,
+            "p95Ms": 568.24,
+            "maxMs": 569.118
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 439.159,
+            "p95Ms": 568.788,
+            "maxMs": 569.586
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 879.971,
+            "p95Ms": 1137.5330000000001,
+            "maxMs": 1137.56
+          },
+          "pings": 40,
+          "errors": [],
+          "observedSqlPerRequest": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "driverTraceComplete": false,
+          "postCommands": {
+            "BEGIN": 20,
+            "INSERT": 20,
+            "SELECT": 20,
+            "COMMIT": 20
+          }
+        },
+        "select1": {
+          "client": {
+            "n": 20,
+            "medianMs": 213.992,
+            "p95Ms": 439.225,
+            "maxMs": 567.468
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 213.992,
+            "p95Ms": 439.225,
+            "maxMs": 567.468
+          },
+          "acquisition": {
+            "n": 20,
+            "medianMs": 0.024,
+            "p95Ms": 0.036,
+            "maxMs": 0.045
+          },
+          "binaryDriver": {
+            "n": 20,
+            "medianMs": 213.587,
+            "p95Ms": 438.889,
+            "maxMs": 567.171
+          },
+          "execute": {
+            "n": 16,
+            "medianMs": 213.453,
+            "maxMs": 219.287
+          },
+          "identity": {
+            "n": 0
+          },
+          "auth": {
+            "n": 0
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 0
+          },
+          "pings": 0,
+          "errors": [],
+          "observedSqlPerRequest": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "driverTraceComplete": true,
+          "postCommands": {}
+        }
+      },
+      "configuration": {
+        "pools": [
+          {
+            "state": {
+              "total": 10,
+              "active": 0,
+              "idle": 10,
+              "queued": 0
+            },
+            "options": {
+              "connectionLimit": 10,
+              "minimumIdle": 10,
+              "acquireTimeout": 10000,
+              "idleTimeout": 1800,
+              "initializationTimeout": 9900,
+              "minDelayValidation": 5000,
+              "pingTimeout": 1000,
+              "resetAfterUse": false,
+              "noControlAfterUse": false,
+              "leakDetectionTimeout": 0
+            },
+            "connectionOptions": {
+              "connectTimeout": 8000,
+              "socketTimeout": 15000,
+              "prepareCacheLength": 32,
+              "pipelining": true
+            },
+            "tls": true
+          }
+        ],
+        "server": {
+          "requestTimeout": 15000,
+          "headersTimeout": 10000,
+          "keepAliveTimeout": 5000
+        },
+        "clientVersion": "7.10.0",
+        "adapterVersion": "7.10.0",
+        "driverVersion": "3.5.4"
+      },
+      "survivingSessionCounters": {
+        "connections": 10,
+        "prepare": 87,
+        "execute": 396,
+        "close": 0,
+        "preparedRetained": 87
+      }
+    },
+    "audit": {
+      "routes": {
+        "users": {
+          "client": {
+            "n": 20,
+            "medianMs": 453.813,
+            "p95Ms": 771.794,
+            "maxMs": 889.524
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 441.873,
+            "p95Ms": 764.114,
+            "maxMs": 884.943
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 60,
+            "medianMs": 0.017,
+            "p95Ms": 0.03,
+            "maxMs": 0.041
+          },
+          "binaryDriver": {
+            "n": 60,
+            "medianMs": 219.642,
+            "p95Ms": 439.834,
+            "maxMs": 441.968
+          },
+          "execute": {
+            "n": 60,
+            "medianMs": 219.244,
+            "p95Ms": 220.707,
+            "maxMs": 222.46
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 219.93,
+            "p95Ms": 440.497,
+            "maxMs": 442.261
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 220.363,
+            "p95Ms": 440.918,
+            "maxMs": 442.942
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 220.298,
+            "p95Ms": 443.88800000000003,
+            "maxMs": 445.49700000000007
+          },
+          "pings": 0,
+          "errors": [],
+          "observedSqlPerRequest": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "driverTraceComplete": true,
+          "postCommands": {
+            "INSERT": 20
+          }
+        },
+        "payments": {
+          "client": {
+            "n": 20,
+            "medianMs": 447.937,
+            "p95Ms": 680.259,
+            "maxMs": 680.384
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 441.103,
+            "p95Ms": 661.054,
+            "maxMs": 662.983
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 60,
+            "medianMs": 0.015,
+            "p95Ms": 0.023,
+            "maxMs": 0.054
+          },
+          "binaryDriver": {
+            "n": 60,
+            "medianMs": 219.448,
+            "p95Ms": 439.076,
+            "maxMs": 440.875
+          },
+          "execute": {
+            "n": 60,
+            "medianMs": 219.305,
+            "p95Ms": 220.398,
+            "maxMs": 220.88
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 219.771,
+            "p95Ms": 220.747,
+            "maxMs": 220.771
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 220.217,
+            "p95Ms": 221.164,
+            "maxMs": 221.26
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 190.362,
+            "p95Ms": 220.814,
+            "maxMs": 222.04599999999994
+          },
+          "pings": 0,
+          "errors": [],
+          "observedSqlPerRequest": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "driverTraceComplete": true,
+          "postCommands": {
+            "INSERT": 20
+          }
+        },
+        "profile": {
+          "client": {
+            "n": 20,
+            "medianMs": 428.367,
+            "p95Ms": 679.256,
+            "maxMs": 897.809
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 412.289,
+            "p95Ms": 662.855,
+            "maxMs": 881.087
+          },
+          "statuses": {
+            "200": 20
+          },
+          "acquisition": {
+            "n": 40,
+            "medianMs": 0.015,
+            "p95Ms": 0.023,
+            "maxMs": 0.069
+          },
+          "binaryDriver": {
+            "n": 40,
+            "medianMs": 219.37,
+            "p95Ms": 440.442,
+            "maxMs": 442.112
+          },
+          "execute": {
+            "n": 40,
+            "medianMs": 219.122,
+            "p95Ms": 220.474,
+            "maxMs": 221.477
+          },
+          "identity": {
+            "n": 20,
+            "medianMs": 219.329,
+            "p95Ms": 220.531,
+            "maxMs": 438.472
+          },
+          "auth": {
+            "n": 20,
+            "medianMs": 219.809,
+            "p95Ms": 221.065,
+            "maxMs": 438.94
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 20,
+            "medianMs": 219.698,
+            "p95Ms": 221.51000000000008,
+            "maxMs": 221.64499999999992
+          },
+          "pings": 0,
+          "errors": [],
+          "observedSqlPerRequest": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "driverTraceComplete": true,
+          "postCommands": {
+            "INSERT": 20
+          }
+        },
+        "select1": {
+          "client": {
+            "n": 20,
+            "medianMs": 219.024,
+            "p95Ms": 438.15,
+            "maxMs": 439.237
+          },
+          "server": {
+            "n": 20,
+            "medianMs": 219.024,
+            "p95Ms": 438.15,
+            "maxMs": 439.237
+          },
+          "acquisition": {
+            "n": 20,
+            "medianMs": 0.022,
+            "p95Ms": 0.039,
+            "maxMs": 0.065
+          },
+          "binaryDriver": {
+            "n": 20,
+            "medianMs": 218.678,
+            "p95Ms": 437.525,
+            "maxMs": 438.95
+          },
+          "execute": {
+            "n": 20,
+            "medianMs": 218.384,
+            "p95Ms": 218.873,
+            "maxMs": 219.355
+          },
+          "identity": {
+            "n": 0
+          },
+          "auth": {
+            "n": 0
+          },
+          "auditConnectionUntilLastCommand": {
+            "n": 0
+          },
+          "pings": 0,
+          "errors": [],
+          "observedSqlPerRequest": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "driverTraceComplete": true,
+          "postCommands": {}
+        }
+      },
+      "configuration": {
+        "pools": [
+          {
+            "state": {
+              "total": 10,
+              "active": 0,
+              "idle": 10,
+              "queued": 0
+            },
+            "options": {
+              "connectionLimit": 10,
+              "minimumIdle": 10,
+              "acquireTimeout": 10000,
+              "idleTimeout": 1800,
+              "initializationTimeout": 9900,
+              "minDelayValidation": 5000,
+              "pingTimeout": 1000,
+              "resetAfterUse": false,
+              "noControlAfterUse": false,
+              "leakDetectionTimeout": 0
+            },
+            "connectionOptions": {
+              "connectTimeout": 8000,
+              "socketTimeout": 15000,
+              "prepareCacheLength": 32,
+              "pipelining": true
+            },
+            "tls": true
+          }
+        ],
+        "server": {
+          "requestTimeout": 15000,
+          "headersTimeout": 10000,
+          "keepAliveTimeout": 5000
+        },
+        "clientVersion": "7.10.0",
+        "adapterVersion": "7.10.0",
+        "driverVersion": "3.5.4"
+      },
+      "survivingSessionCounters": {
+        "connections": 10,
+        "prepare": 74,
+        "execute": 320,
+        "close": 0,
+        "preparedRetained": 74
+      }
+    }
+  },
+  "httpImprovement": {
+    "users": {
+      "before": {
+        "n": 20,
+        "medianMs": 1311.423,
+        "p95Ms": 1339.461,
+        "maxMs": 1345.763
+      },
+      "after": {
+        "n": 20,
+        "medianMs": 453.813,
+        "p95Ms": 771.794,
+        "maxMs": 889.524
+      },
+      "observedMedianReductionPercent": 65.395
+    },
+    "payments": {
+      "before": {
+        "n": 20,
+        "medianMs": 1333.11,
+        "p95Ms": 1342.575,
+        "maxMs": 1342.712
+      },
+      "after": {
+        "n": 20,
+        "medianMs": 447.937,
+        "p95Ms": 680.259,
+        "maxMs": 680.384
+      },
+      "observedMedianReductionPercent": 66.399
+    },
+    "profile": {
+      "before": {
+        "n": 20,
+        "medianMs": 1318.887,
+        "p95Ms": 1339.13,
+        "maxMs": 1343.01
+      },
+      "after": {
+        "n": 20,
+        "medianMs": 428.367,
+        "p95Ms": 679.256,
+        "maxMs": 897.809
+      },
+      "observedMedianReductionPercent": 67.521
+    }
+  },
+  "concurrent": {
+    "client": {
+      "n": 20,
+      "medianMs": 656.041,
+      "p95Ms": 1103.475,
+      "maxMs": 1497.813
+    },
+    "statuses": {
+      "200": 20
+    },
+    "maxActive": 5,
+    "maxQueue": 0
+  },
+  "idle": [
+    {
+      "pauseMs": 1000,
+      "http": 875.945,
+      "status": 200,
+      "pings": []
+    },
+    {
+      "pauseMs": 6000,
+      "http": 1244.299,
+      "status": 200,
+      "pings": [
+        191.314,
+        218.784
+      ]
+    },
+    {
+      "pauseMs": 6000,
+      "http": 1104.686,
+      "status": 200,
+      "pings": [
+        218.785,
+        219.747
+      ]
+    }
+  ],
+  "auditsVerified": {
+    "expected": 60,
+    "found": 60,
+    "exactlyOnePerRequest": true
+  }
+}

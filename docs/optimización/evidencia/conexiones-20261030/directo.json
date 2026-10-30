@@ -1,0 +1,908 @@
+{
+  "capturedAt": "2026-10-30T17:42:43.941Z",
+  "node": "v24.19.0",
+  "commit": "554734f6c5aef2fdc075c0cd76e79ed14be0413d",
+  "scope": "complementary direct real services; no business writes",
+  "targetHash": "9bb94c13009dede70282fae01d6408ded5be2aefab521b7b17fb46dab38c2111",
+  "cold": [
+    {
+      "sample": 0,
+      "dnsMs": 13.499,
+      "tcpFromStartMs": 299.633,
+      "tlsMs": 577.519,
+      "authorized": true,
+      "tlsProtocol": "TLSv1.3",
+      "connectTotalMs": 1737.094,
+      "firstTextQueryMs": 286.795
+    },
+    {
+      "sample": 1,
+      "dnsMs": 0.656,
+      "tcpFromStartMs": 220.256,
+      "tlsMs": 443.096,
+      "authorized": true,
+      "tlsProtocol": "TLSv1.3",
+      "connectTotalMs": 1320.942,
+      "firstTextQueryMs": 218.796
+    },
+    {
+      "sample": 2,
+      "dnsMs": 0.739,
+      "tcpFromStartMs": 219.758,
+      "tlsMs": 444.22,
+      "authorized": true,
+      "tlsProtocol": "TLSv1.3",
+      "connectTotalMs": 1321.5,
+      "firstTextQueryMs": 219.457
+    }
+  ],
+  "series": [
+    {
+      "name": "dedicated_count_query_cache0",
+      "n": 20,
+      "first": {
+        "ms": 196.654,
+        "engine": {
+          "eventId": 4,
+          "eventName": "statement/sql/select",
+          "engineMs": "7.4411",
+          "lockMs": "0.0050",
+          "rowsExamined": 94,
+          "rowsSent": 1
+        }
+      },
+      "values": [
+        {
+          "ms": 189.422,
+          "engine": {
+            "eventId": 7,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5463",
+            "lockMs": "0.0060",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.499,
+          "engine": {
+            "eventId": 10,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5909",
+            "lockMs": "0.0050",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.288,
+          "engine": {
+            "eventId": 13,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5788",
+            "lockMs": "0.0060",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.204,
+          "engine": {
+            "eventId": 16,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5802",
+            "lockMs": "0.0040",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.507,
+          "engine": {
+            "eventId": 19,
+            "eventName": "statement/sql/select",
+            "engineMs": "1.1418",
+            "lockMs": "0.0070",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.111,
+          "engine": {
+            "eventId": 22,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6849",
+            "lockMs": "0.0060",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.279,
+          "engine": {
+            "eventId": 25,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5626",
+            "lockMs": "0.0050",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.068,
+          "engine": {
+            "eventId": 28,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6471",
+            "lockMs": "0.0060",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.473,
+          "engine": {
+            "eventId": 31,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6760",
+            "lockMs": "0.0070",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.024,
+          "engine": {
+            "eventId": 34,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5229",
+            "lockMs": "0.0050",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 191.102,
+          "engine": {
+            "eventId": 37,
+            "eventName": "statement/sql/select",
+            "engineMs": "1.9468",
+            "lockMs": "0.0080",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 188.951,
+          "engine": {
+            "eventId": 40,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6029",
+            "lockMs": "0.0060",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 188.876,
+          "engine": {
+            "eventId": 43,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5633",
+            "lockMs": "0.0050",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.26,
+          "engine": {
+            "eventId": 46,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6725",
+            "lockMs": "0.0060",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.314,
+          "engine": {
+            "eventId": 49,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6899",
+            "lockMs": "0.0050",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.372,
+          "engine": {
+            "eventId": 52,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6733",
+            "lockMs": "0.0050",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.154,
+          "engine": {
+            "eventId": 55,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.7139",
+            "lockMs": "0.0060",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.543,
+          "engine": {
+            "eventId": 58,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6545",
+            "lockMs": "0.0050",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 188.985,
+          "engine": {
+            "eventId": 61,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5872",
+            "lockMs": "0.0040",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 189.116,
+          "engine": {
+            "eventId": 64,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5930",
+            "lockMs": "0.0040",
+            "rowsExamined": 94,
+            "rowsSent": 1
+          }
+        }
+      ],
+      "before": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 0,
+        "Com_stmt_prepare": 0
+      },
+      "after": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 0,
+        "Com_stmt_prepare": 0
+      }
+    },
+    {
+      "name": "dedicated_count_execute_cache0",
+      "n": 20,
+      "first": {
+        "ms": 380.159,
+        "engine": null
+      },
+      "values": [
+        {
+          "ms": 378.62,
+          "engine": {
+            "eventId": 73,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.4504",
+            "lockMs": "0.0030",
+            "rowsExamined": 10,
+            "rowsSent": 0
+          }
+        },
+        {
+          "ms": 378.294,
+          "engine": {
+            "eventId": 78,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.4787",
+            "lockMs": "0.0020",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 378.984,
+          "engine": {
+            "eventId": 83,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.4597",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 378.586,
+          "engine": {
+            "eventId": 88,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6700",
+            "lockMs": "0.0040",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 378.773,
+          "engine": {
+            "eventId": 93,
+            "eventName": "statement/sql/select",
+            "engineMs": "2.0912",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 379.632,
+          "engine": {
+            "eventId": 98,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.8107",
+            "lockMs": "0.0040",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 379.195,
+          "engine": {
+            "eventId": 103,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.8149",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 379.189,
+          "engine": {
+            "eventId": 108,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.7258",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 378.223,
+          "engine": {
+            "eventId": 113,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5530",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 377.487,
+          "engine": {
+            "eventId": 118,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.4984",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 378.395,
+          "engine": {
+            "eventId": 123,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6855",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 377.998,
+          "engine": {
+            "eventId": 128,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.4632",
+            "lockMs": "0.0020",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 377.891,
+          "engine": {
+            "eventId": 133,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6456",
+            "lockMs": "0.0040",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 378.197,
+          "engine": {
+            "eventId": 138,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5071",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 378.672,
+          "engine": {
+            "eventId": 143,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6126",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 377.846,
+          "engine": {
+            "eventId": 148,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5098",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 378.442,
+          "engine": {
+            "eventId": 153,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5233",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 378.143,
+          "engine": {
+            "eventId": 158,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.4602",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 378.858,
+          "engine": {
+            "eventId": 163,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5563",
+            "lockMs": "0.0020",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 378.142,
+          "engine": {
+            "eventId": 168,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6433",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        }
+      ],
+      "before": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 0,
+        "Com_stmt_prepare": 0
+      },
+      "after": {
+        "Com_stmt_close": 21,
+        "Com_stmt_execute": 21,
+        "Com_stmt_prepare": 21
+      }
+    },
+    {
+      "name": "dedicated_count_execute_cache16",
+      "n": 20,
+      "first": {
+        "ms": 438.895,
+        "engine": null
+      },
+      "values": [
+        {
+          "ms": 218.755,
+          "engine": {
+            "eventId": 7,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5809",
+            "lockMs": "0.0020",
+            "rowsExamined": 5,
+            "rowsSent": 0
+          }
+        },
+        {
+          "ms": 218.34,
+          "engine": {
+            "eventId": 10,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.4990",
+            "lockMs": "0.0030",
+            "rowsExamined": 8,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.051,
+          "engine": {
+            "eventId": 13,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5220",
+            "lockMs": "0.0030",
+            "rowsExamined": 10,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.622,
+          "engine": {
+            "eventId": 16,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5304",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.468,
+          "engine": {
+            "eventId": 19,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5035",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.545,
+          "engine": {
+            "eventId": 22,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6862",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.68,
+          "engine": {
+            "eventId": 25,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5149",
+            "lockMs": "0.0020",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.513,
+          "engine": {
+            "eventId": 28,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5341",
+            "lockMs": "0.0020",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.825,
+          "engine": {
+            "eventId": 31,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6453",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.506,
+          "engine": {
+            "eventId": 34,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6097",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.915,
+          "engine": {
+            "eventId": 37,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5425",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.463,
+          "engine": {
+            "eventId": 40,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5682",
+            "lockMs": "0.0040",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.611,
+          "engine": {
+            "eventId": 43,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6001",
+            "lockMs": "0.0040",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.182,
+          "engine": {
+            "eventId": 46,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6758",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.535,
+          "engine": {
+            "eventId": 49,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.5003",
+            "lockMs": "0.0020",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.825,
+          "engine": {
+            "eventId": 52,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6047",
+            "lockMs": "0.0040",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.505,
+          "engine": {
+            "eventId": 55,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6641",
+            "lockMs": "0.0040",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.434,
+          "engine": {
+            "eventId": 58,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.6215",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.189,
+          "engine": {
+            "eventId": 61,
+            "eventName": "statement/sql/select",
+            "engineMs": "0.8015",
+            "lockMs": "0.0030",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        },
+        {
+          "ms": 218.697,
+          "engine": {
+            "eventId": 64,
+            "eventName": "statement/sql/select",
+            "engineMs": "1.4214",
+            "lockMs": "0.0040",
+            "rowsExamined": 11,
+            "rowsSent": 1
+          }
+        }
+      ],
+      "before": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 0,
+        "Com_stmt_prepare": 0
+      },
+      "after": {
+        "Com_stmt_close": 0,
+        "Com_stmt_execute": 21,
+        "Com_stmt_prepare": 1
+      }
+    },
+    {
+      "name": "same_pool_driver_vs_prisma",
+      "n": 20,
+      "driver": [
+        440.323,
+        439.71,
+        439.306,
+        439.712,
+        439.34,
+        439.476,
+        439.355,
+        439.281,
+        439.852,
+        439.426,
+        439.357,
+        440.018,
+        440.141,
+        440.438,
+        439.811,
+        440.126,
+        440.571,
+        440.107,
+        440.261,
+        440.633
+      ],
+      "prisma": [
+        440.428,
+        440.427,
+        440.285,
+        439.809,
+        440.19,
+        440.466,
+        440.67,
+        440.629,
+        440.834,
+        440.736,
+        440.878,
+        440.002,
+        439.66,
+        439.986,
+        439.65,
+        439.901,
+        440.375,
+        439.88,
+        440.361,
+        439.816
+      ],
+      "acquire": [
+        0.106,
+        0.024,
+        0.028,
+        0.036,
+        0.027,
+        0.026,
+        0.036,
+        0.036,
+        0.029,
+        0.032,
+        0.035,
+        0.024,
+        0.023,
+        0.025,
+        0.026,
+        0.023,
+        0.023,
+        0.023,
+        0.027,
+        0.023
+      ]
+    }
+  ],
+  "keycloak": [
+    {
+      "name": "admin_token_first",
+      "ms": 1080.886,
+      "n": 1
+    },
+    {
+      "name": "cached_admin_token",
+      "n": 20,
+      "values": [
+        0.003,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.002,
+        0.003,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001
+      ]
+    },
+    {
+      "name": "jwks",
+      "n": 20,
+      "values": [
+        61.445,
+        50.153,
+        33.85,
+        356.749,
+        102,
+        34.564,
+        30.916,
+        30.162,
+        46.107,
+        30.832,
+        32.484,
+        204.546,
+        42.365,
+        31.1,
+        32.399,
+        308.527,
+        34.294,
+        62.649,
+        34.349,
+        170.981
+      ]
+    }
+  ],
+  "errors": [],
+  "mysql": {
+    "version": "8.4.8",
+    "isolationLevel": "REPEATABLE-READ",
+    "secureTransport": 0
+  },
+  "keycloakTcp": [
+    0.836,
+    0.395,
+    0.298
+  ]
+}

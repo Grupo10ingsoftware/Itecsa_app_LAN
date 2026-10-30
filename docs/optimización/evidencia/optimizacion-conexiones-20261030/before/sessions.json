@@ -1,0 +1,102 @@
+{
+  "sessions": [
+    {
+      "connection": 9,
+      "cacheSize": 0,
+      "counters": {
+        "Com_stmt_close": 40,
+        "Com_stmt_execute": 40,
+        "Com_stmt_prepare": 40
+      }
+    },
+    {
+      "connection": 2,
+      "cacheSize": 0,
+      "counters": {
+        "Com_stmt_close": 40,
+        "Com_stmt_execute": 40,
+        "Com_stmt_prepare": 40
+      }
+    },
+    {
+      "connection": 8,
+      "cacheSize": 0,
+      "counters": {
+        "Com_stmt_close": 40,
+        "Com_stmt_execute": 40,
+        "Com_stmt_prepare": 40
+      }
+    },
+    {
+      "connection": 10,
+      "cacheSize": 0,
+      "counters": {
+        "Com_stmt_close": 40,
+        "Com_stmt_execute": 40,
+        "Com_stmt_prepare": 40
+      }
+    },
+    {
+      "connection": 3,
+      "cacheSize": 0,
+      "counters": {
+        "Com_stmt_close": 45,
+        "Com_stmt_execute": 45,
+        "Com_stmt_prepare": 45
+      }
+    },
+    {
+      "connection": 12,
+      "cacheSize": 0,
+      "counters": {
+        "Com_stmt_close": 33,
+        "Com_stmt_execute": 33,
+        "Com_stmt_prepare": 33
+      }
+    },
+    {
+      "connection": 13,
+      "cacheSize": 0,
+      "counters": {
+        "Com_stmt_close": 39,
+        "Com_stmt_execute": 39,
+        "Com_stmt_prepare": 39
+      }
+    },
+    {
+      "connection": 11,
+      "cacheSize": 0,
+      "counters": {
+        "Com_stmt_close": 39,
+        "Com_stmt_execute": 39,
+        "Com_stmt_prepare": 39
+      }
+    },
+    {
+      "connection": 14,
+      "cacheSize": 0,
+      "counters": {
+        "Com_stmt_close": 42,
+        "Com_stmt_execute": 42,
+        "Com_stmt_prepare": 42
+      }
+    },
+    {
+      "connection": 5,
+      "cacheSize": 0,
+      "counters": {
+        "Com_stmt_close": 38,
+        "Com_stmt_execute": 38,
+        "Com_stmt_prepare": 38
+      }
+    }
+  ],
+  "pools": [
+    {
+      "total": 10,
+      "active": 0,
+      "idle": 10,
+      "queued": 0
+    }
+  ]
+}

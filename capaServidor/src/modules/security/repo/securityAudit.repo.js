@@ -24,9 +24,8 @@ export default class SecurityAuditRepository {
         return this.prisma ?? getPrismaClient();
     }
 
-    async record(event, { client = this.client } = {}) {
-        return client.securityAuditEvent.create({
-            data: {
+    async record(event, { client = this.client, returnRecord = true } = {}) {
+        const data = {
                 event_type: text(event.eventType, 80),
                 occurred_at: event.occurredAt ?? new Date(),
                 actor_user_id: event.actorUserId ? Number(event.actorUserId) : null,
@@ -40,7 +39,16 @@ export default class SecurityAuditRepository {
                     event_key: text(event.eventKey, 100),
                     metadata: incidentMetadata(event.metadata),
                 } : {}),
-            },
-        });
+        };
+        if (returnRecord !== false) return client.securityAuditEvent.create({ data });
+
+        // Callers that consume only confirmation do not need MySQL to hydrate
+        // the inserted row. Do not skip duplicates or retry ambiguous writes.
+        const inserted = await client.securityAuditEvent.createMany({ data: [data] });
+        if (inserted.count !== 1) {
+            throw Object.assign(new Error("No se confirmó la persistencia de auditoría."), {
+                code: "AUDIT_WRITE_NOT_CONFIRMED",
+            });
+        }
     }
 }

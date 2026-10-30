@@ -31,7 +31,8 @@ export async function readPaymentCounts(client, filters) {
     COALESCE(SUM(s.nombre_estado_pago = 'Pendiente'), 0) AS pending,
     COALESCE(SUM(s.nombre_estado_pago = 'Rechazado'), 0) AS rejected,
     COALESCE(SUM(s.nombre_estado_pago = 'Confirmado'), 0) AS confirmed
-    FROM Pedidos p LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente
+    FROM Pedidos p
+    ${filters.search ? Prisma.sql`LEFT JOIN Cliente c ON c.id_cliente=p.id_cliente` : Prisma.empty}
     JOIN Estado_Pago s ON s.id_estado_pago=p.id_estado_pago
     WHERE ${Prisma.join(conditions(filters), ' AND ')}`);
   // Compare status names inside MySQL, preserving the COUNT filters' collation.

@@ -7,10 +7,13 @@ import { KeycloakIdentityAdministrationService } from '../src/modules/users/serv
 import { KeycloakManagementService } from '../src/modules/users/service/keycloakManagement.service.js';
 import { ROLES, PERMISSIONS } from '../../shared/keycloakAuthorization.js';
 const arg = name => process.argv.find(value => value.startsWith(`--${name}=`))?.slice(name.length + 3);
-if (!arg('reference-root')) throw Error('--reference-root is required');
+const variant = arg('variant');
+if (!arg('reference-root') && !['before', 'after'].includes(variant)) throw Error('--reference-root or --variant=before|after is required');
+const sampleCount = Number(arg('samples') ?? 10);
+if (!Number.isSafeInteger(sampleCount) || sampleCount < 1 || sampleCount > 100) throw Error('--samples must be 1..100');
 const load = file => import(pathToFileURL(resolve(arg('reference-root'), 'capaServidor/src/modules/users/service', file)).href);
-const { KeycloakIdentityAdministrationService: BeforeService } = await load('keycloakIdentityAdministration.service.js');
-const { KeycloakManagementService: BeforeManagement } = await load('keycloakManagement.service.js');
+const BeforeService = arg('reference-root') ? (await load('keycloakIdentityAdministration.service.js')).KeycloakIdentityAdministrationService : null;
+const BeforeManagement = arg('reference-root') ? (await load('keycloakManagement.service.js')).KeycloakManagementService : null;
 const issuer = 'https://synthetic.invalid/realms/itecsa';
 const env = { APP_ENV: 'test', KEYCLOAK_ISSUER: issuer, KEYCLOAK_CLIENT_ID: 'web', KEYCLOAK_ROLE_CLIENT_ID: 'roles',
   KEYCLOAK_ADMIN_CLIENT_ID: 'technical', KEYCLOAK_ADMIN_CLIENT_SECRET: 'synthetic-only-never-sent' };
@@ -23,12 +26,13 @@ const input = { username: 'ana.soto', firstName: 'Ana', lastName: 'Soto', email:
 const delay = () => new Promise(resolve => setTimeout(resolve, 5));
 function fixture(Service, Management, scenario) {
   const calls = {}, events = []; let actorReads = 0, passwordWrites = 0;
-  const creating = scenario === 'create', reconciling = scenario === 'reconcile';
+  const creating = scenario === 'create', reconciling = scenario.startsWith('reconcile');
   let external = creating ? null : { id: 'target', username: input.username, firstName: input.firstName,
     lastName: input.lastName, email: input.email, enabled: !reconciling,
     attributes: { itecsa_provision_id: [id] }, requiredActions: reconciling ? ['UPDATE_PASSWORD'] : [] };
   let passwordPresent = reconciling;
   let roles = creating || reconciling ? [] : [{ id: 'old-role', name: ROLES.VENTAS }];
+  if (scenario === 'reconcile-assigned') roles = [{ id: 'next-role', name: input.role }];
   let operation = { id, issuer, username: input.username, input: { ...input }, revision: 0,
     state: reconciling ? 'needs_reconciliation' : 'pending', ...(reconciling ? { external_subject: 'target' } : {}) };
   const binding = { subject: 'target', user_id: 2, issuer, username: input.username, Usuario: { id_usuario: 2,
@@ -106,22 +110,29 @@ function fixture(Service, Management, scenario) {
       assert.equal(binding.Usuario.rol_usuario, update.role);
       assert.ok(events.indexOf('POST logout') < events.indexOf('db.finishUpdate'));
     }
-    return { actorReads, httpCalls: Object.values(calls).reduce((a, b) => a + b, 0), calls };
+    return { actorReads, repositoryCalls: events.filter(event => event.startsWith('db.')).length,
+      checkpoints: events.filter(event => event === 'db.checkpoint').length,
+      httpCalls: Object.values(calls).reduce((a, b) => a + b, 0), calls };
   } };
 }
-const output = { run: 'OPT-03 reimplementation', reference: 'c0eef72', capturedAt: new Date().toISOString(), node: process.version,
+const output = { run: 'gestion-usuarios', reference: arg('commit') ?? 'unspecified', variant: variant ?? 'comparison', capturedAt: new Date().toISOString(), node: process.version,
   environment: 'SYNTHETIC / real administration+management services / fake fetch and DB+PIN / 5ms per IO / fresh cold fixture each sample',
   excludes: ['real network', 'MySQL', 'real PIN hashing', 'real Keycloak', 'HTTP middleware', 'UI/render'], samples: {} };
-for (const scenario of ['inspect', 'movements', 'create', 'reconcile', 'update-name', 'update-role', 'update-state', 'update-noop']) {
-  for (const [version, Service, Management] of [['before', BeforeService, BeforeManagement], ['after', KeycloakIdentityAdministrationService, KeycloakManagementService]]) {
+const versions = variant ? [[variant, KeycloakIdentityAdministrationService, KeycloakManagementService]]
+  : [['before', BeforeService, BeforeManagement], ['after', KeycloakIdentityAdministrationService, KeycloakManagementService]];
+for (const scenario of ['inspect', 'movements', 'create', 'reconcile', 'reconcile-assigned', 'update-name', 'update-role', 'update-state', 'update-noop']) {
+  for (const [version, Service, Management] of versions) {
     const values = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < sampleCount; i++) {
       const f = fixture(Service, Management, scenario), start = performance.now(); const counts = await f.run();
       values.push({ ms: +(performance.now() - start).toFixed(3), ...counts });
     }
     const sorted = values.map(v => v.ms).sort((a, b) => a - b);
-    output.samples[scenario + '_' + version] = { n: 10, minMs: sorted[0], medianMs: +((sorted[4] + sorted[5]) / 2).toFixed(3),
-      meanMs: +(sorted.reduce((a, b) => a + b, 0) / 10).toFixed(3), maxMs: sorted.at(-1), values };
+    const middle = Math.floor(sampleCount / 2);
+    output.samples[scenario + '_' + version] = { n: sampleCount, minMs: sorted[0],
+      medianMs: +(sampleCount % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2).toFixed(3),
+      ...(sampleCount >= 30 ? { p95Ms: sorted[Math.ceil(sampleCount * 0.95) - 1] } : {}),
+      meanMs: +(sorted.reduce((a, b) => a + b, 0) / sampleCount).toFixed(3), maxMs: sorted.at(-1), values };
   }
 }
 const json = JSON.stringify(output, null, 2) + '\n';

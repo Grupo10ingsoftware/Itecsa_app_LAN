@@ -188,3 +188,28 @@ for (const invalidSource of ['effective', 'direct']) {
     assert.equal(writes, 0);
   });
 }
+
+test('an already assigned role avoids DELETE/POST but still verifies effective privilege', async () => {
+  const service = new KeycloakManagementService({ env });
+  let reads = 0;
+  service.getUser = async () => ({ enabled: false });
+  service.roles = async () => { reads++; return [{ id: 'same', name: ROLES.VENTAS }]; };
+  service.roleRepresentation = async () => ({ id: 'same', name: ROLES.VENTAS });
+  service.roleClient = async () => 'uuid';
+  service.request = async () => assert.fail('no role mutation expected');
+  await service.replaceRole('target', ROLES.VENTAS);
+  assert.equal(reads, 3);
+  reads = 0;
+  service.roles = async () => (++reads === 3 ? [] : [{ id: 'same', name: ROLES.VENTAS }]);
+  await assert.rejects(service.replaceRole('target', ROLES.VENTAS), { code: 'KEYCLOAK_ROLE_NOT_CONFIRMED' });
+});
+
+test('deactivation avoids a duplicate disable and still confirms the final remote state', async () => {
+  const f = fixture(); let reads = 0;
+  const getUser = f.management.getUser;
+  f.management.getUser = async subject => { reads++; return getUser(subject); };
+  await f.service.update(context, 'target', { ...update, state: 'Desvinculado' });
+  assert.equal(f.events.filter(event => event === 'disable').length, 1);
+  assert.equal(reads, 3);
+  assert.equal(f.events.at(-1), 'commit');
+});

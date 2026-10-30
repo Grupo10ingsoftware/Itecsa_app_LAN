@@ -1,0 +1,11 @@
+
+> capavista@0.0.0 lint
+> eslint .
+
+
+D:\Universidad\Ing software II\Itecsa_app_LAN\capaVista\src\modules\metrics\utils\productColors.test.jsx
+  2:18  error  'screen' is defined but never used                no-unused-vars
+  2:26  error  'within' is defined but never used                no-unused-vars
+  7:3   error  'normalizeProductType' is defined but never used  no-unused-vars
+
+✖ 3 problems (3 errors, 0 warnings)

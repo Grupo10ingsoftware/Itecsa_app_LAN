@@ -1832,194 +1832,114 @@
     ]
   },
   {
-  "numeroNota": "67679",
-  "fechaEntregaTentativaOrigen": "2026-10-15",
-  "usuarioOrigenManager": "Usuario Demo 010",
-  "tipoNotaVentaOrigen": "Venta Normal",
-  "cliente": {
-    "RUT": "RUT-DEMO-006",
-    "CLIENTE": "Cliente Demo 006",
-    "dir": "Direccion Demo 006",
-    "comuna": "Comuna Demo 006",
-    "ciudad": "Ciudad Demo 006",
-    "TIPO_CLIENTE": "MASIVO"
-  },
-  "observaciones": "Pedido de prueba de 150 yoyos negros.",
-  "items": [
-    {
-      "codigo": "2100010010030",
-      "producto": "PORTA CREDENCIAL TIPO YOYO W/30 - BLACK C/DOM",
-      "cantidad": 150,
-      "familia": "ACCESORIOS",
-      "subfamilia": "YOYO",
-      "importable": true
-    }
-  ]
-  },
-  {
-  "numeroNota": "69697",
-  "fechaEntregaTentativaOrigen": "2026-10-20",
-  "usuarioOrigenManager": "Usuario Demo 011",
-  "tipoNotaVentaOrigen": "Venta Normal",
-  "cliente": {
-    "RUT": "RUT-DEMO-007",
-    "CLIENTE": "Cliente Demo 007",
-    "dir": "Direccion Demo 007",
-    "comuna": "Comuna Demo 007",
-    "ciudad": "Ciudad Demo 007",
-    "TIPO_CLIENTE": "MASIVO"
-  },
-  "observaciones": "Pedido de prueba de 300 yoyos grises.",
-  "items": [
-    {
-      "codigo": "2100010010030",
-      "producto": "PORTA CREDENCIAL TIPO YOYO W/30 - BLACK C/DOM",
-      "cantidad": 300,
-      "familia": "ACCESORIOS",
-      "subfamilia": "YOYO",
-      "importable": true
-    }
-  ]
+    "numeroNota": "67679",
+    "fechaEntregaTentativaOrigen": "2026-10-15",
+    "usuarioOrigenManager": "Usuario Demo 010",
+    "tipoNotaVentaOrigen": "Venta Normal",
+    "cliente": {
+      "RUT": "RUT-DEMO-006",
+      "CLIENTE": "Cliente Demo 006",
+      "dir": "Direccion Demo 006",
+      "comuna": "Comuna Demo 006",
+      "ciudad": "Ciudad Demo 006",
+      "TIPO_CLIENTE": "MASIVO"
+    },
+    "observaciones": "Pedido de prueba de 150 yoyos negros.",
+    "items": [
+      {
+        "codigo": "2100010010030",
+        "producto": "PORTA CREDENCIAL TIPO YOYO W/30 - BLACK C/DOM",
+        "cantidad": 150,
+        "familia": "ACCESORIOS",
+        "subfamilia": "YOYO",
+        "importable": true
+      }
+    ]
   },
   {
-  "numeroNota": "22406",
-  "fechaEntregaTentativaOrigen": "2026-09-03",
-  "usuarioOrigenManager": "Usuario Demo 005",
+    "numeroNota": "69697",
+    "fechaEntregaTentativaOrigen": "2026-10-20",
+    "usuarioOrigenManager": "Usuario Demo 011",
+    "tipoNotaVentaOrigen": "Venta Normal",
+    "cliente": {
+      "RUT": "RUT-DEMO-007",
+      "CLIENTE": "Cliente Demo 007",
+      "dir": "Direccion Demo 007",
+      "comuna": "Comuna Demo 007",
+      "ciudad": "Ciudad Demo 007",
+      "TIPO_CLIENTE": "MASIVO"
+    },
+    "observaciones": "Pedido de prueba de 300 yoyos grises.",
+    "items": [
+      {
+        "codigo": "2100010010030",
+        "producto": "PORTA CREDENCIAL TIPO YOYO W/30 - BLACK C/DOM",
+        "cantidad": 300,
+        "familia": "ACCESORIOS",
+        "subfamilia": "YOYO",
+        "importable": true
+      }
+    ]
+  },
+  {
+    "numeroNota": "22406",
+    "fechaEntregaTentativaOrigen": "2026-09-03",
+    "usuarioOrigenManager": "Usuario Demo 005",
+    "tipoNotaVentaOrigen": "Venta Normal",
+    "cliente": {
+      "RUT": "RUT-DEMO-042",
+      "CLIENTE": "Cliente Demo 042",
+      "dir": "Direccion Demo 042",
+      "comuna": "Comuna Demo 042",
+      "ciudad": "Ciudad Demo 042",
+      "TIPO_CLIENTE": "EMPRESAS"
+    },
+    "observaciones": null,
+    "items": [
+      {
+        "codigo": "2100010060017",
+        "producto": "TARJETAS ID CARD PVC BLANCA",
+        "cantidad": 50,
+        "familia": "TARJETAS",
+        "subfamilia": "TARJETAS",
+        "importable": true
+      }
+    ]
+  },
+  
+  
+{
+  "numeroNota": "22408",
+  "fechaEntregaTentativaOrigen": "2026-11-20",
+  "usuarioOrigenManager": "Vendedor Demo",
   "tipoNotaVentaOrigen": "Venta Normal",
   "cliente": {
-    "RUT": "RUT-DEMO-042",
-    "CLIENTE": "Cliente Demo 042",
-    "dir": "Direccion Demo 042",
-    "comuna": "Comuna Demo 042",
-    "ciudad": "Ciudad Demo 042",
+    "RUT": "RUT-DEMO-043",
+    "CLIENTE": "Empresa Prueba Industrial SpA",
+    "dir": "Av. Industrial 1450",
+    "comuna": "Quilicura",
+    "ciudad": "Santiago",
     "TIPO_CLIENTE": "EMPRESAS"
   },
-  "observaciones": null,
+  "observaciones": "Pedido de prueba para validar la importacion de notas de venta y el flujo de produccion.",
   "items": [
     {
       "codigo": "2100010060017",
       "producto": "TARJETAS ID CARD PVC BLANCA",
-      "cantidad": 50,
+      "cantidad": 150,
+      "familia": "TARJETAS",
+      "subfamilia": "TARJETAS",
+      "importable": true
+    },
+    {
+      "codigo": "2100010060018",
+      "producto": "TARJETAS ID CARD PVC BLANCA",
+      "cantidad": 75,
       "familia": "TARJETAS",
       "subfamilia": "TARJETAS",
       "importable": true
     }
   ]
-},
-{
-  "numeroNota": "22407",
-  "fechaEntregaTentativaOrigen": "2026-09-05",
-  "usuarioOrigenManager": "Usuario Demo 006",
-  "tipoNotaVentaOrigen": "Venta Normal",
-  "cliente": {
-    "RUT": "RUT-DEMO-043",
-    "CLIENTE": "Cliente Demo 043",
-    "dir": "Direccion Demo 043",
-    "comuna": "Comuna Demo 043",
-    "ciudad": "Ciudad Demo 043",
-    "TIPO_CLIENTE": "GRANDES CUENTAS"
-  },
-  "observaciones": "Entrega prioritaria",
-  "items": [
-    {
-      "codigo": "2100010060018",
-      "producto": "CREDENCIALES PERSONALIZADAS",
-      "cantidad": 75,
-      "familia": "CREDENCIALES",
-      "subfamilia": "CREDENCIALES",
-      "importable": true
-    }
-  ]
-},
-{
-  "numeroNota": "22408",
-  "fechaEntregaTentativaOrigen": "2026-09-08",
-  "usuarioOrigenManager": "Usuario Demo 007",
-  "tipoNotaVentaOrigen": "Venta Especial",
-  "cliente": {
-    "RUT": "RUT-DEMO-044",
-    "CLIENTE": "Cliente Demo 044",
-    "dir": "Direccion Demo 044",
-    "comuna": "Comuna Demo 044",
-    "ciudad": "Ciudad Demo 044",
-    "TIPO_CLIENTE": "PYME"
-  },
-  "observaciones": null,
-  "items": [
-    {
-      "codigo": "2100010060019",
-      "producto": "ETIQUETAS ADHESIVAS IMPRESAS",
-      "cantidad": 120,
-      "familia": "ETIQUETAS",
-      "subfamilia": "ADHESIVOS",
-      "importable": true
-    },
-    {
-      "codigo": "2100010060020",
-      "producto": "SOBRES CORPORATIVOS IMPRESOS",
-      "cantidad": 80,
-      "familia": "SOBRES",
-      "subfamilia": "PAPELERIA",
-      "importable": true
-    }
-  ]
-},
-{
-  "numeroNota": "22409",
-  "fechaEntregaTentativaOrigen": "2026-09-10",
-  "usuarioOrigenManager": "Usuario Demo 008",
-  "tipoNotaVentaOrigen": "Venta Normal",
-  "cliente": {
-    "RUT": "RUT-DEMO-045",
-    "CLIENTE": "Cliente Demo 045",
-    "dir": "Direccion Demo 045",
-    "comuna": "Comuna Demo 045",
-    "ciudad": "Ciudad Demo 045",
-    "TIPO_CLIENTE": "CORPORATIVO"
-  },
-  "observaciones": "Requiere revisión de diseño",
-  "items": [
-    {
-      "codigo": "2100010060021",
-      "producto": "FOLLETOS TRIPTICOS FULL COLOR",
-      "cantidad": 300,
-      "familia": "IMPRESOS",
-      "subfamilia": "FOLLETOS",
-      "importable": true
-    }
-  ]
-},
-{
-  "numeroNota": "22410",
-  "fechaEntregaTentativaOrigen": "2026-09-12",
-  "usuarioOrigenManager": "Usuario Demo 009",
-  "tipoNotaVentaOrigen": "Venta Normal",
-  "cliente": {
-    "RUT": "RUT-DEMO-046",
-    "CLIENTE": "Cliente Demo 046",
-    "dir": "Direccion Demo 046",
-    "comuna": "Comuna Demo 046",
-    "ciudad": "Ciudad Demo 046",
-    "TIPO_CLIENTE": "GRANDES CUENTAS"
-  },
-  "observaciones": null,
-  "items": [
-    {
-      "codigo": "2100010060022",
-      "producto": "TARJETAS DE PRESENTACION CORPORATIVAS",
-      "cantidad": 200,
-      "familia": "TARJETAS",
-      "subfamilia": "PRESENTACION",
-      "importable": true
-    },
-    {
-      "codigo": "2100010060023",
-      "producto": "CARPETAS CORPORATIVAS IMPRESAS",
-      "cantidad": 100,
-      "familia": "CARPETAS",
-      "subfamilia": "PAPELERIA",
-      "importable": true
-    }
-  ]
 }
+
 ]
