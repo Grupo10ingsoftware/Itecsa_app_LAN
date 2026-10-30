@@ -120,6 +120,8 @@ export function useOrderCreateFlow({ navigate, api }) {
       setDraft((previous) => ({ ...previous, salesNoteCode: code, managerRecord }))
       setNeedsReconciliation(false)
       setErrors((previous) => ({ ...previous, salesNoteCode: null }))
+
+      notify.success(`Información encontrada: ${code}`)
     } catch (error) {
       if (!mounted.current || version !== requestVersion.current || controller.signal.aborted) return
       const message = getErrorMessage(error, `No se encontro informacion para ${code}.`)
@@ -185,7 +187,7 @@ export function useOrderCreateFlow({ navigate, api }) {
       setDraft(createInitialDraft())
       setErrors({})
       notify.success('Pedido registrado correctamente.', {
-        action: { label: 'Ver pedidos', onClick: () => navigate('/pagos') },
+        action: { label: 'Ver pedidos', onClick: () => navigate('/kanban') },
       })
     } catch (error) {
       if (!mounted.current) return

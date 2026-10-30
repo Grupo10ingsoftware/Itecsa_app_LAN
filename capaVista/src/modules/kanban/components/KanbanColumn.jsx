@@ -25,6 +25,8 @@ import KanbanOffCanvas from './KanbanOffCanvas';
 import KanbanDetailBoundary from './KanbanDetailBoundary.jsx';
 import { hasValidProductionSchedule, PRODUCTION_SCHEDULE_REQUIRED_MESSAGE } from '../../../../../shared/productionScheduling.js';
 
+
+
 function rememberCardExpansion(current, orders) {
   const byOrder = { ...current.byOrder }
   for (const order of orders) {

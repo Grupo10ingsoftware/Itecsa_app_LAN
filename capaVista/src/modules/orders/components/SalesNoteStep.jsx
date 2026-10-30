@@ -214,15 +214,7 @@ export default function SalesNoteStep({
         </section>
       </div>
 
-      {record && (
-        <div className={styles.verificationBanner} role="status">
-          <span className={styles.successBadge}>
-            <i className="bi bi-check-circle" aria-hidden="true" />
-            Informacion encontrada
-          </span>
-          <span className={styles.noteBadge}>{draft.salesNoteCode}</span>
-        </div>
-      )}
+    
 
       <section className={styles.detailsPanel} aria-labelledby="order-details-title">
         {record ? (
