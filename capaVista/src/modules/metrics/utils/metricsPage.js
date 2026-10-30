@@ -152,3 +152,5 @@ export function subscribeMetricsSummary({ api, from, to, onSuccess, onError }) {
     })
   }
 }
+
+export { getProductTypeColor, PRODUCTION_PALETTE } from './productColors'

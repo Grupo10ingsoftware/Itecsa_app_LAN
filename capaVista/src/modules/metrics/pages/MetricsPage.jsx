@@ -10,6 +10,7 @@ import {
   getPeriodQuery,
   subscribeMetricsSummary,
   getMetricsScope,
+  getProductTypeColor,
 } from '../utils/metricsPage'
 import styles from './MetricsPage.module.css'
 import PageShell, { PageSurface } from '../../../shared/components/layout/PageShell'
@@ -128,7 +129,7 @@ export function MetricsContent({ api }) {
             <p className={styles.chartTotal}>Total producido <strong>{Number(summary.production.total).toLocaleString('es-CL')}</strong> unidades</p>
             {summary.production.products.length === 0 ? <p className={styles.emptyState} role="status">No hay producción registrada.</p> : <MetricsBarChart
               label="Unidades producidas por producto" unit="unidades"
-              items={summary.production.products.map(item => ({ label: item.productType, value: item.quantity }))}
+              items={summary.production.products.map(item => ({ label: item.productType, value: item.quantity, color: getProductTypeColor(item.productType) }))}
             />}
           </section>}
           {canQuery && <ProductionPerformance key={queryKey} api={api} period={{ from: queryFrom, to: queryTo }} />}

@@ -14,7 +14,13 @@ export default function MetricsBarChart({ items, label, unit }) {
       <ul className={styles.chartColumns} style={{ '--chart-columns': items.length }}>
         {items.map(item => <li className={styles.chartColumn} key={item.label}>
           <div className={styles.barArea}>
-            <div className={`${styles.verticalBar} ${styles[item.tone] ?? ''}`} style={{ height: `${Number(item.value) / ceiling * 100}%` }}>
+            <div
+              className={`${styles.verticalBar} ${styles[item.tone] ?? ''}`}
+              style={{
+                height: `${Number(item.value) / ceiling * 100}%`,
+                ...(item.color ? { backgroundColor: item.color, '--bar-color': item.color } : {}),
+              }}
+            >
               <strong className={styles.barValue}>{Number(item.value).toLocaleString('es-CL')}<span className={styles.visuallyHidden}> {unit}</span></strong>
             </div>
           </div>

@@ -200,7 +200,7 @@
   width: 50%;
   max-width: 3.25rem;
   position: relative;
-  background: var(--itexsa-orange);
+  background: var(--bar-color, var(--itexsa-orange));
   border-radius: .2rem .2rem 0 0;
 }
 
