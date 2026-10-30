@@ -205,8 +205,8 @@ export default function UserManagementPage() {
   }
 
   function refreshAfterMutation(message, { resetPage = false } = {}) {
-    if (message.type === 'success') notify.success(message.text)
-    else setActionMessage(message)
+    if (message?.type === 'success') notify.success(message.text)
+    else if (message) setActionMessage(message)
     // The effect reloads with current filters, including changes made while the
     // mutation was pending. A captured loadUsers closure can contain old filters.
     latestRequestRef.current++
@@ -236,10 +236,7 @@ export default function UserManagementPage() {
 
   function handleCreatedUser(user) {
     if (user.outcome === 'user_created') setIsCreateModalOpen(false)
-    refreshAfterMutation({ type: user.outcome === 'user_created' ? 'success' : 'warning',
-      text: user.outcome === 'user_created'
-        ? 'Usuario creado. Deberá cambiar su contraseña temporal al iniciar sesión.'
-        : 'Preparacion incompleta. No repitas el alta con otro nombre. Referencia: ' + user.operationId + '.' }, { resetPage: true })
+    refreshAfterMutation(null, { resetPage: true })
   }
   async function handleInspectUser(user) {
     if (inspection.current.busy) return

@@ -101,6 +101,15 @@ export class KeycloakManagementService {
     return matches[0] ?? null;
   }
 
+  async findByEmail(email) {
+    if (!validText(email, 255)) invalid();
+    const { data } = await this.request('/users?' + new URLSearchParams({ email, exact: true, max: 2 }));
+    if (!Array.isArray(data) || data.some(user => !validText(user?.id, 128))) throw new KeycloakServiceError('KEYCLOAK_INVALID_RESPONSE');
+    const matches = data.filter(user => typeof user.email === 'string' && user.email.toLowerCase() === email.toLowerCase());
+    if (matches.length > 1) throw new KeycloakServiceError('KEYCLOAK_IDENTITY_CONFLICT', { status: 409 });
+    return matches[0] ?? null;
+  }
+
   async getUser(subject) {
     const { data } = await this.request('/users/' + segment(subject));
     if (data?.id !== subject || !validText(data.username, 255) || typeof data.enabled !== 'boolean') throw new KeycloakServiceError('KEYCLOAK_INVALID_RESPONSE');
@@ -110,10 +119,23 @@ export class KeycloakManagementService {
   async createDisabled({ username, email = null, firstName, lastName, operationId }) {
     if (!validText(username, 255) || (email !== null && (!validText(email, 255) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))
       || !validText(firstName, 100) || !validText(lastName, 100) || !/^[0-9a-f-]{36}$/i.test(operationId ?? '')) invalid();
-    const { response } = await this.request('/users', { method: 'POST', expected: [201], body: {
+    let response;
+    try { ({ response } = await this.request('/users', { method: 'POST', expected: [201], body: {
       username, ...(email === null ? {} : { email }), firstName, lastName, enabled: false, emailVerified: false,
       attributes: { itecsa_provision_id: [operationId] },
-    } });
+    } })); } catch (error) {
+      // Only a confirmed rejected POST permits duplicate classification. Never
+      // translate a timeout or a partial provisioning failure into a duplicate.
+      if (error.code !== 'KEYCLOAK_USER_EXISTS' || error.ambiguous) throw error;
+      let code = 'KEYCLOAK_IDENTITY_CONFLICT';
+      try {
+        const existing = await this.findByUsername(username);
+        if (existing?.attributes?.itecsa_provision_id?.includes(operationId)) throw error;
+        if (existing) code = 'IDENTITY_USERNAME_EXISTS';
+        else if (email && await this.findByEmail(email)) code = 'IDENTITY_EMAIL_EXISTS';
+      } catch { throw new KeycloakServiceError('KEYCLOAK_IDENTITY_CONFLICT', { status: 409 }); }
+      throw new KeycloakServiceError(code, { status: 409, category: 'conflict' });
+    }
     const location = response.headers.get('location');
     if (!location || !location.startsWith(this.config.adminUrl + '/users/')) throw new KeycloakServiceError('KEYCLOAK_INVALID_LOCATION', { ambiguous: true });
     const subject = location.slice((this.config.adminUrl + '/users/').length);

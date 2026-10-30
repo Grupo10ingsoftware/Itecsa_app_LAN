@@ -26,7 +26,8 @@ export function createKeycloakIdentityPreparationRouter({ authenticate = checkJw
           IDENTITY_UPDATE_REQUIRES_REVIEW: 'La actualizacion quedo incompleta y el acceso permanece bloqueado. Requiere revision administrativa.',
           IDENTITY_INPUT_INVALID: 'Revisa el nombre, apellido, correo, rol y estado ingresados.',
         };
-        return res.status(error.status).json({ code: error.code, message: messages[error.code] ?? 'La operacion administrativa no pudo completarse.' });
+        return res.status(error.status).json({ ...(error.operation ? { operation: error.operation, operationId: error.operation.operationId } : {}),
+          code: error.code, message: messages[error.code] ?? 'La operacion administrativa no pudo completarse.' });
       }
       return respondError(error, req, res);
     }
@@ -64,6 +65,10 @@ export function createKeycloakIdentityPreparationRouter({ authenticate = checkJw
   router.post('/operations/:id/reconcile', run(async (req, res) => {
     if (!req.body || Object.keys(req.body).some(key => key !== 'pin')) throw new IdentityAdministrationError('IDENTITY_INPUT_INVALID', 400);
     return res.status(202).json(await service.reconcile(context(req), req.params.id));
+  }));
+  router.post('/operations/status', run(async (req, res) => {
+    if (!req.body || Object.keys(req.body).some(key => key !== 'identity')) throw new IdentityAdministrationError('IDENTITY_INPUT_INVALID', 400);
+    return res.json(await service.creationStatus(context(req), req.body.identity));
   }));
   return router;
 }

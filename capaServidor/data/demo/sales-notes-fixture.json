@@ -1940,6 +1940,104 @@
       "importable": true
     }
   ]
-}
+},
 
+  {
+    "numeroNota": "00000",
+    "fechaEntregaTentativaOrigen": "2026-11-20",
+    "usuarioOrigenManager": "Vendedor Demo",
+    "tipoNotaVentaOrigen": "Venta Normal",
+    "cliente": {
+      "RUT": "RUT-DEMO-043",
+      "CLIENTE": "Empresa Prueba Industrial SpA",
+      "dir": "Av. Industrial 1450",
+      "comuna": "Quilicura",
+      "ciudad": "Santiago",
+      "TIPO_CLIENTE": "EMPRESAS"
+    },
+    "observaciones": "Pedido de prueba para validar la importacion de notas de venta y el flujo de produccion.",
+    "items": [
+      {
+        "codigo": "2100010060017",
+        "producto": "TARJETAS ID CARD PVC BLANCA",
+        "cantidad": 150,
+        "familia": "TARJETAS",
+        "subfamilia": "TARJETAS",
+        "importable": true
+      },
+      {
+        "codigo": "2100010060018",
+        "producto": "TARJETAS ID CARD PVC BLANCA",
+        "cantidad": 75,
+        "familia": "TARJETAS",
+        "subfamilia": "TARJETAS",
+        "importable": true
+      }
+    ]
+  },
+  {
+    "numeroNota": "00001",
+    "fechaEntregaTentativaOrigen": "2026-11-20",
+    "usuarioOrigenManager": "Vendedor Demo",
+    "tipoNotaVentaOrigen": "Venta Normal",
+    "cliente": {
+      "RUT": "RUT-DEMO-043",
+      "CLIENTE": "Empresa Prueba Industrial SpA",
+      "dir": "Av. Industrial 1450",
+      "comuna": "Quilicura",
+      "ciudad": "Santiago",
+      "TIPO_CLIENTE": "EMPRESAS"
+    },
+    "observaciones": "Pedido de prueba para validar la importacion de notas de venta y el flujo de produccion.",
+    "items": [
+      {
+        "codigo": "2100010060017",
+        "producto": "TARJETAS ID CARD PVC BLANCA",
+        "cantidad": 150,
+        "familia": "TARJETAS",
+        "subfamilia": "TARJETAS",
+        "importable": true
+      },
+      {
+        "codigo": "2100010060018",
+        "producto": "TARJETAS ID CARD PVC BLANCA",
+        "cantidad": 75,
+        "familia": "TARJETAS",
+        "subfamilia": "TARJETAS",
+        "importable": true
+      }
+    ]
+  },
+  {
+    "numeroNota": "00002",
+    "fechaEntregaTentativaOrigen": "2026-11-20",
+    "usuarioOrigenManager": "Vendedor Demo",
+    "tipoNotaVentaOrigen": "Venta Normal",
+    "cliente": {
+      "RUT": "RUT-DEMO-043",
+      "CLIENTE": "Empresa Prueba Industrial SpA",
+      "dir": "Av. Industrial 1450",
+      "comuna": "Quilicura",
+      "ciudad": "Santiago",
+      "TIPO_CLIENTE": "EMPRESAS"
+    },
+    "observaciones": "Pedido de prueba para validar la importacion de notas de venta y el flujo de produccion.",
+    "items": [
+      {
+        "codigo": "2100010060017",
+        "producto": "TARJETAS ID CARD PVC BLANCA",
+        "cantidad": 150,
+        "familia": "TARJETAS",
+        "subfamilia": "TARJETAS",
+        "importable": true
+      },
+      {
+        "codigo": "2100010060018",
+        "producto": "TARJETAS ID CARD PVC BLANCA",
+        "cantidad": 75,
+        "familia": "TARJETAS",
+        "subfamilia": "TARJETAS"
+      }
+    ]
+  }
 ]

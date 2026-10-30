@@ -45,6 +45,7 @@ const result = operation => ({
   operationId: operation.id, outcome: operation.state === 'created' ? 'user_created'
     : operation.state === 'prepared' ? 'identity_prepared' : operation.state,
   externalSubject: operation.external_subject, localUserId: operation.local_user_id,
+  code: operation.last_error ?? null,
   recoverable: ['needs_reconciliation', 'running', 'pending'].includes(operation.state),
   credentialsConfigured: operation.state === 'created', fullyProvisioned: operation.state === 'created',
 });
@@ -192,7 +193,15 @@ export class KeycloakIdentityAdministrationService {
     let operation;
     try { operation = await this.repository.claim({ issuer: this.management.config.issuer, input, digest, actorId }); }
     catch { throw new IdentityAdministrationError('IDENTITY_JOURNAL_UNAVAILABLE', 503); }
-    if (operation.payload_digest !== digest) reject('IDENTITY_OPERATION_PAYLOAD_CONFLICT');
+    if (operation.payload_digest !== digest) {
+      // A completed, different account owns this username. This request has
+      // not started provisioning; do not present the old account as partial.
+      if (operation.state === 'created') return { outcome: 'failed', code: 'IDENTITY_USERNAME_EXISTS',
+        recoverable: false, credentialsConfigured: false, fullyProvisioned: false };
+      const error = new IdentityAdministrationError('IDENTITY_OPERATION_PAYLOAD_CONFLICT');
+      error.operation = result(operation);
+      throw error;
+    }
     if (operation.state === 'created') return result(operation);
     if (operation.state === 'prepared') {
       const user = await this.inspect(context, operation.external_subject, { revalidateActor: true });
@@ -214,17 +223,31 @@ export class KeycloakIdentityAdministrationService {
     const acquired = await this.repository.acquire(operation, true);
     return acquired ? this.execute(context, acquired, actorId, true) : reject('IDENTITY_OPERATION_BUSY');
   }
+  async creationStatus(context, rawInput) {
+    await this.authorize(context);
+    const input = normalize(rawInput);
+    const operation = await this.repository.operationByUsername(this.management.config.issuer, input.username);
+    if (!operation) return null;
+    const digest = createHash('sha256').update(JSON.stringify(input)).digest('hex');
+    return operation.payload_digest === digest ? result(operation)
+      : { ...result(operation), outcome: 'identity_conflict', code: 'IDENTITY_OPERATION_PAYLOAD_CONFLICT' };
+  }
   async execute(context, operation, actorId, reconcile) {
-    let ownedSubject;
+    let ownedSubject, creationStarted = false;
     try {
       let checkpointed = false;
       let external = await this.management.findByUsername(operation.username);
       if (external && (!reconcile || external.attributes?.itecsa_provision_id?.[0] !== operation.id)) {
-        reject('IDENTITY_USERNAME_EXISTS');
+        reject(reconcile ? 'KEYCLOAK_IDENTITY_CONFLICT' : 'IDENTITY_USERNAME_EXISTS');
       }
       if (!external) {
         if (reconcile) reject('IDENTITY_EXTERNAL_OUTCOME_UNKNOWN');
+        const conflict = await this.repository.creationConflict(operation.input);
+        if (conflict) reject(conflict);
+        if (await this.management.findByEmail(operation.input.email)) reject('IDENTITY_EMAIL_EXISTS');
+        creationStarted = true;
         const subject = await this.management.createDisabled({ ...operation.input, operationId: operation.id });
+        ownedSubject = subject;
         await this.repository.checkpoint(operation, subject);
         checkpointed = true;
         external = await this.management.getUser(subject);
@@ -269,11 +292,24 @@ export class KeycloakIdentityAdministrationService {
         try { await this.management.setEnabled(ownedSubject, false); }
         catch { disableFailed = true; }
       }
+      const uniqueTarget = String(error?.meta?.target ?? '');
+      const storageCode = error?.code === 'P2002'
+        ? /correo_usuario/.test(uniqueTarget) ? 'IDENTITY_EMAIL_EXISTS' : /rut_usuario/.test(uniqueTarget) ? 'IDENTITY_RUT_EXISTS' : 'KEYCLOAK_IDENTITY_CONFLICT'
+        : error?.message === 'IDENTITY_BINDING_CONFLICT' ? 'KEYCLOAK_IDENTITY_CONFLICT' : 'IDENTITY_STORAGE_UNAVAILABLE';
       const code = disableFailed ? 'IDENTITY_DISABLE_UNCONFIRMED' : error instanceof IdentityAdministrationError || error instanceof KeycloakServiceError ? error.code
-        : error?.code === 'IDENTITY_ACTOR_CHANGED' ? 'IDENTITY_ADMIN_FORBIDDEN' : 'IDENTITY_STORAGE_UNAVAILABLE';
-      try { await this.repository.fail(operation, code, { terminal: code === 'IDENTITY_USERNAME_EXISTS', actorId }); }
-      catch { throw new IdentityAdministrationError('IDENTITY_JOURNAL_UNAVAILABLE', 503); }
-      return result(await this.repository.operation(operation.id));
+        : error?.code === 'IDENTITY_ACTOR_CHANGED' ? 'IDENTITY_ADMIN_FORBIDDEN' : storageCode;
+      const duplicate = ['IDENTITY_USERNAME_EXISTS', 'IDENTITY_EMAIL_EXISTS', 'IDENTITY_RUT_EXISTS'].includes(code);
+      const terminal = duplicate && !reconcile && !ownedSubject && !operation.external_subject && !operation.local_user_id
+        && (!creationStarted || (error instanceof KeycloakServiceError && error.status === 409 && !error.ambiguous));
+      try {
+        await this.repository.fail(operation, code, { terminal, actorId });
+        return result(await this.repository.operation(operation.id));
+      }
+      catch {
+        const failure = new IdentityAdministrationError('IDENTITY_JOURNAL_UNAVAILABLE', 503);
+        failure.operation = { ...result(operation), outcome: 'unknown', code, externalSubject: ownedSubject ?? operation.external_subject };
+        throw failure;
+      }
     }
   }
 }

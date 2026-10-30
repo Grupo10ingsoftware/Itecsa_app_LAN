@@ -10,7 +10,8 @@ import { useAdminUsersApi } from '../hooks/useAdminUsersApi'
 import { hasValidationErrors, validateUserCreateForm } from '../utils/userValidation'
 import styles from './UserCreateForm.module.css'
 import { useToast } from '../../../shared/notifications/useToast'
-import { publicOperationMessage, requiresContext, uncertainOperation } from '../../../shared/notifications/operationFeedback'
+import { publicOperationMessage, uncertainOperation } from '../../../shared/notifications/operationFeedback'
+import { userCreationFeedback } from '../utils/userCreationFeedback.js'
 import { generateUsername } from '../utils/generateUsername.js'
 
 const INITIAL_VALUES = Object.freeze({ nombreUsuario: '', apellidoUsuario: '', rutUsuario: '', correoUsuario: '', rolUsuario: '', username: '' })
@@ -29,22 +30,21 @@ function getErrorMessage(error) {
   if (error?.status === 409) return { type: MESSAGE_TYPES.WARNING, text: 'La cuenta o la operacion tiene un conflicto. Revisa su estado antes de repetir el alta.' }
   return { type: MESSAGE_TYPES.DANGER, text: publicOperationMessage(error, 'No se pudo confirmar la preparación. Revisa el estado antes de repetirla.') }
 }
-function preparationMessage(result) {
-  return { type: MESSAGE_TYPES.WARNING, text: 'Creación incompleta. No repitas el alta. Referencia: ' + result.operationId + '.' }
-}
+
 export default function UserCreateForm(props) {
   const { user } = useAuth()
-  return <UserCreateFormContent key={user?.sub ?? ''} {...props} />
+  return <UserCreateFormContent key={user?.sub ?? ''} {...props}
+    recovery={props.recovery?.actor === user?.sub ? props.recovery : null} />
 }
 
-function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreated } = {}) {
+function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreated, recovery, onRecoveryChange } = {}) {
   const notify = useToast()
   const { loginWithRedirect, user: actor } = useAuth()
   const adminUsersApi = useAdminUsersApi()
-  const [values, setValues] = useState(INITIAL_VALUES)
+  const [values, setValues] = useState(recovery?.values ?? INITIAL_VALUES)
   const [fieldErrors, setFieldErrors] = useState(INITIAL_ERRORS)
-  const [message, setMessage] = useState(null)
-  const [createdUser, setCreatedUser] = useState(null)
+  const [requiresLogin, setRequiresLogin] = useState(false)
+  const [createdUser, setCreatedUser] = useState(recovery?.result ?? null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [pinAction, setPinAction] = useState(null)
   const [pinError, setPinError] = useState('')
@@ -61,7 +61,6 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
       }
       return next
     })
-    if (!createdUser) setMessage(null)
   }
   async function handleSubmit(event) {
     event.preventDefault()
@@ -72,7 +71,7 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
       && [...values.username].every(char => char.codePointAt(0) > 32) ? [] : ['Ingresa un nombre de acceso en minusculas, sin espacios.']
     if (!manageableRoles(actor?.rolUsuario).includes(values.rolUsuario)) nextErrors.rolUsuario = ['No puedes asignar ese rol.']
     setFieldErrors(nextErrors)
-    setMessage(null)
+    setRequiresLogin(false)
     if (hasValidationErrors(nextErrors)) return
     openPin('create')
   }
@@ -100,24 +99,63 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
           rutUsuario: values.rutUsuario.trim(), rolUsuario: values.rolUsuario, username: values.username, pin })
       if (!active.current) return
       const { temporaryPassword, ...result } = response
-      setCreatedUser(result)
       setFieldErrors(INITIAL_ERRORS)
       setPinAction(null)
-      setMessage(result.outcome === 'user_created' ? null : preparationMessage(result))
+      applyResult(result)
       if (result.outcome === 'user_created' && result.mustChangePassword && typeof temporaryPassword === 'string' && temporaryPassword) {
         setCredential({ username: values.username, temporaryPassword })
       } else {
         onBusyChange?.(false)
-        onCreated?.(result)
+        if (result.outcome === 'user_created') onCreated?.(result)
       }
     } catch (error) {
       if (active.current) {
-        if (requiresContext(error) || uncertainOperation(error) || error?.status === 409) setPinError(getErrorMessage(error).text)
-        else notify.error(getErrorMessage(error).text)
+        if (error?.payload?.code?.startsWith('PIN_')) {
+          setPinError(getErrorMessage(error).text)
+        } else {
+          setPinAction(null)
+          onBusyChange?.(false)
+          if (error?.payload?.outcome) applyResult(error.payload)
+          else if (error?.payload?.operation) applyResult({ ...error.payload.operation,
+            ...(error.payload.code === 'IDENTITY_OPERATION_PAYLOAD_CONFLICT' ? { outcome: 'identity_conflict' } : {}), code: error.payload.code })
+          else if (uncertainOperation(error) || error?.status === 409 || pinAction === 'reconcile') {
+            applyResult({ ...createdUser, outcome: createdUser?.outcome ?? 'unknown',
+              operationId: createdUser?.operationId ?? error?.payload?.operationId, code: error?.payload?.code })
+          } else {
+            const feedback = getErrorMessage(error)
+            setRequiresLogin(feedback.requiresLogin === true)
+            notify.error(feedback.text)
+          }
+        }
       }
     } finally {
       submitting.current = false
       if (active.current) setIsSubmitting(false)
+    }
+  }
+  function applyResult(result) {
+    const feedback = userCreationFeedback(result)
+    const pending = feedback.blocked ? result : null
+    setCreatedUser(pending)
+    onRecoveryChange?.(pending && result.outcome !== 'user_created' ? { actor: actor?.sub, values, result: pending } : null)
+    notify[feedback.type](feedback.text)
+  }
+  async function checkStatus() {
+    if (submitting.current) return
+    submitting.current = true
+    setIsSubmitting(true)
+    onBusyChange?.(true)
+    try {
+      const result = await adminUsersApi.creationStatus(values)
+      if (!active.current) return
+      applyResult(result ?? { ...createdUser, outcome: 'unknown' })
+      if (result?.outcome === 'user_created') onCreated?.(result)
+    } catch {
+      if (active.current) notify.warning('No fue posible consultar el estado. No repitas el alta hasta verificar la operación.' +
+        (createdUser?.operationId ? ' Referencia: ' + createdUser.operationId + '.' : ''))
+    } finally {
+      submitting.current = false
+      if (active.current) { setIsSubmitting(false); onBusyChange?.(false) }
     }
   }
   function acceptCredential() {
@@ -126,7 +164,6 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
     onBusyChange?.(false)
     onCreated?.(createdUser)
   }
-  const isSessionInvalid = message?.requiresLogin === true
   const nombreUsuarioErrors = fieldErrors.nombreUsuario ?? []
   const apellidoUsuarioErrors = fieldErrors.apellidoUsuario ?? []
   const rutUsuarioErrors = fieldErrors.rutUsuario ?? []
@@ -143,22 +180,17 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
       onSubmit={handleSubmit}
     >
       <div className={styles.formContent}>
-        {message && (
-          <div className={`${styles.messageBox} ${styles[`message${message.type}`]}`} role="status">
-            <p>{message.text}</p>
-            {isSessionInvalid && (
-              <button className={styles.messageButton} onClick={() => loginWithRedirect()} type="button">
-                Iniciar sesion
-              </button>
-            )}
-          </div>
-        )}
+        {requiresLogin && <button className={styles.messageButton} onClick={() => loginWithRedirect()} type="button">Iniciar sesion</button>}
+        {createdUser && createdUser.outcome !== 'user_created' && <p className={styles.fieldHelp}>
+          {createdUser.operationId ? 'Referencia de operación: ' + createdUser.operationId : 'Consulta pendiente para: ' + values.username}
+        </p>}
         <div className={styles.nameRow}>
           <div className={`${styles.fieldCard} ${nombreUsuarioErrors.length > 0 ? styles.fieldCardInvalid : ''}`}>
             <div className={styles.fieldContent}>
               <label htmlFor="user-first-name">Nombre <span>*</span></label>
               <input
                 aria-describedby="user-first-name-errors"
+                disabled={Boolean(createdUser)}
                 aria-invalid={nombreUsuarioErrors.length > 0}
                 autoComplete="given-name"
                 required
@@ -179,6 +211,7 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
               <label htmlFor="user-last-name">Apellido <span>*</span></label>
               <input
                 aria-describedby="user-last-name-errors"
+                disabled={Boolean(createdUser)}
                 aria-invalid={apellidoUsuarioErrors.length > 0}
                 autoComplete="family-name"
                 required
@@ -199,7 +232,7 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
         <div className={`${styles.fieldCard} ${styles.fieldCardWide}`}>
           <div className={styles.fieldContent}>
             <label htmlFor="user-username">Nombre de acceso <span>*</span></label>
-            <input id="user-username" name="username" value={values.username} readOnly required
+            <input id="user-username" name="username" value={values.username} onChange={handleFieldChange} required
               autoComplete="off" maxLength={255} disabled={Boolean(createdUser)} aria-invalid={Boolean(fieldErrors.username?.length)} aria-describedby="user-username-errors" />
             <FieldErrors errors={fieldErrors.username ?? []} id="user-username-errors" />
           </div>
@@ -210,6 +243,7 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
             <label htmlFor="user-email">Correo electronico <span>*</span></label>
             <input
               aria-describedby="user-email-errors"
+              disabled={Boolean(createdUser)}
               aria-invalid={correoUsuarioErrors.length > 0}
               autoComplete="email"
               required
@@ -230,6 +264,7 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
             <label htmlFor="user-rut">RUT <span>*</span></label>
             <input
               aria-describedby="user-rut-errors"
+              disabled={Boolean(createdUser)}
               aria-invalid={rutUsuarioErrors.length > 0}
               autoComplete="off"
               id="user-rut"
@@ -250,6 +285,7 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
             <label htmlFor="user-role">Rol <span>*</span></label>
             <select
               aria-describedby="user-role-errors"
+              disabled={Boolean(createdUser)}
               aria-invalid={rolUsuarioErrors.length > 0}
               id="user-role"
               name="rolUsuario"
@@ -295,6 +331,9 @@ function UserCreateFormContent({ mode = 'page', onBusyChange, onCancel, onCreate
 
         {createdUser?.outcome === 'needs_reconciliation' && <button className={styles.secondaryButton}
           type="button" disabled={isBusy} onClick={() => openPin('reconcile')}>Conciliar preparacion</button>}
+
+        {createdUser && createdUser.outcome !== 'user_created' && <button className={styles.secondaryButton}
+          type="button" disabled={isBusy} onClick={checkStatus}>Verificar estado</button>}
 
         <button
           className={styles.submitButton}
