@@ -21,7 +21,7 @@ done
 verify_release_revisions() {
   local image revision
   for image in "${IMAGES[@]:1}"; do
-    revision="$(docker image inspect --format '{{if .Config.Labels}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
+    revision="$(docker image inspect --format '{{if index .Config "Labels"}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
     [[ "$revision" == "$APP_VERSION" ]] || fail "imagen de otra version: $image"
   done
 }
@@ -40,7 +40,7 @@ verify_inventory() {
     seen[$image]=1
     count=$((count + 1))
     current_id="$(docker image inspect --format '{{.Id}}' "$image")"
-    current_revision="$(docker image inspect --format '{{if .Config.Labels}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
+    current_revision="$(docker image inspect --format '{{if index .Config "Labels"}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
     [[ -n "$current_revision" ]] || current_revision="-"
     [[ "$current_id" == "$expected_id" && "$current_revision" == "$expected_revision" ]] || fail "imagen cambiada: $image"
   done < "$OUT_DIR/itecsa-images.txt"
@@ -55,7 +55,7 @@ case "$ACTION" in
     (cd "$OUT_DIR" && sha256sum itecsa-images.tar > itecsa-images.sha256)
     : > "$OUT_DIR/itecsa-images.txt"
     for image in "${IMAGES[@]}"; do
-      revision="$(docker image inspect --format '{{if .Config.Labels}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
+      revision="$(docker image inspect --format '{{if index .Config "Labels"}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
       [[ -n "$revision" ]] || revision="-"
       printf '%s %s %s\n' "$image" "$(docker image inspect --format '{{.Id}}' "$image")" "$revision" >> "$OUT_DIR/itecsa-images.txt"
     done

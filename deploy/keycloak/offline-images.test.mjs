@@ -9,7 +9,7 @@ import { spawnSync } from 'node:child_process';
 const bash = process.env.BASH_TEST_BINARY ?? (process.platform === 'win32'
   ? 'C:/Program Files/Git/bin/bash.exe' : 'bash');
 const images = ['mysql:test', 'api:test', 'web:test', 'tools:test', 'keycloak:test'];
-const inventory = images.map(image => `${image} sha256:fixture release-test\n`).join('');
+const inventory = images.map((image, index) => `${image} sha256:fixture ${index === 0 ? '-' : 'release-test'}\n`).join('');
 
 function run(action, manifest, { corrupt = false, changed = false, revision = 'release-test' } = {}) {
   const directory = mkdtempSync(path.join(tmpdir(), 'itecsa-offline-test-'));
@@ -27,8 +27,17 @@ function run(action, manifest, { corrupt = false, changed = false, revision = 'r
     // No Docker daemon or real image is used by this regression test.
     writeFileSync(path.join(directory, 'bin/docker'), `#!/usr/bin/env bash
 if [[ "$1 $2" == "image load" ]]; then exit 0; fi
+if [[ "$1 $2" == "image save" ]]; then
+  while (( $# )); do
+    if [[ "$1" == "-o" ]]; then printf 'fixture archive' > "$2"; exit 0; fi
+    shift
+  done
+fi
 [[ "$1 $2" == "image inspect" ]] || exit 90
-if [[ "$4" == '{{.Id}}' ]]; then echo '${changed ? 'sha256:changed' : 'sha256:fixture'}'; else echo '${revision}'; fi
+if [[ "$4" == '{{.Id}}' ]]; then echo '${changed ? 'sha256:changed' : 'sha256:fixture'}';
+elif [[ "$5" == 'mysql:test' ]]; then
+  [[ "$4" != *'{{if .Config.Labels}}'* ]] || { echo 'map has no entry for key "Labels"' >&2; exit 1; }
+else echo '${revision}'; fi
 `, { mode: 0o755 });
     return spawnSync(bash, ['-c', 'export PATH="$PWD/bin:$PATH"; bash ./offline.sh "$1" ./images.env ./pack', '--', action],
       { cwd: directory, encoding: 'utf8' });
@@ -65,4 +74,10 @@ test('pack rechaza imagenes de otra version antes de crear el TAR', () => {
   assert.equal(result.error, undefined);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /imagen de otra version/);
+});
+
+test('pack acepta MySQL sin Config.Labels y genera el inventario', () => {
+  const result = run('pack', inventory);
+  assert.equal(result.status, 0, result.error?.message ?? result.stderr);
+  assert.match(result.stdout, /paquete e inventario preparados/);
 });
