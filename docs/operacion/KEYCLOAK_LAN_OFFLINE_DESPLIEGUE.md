@@ -20,6 +20,7 @@ Instalar Docker Engine, Compose v2, Node.js 22 o posterior y OpenSSL. Copiar el 
 ```bash
 cp deploy/mysql.env.example deploy/mysql.env
 cp capaServidor/env.mysql.docker.example capaServidor/.env.mysql.docker
+cp capaVista/env.example capaVista/.env
 ```
 
 Completar `deploy/mysql.env`, `capaServidor/.env.mysql.docker` y `capaVista/.env`. `manage.sh` rechaza marcadores `<...>`. `APP_VERSION` debe ser una etiqueta estable de release, igual en API, web, herramientas y Keycloak. `COMPOSE_PROJECT_NAME` debe permanecer estable: identifica los volúmenes. Usar secretos distintos para root MySQL, API, migradora, Keycloak, client administrativo y las dos cuentas administrativas. El secreto del client debe tener al menos 32 caracteres; la clave del administrador permanente, al menos 20. Las variables `FIRST_USER_*` se dejan vacías hasta el primer acceso.
@@ -41,9 +42,12 @@ La consola administrativa queda en `${PUBLIC_ORIGIN}/admin/`. Tras instalar, ret
 ./deploy/mysql/manage.sh start
 ./deploy/mysql/manage.sh stop
 ./deploy/mysql/manage.sh update
+docker compose --env-file deploy/mysql.env -f compose.mysql.yaml ps
+docker compose --env-file deploy/mysql.env -f compose.mysql.yaml logs --tail=100 mysql keycloak api web
 ```
 
 `verify` y `start` comprueban el discovery OIDC por HTTPS desde host y API. `update` conserva el realm y sus usuarios; aplica únicamente migraciones de la aplicación. No se debe ejecutar `docker compose down --volumes`.
+`ps` muestra el estado de los cuatro servicios y `logs` permite revisar sus últimos eventos sin alterar los volúmenes. Ejecutar `stop` para detenerlos y `start` para reanudarlos; conservar el mismo `COMPOSE_PROJECT_NAME`.
 
 ## Primer usuario Soporte
 
@@ -90,6 +94,7 @@ Transportar `itecsa-images.tar`, `itecsa-images.sha256` e `itecsa-images.txt`. E
 ```
 
 Fijar `DEPLOY_IMAGE_MODE=preloaded` antes de `manage.sh install`. El script comprueba SHA-256, identidades y etiquetas de revisión de las imágenes. También se necesitan los archivos de entorno, certificado, clave y CA por un canal seguro. `preloaded` no descarga imágenes.
+El inventario de API, web, herramientas y Keycloak debe coincidir con `APP_VERSION` tanto al empaquetar como al cargar o verificar. En `preloaded`, el gestor comprueba las cinco imágenes antes de crear o arrancar servicios; si falta una, falla con `imagen no cargada` sin iniciar la instalación. Los comandos Compose de arranque usan `--pull never` y `--no-build`; los contenedores auxiliares usan `--pull never`.
 
 `MYSQL_IMAGE=itecsa-mysql:8.4-pinned` es una etiqueta local exportable. En modos `build` y `pull`, el gestor la crea a partir del digest MySQL 8.4 fijado en `manage.sh`; en el destino offline se restaura desde el TAR. No cambiarla por una referencia solo `@sha256`: Docker no conserva una etiqueta para esa forma al exportar.
 
@@ -98,3 +103,5 @@ Fijar `DEPLOY_IMAGE_MODE=preloaded` antes de `manage.sh install`. El script comp
 La suite local `node --test deploy/keycloak/render-realm.test.mjs` comprueba el contrato de cinco clients, roles, mappers, callback PIN, política y rechazo de orígenes inseguros. Las pruebas existentes de sesión, PIN, alta y retorno de login completaron 50 casos. La prueba con Keycloak 26.8.1 descartable confirmó el import y la configuración administrativa, incluidos los cuatro permisos técnicos y el reemplazo del administrador temporal. Un segundo laboratorio con MySQL 8.4 comprobó creación de base y cuenta exclusivas, conexión JDBC con TLS, salud, persistencia tras reinicio, respaldo independiente con manifiesto, restauración en base vacía y arranque posterior con `Realm 'itecsa' already exists. Import skipped`. El paquete offline de cinco imágenes pasó `pack`, `verify` y `load` con SHA-256 correcto. `docker compose --env-file deploy/mysql.env.example -f compose.mysql.yaml config --quiet` comprueba el esquema Compose.
 
 Antes de aceptar la LAN definitiva, ejecutar login, logout, renovación y validación de tokens en la API; alta de usuario, primer cambio de clave, PIN y recuperación administrativa tras bloqueo por fuerza bruta; reinicio con persistencia; respaldo y restauración de ambas bases; arranque `preloaded` sin internet. Registrar evidencia de DNS/IP, SAN, confianza de CA en navegador y host, conexión TLS desde API al issuer y capacidad de CPU, memoria y disco del servidor. Esas pruebas dependen del entorno definitivo y no se declaran completadas por la inspección de la VM.
+
+En el cierre local posterior de `feat/docker-lan-cierre` solo se ejecutaron comprobaciones estáticas y pruebas con procesos Docker simulados. El daemon local estaba disponible, pero no había imágenes cargadas ni certificados y configuración HTTPS de laboratorio para una instalación completa. Quedan pendientes en un entorno descartable la instalación integrada, reinicio con persistencia, actualización, respaldo/restauración y comprobación de aislamiento de Internet con imágenes reales; la aceptación desde otro equipo sigue siendo una prueba de la LAN de destino.
