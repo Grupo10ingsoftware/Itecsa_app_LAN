@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react'
+import { useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useModalDialog } from '../../../modules/users/hooks/useModalDialog'
 import { LoadingAction } from '../loading/LoadingIndicator'

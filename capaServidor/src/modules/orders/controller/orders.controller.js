@@ -1,7 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { response, request } from "express";
 import { respondError } from "../../../errors/httpErrors.js";
-import { authorizationForProvider } from '../../../../../shared/identityAuthorization.js';
 import OrderService from "../service/order.service.js";
 import SalesNoteSecurityMonitor, { SALES_NOTE_LOOKUP_OUTCOMES } from "../../security/service/salesNoteSecurityMonitor.service.js";
 import {
@@ -103,7 +102,7 @@ class OrderController {
       if (!orderId) return res.status(400).json({ msg: "Missing ID" });
       const result = await this.service.updPaymentState(orderId, req.body?.paymentStatusId ?? req.body?.paymentStatus, {
         identitySubject: req.auth?.payload?.sub, actor: req.pinActor, observacion: req.body?.observacion,
-        role: authorizationForProvider(req.identityProvider)?.roleFromPayload(req.auth?.payload), permissions: req.auth?.payload?.permissions,
+        role: req.pinActor?.rolUsuario, permissions: req.pinActor?.permissions,
         ...(req.identityProvider ? { identityProvider: req.identityProvider } : {}),
       });
       if (!result) return res.status(404).json({ message: "Pedido no encontrado" });
@@ -116,7 +115,7 @@ class OrderController {
       const { orderId } = req.params;
       if (!orderId) return res.status(400).json({ msg: "Missing ID" });
       const result = await this.service.updGeneralStep(orderId, req.body?.generalStepId, {
-        permissions: req.auth?.payload?.permissions, role: authorizationForProvider(req.identityProvider)?.roleFromPayload(req.auth?.payload), actor: req.pinActor, comment: req.body?.comment,
+        permissions: req.pinActor?.permissions, role: req.pinActor?.rolUsuario, actor: req.pinActor, comment: req.body?.comment,
         ...(req.identityProvider ? { identityProvider: req.identityProvider } : {}),
       });
       if (!result) return res.status(404).json({ message: "Pedido no encontrado" });

@@ -76,7 +76,29 @@ verify_public_certificate() {
 [[ -r "$WEB_ENV_FILE" ]] || fail "falta WEB_ENV_FILE"
 if grep -Eq '<[^>]+>' "$ENV_FILE" "$API_ENV_FILE" "$WEB_ENV_FILE"; then fail "quedan marcadores sin reemplazar"; fi
 if grep -qi aiven "$COMPOSE_FILE"; then fail "el Compose autonomo contiene una referencia a Aiven"; fi
-compose() { docker compose --project-name "$PROJECT" --env-file "$ENV_FILE" -f "$COMPOSE_FILE" "$@"; }
+compose() {
+  local -a base=(docker compose --project-name "$PROJECT" --env-file "$ENV_FILE" -f "$COMPOSE_FILE")
+  if [[ "$IMAGE_MODE" == preloaded ]]; then
+    case "$1" in
+      up)
+        shift
+        "${base[@]}" up --pull never --no-build "$@"
+        return ;;
+      run)
+        shift
+        "${base[@]}" run --pull never "$@"
+        return ;;
+      --profile)
+        if [[ "${3:-}" == run ]]; then
+          local profile="$2"
+          shift 3
+          "${base[@]}" --profile "$profile" run --pull never "$@"
+          return
+        fi ;;
+    esac
+  fi
+  "${base[@]}" "$@"
+}
 verify_release_images() {
   local api_revision tools_revision web_revision keycloak_revision
   api_revision="$(docker image inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' "$API_IMAGE")"
@@ -101,11 +123,15 @@ prepare_images() {
       compose --profile tools pull api web database-tools keycloak
       docker pull mysql@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69
       docker tag mysql@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69 "$(read_value MYSQL_IMAGE)" ;;
-    preloaded)
-      for image in "$(read_value MYSQL_IMAGE)" "$API_IMAGE" "$WEB_IMAGE" "$TOOLS_IMAGE" "$KEYCLOAK_IMAGE"; do
-        docker image inspect "$image" >/dev/null 2>&1 || fail "imagen no cargada: $image"
-      done ;;
+    preloaded) : ;;
   esac
+  [[ "$IMAGE_MODE" == preloaded ]] || verify_release_images
+}
+verify_preloaded_images() {
+  local image
+  for image in "$(read_value MYSQL_IMAGE)" "$API_IMAGE" "$WEB_IMAGE" "$TOOLS_IMAGE" "$KEYCLOAK_IMAGE"; do
+    docker image inspect "$image" >/dev/null 2>&1 || fail "imagen no cargada: $image"
+  done
   verify_release_images
 }
 ensure_tls() {
@@ -217,6 +243,9 @@ update_database() {
   verify_public_issuer
   echo "MYSQL_DEPLOY: actualizacion completa para $PROJECT."
 }
+if [[ "$IMAGE_MODE" == preloaded && "$ACTION" != stop ]]; then
+  verify_preloaded_images
+fi
 case "$ACTION" in
   install) install_database ;;
   update) update_database ;;

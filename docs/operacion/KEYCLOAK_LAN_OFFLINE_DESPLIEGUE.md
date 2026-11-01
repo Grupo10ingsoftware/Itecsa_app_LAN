@@ -20,6 +20,7 @@ Instalar Docker Engine, Compose v2, Node.js 22 o posterior y OpenSSL. Copiar el 
 ```bash
 cp deploy/mysql.env.example deploy/mysql.env
 cp capaServidor/env.mysql.docker.example capaServidor/.env.mysql.docker
+cp capaVista/env.example capaVista/.env
 ```
 
 Completar `deploy/mysql.env`, `capaServidor/.env.mysql.docker` y `capaVista/.env`. `manage.sh` rechaza marcadores `<...>`. `APP_VERSION` debe ser una etiqueta estable de release, igual en API, web, herramientas y Keycloak. `COMPOSE_PROJECT_NAME` debe permanecer estable: identifica los volúmenes. Usar secretos distintos para root MySQL, API, migradora, Keycloak, client administrativo y las dos cuentas administrativas. El secreto del client debe tener al menos 32 caracteres; la clave del administrador permanente, al menos 20. Las variables `FIRST_USER_*` se dejan vacías hasta el primer acceso.
@@ -41,9 +42,12 @@ La consola administrativa queda en `${PUBLIC_ORIGIN}/admin/`. Tras instalar, ret
 ./deploy/mysql/manage.sh start
 ./deploy/mysql/manage.sh stop
 ./deploy/mysql/manage.sh update
+docker compose --env-file deploy/mysql.env -f compose.mysql.yaml ps
+docker compose --env-file deploy/mysql.env -f compose.mysql.yaml logs --tail=100 mysql keycloak api web
 ```
 
 `verify` y `start` comprueban el discovery OIDC por HTTPS desde host y API. `update` conserva el realm y sus usuarios; aplica únicamente migraciones de la aplicación. No se debe ejecutar `docker compose down --volumes`.
+`ps` muestra el estado de los cuatro servicios y `logs` permite revisar sus últimos eventos sin alterar los volúmenes. Ejecutar `stop` para detenerlos y `start` para reanudarlos; conservar el mismo `COMPOSE_PROJECT_NAME`.
 
 ## Primer usuario Soporte
 
@@ -90,6 +94,7 @@ Transportar `itecsa-images.tar`, `itecsa-images.sha256` e `itecsa-images.txt`. E
 ```
 
 Fijar `DEPLOY_IMAGE_MODE=preloaded` antes de `manage.sh install`. El script comprueba SHA-256, identidades y etiquetas de revisión de las imágenes. También se necesitan los archivos de entorno, certificado, clave y CA por un canal seguro. `preloaded` no descarga imágenes.
+El inventario de API, web, herramientas y Keycloak debe coincidir con `APP_VERSION` tanto al empaquetar como al cargar o verificar. En `preloaded`, el gestor comprueba las cinco imágenes antes de crear o arrancar servicios; si falta una, falla con `imagen no cargada` sin iniciar la instalación. Los comandos Compose de arranque usan `--pull never` y `--no-build`; los contenedores auxiliares usan `--pull never`.
 
 `MYSQL_IMAGE=itecsa-mysql:8.4-pinned` es una etiqueta local exportable. En modos `build` y `pull`, el gestor la crea a partir del digest MySQL 8.4 fijado en `manage.sh`; en el destino offline se restaura desde el TAR. No cambiarla por una referencia solo `@sha256`: Docker no conserva una etiqueta para esa forma al exportar.
 
@@ -98,3 +103,30 @@ Fijar `DEPLOY_IMAGE_MODE=preloaded` antes de `manage.sh install`. El script comp
 La suite local `node --test deploy/keycloak/render-realm.test.mjs` comprueba el contrato de cinco clients, roles, mappers, callback PIN, política y rechazo de orígenes inseguros. Las pruebas existentes de sesión, PIN, alta y retorno de login completaron 50 casos. La prueba con Keycloak 26.8.1 descartable confirmó el import y la configuración administrativa, incluidos los cuatro permisos técnicos y el reemplazo del administrador temporal. Un segundo laboratorio con MySQL 8.4 comprobó creación de base y cuenta exclusivas, conexión JDBC con TLS, salud, persistencia tras reinicio, respaldo independiente con manifiesto, restauración en base vacía y arranque posterior con `Realm 'itecsa' already exists. Import skipped`. El paquete offline de cinco imágenes pasó `pack`, `verify` y `load` con SHA-256 correcto. `docker compose --env-file deploy/mysql.env.example -f compose.mysql.yaml config --quiet` comprueba el esquema Compose.
 
 Antes de aceptar la LAN definitiva, ejecutar login, logout, renovación y validación de tokens en la API; alta de usuario, primer cambio de clave, PIN y recuperación administrativa tras bloqueo por fuerza bruta; reinicio con persistencia; respaldo y restauración de ambas bases; arranque `preloaded` sin internet. Registrar evidencia de DNS/IP, SAN, confianza de CA en navegador y host, conexión TLS desde API al issuer y capacidad de CPU, memoria y disco del servidor. Esas pruebas dependen del entorno definitivo y no se declaran completadas por la inspección de la VM.
+
+### Ejecución integrada local del 31 de octubre de 2026
+
+En `feat/docker-lan-cierre` se ejecutó una instalación real con Docker Desktop y `compose.mysql.yaml`. El proyecto exclusivo fue `itecsa-lab-091f21d5`, con `APP_VERSION=lab-091f21d5`, `DEPLOY_IMAGE_MODE=preloaded`, `APP_RUNTIME_ENV=production`, `PUBLIC_ORIGIN=https://host.docker.internal` y puerto 443 publicado solo en `127.0.0.1`. Los tres entornos nuevos, la CA y el certificado de laboratorio se guardaron con permisos restrictivos en `deploy/mysql/certs/itecsa-docker-lab-091f21d5/`, ignorado por Git. `manage.sh` recibió siempre `--env-file` con la ruta absoluta de `deploy.env`; este archivo apuntó mediante `API_ENV_FILE` y `WEB_ENV_FILE` a los otros dos entornos nuevos. No se modificaron ni utilizaron los `.env` previos ni `deploy/mysql.env`.
+
+Antes de preparar imágenes o volúmenes, se resolvió Compose con esos archivos y se comprobó sin imprimir valores sensibles: `API_ENV_FILE` y `WEB_ENV_FILE` eran las rutas absolutas nuevas; la API no tenía `DATABASE_URL` ni referencias a Aiven; `DB_HOST=mysql`, `DB_PORT=3306`, `DB_NAME=itecsa_lab`, `DB_TARGET=mysql-docker` y `DB_SSL_CA_PATH=/run/secrets/mysql-ca.pem` coincidían con la base local. La imagen API también se inspeccionó sin hallar archivos `.env` ni `DATABASE_URL`. MySQL se descargó mediante el digest fijado en `manage.sh`; las imágenes de herramientas, API, web y Keycloak se construyeron secuencialmente con la misma revisión `lab-091f21d5`. Se confirmó la presencia de las cinco antes de instalar. No fue necesario aumentar la memoria de Docker Desktop; la asignación permaneció en aproximadamente 1,8 GiB.
+
+La primera invocación de `install` se detuvo antes de crear volúmenes porque Docker Desktop no compartía el directorio temporal `/tmp` usado inicialmente para los certificados. Se trasladaron únicamente los archivos nuevos del laboratorio a `deploy/mysql/certs/`. Una segunda invocación se detuvo tras preparar TLS porque `NODE_OPTIONS` no interpretó una ruta con espacios; se usó un enlace temporal corto a un resolver Node de laboratorio. No se cambió `/etc/hosts`, no se publicó HTTPS en la LAN y no se creó un proxy adicional. La tercera invocación completó `install`:
+
+```bash
+LAB_DIR="$PWD/deploy/mysql/certs/itecsa-docker-lab-091f21d5"
+./deploy/mysql/manage.sh install --env-file "$LAB_DIR/deploy.env"
+./deploy/mysql/manage.sh verify --env-file "$LAB_DIR/deploy.env"
+./deploy/mysql/manage.sh first-user --env-file "$LAB_DIR/deploy.env"
+./deploy/keycloak/offline-images.sh pack "$LAB_DIR/deploy.env" "$LAB_DIR/offline"
+./deploy/keycloak/offline-images.sh verify "$LAB_DIR/deploy.env" "$LAB_DIR/offline"
+./deploy/mysql/manage.sh stop --env-file "$LAB_DIR/deploy.env"
+./deploy/mysql/manage.sh start --env-file "$LAB_DIR/deploy.env"
+./deploy/mysql/manage.sh update --env-file "$LAB_DIR/deploy.env"
+./deploy/mysql/manage.sh stop --env-file "$LAB_DIR/deploy.env"
+```
+
+Para esos comandos `manage.sh`, el host necesitó temporalmente `NODE_OPTIONS=--require=/tmp/itecsa-lab-resolve-091f21d5.cjs`, un enlace al resolver local que asignaba `host.docker.internal` a `127.0.0.1` solo en los procesos Node iniciados por el gestor. El enlace se retiró al finalizar. En una ejecución posterior se debe configurar una resolución equivalente del origen público antes de usar esos comandos. `FIRST_USER_*` se completó solo para crear una cuenta ficticia de laboratorio; `FIRST_USER_TEMP_PASSWORD` se eliminó del archivo inmediatamente después.
+
+Resultados observados: MySQL, Keycloak, API y web alcanzaron `healthy`; `mysql:verify` confirmó identidad, TLS, cuentas, 16 checksums de migración, esquema y catálogos. El proxy respondió por HTTPS con la CA de laboratorio en `/`, `/api/health/live`, `/runtime-config.js`, discovery OIDC y JWKS; el issuer y la URI JWKS coincidieron con el origen público y JWKS entregó dos claves. La configuración pública no contenía Aiven. `/api/orders` rechazó una petición sin token con HTTP 401 y el endpoint OIDC de autorización respondió con HTTP 302. `first-user` creó una cuenta Soporte con cambio de contraseña obligatorio; MySQL mostró un usuario y un vínculo Keycloak. Después de `stop` y `start`, los cuatro servicios volvieron a `healthy` y ambos registros persistieron. `verify` y `update` terminaron correctamente; `update` generó un respaldo propio, informó `No pending migrations to apply` y `No difference detected`, y conservó el usuario y su vínculo. `pack` y `verify` comprobaron las cinco imágenes reales y el SHA-256 del archivo. La inspección real reveló que la imagen MySQL carece de `Config.Labels`; se corrigió `offline-images.sh` y pasaron sus 18 pruebas enfocadas.
+
+No se probaron en navegador el cambio inicial de contraseña, PIN, login/logout, renovación de tokens ni recuperación administrativa; tampoco se ejecutaron `load`, restauración de respaldos, aislamiento sin Internet ni aceptación desde otro equipo de la LAN. Son comprobaciones pendientes, no resultados inferidos de la salud del stack. Los intentos y resultados del laboratorio quedaron en archivos privados ignorados por Git, sin credenciales en este informe. Al terminar, los cuatro contenedores del proyecto quedaron detenidos; se conservaron sus cinco volúmenes, imágenes, respaldo y paquete offline para revisión. No se alteraron recursos Docker ajenos ni `main`; los dos documentos de handoff sin seguimiento siguieron sin añadirse a Git.

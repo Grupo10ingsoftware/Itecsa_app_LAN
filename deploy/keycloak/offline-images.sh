@@ -10,12 +10,21 @@ read_value() {
   awk -F= -v key="$1" '$0 !~ /^[[:space:]]*#/ && $1 == key {sub(/^[^=]*=/, ""); print; exit}' "$ENV_FILE"
 }
 IMAGES=()
+APP_VERSION="$(read_value APP_VERSION)"
+[[ "$APP_VERSION" =~ ^[A-Za-z0-9._-]{1,128}$ ]] || fail "APP_VERSION invalido"
 for key in MYSQL_IMAGE API_IMAGE WEB_IMAGE DB_TOOLS_IMAGE KEYCLOAK_IMAGE; do
   value="$(read_value "$key")"
   [[ -n "$value" && "$value" != *'<'* ]] || fail "falta $key"
   IMAGES+=("$value")
 done
 [[ "${IMAGES[0]}" != *'@'* ]] || fail "MYSQL_IMAGE necesita una etiqueta local para sobrevivir a docker image load"
+verify_release_revisions() {
+  local image revision
+  for image in "${IMAGES[@]:1}"; do
+    revision="$(docker image inspect --format '{{if index .Config "Labels"}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
+    [[ "$revision" == "$APP_VERSION" ]] || fail "imagen de otra version: $image"
+  done
+}
 verify_inventory() {
   local image expected_id expected_revision extra current_id current_revision count=0
   local -A seen=()
@@ -25,10 +34,13 @@ verify_inventory() {
     local configured=0
     for expected in "${IMAGES[@]}"; do [[ "$image" != "$expected" ]] || configured=1; done
     (( configured )) || fail "imagen ajena a la configuracion"
+    if [[ "$image" != "${IMAGES[0]}" && "$expected_revision" != "$APP_VERSION" ]]; then
+      fail "inventario de otra version: $image"
+    fi
     seen[$image]=1
     count=$((count + 1))
     current_id="$(docker image inspect --format '{{.Id}}' "$image")"
-    current_revision="$(docker image inspect --format '{{if .Config.Labels}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
+    current_revision="$(docker image inspect --format '{{if index .Config "Labels"}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
     [[ -n "$current_revision" ]] || current_revision="-"
     [[ "$current_id" == "$expected_id" && "$current_revision" == "$expected_revision" ]] || fail "imagen cambiada: $image"
   done < "$OUT_DIR/itecsa-images.txt"
@@ -38,11 +50,12 @@ case "$ACTION" in
   pack)
     mkdir -p "$OUT_DIR"
     for image in "${IMAGES[@]}"; do docker image inspect "$image" >/dev/null || fail "imagen ausente: $image"; done
+    verify_release_revisions
     docker image save -o "$OUT_DIR/itecsa-images.tar" "${IMAGES[@]}"
     (cd "$OUT_DIR" && sha256sum itecsa-images.tar > itecsa-images.sha256)
     : > "$OUT_DIR/itecsa-images.txt"
     for image in "${IMAGES[@]}"; do
-      revision="$(docker image inspect --format '{{if .Config.Labels}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
+      revision="$(docker image inspect --format '{{if index .Config "Labels"}}{{index .Config.Labels "org.opencontainers.image.revision"}}{{end}}' "$image")"
       [[ -n "$revision" ]] || revision="-"
       printf '%s %s %s\n' "$image" "$(docker image inspect --format '{{.Id}}' "$image")" "$revision" >> "$OUT_DIR/itecsa-images.txt"
     done

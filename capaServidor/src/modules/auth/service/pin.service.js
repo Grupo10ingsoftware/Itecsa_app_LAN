@@ -15,6 +15,7 @@ import getPrismaClient from "../../../database/prisma.js";
 import {
     isActiveUserStatus,
 } from "../../../config/userLifecycle.js";
+import { BUSINESS_PERMISSIONS, ROLE_PERMISSIONS } from '../../../../../shared/authorization.js';
 
 
 const scrypt = promisify(scryptCallback);
@@ -101,7 +102,7 @@ function assertActiveUser(user) {
     if (!user || !isActiveUserStatus(user.estado_usuario)) {
         throw new PinServiceError(
             "PIN_USER_UNAVAILABLE",
-            "El usuario autenticado no esta activo o no esta vinculado.",
+            "El titular del PIN no esta activo o no esta vinculado.",
             { status: 403 },
         );
     }
@@ -204,10 +205,24 @@ export class PinService {
         const key = identityKey(identitySubject);
         const users = await transaction.$queryRaw`
             SELECT u.id_usuario, u.correo_usuario, u.nombre_usuario,
-                u.apellido_usuario, u.estado_usuario, u.pin_hash, u.pin_salt,
+                u.apellido_usuario, u.rol_usuario, u.estado_usuario, u.pin_hash, u.pin_salt,
                 u.pin_accepted_at, u.pin_failed_attempts, u.pin_locked_until
             FROM Usuario u JOIN ExternalIdentity e ON e.user_id = u.id_usuario
             WHERE e.provider = ${key.provider} AND e.issuer = ${key.issuer} AND e.subject = ${key.subject}
+            FOR UPDATE
+        `;
+        return users[0] ?? null;
+    }
+
+    async findPinOwnerForUpdate(transaction, identitySubject, pin) {
+        const key = identityKey(identitySubject);
+        const users = await transaction.$queryRaw`
+            SELECT u.id_usuario, u.correo_usuario, u.nombre_usuario,
+                u.apellido_usuario, u.rol_usuario, u.estado_usuario, u.pin_hash,
+                u.pin_salt, u.pin_accepted_at, u.pin_failed_attempts, u.pin_locked_until
+            FROM Usuario u JOIN ExternalIdentity e ON e.user_id = u.id_usuario
+            WHERE u.pin_fingerprint = ${this.fingerprint(pin)}
+                AND e.provider = ${key.provider} AND e.issuer = ${key.issuer}
             FOR UPDATE
         `;
         return users[0] ?? null;
@@ -305,89 +320,116 @@ export class PinService {
         });
     }
 
-    async validate(identitySubject, pin) {
+    assertPinFormat(pin) {
         if (!PIN_PATTERN.test(String(pin ?? ""))) {
             throw new PinServiceError(
                 "PIN_FORMAT_INVALID",
                 "El PIN debe contener seis digitos.",
             );
         }
+    }
 
-        const result = await this.client.$transaction(async (transaction) => {
-            const user = await this.findUserForUpdate(transaction, identitySubject);
-            assertActiveUser(user);
+    async validateLockedPin(transaction, user, pin) {
+        assertActiveUser(user);
+        if (!user.pin_hash || !user.pin_accepted_at) {
+            return {
+                error: new PinServiceError(
+                    "PIN_NOT_ACKNOWLEDGED",
+                    "Debes recibir y aceptar tu PIN antes de usarlo.",
+                    { status: 403 },
+                ),
+            };
+        }
 
-            if (!user.pin_hash || !user.pin_accepted_at) {
-                return {
-                    error: new PinServiceError(
-                        "PIN_NOT_ACKNOWLEDGED",
-                        "Debes recibir y aceptar tu PIN antes de usarlo.",
-                        { status: 403 },
-                    ),
-                };
-            }
-
-            const now = this.now();
-            if (user.pin_locked_until && user.pin_locked_until > now) {
-                return {
-                    error: new PinServiceError(
-                        "PIN_LOCKED",
-                        "El PIN esta temporalmente bloqueado.",
-                        {
-                            status: 423,
-                            details: {
-                                retryAfterSeconds: Math.ceil(
-                                    (user.pin_locked_until - now) / 1000,
-                                ),
-                            },
+        const now = this.now();
+        if (user.pin_locked_until && user.pin_locked_until > now) {
+            return {
+                error: new PinServiceError(
+                    "PIN_LOCKED",
+                    "El PIN esta temporalmente bloqueado.",
+                    {
+                        status: 423,
+                        details: {
+                            retryAfterSeconds: Math.ceil(
+                                (user.pin_locked_until - now) / 1000,
+                            ),
                         },
-                    ),
-                };
-            }
-
-            const valid = await matchesHash(pin, user.pin_hash, user.pin_salt);
-            if (!valid) {
-                const attempts = (user.pin_failed_attempts ?? 0) + 1;
-                const lockedUntil =
-                    attempts >= MAX_ATTEMPTS
-                        ? new Date(now.getTime() + LOCK_MS)
-                        : null;
-
-                await transaction.usuario.update({
-                    where: { id_usuario: user.id_usuario },
-                    data: {
-                        pin_failed_attempts:
-                            attempts >= MAX_ATTEMPTS ? 0 : attempts,
-                        pin_locked_until: lockedUntil,
                     },
-                });
+                ),
+            };
+        }
 
-                return {
-                    error: new PinServiceError(
-                        "PIN_INVALID",
-                        "El PIN ingresado no es valido.",
-                        { status: 403 },
-                    ),
-                };
-            }
+        const valid = await matchesHash(pin, user.pin_hash, user.pin_salt);
+        if (!valid) {
+            const attempts = (user.pin_failed_attempts ?? 0) + 1;
+            const lockedUntil = attempts >= MAX_ATTEMPTS
+                ? new Date(now.getTime() + LOCK_MS)
+                : null;
 
-            if (user.pin_failed_attempts || user.pin_locked_until) {
-                await transaction.usuario.update({
-                    where: { id_usuario: user.id_usuario },
-                    data: { pin_failed_attempts: 0, pin_locked_until: null },
-                });
-            }
+            await transaction.usuario.update({
+                where: { id_usuario: user.id_usuario },
+                data: {
+                    pin_failed_attempts: attempts >= MAX_ATTEMPTS ? 0 : attempts,
+                    pin_locked_until: lockedUntil,
+                },
+            });
 
             return {
-                user: {
-                    idUsuario: user.id_usuario,
-                    correoUsuario: user.correo_usuario,
-                    nombreUsuario: user.nombre_usuario,
-                    apellidoUsuario: user.apellido_usuario,
-                },
+                error: new PinServiceError(
+                    "PIN_INVALID",
+                    "El PIN ingresado no es valido.",
+                    { status: 403 },
+                ),
             };
+        }
+
+        if (user.pin_failed_attempts || user.pin_locked_until) {
+            await transaction.usuario.update({
+                where: { id_usuario: user.id_usuario },
+                data: { pin_failed_attempts: 0, pin_locked_until: null },
+            });
+        }
+
+        return {
+            user: {
+                idUsuario: user.id_usuario,
+                correoUsuario: user.correo_usuario,
+                nombreUsuario: user.nombre_usuario,
+                apellidoUsuario: user.apellido_usuario,
+                rolUsuario: user.rol_usuario,
+            },
+        };
+    }
+
+    async validate(identitySubject, pin) {
+        this.assertPinFormat(pin);
+        const result = await this.client.$transaction(async (transaction) => {
+            const user = await this.findUserForUpdate(transaction, identitySubject);
+            return this.validateLockedPin(transaction, user, pin);
         });
 
+        if (result.error) throw result.error;
+        return result.user;
+    }
+
+    async validateForPermission(identitySubject, pin, permission) {
+        if (!BUSINESS_PERMISSIONS.includes(permission)) throw new TypeError('Capacidad desconocida.');
+        this.assertPinFormat(pin);
+        const result = await this.client.$transaction(async (transaction) => {
+            const user = await this.findPinOwnerForUpdate(transaction, identitySubject, pin);
+            if (!user) {
+                // Unknown PINs take a comparable hash cost without scanning users.
+                await hashValue(pin, Buffer.alloc(16), true);
+                return { error: new PinServiceError('PIN_INVALID', 'El PIN ingresado no es valido.', { status: 403 }) };
+            }
+            const validated = await this.validateLockedPin(transaction, user, pin);
+            if (validated.error) return validated;
+            const permissions = ROLE_PERMISSIONS[user.rol_usuario];
+            if (!permissions?.includes(permission)) {
+                return { error: new PinServiceError('PIN_ACTOR_FORBIDDEN', 'El titular del PIN no tiene autorizacion para esta accion.', { status: 403 }) };
+            }
+            return { user: { ...validated.user, permissions } };
+        });
         if (result.error) throw result.error;
         return result.user;
     }

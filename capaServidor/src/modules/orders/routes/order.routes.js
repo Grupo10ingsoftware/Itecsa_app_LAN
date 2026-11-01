@@ -4,7 +4,7 @@ import {
 } from "../../../config/status.js";
 import checkJwt from "../../../middlewares/checkJwt.js";
 import requireCapability, { PERMISSIONS as P } from "../../../middlewares/requireCapability.js";
-import requirePin from "../../../middlewares/requirePin.js";
+import { createRequirePin } from "../../../middlewares/requirePin.js";
 import requireAdministratorRole from "../../../middlewares/requireAdministratorRole.js";
 import requireSalesRole from "../../../middlewares/requireSalesRole.js";
 import OrderController from "../controller/orders.controller.js";
@@ -20,9 +20,11 @@ export function createOrderRouter({
     authorizeCancellation = requireAdministratorRole,
     authorizeSales = requireSalesRole,
     controller = new OrderController(),
-    validatePin = requirePin,
+    validatePin,
+    validateBusinessPin = permission => createRequirePin({ permission }),
 } = {}) {
     const router = Router();
+    const pinFor = permission => validatePin ?? validateBusinessPin(permission);
     const fallbackController = new OrderController();
     const routeController = {
         getOrders: controller.getOrders ?? fallbackController.getOrders,
@@ -64,15 +66,15 @@ export function createOrderRouter({
     router.get("/:orderId/kanban-precheck", authenticate, requireCapability(P.READ_ORDERS), routeController.getKanbanPrecheck);
     router.get("/:orderId/calendar-detail", authenticate, requireCapability(P.READ_CALENDAR), routeController.getCalendarDetail);
     router.get("/:orderId", authenticate, requireCapability(P.READ_ORDERS), routeController.getOrder);
-    router.post("/", authenticate, requireCapability(P.CREATE_ORDERS), validatePin, routeController.createOrder);
+    router.post("/", authenticate, requireCapability(P.CREATE_ORDERS), pinFor(P.CREATE_ORDERS), routeController.createOrder);
     router.patch(
         "/:orderId/payment-status",
         authenticate,
         authorizePaymentStatusUpdate,
-        validatePin,
+        pinFor(P.UPDATE_PAYMENT_STATUS),
         routeController.updatePaymentStatus,
     );
-    router.patch("/:orderId/move", authenticate, requireCapability(P.MOVE_ORDERS), validatePin, routeController.updateGeneralStep);
+    router.patch("/:orderId/move", authenticate, requireCapability(P.MOVE_ORDERS), pinFor(P.MOVE_ORDERS), routeController.updateGeneralStep);
     router.patch(
         "/:orderId/review",
         authenticate,
@@ -83,24 +85,24 @@ export function createOrderRouter({
         "/:orderId/cancel-production",
         authenticate,
         authorizeCancellation,
-        validatePin,
+        pinFor(P.CANCEL_ORDERS),
         routeController.cancelProduction,
     );
     router.patch("/:orderId/reevaluate", authenticate, authorizeSales, routeController.reevaluate);
     router.patch("/:orderId/labels", authenticate, requireCapability(P.MANAGE_TAGS), routeController.setLabel);
-    router.patch("/:orderId/delivery-date", authenticate, requireCapability(P.UPDATE_DELIVERY_DATE), validatePin, routeController.updateDeliveryDate);
+    router.patch("/:orderId/delivery-date", authenticate, requireCapability(P.UPDATE_DELIVERY_DATE), pinFor(P.UPDATE_DELIVERY_DATE), routeController.updateDeliveryDate);
     router.patch(
         "/:orderId/details/:detailId/subprocesses/:subprocessId/complete",
         authenticate,
         requireCapability(P.UPDATE_SUBPROCESSES),
-        validatePin,
+        pinFor(P.UPDATE_SUBPROCESSES),
         routeController.completeSubprocess,
     );
     router.patch(
         "/:orderId/details/:detailId/subprocesses/:subprocessId/rollback",
         authenticate,
         requireCapability(P.ROLLBACK_SUBPROCESSES),
-        validatePin,
+        pinFor(P.ROLLBACK_SUBPROCESSES),
         routeController.rollbackSubprocess,
     );
 
