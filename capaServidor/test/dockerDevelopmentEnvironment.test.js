@@ -4,7 +4,7 @@ import { dockerDatabaseUrl } from '../scripts/dockerDevelopmentEnvironment.mjs';
 
 const env = {
   DATABASE_URL: 'mysql://user:example%40password@db.example:3306/application?sslcert=.%2Fcerts%2Fca.pem&sslaccept=strict&connection_limit=5',
-  DB_SSL_CA_PATH: '/run/secrets/aiven-ca.pem',
+  DB_SSL_CA_PATH: '/run/secrets/mysql-lab-ca.pem',
 };
 
 test('changes only the CA path for the existing Docker secret', () => {

@@ -60,7 +60,7 @@ services:
       target: production
       args:
         APP_VERSION: ${APP_VERSION:?Definir APP_VERSION}
-    env_file: ${API_ENV_FILE:-./capaServidor/.env.mysql.docker}
+    env_file: ${API_ENV_FILE:-./capaServidor/.env}
     environment:
       APP_ENV: ${APP_RUNTIME_ENV:-production}
       NODE_ENV: ${APP_RUNTIME_ENV:-production}

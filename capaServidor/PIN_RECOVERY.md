@@ -66,7 +66,7 @@ KEYCLOAK_PIN_RECOVERY_REDIRECT_URI=http://127.0.0.1:5173/auth/pin-recovery/callb
 
 Se reutilizan `KEYCLOAK_ISSUER`, `KEYCLOAK_JWKS_URI`, `FRONTEND_ORIGIN` y la configuración de identidad existente. No agregar secretos para este cliente. Eliminar del entorno cualquier secreto antiguo de recuperación.
 
-Solo cuando el contenedor no pueda acceder al issuer público, configurar `KEYCLOAK_PIN_RECOVERY_TRANSPORT_ORIGIN` con el origen interno de Keycloak; se conserva la ruta del realm y se valida siempre el issuer público del token. `compose.yaml` incluye `http://host.docker.internal:18080` para el entorno local. HTTP solo se permite en el laboratorio autorizado; producción requiere HTTPS. No se necesitan variables nuevas en el frontend.
+Solo cuando el contenedor no pueda acceder al issuer público, configurar `KEYCLOAK_PIN_RECOVERY_TRANSPORT_ORIGIN` con el origen interno de Keycloak; se conserva la ruta del realm y se valida siempre el issuer público del token. HTTP solo se permite en el laboratorio autorizado; producción requiere HTTPS. No se necesitan variables nuevas en el frontend.
 
 Pasos de despliegue (no ejecutados contra producción):
 
@@ -86,7 +86,7 @@ No se modificó automáticamente Keycloak, ningún archivo `.env` ni la base de 
 | OIDC y autorización temporal | `src/config/pinRecovery.js`, `src/modules/auth/service/pinRecovery.service.js`; continuidad de navegación en `pinRecoveryNavigation.service.js` |
 | PIN y endpoints | `pin.service.js`, `auth.controller.js`, `auth.routes.js`, `httpErrors.js`, `rateLimit.js` |
 | Navegación, callback y perfil | `capaVista/src/modules/auth/pinRecoveryBrowser.js`, `pages/PinRecoveryCallbackPage.jsx`, `authApi.js`, `useAuthApi.js`, `ProfilePage.jsx`, `app/App.jsx`; bootstrap opcional en `AppProviders.jsx`, `IdentityProviders.jsx`, `keycloakSession.js`; credenciales de cookie limitadas al flujo en `apiClient.js` y `server.js` |
-| Configuración y despliegue | `env.example`, `package.json`, `package-lock.json`, `compose.yaml`, `deploy/nginx.conf`, `capaVista/index.html` |
+| Configuración y despliegue | `env.example`, `package.json`, `package-lock.json`, `compose.mysql.yaml`, `deploy/nginx.conf`, `capaVista/index.html` |
 | Tema | `deploy/keycloak/themes/itecsa-pin-recovery/login/` |
 | Pruebas | `pinRecovery.test.js`, `pinRecoveryBrowser.test.js`, `ProfilePage.test.jsx`, `keycloakSession.test.js` |
 

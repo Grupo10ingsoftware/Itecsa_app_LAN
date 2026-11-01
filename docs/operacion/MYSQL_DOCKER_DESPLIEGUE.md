@@ -1,13 +1,11 @@
 # MySQL Docker: despliegue autónomo
 
 La guía completa de la instalación integrada con Keycloak 26.8.1 está en
-`docs/operacion/KEYCLOAK_LAN_OFFLINE_DESPLIEGUE.md`. Las instrucciones de esta
-página describen el despliegue MySQL anterior y deben leerse junto con la guía
-integrada para instalaciones nuevas.
+`docs/operacion/KEYCLOAK_LAN_OFFLINE_DESPLIEGUE.md`. Esta página detalla
+las operaciones de MySQL del mismo despliegue de producción.
 
-Este despliegue utiliza `compose.mysql.yaml` de forma independiente. No combina
-`compose.production.yaml`, no monta certificados de Aiven y no necesita acceso
-a ese proveedor.
+Este despliegue utiliza `compose.mysql.yaml` con MySQL y Keycloak locales. Es
+el mismo stack integrado para servidor y pruebas aisladas en computador.
 
 ## Preparación
 
@@ -18,13 +16,15 @@ acceso a los registros de paquetes durante el build.
 
    ```bash
    cp deploy/mysql.env.example deploy/mysql.env
-   cp capaServidor/env.mysql.docker.example capaServidor/.env.mysql.docker
+   cp capaServidor/env.example capaServidor/.env
    ```
 
-2. Completar `deploy/mysql.env`, el entorno de la API y
-   `capaVista/.env`. No deben quedar valores entre `<...>`.
+2. Completar `deploy/mysql.env`, `capaServidor/.env` y
+   `capaVista/.env`. No deben quedar valores entre `<...>` ni claves `DB_*`
+   heredadas en el `.env` de la API: el Compose inyecta la conexión local.
 3. Mantener estable `COMPOSE_PROJECT_NAME`: identifica la instalación y
-   determina sus volúmenes.
+   determina sus volúmenes. Usar un valor distinto en el computador de pruebas
+   y en el servidor.
 4. Mantener `APP_RUNTIME_ENV=production` para instalaciones reales. Un laboratorio
    local que use deliberadamente Keycloak por HTTP puede seleccionar
    `APP_RUNTIME_ENV=development`; el modo `production` seguirá rechazando HTTP.
@@ -117,7 +117,7 @@ Repetir con la confirmación exacta indicada:
 ```
 
 Se verifican checksum, proyecto, base, UUID destino, hostname, MySQL 8.4, TLS y
-ausencia de indicadores de Aiven. La base destino debe estar sin tablas.
+coincidencia con la identidad del volumen local. La base destino debe estar sin tablas.
 Después del restore se aplican migraciones posteriores, seed y verificación.
 
 ## Entrega sin internet

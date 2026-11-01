@@ -4,7 +4,6 @@ import { createStrictTlsOptions, resolveDatabaseConnection } from "./connectionC
 
 const LAB_TARGETS = new Set(["mysql-lab-host", "mysql-lab-docker"]);
 const DOCKER_TARGET = "mysql-docker";
-const AIVEN_MARKER = /aiven/i;
 const MYSQL_LAB = Object.freeze({
   database: "itecsa_lab",
   hostname: "itecsa-mysql-lab",
@@ -92,7 +91,6 @@ export function verifyEffectiveLabServer(row, identity, env = process.env) {
   const hostname = String(row.hostname ?? "");
   const uuid = String(row.serverUuid ?? "");
   const version = String(row.version ?? "");
-  const versionComment = String(row.versionComment ?? "");
   const currentUser = String(row.currentUser ?? "");
   const identityHostname = identity.MYSQL_SERVER_HOSTNAME ?? identity.MYSQL_LAB_SERVER_HOSTNAME;
   const identityUuid = identity.MYSQL_SERVER_UUID ?? identity.MYSQL_LAB_SERVER_UUID;
@@ -104,7 +102,6 @@ export function verifyEffectiveLabServer(row, identity, env = process.env) {
   if (!version.startsWith("8.4.")) fail("la version efectiva no es MySQL 8.4.");
   if (Number(row.secureTransport) !== 1) fail("require_secure_transport no esta habilitado.");
   if (currentUser.split("@")[0] !== env.DB_USER) fail("CURRENT_USER() no coincide con la cuenta API.");
-  if (AIVEN_MARKER.test(`${hostname} ${versionComment}`)) fail("el servidor efectivo contiene indicadores de Aiven.");
   return true;
 }
 

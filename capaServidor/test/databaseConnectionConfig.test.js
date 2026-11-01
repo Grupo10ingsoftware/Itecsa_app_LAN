@@ -13,7 +13,8 @@ process.on("exit", () => rmSync(temporary, { recursive: true, force: true }));
 function base(overrides = {}) {
     const env = {
         APP_ENV: "development",
-        DB_HOST: "db.example.invalid",
+        DB_TARGET: "mysql-lab-docker",
+        DB_HOST: "mysql",
         DB_PORT: "3306",
         DB_USER: "api_user",
         DB_PASSWORD: "api-secret",
@@ -22,7 +23,7 @@ function base(overrides = {}) {
         DB_SSL_CA_PATH: caPath,
         ...overrides,
     };
-    const url = new URL("mysql://cli_user:cli-secret@db.example.invalid:3306/itecsa_lab");
+    const url = new URL("mysql://cli_user:cli-secret@mysql:3306/itecsa_lab");
     url.searchParams.set("sslcert", env.DB_SSL_CA_PATH);
     url.searchParams.set("sslaccept", "strict");
     env.DATABASE_URL = overrides.DATABASE_URL ?? url.href;
@@ -89,14 +90,14 @@ test("TLS requires a readable CA and strict CLI validation", () => {
 
 test("unencrypted connections remain limited to the test environment", () => {
     const env = base({ DB_SSL_MODE: "disabled" });
-    env.DATABASE_URL = "mysql://cli_user:cli-secret@db.example.invalid:3306/itecsa_lab";
+    env.DATABASE_URL = "mysql://cli_user:cli-secret@mysql:3306/itecsa_lab";
     assert.throws(() => resolveDatabaseConnection(env), /APP_ENV=test/);
     env.APP_ENV = "test";
     assert.equal(resolveDatabaseConnection(env).sslMode, "disabled");
 });
 
 test("laboratory API profile pins its address without receiving the migration URL", () => {
-    const env = base({ DB_TARGET: "mysql-lab-docker" });
+    const env = base({ DB_TARGET: "mysql-lab-docker", DB_HOST: "external.example.invalid" });
     assert.throws(() => resolveDatabaseConnection(env), /DB_HOST=mysql/);
     env.DB_HOST = "mysql";
     const url = new URL(env.DATABASE_URL);
@@ -111,4 +112,26 @@ test("laboratory API profile pins its address without receiving the migration UR
 test("a selected missing environment file fails instead of falling back", () => {
     const env = base({ DOTENV_PATH: path.join(temporary, "missing.env") });
     assert.throws(() => resolveDatabaseConnection(env), /no se encontro el archivo/);
+});
+
+test("rejects inherited external database profiles without exposing credentials", () => {
+    for (const env of [
+        base({ DB_TARGET: "aiven", DB_HOST: "mysql.aivencloud.com" }),
+        base({ DB_TARGET: "mysql-lab-docker", DB_HOST: "external.example.invalid" }),
+    ]) {
+        assert.throws(() => resolveDatabaseConnection(env), (error) =>
+            /perfil MySQL local|DB_HOST=mysql/.test(error.message) &&
+            !error.message.includes("api-secret") && !error.message.includes("cli-secret"));
+    }
+    const withoutTarget = base();
+    delete withoutTarget.DB_TARGET;
+    assert.throws(() => resolveDatabaseConnection(withoutTarget), /perfil MySQL local/);
+    withoutTarget.APP_ENV = "test";
+    assert.throws(() => resolveDatabaseConnection(withoutTarget), /perfil MySQL local/);
+});
+
+test("production requires the integrated mysql-docker profile", () => {
+    assert.equal(resolveDatabaseConnection(base({ APP_ENV: "production", DB_TARGET: "mysql-docker" })).host, "mysql");
+    assert.throws(() => resolveDatabaseConnection(base({ APP_ENV: "production" })), /DB_TARGET=mysql-docker/);
+    assert.throws(() => resolveDatabaseConnection({ APP_ENV: "production" }, { allowUnconfigured: true }), /DB_TARGET=mysql-docker/);
 });

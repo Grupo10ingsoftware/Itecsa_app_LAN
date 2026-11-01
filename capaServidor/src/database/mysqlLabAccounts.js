@@ -58,7 +58,6 @@ export async function bootstrapMysqlLabAccounts(env = process.env, {
     if (!/^[0-9a-f-]{36}$/i.test(String(server.serverUuid ?? ""))) fail("server_uuid no es valido.");
     if (!String(server.version).startsWith("8.4.")) fail("la instancia local no usa MySQL 8.4.");
     if (Number(server.secureTransport) !== 1) fail("require_secure_transport no esta habilitado.");
-    if (/aiven/i.test(`${server.hostname} ${server.versionComment}`)) fail("se detectaron indicadores de Aiven.");
     if (env.MYSQL_REQUIRE_EMPTY === "1") {
       const tables = await connection.query(
         "SELECT TABLE_NAME AS tableName FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?",

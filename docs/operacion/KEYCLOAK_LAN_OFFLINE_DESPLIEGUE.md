@@ -19,13 +19,15 @@ Instalar Docker Engine, Compose v2, Node.js 22 o posterior y OpenSSL. Copiar el 
 
 ```bash
 cp deploy/mysql.env.example deploy/mysql.env
-cp capaServidor/env.mysql.docker.example capaServidor/.env.mysql.docker
+cp capaServidor/env.example capaServidor/.env
 cp capaVista/env.example capaVista/.env
 ```
 
-Completar `deploy/mysql.env`, `capaServidor/.env.mysql.docker` y `capaVista/.env`. `manage.sh` rechaza marcadores `<...>`. `APP_VERSION` debe ser una etiqueta estable de release, igual en API, web, herramientas y Keycloak. `COMPOSE_PROJECT_NAME` debe permanecer estable: identifica los volúmenes. Usar secretos distintos para root MySQL, API, migradora, Keycloak, client administrativo y las dos cuentas administrativas. El secreto del client debe tener al menos 32 caracteres; la clave del administrador permanente, al menos 20. Las variables `FIRST_USER_*` se dejan vacías hasta el primer acceso.
+Completar `deploy/mysql.env`, `capaServidor/.env` y `capaVista/.env`. `manage.sh` rechaza marcadores `<...>` y variables de conexión MySQL heredadas en el `.env` de la API; el Compose inyecta esa conexión. Si existe un `.env` anterior, reemplazarlo deliberadamente a partir de la plantilla, sin copiar sus credenciales de base externa. `APP_VERSION` debe ser una etiqueta estable de release, igual en API, web, herramientas y Keycloak. `COMPOSE_PROJECT_NAME` debe permanecer estable: identifica los volúmenes. Usar secretos distintos para root MySQL, API, migradora, Keycloak, client administrativo y las dos cuentas administrativas. El secreto del client debe tener al menos 32 caracteres; la clave del administrador permanente, al menos 20. Las variables `FIRST_USER_*` se dejan vacías hasta el primer acceso.
 
 `PUBLIC_ORIGIN` es la única fuente para issuer, JWKS, redirects, callback PIN y configuración pública de SPA/API. Debe ser `https://nombre-o-ip` sin puerto ni ruta. `LAN_CA_FILE`, `LAN_TLS_CERT_FILE` y `LAN_TLS_KEY_FILE` apuntan a archivos locales. `LAN_BIND_ADDRESS` permite limitar la interfaz HTTPS. `APP_RUNTIME_ENV=production` en la LAN.
+
+Para pruebas aisladas en el computador, usar este mismo Compose en otra copia de trabajo, con sus propios `deploy/mysql.env`, `capaServidor/.env`, `capaVista/.env`, certificado y `COMPOSE_PROJECT_NAME`. Elegir un nombre de proyecto distinto del servidor; Docker separa los volúmenes de MySQL y Keycloak por ese nombre. Conservar el nombre al actualizar esa instalación. Tras cambiar el código, crear imágenes de una revisión nueva y ejecutar `./deploy/mysql/manage.sh update`; la recreación de la API y web conserva los volúmenes. No usar `docker compose down -v` para actualizar.
 
 ## Instalación inicial
 

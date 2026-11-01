@@ -31,8 +31,7 @@ try {
       server.hostname !== "itecsa-mysql" ||
       server.hostname !== identity.MYSQL_SERVER_HOSTNAME ||
       server.serverUuid !== identity.MYSQL_SERVER_UUID ||
-      !String(server.version).startsWith("8.4.") || Number(server.secureTransport) !== 1 ||
-      /aiven/i.test(`${server.hostname} ${server.versionComment}`)) {
+      !String(server.version).startsWith("8.4.") || Number(server.secureTransport) !== 1) {
     throw new Error("La identidad efectiva no corresponde al despliegue autonomo.");
   }
   migrations = await connection.query(

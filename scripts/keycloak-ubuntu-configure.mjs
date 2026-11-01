@@ -170,7 +170,7 @@ async function main() {
     VITE_KEYCLOAK_REALM: contract.realm, VITE_KEYCLOAK_CLIENT_ID: contract.clientId,
     VITE_KEYCLOAK_AUDIENCE: contract.audience, VITE_API_BASE_URL: 'http://127.0.0.1:3000/api',
     VITE_IDENTITY_PREPARATION: 'true' });
-  console.log('Existing SPA, administrative client and .env configured; Aiven credentials preserved.');
+  console.log('Existing SPA, administrative client and .env configured.');
   for (const user of labUsers) await request('/users/' + user.id, 'DELETE');
   for (const name of ['itecsa-web-integration-065', 'itecsa-integration-065-admin']) {
     const found = await request('/clients?clientId=' + encodeURIComponent(name));

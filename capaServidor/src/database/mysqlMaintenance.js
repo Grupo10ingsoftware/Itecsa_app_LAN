@@ -27,8 +27,7 @@ export async function setMysqlApiWrites(env = process.env, { connector = mariadb
         server.hostname !== (env.MYSQL_EXPECTED_HOSTNAME ?? "itecsa-mysql") ||
         server.hostname !== identity.MYSQL_SERVER_HOSTNAME ||
         server.serverUuid !== identity.MYSQL_SERVER_UUID ||
-        !String(server.version).startsWith("8.4.") || Number(server.secureTransport) !== 1 ||
-        /aiven/i.test(`${server.hostname} ${server.versionComment}`)) {
+        !String(server.version).startsWith("8.4.") || Number(server.secureTransport) !== 1) {
       fail("la identidad efectiva no corresponde al despliegue autonomo.");
     }
     const schema = connection.escapeId(env.MYSQL_DATABASE);

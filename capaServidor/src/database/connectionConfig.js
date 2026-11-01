@@ -38,7 +38,10 @@ export function resolveDatabaseConnection(env = process.env, { allowUnconfigured
 
     const configured = databaseKeys.some((key) => env[key] !== undefined) ||
         env.DATABASE_URL !== undefined || env.DB_TARGET !== undefined;
-    if (!configured && allowUnconfigured) return null;
+    if (!configured && allowUnconfigured) {
+        if (env.APP_ENV === "production") invalid("produccion requiere DB_TARGET=mysql-docker.");
+        return null;
+    }
 
     const missing = databaseKeys.filter((key) => !env[key]?.trim());
     if (missing.length) invalid(`faltan ${missing.join(", ")}.`);
@@ -51,7 +54,9 @@ export function resolveDatabaseConnection(env = process.env, { allowUnconfigured
 
     const target = env.DB_TARGET?.trim();
     if (env.DB_TARGET !== undefined && !target) invalid("DB_TARGET no puede estar vacio.");
-    if (target && target !== "aiven" && !labTargets.has(target)) invalid("DB_TARGET no es valido.");
+    if (env.APP_ENV === "production" && target !== "mysql-docker") invalid("produccion requiere DB_TARGET=mysql-docker.");
+    if (!target) invalid("DB_TARGET debe seleccionar un perfil MySQL local.");
+    if (target && !labTargets.has(target)) invalid("DB_TARGET no es un perfil MySQL local valido.");
     if (target === "mysql-lab-host" && host !== "127.0.0.1") invalid("el perfil de computador requiere DB_HOST=127.0.0.1.");
     if (dockerTargets.has(target) && host !== "mysql") invalid("el perfil Docker requiere DB_HOST=mysql.");
 

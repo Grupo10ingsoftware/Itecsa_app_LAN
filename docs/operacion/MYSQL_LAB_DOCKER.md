@@ -20,7 +20,7 @@ No iniciar este servicio como parte de los Compose existentes.
    firmado por esa CA y tener SAN DNS para `mysql` y SAN IP para `127.0.0.1`.
    Ambos nombres se usaran en perfiles distintos de la API. Mantener la clave privada legible solo por
    el usuario de MySQL dentro del contenedor y sus custodios en el host. No
-   reutilizar la CA ni las credenciales de Aiven.
+   reutilizar la CA ni las credenciales de otra instalación.
 3. Confirmar la arquitectura de la maquina y que la imagen fijada esta
    disponible localmente o puede descargarse antes de entrar en una LAN sin
    acceso al registro. Confirmar espacio persistente y procedimiento de copia
@@ -105,8 +105,8 @@ El puerto puede ajustarse con `MYSQL_HOST_PORT`; entonces cambiar tambien
 seleccionar el archivo equivalente del inicializador cuando corresponda.
 `DB_TARGET` obliga a usar la direccion local incluso si el shell contiene
 variables antiguas. Si el archivo seleccionado falta o no se puede leer, el
-proceso falla antes de utilizar una conexion. El `.env` actual de Aiven
-permanece intacto y sigue siendo el perfil predeterminado de desarrollo.
+proceso falla antes de utilizar una conexion. El despliegue integrado usa
+`capaServidor/.env` y `compose.mysql.yaml`.
 
 Para ejecutar despues la API en Docker, `compose.api.mysql.lab.yaml` usa el
 perfil Docker indicado por `LAB_API_ENV_FILE=./capaServidor/.env.mysql-lab.docker`,
@@ -172,8 +172,8 @@ incorpora al arranque de la API.
 5. Ejecutar explicitamente `npm run mysql-lab:init` con el perfil host, o el
    servicio manual `db-init` con el perfil Docker. Antes de Prisma, el proceso
    abre una conexion TLS de solo lectura con la cuenta API y compara UUID,
-   hostname, base, puerto interno, usuario efectivo, version, transporte seguro
-   y ausencia de indicadores de Aiven. La CA valida tambien el nombre local del
+   hostname, base, puerto interno, usuario efectivo, version y transporte seguro.
+   La CA valida tambien el nombre local del
    certificado.
 6. Solo tras esas comprobaciones se ejecutan, en orden, `prisma migrate deploy`,
    `prisma db seed` y la validacion de catalogos. La URL de migracion solo existe

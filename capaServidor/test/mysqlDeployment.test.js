@@ -114,6 +114,7 @@ test("update valida versiones, bloquea escritores y respalda antes de migrar", (
   assert.match(body, /trap 'if \(\( maintenance_active \)\); then lock_writes[^']+' ERR/);
   assert.ok(body.indexOf("maintenance_active=0", body.indexOf("deploy_database")) < body.indexOf("start_application"));
   assert.match(script, /compose up -d --wait keycloak api web/);
+  assert.doesNotMatch(body, /compose down|docker volume rm|down --volumes/);
 });
 
 

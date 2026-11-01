@@ -74,8 +74,10 @@ verify_public_certificate() {
 }
 [[ -r "$API_ENV_FILE" ]] || fail "falta API_ENV_FILE"
 [[ -r "$WEB_ENV_FILE" ]] || fail "falta WEB_ENV_FILE"
+if grep -Eq '^[[:space:]]*(export[[:space:]]+)?(DB_TARGET|DB_HOST|DB_PORT|DB_USER|DB_PASSWORD|DB_NAME|DB_SSL_MODE|DB_SSL_CA_PATH|DATABASE_URL)[[:space:]]*=' "$API_ENV_FILE"; then
+  fail "API_ENV_FILE contiene variables de conexion MySQL heredadas; recrear capaServidor/.env desde capaServidor/env.example"
+fi
 if grep -Eq '<[^>]+>' "$ENV_FILE" "$API_ENV_FILE" "$WEB_ENV_FILE"; then fail "quedan marcadores sin reemplazar"; fi
-if grep -qi aiven "$COMPOSE_FILE"; then fail "el Compose autonomo contiene una referencia a Aiven"; fi
 compose() {
   local -a base=(docker compose --project-name "$PROJECT" --env-file "$ENV_FILE" -f "$COMPOSE_FILE")
   if [[ "$IMAGE_MODE" == preloaded ]]; then

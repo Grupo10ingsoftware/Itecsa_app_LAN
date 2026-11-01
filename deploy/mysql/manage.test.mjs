@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -94,6 +94,23 @@ test('preloaded inicia con imagenes presentes sin solicitar pull ni build', () =
     assert.equal(calls.filter(call => call.startsWith('image inspect ')).length, 9);
     assert.equal(calls.filter(call => call.includes(' up --pull never --no-build ')).length, 2);
     assert.equal(calls.some(call => /\s(pull|build)\s/.test(call)), false);
+  } finally {
+    rmSync(f.root, { recursive: true, force: true });
+  }
+});
+
+test('rechaza un .env heredado antes de llamar a Docker y sin revelar credenciales', () => {
+  const f = fixture();
+  try {
+    writeFileSync(path.join(f.root, 'api.env'), [
+      'APP_ENV=production', 'DB_TARGET=aiven', 'DB_HOST=external.example.invalid',
+      'DB_PASSWORD=private-test-secret', '',
+    ].join('\n'));
+    const result = f.run('install');
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /variables de conexion MySQL heredadas/);
+    assert.doesNotMatch(result.stderr, /private-test-secret|external\.example\.invalid/);
+    assert.equal(existsSync(path.join(f.root, 'docker-calls.txt')), false);
   } finally {
     rmSync(f.root, { recursive: true, force: true });
   }

@@ -12,7 +12,7 @@ import { ROLES } from '../../shared/keycloakAuthorization.js';
 const directory=mkdtempSync(path.join(tmpdir(),'itecsa-pool-policy-'));
 const ca=path.join(directory,'ca.pem');writeFileSync(ca,'test CA');
 process.on('exit',()=>rmSync(directory,{recursive:true,force:true}));
-const environment=extra=>({APP_ENV:'development',DB_HOST:'db.example.invalid',DB_PORT:'3306',DB_USER:'test',DB_PASSWORD:'not-a-real-password',DB_NAME:'test',DB_SSL_MODE:'required',DB_SSL_CA_PATH:ca,...extra});
+const environment=extra=>({APP_ENV:'development',DB_TARGET:'mysql-lab-docker',DB_HOST:'mysql',DB_PORT:'3306',DB_USER:'test',DB_PASSWORD:'not-a-real-password',DB_NAME:'test',DB_SSL_MODE:'required',DB_SSL_CA_PATH:ca,...extra});
 
 test('central pool policy bounds reuse and preserves strict TLS, timeouts and maximum capacity',()=>{
  const o=readPrismaConfiguration(environment());
