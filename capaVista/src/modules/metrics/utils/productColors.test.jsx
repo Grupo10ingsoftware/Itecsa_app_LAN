@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import MetricsBarChart from '../components/MetricsBarChart'
 import {
   getProductTypeColor,
   getColorForIndex,
-  normalizeProductType,
   PRODUCTION_PALETTE,
 } from './productColors'
 
@@ -106,4 +105,3 @@ describe('productColors', () => {
     expect(bars).toHaveLength(0)
   })
 })
-

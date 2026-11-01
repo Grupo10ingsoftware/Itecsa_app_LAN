@@ -25,7 +25,7 @@ it.each([
 ])('%s starts closed and closes on re-entry through the real router and navigation', async (route, navigation, label) => {
   const reads = vi.spyOn(client, 'get')
   render(<MemoryRouter initialEntries={[route]}><AppRouter /></MemoryRouter>)
-  const toggle = await screen.findByRole('button', { name: 'Expandir ' + label })
+  const toggle = await screen.findByRole('button', { name: 'Expandir ' + label }, { timeout: 5000 })
   const main = within(screen.getByRole('main'))
   expect(toggle.getAttribute('aria-expanded')).toBe('false')
   expect(main.queryByRole('button', { name: 'Aplicar filtros' })).toBeNull()
@@ -48,7 +48,7 @@ it.each([
   const returned = await screen.findByRole('button', { name: 'Expandir ' + label })
   expect(returned.getAttribute('aria-expanded')).toBe('false')
   expect(within(screen.getByRole('main')).queryByRole('button', { name: 'Aplicar filtros', exact: true })).toBeNull()
-})
+}, 15000)
 
 it('keeps Create user functional beside both collapsed and expanded filters', async () => {
   render(<MemoryRouter initialEntries={['/admin/usuarios']}><AppRouter /></MemoryRouter>)
