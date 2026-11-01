@@ -1,5 +1,9 @@
 **/.env
 **/.env.*
+deploy/*.env
+**/private
+data/backups
+data/offline
 **/*.pem
 **/*.key
 **/.npmrc

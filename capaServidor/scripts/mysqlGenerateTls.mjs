@@ -11,7 +11,21 @@ const outputs = [
   path.join(certs, "server-key.pem"),
 ];
 const present = outputs.filter(fs.existsSync);
+function normalizePermissions() {
+  const uid = Number(process.env.MYSQL_OWNER_UID ?? process.getuid());
+  const gid = Number(process.env.MYSQL_OWNER_GID ?? process.getgid());
+  if (![uid, gid].every(v => Number.isInteger(v) && v >= 0)) throw Error('MYSQL_TLS: propietario invalido');
+  for (const [file, mode] of [[certs, 0o700], [privatePath, 0o700],
+    ...outputs.map((file, i) => [file, i === 2 ? 0o600 : 0o644]),
+    [path.join(privatePath, 'ca-key.pem'), 0o600]]) {
+    if (!fs.existsSync(file)) continue;
+    if (fs.lstatSync(file).isSymbolicLink()) throw Error('MYSQL_TLS: no se admiten enlaces simbolicos');
+    if (process.getuid() === 0) fs.chownSync(file, uid, gid);
+    fs.chmodSync(file, mode);
+  }
+}
 if (present.length === outputs.length) {
+  normalizePermissions();
   console.log("MYSQL_TLS: certificados existentes conservados.");
   process.exit(0);
 }
@@ -43,4 +57,5 @@ fs.chmodSync(caKey, 0o600);
 fs.chmodSync(serverKey, 0o600);
 fs.chmodSync(outputs[0], 0o644);
 fs.chmodSync(outputs[1], 0o644);
+normalizePermissions();
 console.log("MYSQL_TLS: CA y certificado de servidor generados.");

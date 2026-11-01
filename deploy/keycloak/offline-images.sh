@@ -6,9 +6,15 @@ ACTION="${1:-}"
 OUT_DIR="${3:-$ROOT_DIR/data/offline}"
 fail() { echo "OFFLINE_IMAGES: $*" >&2; exit 1; }
 [[ -r "$ENV_FILE" ]] || fail "archivo de entorno ausente"
-read_value() {
-  awk -F= -v key="$1" '$0 !~ /^[[:space:]]*#/ && $1 == key {sub(/^[^=]*=/, ""); print; exit}' "$ENV_FILE"
-}
+command -v node >/dev/null || fail "falta Node.js 22 en este usuario"
+loaded_env="$(mktemp)"
+trap 'rm -f "$loaded_env"' EXIT
+node "$ROOT_DIR/deploy/mysql/environment.mjs" images "$ENV_FILE" > "$loaded_env" || exit 1
+while IFS= read -r -d '' key && IFS= read -r -d '' value; do
+  export "$key=$value"
+done < "$loaded_env"
+rm -f "$loaded_env"
+read_value() { printf '%s\n' "${!1-}"; }
 IMAGES=()
 APP_VERSION="$(read_value APP_VERSION)"
 [[ "$APP_VERSION" =~ ^[A-Za-z0-9._-]{1,128}$ ]] || fail "APP_VERSION invalido"

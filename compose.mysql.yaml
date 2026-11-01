@@ -29,7 +29,7 @@ x-db-tools: &db-tools
 services:
   mysql:
     image: ${MYSQL_IMAGE:-itecsa-mysql:8.4-pinned}
-    command: ["mysqld", "--defaults-extra-file=/etc/itecsa-mysql.cnf"]
+    command: ["mysqld", "--defaults-extra-file=/etc/itecsa/mysql.cnf"]
     hostname: itecsa-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Definir MYSQL_ROOT_PASSWORD}
@@ -40,10 +40,11 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - mysql_socket:/var/run/mysqld
-      - ./deploy/mysql/mysql.cnf:/etc/itecsa-mysql.cnf:ro
+      - mysql_config:/etc/itecsa:ro
       - mysql_tls:/run/mysql-tls:ro
     networks: [mysql_private]
     healthcheck:
+      # Liveness only. manage.sh verify checks authentication, TLS, schema and grants.
       test: ["CMD", "mysqladmin", "--protocol=TCP", "--host=127.0.0.1", "--ssl-mode=VERIFY_CA", "--ssl-ca=/run/mysql-tls/ca.pem", "ping"]
       interval: 10s
       timeout: 5s
@@ -77,6 +78,8 @@ services:
       NODE_EXTRA_CA_CERTS: /run/secrets/lan-ca.pem
       FRONTEND_ORIGIN: ${PUBLIC_ORIGIN:?Definir PUBLIC_ORIGIN}
       TRUST_PROXY: "1"
+      AUTH_PROVIDER: keycloak
+      IDENTITY_PREPARATION_ENABLED: "true"
       KEYCLOAK_ISSUER: ${PUBLIC_ORIGIN}/realms/itecsa
       KEYCLOAK_JWKS_URI: ${PUBLIC_ORIGIN}/realms/itecsa/protocol/openid-connect/certs
       KEYCLOAK_AUDIENCE: https://api.itecsa.local
@@ -119,10 +122,7 @@ services:
       VITE_KEYCLOAK_AUDIENCE: https://api.itecsa.local
       VITE_API_BASE_URL: ${PUBLIC_ORIGIN}/api
     volumes:
-      - ${LAN_TLS_CERT_FILE:?Definir LAN_TLS_CERT_FILE}:/run/lan-tls/tls.crt:ro
-      - ${LAN_TLS_KEY_FILE:?Definir LAN_TLS_KEY_FILE}:/run/lan-tls/tls.key:ro
-    group_add:
-      - "${LAN_TLS_KEY_GID:-101}"
+      - lan_tls:/run/lan-tls:ro
     depends_on:
       keycloak:
         condition: service_healthy
@@ -139,7 +139,13 @@ services:
       dockerfile: deploy/keycloak/Dockerfile
       args:
         APP_VERSION: ${APP_VERSION:?Definir APP_VERSION}
-    command: ["start", "--optimized", "--import-realm"]
+    entrypoint: ["/bin/bash", "-ec"]
+    command:
+      - |
+        if [ -z "$${KC_BOOTSTRAP_ADMIN_PASSWORD:-}" ]; then
+          unset KC_BOOTSTRAP_ADMIN_USERNAME KC_BOOTSTRAP_ADMIN_PASSWORD
+        fi
+        exec /opt/keycloak/bin/kc.sh start --optimized --import-realm
     environment:
       KC_DB: mysql
       KC_DB_URL: "jdbc:mysql://mysql:3306/${KEYCLOAK_DB_NAME:?Definir KEYCLOAK_DB_NAME}?sslMode=VERIFY_CA&trustCertificateKeyStoreUrl=file:/run/keycloak-trust/mysql.p12&trustCertificateKeyStorePassword=changeit"
@@ -151,9 +157,9 @@ services:
       KC_HEALTH_ENABLED: "true"
       KC_METRICS_ENABLED: "true"
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME:?Definir KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME}
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD:?Definir KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD:-}
     volumes:
-      - ./deploy/keycloak/private/itecsa-realm.json:/opt/keycloak/data/import/itecsa-realm.json:ro
+      - keycloak_import:/opt/keycloak/data/import:ro
       - mysql_trust:/run/keycloak-trust:ro
     depends_on:
       mysql:
@@ -205,6 +211,54 @@ services:
         install -o 999 -g 999 -m 0644 /input/server-cert.pem /output/server-cert.pem
         install -o 999 -g 999 -m 0600 /input/server-key.pem /output/server-key.pem
 
+  runtime-install:
+    <<: *db-tools
+    network_mode: none
+    user: "0:0"
+    environment:
+      APP_VERSION: ${APP_VERSION}
+    volumes:
+      - ./deploy/mysql/mysql.cnf:/input/mysql.cnf:ro
+      - ./deploy/keycloak/private/itecsa-realm.json:/input/realm.json:ro
+      - ${LAN_TLS_CERT_FILE}:/input/tls.crt:ro
+      - ${LAN_TLS_KEY_FILE}:/input/tls.key:ro
+      - mysql_config:/output/mysql
+      - keycloak_import:/output/keycloak
+      - lan_tls:/output/https
+    command:
+      - sh
+      - -ec
+      - |
+        install -o 0 -g 0 -m 0644 /input/mysql.cnf /output/mysql/mysql.cnf
+        install -o 1000 -g 1000 -m 0600 /input/realm.json /output/keycloak/itecsa-realm.json
+        install -o 101 -g 101 -m 0644 /input/tls.crt /output/https/tls.crt
+        install -o 101 -g 101 -m 0600 /input/tls.key /output/https/tls.key
+
+  install-state:
+    <<: *db-tools
+    network_mode: none
+    user: "0:0"
+    environment:
+      <<: *db-environment
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_MIGRATION_USER: ${MYSQL_MIGRATION_USER}
+      MYSQL_MIGRATION_PASSWORD: ${MYSQL_MIGRATION_PASSWORD}
+      KEYCLOAK_DB_NAME: ${KEYCLOAK_DB_NAME}
+      KEYCLOAK_DB_USER: ${KEYCLOAK_DB_USER}
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+      KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME}
+      KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD}
+      KEYCLOAK_OPERATOR_USERNAME: ${KEYCLOAK_OPERATOR_USERNAME}
+      KEYCLOAK_OPERATOR_PASSWORD: ${KEYCLOAK_OPERATOR_PASSWORD}
+    volumes:
+      - mysql_state:/run/mysql-state
+    command: ["node", "scripts/mysqlInstallState.mjs", "status"]
+
   account-bootstrap:
     <<: *db-tools
     network_mode: none
@@ -234,9 +288,14 @@ services:
 
   keycloak-db-bootstrap:
     <<: *db-tools
-    network_mode: none
+    networks: [mysql_private]
+    secrets:
+      - source: mysql_ca
+        target: mysql-ca.pem
     user: "0:0"
     environment:
+      KEYCLOAK_BOOTSTRAP_RESUME: ${KEYCLOAK_BOOTSTRAP_RESUME:-0}
+      DB_SSL_CA_PATH: /run/secrets/mysql-ca.pem
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
@@ -407,6 +466,9 @@ volumes:
   mysql_state:
   mysql_tls:
   mysql_trust:
+  mysql_config:
+  keycloak_import:
+  lan_tls:
 
 networks:
   mysql_private:

@@ -27,7 +27,7 @@ function fixture({ failAssignment = false, rejectOperator = false, missingAction
     const url = new URL(input);
     const method = options.method ?? 'GET';
     if (url.pathname.endsWith('/protocol/openid-connect/token')) {
-      const temporary = options.body.get('username') === 'temporary';
+      const temporary = options.body.get('username').toLowerCase() === 'temporary';
       return (temporary ? state.temporary : state.operator && !rejectOperator)
         ? ok({ access_token: temporary ? 'temporary-token' : (state.admin ? 'operator-token' : 'operator-without-role') }) : ok({}, 401);
     }
@@ -37,7 +37,7 @@ function fixture({ failAssignment = false, rejectOperator = false, missingAction
       if (options.headers.authorization === 'Bearer operator-without-role') return ok({}, 403);
       if (route === '/users' && method === 'POST') { state.operator = true; return ok(undefined, 201); }
       if (route === '/users') {
-        const temporary = url.searchParams.get('username') === 'temporary';
+        const temporary = url.searchParams.get('username').toLowerCase() === 'temporary';
         return ok((temporary ? state.temporary : state.operator)
           ? [{ id: temporary ? 'temporary-id' : 'operator-id', username: temporary ? 'temporary' : 'operator' }] : []);
       }
@@ -108,4 +108,39 @@ test('bootstrap rejects an imported password action without its provider before 
   await assert.rejects(bootstrap(env, fetcher), /UPDATE_PASSWORD sin proveedor/);
   assert.equal(state.operator, false);
   assert.equal(state.temporary, true);
+});
+
+
+test('bootstrap recognizes Keycloak lowercase names when configured with mixed case', async () => {
+  const { state, fetcher } = fixture();
+  await bootstrap({ ...env, KEYCLOAK_OPERATOR_USERNAME: 'OperAtor', KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME: 'Temporary' }, fetcher);
+  assert.equal(state.operator, true);
+  assert.equal(state.temporary, false);
+});
+
+test('check verifies a completed bootstrap without writes to admin endpoints', async () => {
+  const { state, fetcher } = fixture();
+  await bootstrap(env, fetcher);
+  const readonly = async (url, options) => {
+    if (url.includes('/admin/')) assert.equal(options.method, 'GET');
+    return fetcher(url, options);
+  };
+  await bootstrap({ ...env, KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD: '' }, readonly, { readOnly: true });
+  state.temporary = true;
+  await assert.rejects(bootstrap(env, readonly, { readOnly: true }), /administrador temporal activo/);
+  assert.equal(state.temporary, true);
+});
+
+test('check reports incomplete scopes without completing them', async () => {
+  const { state, fetcher } = fixture();
+  state.operator = true; state.admin = true;
+  const readonly = async (url, options) => {
+    if (url.includes('/admin/')) assert.equal(options.method, 'GET');
+    return fetcher(url, options);
+  };
+  await assert.rejects(bootstrap(env, readonly, { readOnly: true }), /faltan roles o scopes/);
+});
+
+test('temporary and permanent names cannot differ only by case', async () => {
+  await assert.rejects(bootstrap({ ...env, KEYCLOAK_OPERATOR_USERNAME: 'Temporary' }, () => { throw Error('must not call'); }), /credenciales administrativas/);
 });

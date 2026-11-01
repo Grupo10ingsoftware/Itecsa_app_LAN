@@ -1,6 +1,6 @@
 # MySQL Docker: despliegue autónomo
 
-La guía completa de la instalación integrada con Keycloak 26.8.1 está en
+La referencia técnica de la instalación integrada con Keycloak 26.8.1 está en
 `docs/operacion/KEYCLOAK_LAN_OFFLINE_DESPLIEGUE.md`. Esta página detalla
 las operaciones de MySQL del mismo despliegue de producción.
 
@@ -9,7 +9,7 @@ el mismo stack integrado para servidor y pruebas aisladas en computador.
 
 ## Preparación
 
-Requisitos: Docker Engine con Compose v2 y, para el modo de construcción,
+Requisitos: Docker Engine con el complemento Compose, Node.js 22 o posterior, OpenSSL y, para el modo de construcción,
 acceso a los registros de paquetes durante el build.
 
 1. Copiar las plantillas:
@@ -25,15 +25,16 @@ acceso a los registros de paquetes durante el build.
 3. Mantener estable `COMPOSE_PROJECT_NAME`: identifica la instalación y
    determina sus volúmenes. Usar un valor distinto en el computador de pruebas
    y en el servidor.
-4. Mantener `APP_RUNTIME_ENV=production` para instalaciones reales. Un laboratorio
-   local que use deliberadamente Keycloak por HTTP puede seleccionar
-   `APP_RUNTIME_ENV=development`; el modo `production` seguirá rechazando HTTP.
+4. Mantener `APP_RUNTIME_ENV=production` y HTTPS, tanto en el servidor como
+   en las pruebas locales con el stack integrado.
 5. Elegir `DEPLOY_IMAGE_MODE`:
-   - `build`: construye API, web y database-tools desde el clon.
+   - `build`: construye API, web, database-tools y Keycloak desde el clon.
    - `pull`: descarga las referencias configuradas.
    - `preloaded`: exige que todas las imágenes ya estén cargadas.
 
-Las contraseñas admiten caracteres arbitrarios de dotenv. No se escribe
+Los valores de `deploy/mysql.env` se leen literalmente, sin interpolar variables.
+Se admiten CRLF y comillas alrededor de un valor; no se admiten valores multilínea.
+No se escribe
 `DATABASE_URL`: el inicializador la construye mediante `URL`.
 
 ## Instalación nueva
@@ -41,15 +42,18 @@ Las contraseñas admiten caracteres arbitrarios de dotenv. No se escribe
 Desde la raíz:
 
 ```bash
+./deploy/mysql/manage.sh check
 ./deploy/mysql/manage.sh install
 ```
 
 El comando prepara imágenes y TLS, inicia MySQL, crea las cuentas por socket,
 registra el UUID del volumen, aplica migraciones, ejecuta el seed, verifica el
-resultado y finalmente levanta API y web.
+resultado y finalmente levanta Keycloak, API y web, y completa el bootstrap administrativo.
 
 `install` rechaza una identidad existente y una base que ya tenga tablas. No
 elimina ni reemplaza volúmenes.
+Si la instalación queda pendiente, usar `manage.sh resume` con la misma versión
+y configuración. No tratar una instalación interrumpida como una actualización.
 
 ## Arranque, parada y verificación
 
@@ -60,6 +64,8 @@ elimina ni reemplaza volúmenes.
 ```
 
 `start` no ejecuta migraciones ni seeds. MySQL no publica el puerto 3306.
+`verify` exige servicios en ejecución y comprueba su configuración sin iniciarlos
+ni completar pasos de instalación.
 
 ## Actualización
 
@@ -122,11 +128,12 @@ Después del restore se aplican migraciones posteriores, seed y verificación.
 
 ## Entrega sin internet
 
-En un equipo con acceso, preparar las cuatro imágenes configuradas:
+En un equipo con acceso, preparar las cinco imágenes configuradas:
 
 - MySQL 8.4;
 - API;
 - web;
+- Keycloak;
 - database-tools de la misma release que la API.
 
 Exportarlas con `docker image save`, transportarlas por el procedimiento
@@ -134,7 +141,8 @@ aprobado y cargarlas con `docker image load`. En el destino usar referencias
 locales y `DEPLOY_IMAGE_MODE=preloaded`.
 
 También deben transportarse, por un canal seguro, los archivos de entorno. Los
-certificados pueden generarse durante `install`; una configuración TLS
+certificados internos de MySQL pueden generarse durante `install`; el certificado
+HTTPS de la LAN, su clave y CA deben estar disponibles previamente. Una configuración TLS
 existente nunca es sobrescrita. El certificado y la clave del servidor se
 copian a `mysql_tls` con propietario y permisos aptos para el usuario interno
 de la imagen MySQL; la clave privada de la CA permanece solo en

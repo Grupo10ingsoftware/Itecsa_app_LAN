@@ -15,7 +15,7 @@ La audiencia es un identificador y no requiere DNS. `PUBLIC_ORIGIN` sí debe res
 
 ## Preparación en Ubuntu limpio
 
-Instalar Docker Engine, Compose v2, Node.js 22 o posterior y OpenSSL. Copiar el repositorio, sin datos de la VM. Preparar DNS interno o resolución de la IP elegida y el certificado con su clave y CA. La clave debe ser legible para el GID `LAN_TLS_KEY_GID` dentro del contenedor web; el valor por defecto es 101. Conservar archivos de secretos fuera del control de versiones y con permisos restrictivos.
+Instalar Docker Engine, el complemento Compose, Node.js 22 o posterior y OpenSSL. Node debe estar disponible para el usuario que ejecuta el gestor; `sudo` puede perder el PATH de NVM. Copiar el repositorio, sin datos de la VM. Preparar DNS interno o resolución de la IP elegida y el certificado con su clave y CA. El instalador copia la clave HTTPS a un volumen con propietario 101 y modo 0600; ya no depende de `LAN_TLS_KEY_GID` del host. También prepara el import de Keycloak para UID 1000 y la configuración MySQL con modo 0644. Conservar los originales y secretos fuera del control de versiones y con permisos restrictivos.
 
 ```bash
 cp deploy/mysql.env.example deploy/mysql.env
@@ -32,12 +32,17 @@ Para pruebas aisladas en el computador, usar este mismo Compose en otra copia de
 ## Instalación inicial
 
 ```bash
+./deploy/mysql/manage.sh check
 ./deploy/mysql/manage.sh install
 ```
 
+`check` valida variables, archivos, Docker, Compose, certificado y resolución del host sin arrancar servicios. En modo `preloaded` también exige las cinco imágenes. Acepta finales de línea CRLF y valores entre comillas; los valores de `deploy/mysql.env` son literales, sin expansión de `$VARIABLE`, y prevalecen sobre variables heredadas de la terminal. No usar valores multilínea ni claves duplicadas. Las cuatro contraseñas MySQL deben ser distintas y tener al menos 20 caracteres; las claves administrativas también requieren 20. Los cuatro secretos de API requieren 32 bytes en base64 y valores distintos. `first-user` valida sus campos antes de llamar a Docker.
+
+Gestión de usuarios queda habilitada por el Compose mediante `IDENTITY_PREPARATION_ENABLED=true` y `AUTH_PROVIDER=keycloak`, incluso si un archivo anterior tenía el flag en `false`. Las rutas conservan autenticación, permisos y confirmación por PIN.
+
 El instalador comprueba certificado, SAN, clave y resolución del origen público desde host y contenedor API antes de crear las bases. Luego prepara TLS de MySQL, crea las dos bases y las cuentas separadas, aplica migraciones, importa el realm una sola vez, arranca MySQL, Keycloak, API y web, verifica el issuer público por TLS desde host y API, configura permisos y perfil de usuario, crea un administrador permanente en `master`, valida su acceso y elimina el administrador temporal. No borra volúmenes. El JSON generado en `deploy/keycloak/private/` contiene el secreto del client y queda ignorado por Git. El import posterior de Keycloak omite un realm existente; cambios posteriores deben hacerse mediante migraciones administrativas verificadas, no editando ese JSON ni esperando que un reinicio lo aplique.
 
-La consola administrativa queda en `${PUBLIC_ORIGIN}/admin/`. Tras instalar, retirar las credenciales temporales del almacenamiento operativo cuando ya no se necesiten. Conservar las credenciales del operador permanente en un gestor de secretos. La base MySQL de Keycloak usa TLS con la CA de MySQL; la API usa la CA LAN para consultar el issuer público.
+La consola administrativa queda en `${PUBLIC_ORIGIN}/admin/`. Tras completar la instalación, vaciar `KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD`; conservar el nombre temporal para verificar que esa cuenta ya no existe. No vaciarla durante una instalación pendiente. Conservar las credenciales del operador permanente en un gestor de secretos. La base MySQL de Keycloak usa TLS con la CA de MySQL; la API usa la CA LAN para consultar el issuer público.
 
 ```bash
 ./deploy/mysql/manage.sh verify
@@ -48,12 +53,14 @@ docker compose --env-file deploy/mysql.env -f compose.mysql.yaml ps
 docker compose --env-file deploy/mysql.env -f compose.mysql.yaml logs --tail=100 mysql keycloak api web
 ```
 
-`verify` y `start` comprueban el discovery OIDC por HTTPS desde host y API. `update` conserva el realm y sus usuarios; aplica únicamente migraciones de la aplicación. No se debe ejecutar `docker compose down --volumes`.
+`verify` exige los cuatro servicios en ejecución: no construye imágenes, prepara certificados, inicia servicios ni completa el bootstrap. Usa contenedores auxiliares de comprobación para verificar MySQL y consulta HTTPS, roles, scopes, administrador permanente, retirada del temporal, cuenta técnica y ruta protegida de Gestión de usuarios. `start` prepara los archivos de ejecución, inicia los servicios y comprueba la aplicación. `update` conserva el realm y sus usuarios; aplica únicamente migraciones de la aplicación. No se debe ejecutar `docker compose down --volumes`.
 `ps` muestra el estado de los cuatro servicios y `logs` permite revisar sus últimos eventos sin alterar los volúmenes. Ejecutar `stop` para detenerlos y `start` para reanudarlos; conservar el mismo `COMPOSE_PROJECT_NAME`.
+
+Si `install` se interrumpe, corregir la causa indicada y ejecutar `./deploy/mysql/manage.sh resume` con el mismo `--env-file`, versión y configuración. Un recibo en `mysql_state` distingue instalación pendiente y completa; `start`, `update` y `first-user` rechazan una pendiente. `resume` conserva las cuentas existentes, verifica sus credenciales, reaplica únicamente migraciones pendientes y termina el bootstrap. Una migración fallida exige diagnóstico: no se borra ni se marca como aplicada automáticamente. Para instalaciones anteriores sin recibo, `resume` solo termina el bootstrap si primero puede verificar íntegramente la base de aplicación existente; MySQL debe estar ejecutándose.
 
 ## Primer usuario Soporte
 
-Con la instalación vacía, rellenar `FIRST_USER_USERNAME`, `FIRST_USER_EMAIL`, `FIRST_USER_FIRST_NAME`, `FIRST_USER_LAST_NAME`, `FIRST_USER_RUT` y una contraseña temporal aleatoria de al menos 20 caracteres. Ejecutar supervisadamente:
+Con la instalación vacía, rellenar `FIRST_USER_USERNAME`, `FIRST_USER_EMAIL`, `FIRST_USER_FIRST_NAME`, `FIRST_USER_LAST_NAME`, `FIRST_USER_RUT` y una contraseña temporal aleatoria de al menos 20 caracteres, con mayúscula, minúscula, número y símbolo. Ejecutar supervisadamente:
 
 ```bash
 ./deploy/mysql/manage.sh first-user
@@ -132,3 +139,11 @@ Para esos comandos `manage.sh`, el host necesitó temporalmente `NODE_OPTIONS=--
 Resultados observados: MySQL, Keycloak, API y web alcanzaron `healthy`; `mysql:verify` confirmó identidad, TLS, cuentas, 16 checksums de migración, esquema y catálogos. El proxy respondió por HTTPS con la CA de laboratorio en `/`, `/api/health/live`, `/runtime-config.js`, discovery OIDC y JWKS; el issuer y la URI JWKS coincidieron con el origen público y JWKS entregó dos claves. La configuración pública no contenía Aiven. `/api/orders` rechazó una petición sin token con HTTP 401 y el endpoint OIDC de autorización respondió con HTTP 302. `first-user` creó una cuenta Soporte con cambio de contraseña obligatorio; MySQL mostró un usuario y un vínculo Keycloak. Después de `stop` y `start`, los cuatro servicios volvieron a `healthy` y ambos registros persistieron. `verify` y `update` terminaron correctamente; `update` generó un respaldo propio, informó `No pending migrations to apply` y `No difference detected`, y conservó el usuario y su vínculo. `pack` y `verify` comprobaron las cinco imágenes reales y el SHA-256 del archivo. La inspección real reveló que la imagen MySQL carece de `Config.Labels`; se corrigió `offline-images.sh` y pasaron sus 18 pruebas enfocadas.
 
 No se probaron en navegador el cambio inicial de contraseña, PIN, login/logout, renovación de tokens ni recuperación administrativa; tampoco se ejecutaron `load`, restauración de respaldos, aislamiento sin Internet ni aceptación desde otro equipo de la LAN. Son comprobaciones pendientes, no resultados inferidos de la salud del stack. Los intentos y resultados del laboratorio quedaron en archivos privados ignorados por Git, sin credenciales en este informe. Al terminar, los cuatro contenedores del proyecto quedaron detenidos; se conservaron sus cinco volúmenes, imágenes, respaldo y paquete offline para revisión. No se alteraron recursos Docker ajenos ni `main`; los dos documentos de handoff sin seguimiento siguieron sin añadirse a Git.
+
+### Correcciones del instalador verificadas el 1 de noviembre de 2026
+
+Se ejecutaron 379 pruebas de backend y despliegue, sin fallos, con `node --test capaServidor/test/*.test.js deploy/keycloak/*.test.mjs deploy/mysql/*.test.mjs`. Cubren CRLF, valores literales, rechazo de configuración heredada sin revelar secretos, campos de Soporte, reintentos sin restablecer claves, mayúsculas en nombres de administrador y verificación sin completar el bootstrap.
+
+Se construyeron las cuatro imágenes de aplicación y se descargó MySQL por el digest fijado. En un proyecto Docker independiente, con configuración de producción y credenciales ficticias, se verificaron: instalación retomada tras un fallo de montaje, cuatro servicios saludables, HTTPS desde host y API, bootstrap con nombres administrativos mixtos, creación de Soporte, actualización con respaldo y persistencia, `pack`/`load`/`verify` de cinco imágenes, reinicio sin contraseña temporal y reintento de la cuenta MySQL de Keycloak ya existente. Tras forzar la recreación de la API con `IDENTITY_PREPARATION_ENABLED=false` en su archivo, el valor efectivo continuó en `true`; se conservaron un usuario y un vínculo externo. La comprobación final validó 16 checksums, esquema, catálogos y administración de identidades.
+
+La prueba se hizo en Docker Desktop Linux amd64 con certificado temporal por IP. `/tmp` no estaba compartido con Docker y se trasladó la prueba a un directorio permitido. No sustituye la aceptación en Ubuntu del cliente, la confianza de certificados en Windows/navegadores, el recorrido interactivo de primer acceso ni una prueba con Internet físicamente bloqueado. La guía para el equipo en terreno se preparará con esos requisitos explícitos.

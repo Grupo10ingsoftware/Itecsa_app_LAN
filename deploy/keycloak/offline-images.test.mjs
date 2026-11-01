@@ -16,7 +16,11 @@ function run(action, manifest, { corrupt = false, changed = false, revision = 'r
   try {
     mkdirSync(path.join(directory, 'bin'));
     mkdirSync(path.join(directory, 'pack'));
-    writeFileSync(path.join(directory, 'offline.sh'), readFileSync(new URL('./offline-images.sh', import.meta.url)));
+    for (const folder of ['deploy/keycloak', 'deploy/mysql', 'shared']) mkdirSync(path.join(directory, folder), {recursive: true});
+    for (const file of ['deploy/mysql/environment.mjs', 'shared/deploymentValidation.mjs']) {
+      writeFileSync(path.join(directory, file), readFileSync(new URL('../../' + file, import.meta.url)));
+    }
+    writeFileSync(path.join(directory, 'deploy/keycloak/offline.sh'), readFileSync(new URL('./offline-images.sh', import.meta.url)));
     writeFileSync(path.join(directory, 'images.env'), 'APP_VERSION=release-test\n' +
       ['MYSQL_IMAGE', 'API_IMAGE', 'WEB_IMAGE', 'DB_TOOLS_IMAGE', 'KEYCLOAK_IMAGE']
         .map((key, index) => `${key}=${images[index]}\n`).join(''));
@@ -39,7 +43,7 @@ elif [[ "$5" == 'mysql:test' ]]; then
   [[ "$4" != *'{{if .Config.Labels}}'* ]] || { echo 'map has no entry for key "Labels"' >&2; exit 1; }
 else echo '${revision}'; fi
 `, { mode: 0o755 });
-    return spawnSync(bash, ['-c', 'export PATH="$PWD/bin:$PATH"; bash ./offline.sh "$1" ./images.env ./pack', '--', action],
+    return spawnSync(bash, ['-c', 'export PATH="$PWD/bin:$PATH"; bash ./deploy/keycloak/offline.sh "$1" ./images.env ./pack', '--', action],
       { cwd: directory, encoding: 'utf8' });
   } finally {
     rmSync(directory, { recursive: true, force: true });

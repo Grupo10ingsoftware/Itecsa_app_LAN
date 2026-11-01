@@ -1,16 +1,13 @@
 import { randomUUID } from 'node:crypto';
 import getPrismaClient, { disconnectPrismaClient } from '../src/database/prisma.js';
+import { validateFirstUser } from '../../shared/deploymentValidation.mjs';
 
 const env = process.env;
 const fail = message => { throw Error('KEYCLOAK_FIRST_USER: ' + message); };
 const origin = new URL(env.PUBLIC_ORIGIN ?? '');
 if (origin.protocol !== 'https:' || origin.pathname !== '/' || origin.search || origin.hash ||
-    !env.KEYCLOAK_OPERATOR_USERNAME || !env.KEYCLOAK_OPERATOR_PASSWORD ||
-    !env.FIRST_USER_USERNAME || !/^[a-z0-9._-]{3,80}$/.test(env.FIRST_USER_USERNAME) ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(env.FIRST_USER_EMAIL ?? '') ||
-    !env.FIRST_USER_FIRST_NAME || !env.FIRST_USER_LAST_NAME ||
-    !/^(\d{1,2}\.?\d{3}\.?\d{3}-[\dkK])$/.test(env.FIRST_USER_RUT ?? '') ||
-    !env.FIRST_USER_TEMP_PASSWORD || env.FIRST_USER_TEMP_PASSWORD.length < 20) fail('datos iniciales incompletos');
+    !env.KEYCLOAK_OPERATOR_USERNAME || !env.KEYCLOAK_OPERATOR_PASSWORD) fail('origen o administrador incompleto');
+validateFirstUser(env);
 const prisma = getPrismaClient();
 let createdId;
 let adminToken;

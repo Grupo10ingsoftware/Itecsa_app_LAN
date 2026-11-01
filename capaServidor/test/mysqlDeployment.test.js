@@ -98,9 +98,9 @@ test("mantenimiento solo rehabilita los privilegios de datos aprobados", async (
 
 test("update valida versiones, bloquea escritores y respalda antes de migrar", () => {
   const script = readFileSync(new URL("../../deploy/mysql/manage.sh", import.meta.url), "utf8");
-  const body = script.slice(script.indexOf("update_database()"), script.indexOf("case \"$ACTION\""));
+  const body = script.slice(script.indexOf("update_database()"), script.lastIndexOf("case \"$ACTION\""));
   const ordered = [
-    "preflight", "compose stop api", "lock_writes", "backup_database", "enable_migrations",
+    "prepare_images", "require_completed_installation", "prepare_runtime", "compose stop api", "lock_writes", "backup_database", "enable_migrations",
     "deploy_database", "verify_database_read_only", "unlock_writes", "verify_database", "start_application", "verify_public_issuer",
   ];
   let position = -1;

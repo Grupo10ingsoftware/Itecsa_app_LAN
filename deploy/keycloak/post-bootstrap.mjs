@@ -3,13 +3,14 @@ import { RECOGNIZED_ROLES, BUSINESS_PERMISSIONS, ROLE_PERMISSIONS } from '../../
 import { validateOrigin, managementRoles } from './render-realm.mjs';
 
 const fail = message => { throw Error('KEYCLOAK_BOOTSTRAP: ' + message); };
+const sameUser = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
 const equal = (a, b) => JSON.stringify([...a].sort()) === JSON.stringify([...b].sort());
 
-export async function bootstrap(env = process.env, fetcher = fetch) {
+export async function bootstrap(env = process.env, fetcher = fetch, { readOnly = false } = {}) {
   const origin = validateOrigin(env.PUBLIC_ORIGIN);
-  if (!env.KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME || !env.KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD ||
+  if (!env.KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME ||
       !env.KEYCLOAK_OPERATOR_USERNAME || !env.KEYCLOAK_OPERATOR_PASSWORD ||
-      env.KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME === env.KEYCLOAK_OPERATOR_USERNAME ||
+      sameUser(env.KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME, env.KEYCLOAK_OPERATOR_USERNAME) ||
       env.KEYCLOAK_OPERATOR_PASSWORD.length < 20) fail('credenciales administrativas incompletas');
   async function getToken(username, password) {
     const response = await fetcher(origin + '/realms/master/protocol/openid-connect/token', {
@@ -19,7 +20,7 @@ export async function bootstrap(env = process.env, fetcher = fetch) {
     if (!response.ok) return null;
     return (await response.json()).access_token ?? null;
   }
-  let token = await getToken(env.KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME, env.KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD);
+  let token = readOnly || !env.KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD ? null : await getToken(env.KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME, env.KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD);
   let temporaryActive = Boolean(token);
   if (!token) token = await getToken(env.KEYCLOAK_OPERATOR_USERNAME, env.KEYCLOAK_OPERATOR_PASSWORD);
   if (!token) fail('no se pudo autenticar a un administrador');
@@ -49,6 +50,7 @@ export async function bootstrap(env = process.env, fetcher = fetch) {
   async function ensureRoles(path, desired) {
     const current = await assigned(path);
     const missing = desired.filter(role => !current.some(existing => existing.id === role.id));
+    if (missing.length && readOnly) fail('bootstrap pendiente: faltan roles o scopes; usar manage.sh resume');
     if (missing.length) await request(path, 'POST', missing);
     const actual = await assigned(path);
     if (!equal(actual.map(role => role.name), desired.map(role => role.name))) fail('scope o cuenta con roles inesperados');
@@ -119,6 +121,7 @@ export async function bootstrap(env = process.env, fetcher = fetch) {
     permissions: { view: ['admin'], edit: ['admin'] }, validations: { length: { max: 36 } } };
   const currentMarker = profile.attributes?.find(attribute => attribute.name === marker.name);
   if (!currentMarker) {
+    if (readOnly) fail('bootstrap pendiente: falta atributo tecnico');
     await request('/users/profile', 'PUT', { ...profile, attributes: [...profile.attributes, marker] });
   } else if (!equal(currentMarker.permissions?.view ?? [], ['admin']) ||
       !equal(currentMarker.permissions?.edit ?? [], ['admin']) ||
@@ -127,6 +130,7 @@ export async function bootstrap(env = process.env, fetcher = fetch) {
   }
   if (realm.attributes?.itecsaBootstrapVersion && realm.attributes.itecsaBootstrapVersion !== '1') fail('version de bootstrap incompatible');
   if (!realm.attributes?.itecsaBootstrapVersion) {
+    if (readOnly) fail('bootstrap pendiente: falta marca de configuracion');
     await request('', 'PUT', { ...realm, attributes: { ...realm.attributes, itecsaBootstrapVersion: '1' } });
   }
   async function master(path, method = 'GET', body) {
@@ -143,14 +147,14 @@ export async function bootstrap(env = process.env, fetcher = fetch) {
   }
   const operatorName = encodeURIComponent(env.KEYCLOAK_OPERATOR_USERNAME);
   let operators = await master('/users?username=' + operatorName + '&exact=true');
-  operators = operators.filter(user => user.username === env.KEYCLOAK_OPERATOR_USERNAME);
+  operators = operators.filter(user => sameUser(user.username, env.KEYCLOAK_OPERATOR_USERNAME));
   if (operators.length > 1) fail('administrador permanente ambiguo');
   if (!operators.length) {
     if (!temporaryActive) fail('administrador permanente ausente');
     await master('/users', 'POST', { username: env.KEYCLOAK_OPERATOR_USERNAME, enabled: true,
       credentials: [{ type: 'password', value: env.KEYCLOAK_OPERATOR_PASSWORD, temporary: false }] });
     operators = (await master('/users?username=' + operatorName + '&exact=true'))
-      .filter(user => user.username === env.KEYCLOAK_OPERATOR_USERNAME);
+      .filter(user => sameUser(user.username, env.KEYCLOAK_OPERATOR_USERNAME));
     if (operators.length !== 1) fail('no se creo el administrador permanente');
   }
   // Resume safely if a previous run created the operator but failed before
@@ -168,15 +172,16 @@ export async function bootstrap(env = process.env, fetcher = fetch) {
   }
   token = permanentToken;
   await master('/users/' + operators[0].id);
-  if (temporaryActive) {
+  {
     const temporary = (await master('/users?username=' + encodeURIComponent(env.KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME) + '&exact=true'))
-      .filter(user => user.username === env.KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME);
-    if (temporary.length !== 1) fail('administrador temporal ambiguo');
-    await master('/users/' + temporary[0].id, 'DELETE');
+      .filter(user => sameUser(user.username, env.KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME));
+    if (temporary.length > 1) fail('administrador temporal ambiguo');
+    if (temporary.length && readOnly) fail('bootstrap pendiente: administrador temporal activo');
+    if (temporary.length) await master('/users/' + temporary[0].id, 'DELETE');
   }
   console.log('KEYCLOAK_BOOTSTRAP: roles, scopes y cuenta tecnica verificados');
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  bootstrap().catch(error => { console.error(error.message); process.exitCode = 1; });
+  bootstrap(process.env, fetch, { readOnly: process.argv.includes('--check') }).catch(error => { console.error(error.message); process.exitCode = 1; });
 }
