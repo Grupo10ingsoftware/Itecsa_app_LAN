@@ -76,6 +76,18 @@ export class SecurityThrottleService {
         return state;
     }
 
+    async check({ scope, subject, limit }) {
+        const subjectHash = this.hash(scope, subject);
+        const state = await this.client.securityThrottle.findUnique({
+            where: { scope_subject_hash: { scope, subject_hash: subjectHash } },
+            select: { request_count: true, expires_at: true },
+        });
+        const now = this.now().getTime();
+        if (state && new Date(state.expires_at).getTime() > now && Number(state.request_count) >= limit) {
+            throw new RateLimitExceededError(Math.max(1, Math.ceil((new Date(state.expires_at).getTime() - now) / 1000)));
+        }
+    }
+
     async consume({ scope, subject, limit, windowMs }) {
         const state = await this.increment({ scope, subject, windowMs });
         const now = this.now();
@@ -116,6 +128,15 @@ export class MemoryThrottleService {
         state.count += 1;
         this.entries.set(key, state);
         return { request_count: state.count, expires_at: new Date(state.expiresAt) };
+    }
+
+    async check({ scope, subject, limit }) {
+        await this.purgeExpired();
+        const key = createHash("sha256").update(`${scope}:${subject}`).digest("hex");
+        const state = this.entries.get(key);
+        if (state?.count >= limit) {
+            throw new RateLimitExceededError(Math.max(1, Math.ceil((state.expiresAt - this.now().getTime()) / 1000)));
+        }
     }
 
     async consume({ scope, subject, limit, windowMs }) {

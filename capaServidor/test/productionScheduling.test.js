@@ -10,7 +10,7 @@ import { createOrderRouter } from '../src/modules/orders/routes/order.routes.js'
 import { createRequirePin } from '../src/middlewares/requirePin.js';
 import { AppError } from '../src/errors/AppError.js';
 import { ROLES, ROLES_CLAIM, PERMISSIONS as P } from '../../shared/authorization.js';
-const options = { actor: { idUsuario: 9 }, role: ROLES.ADMINISTRADOR, identityProvider: 'keycloak', permissions: [P.MOVE_ORDERS, P.START_PRODUCTION] };
+const options = { actor: { idUsuario: 9, rolUsuario: ROLES.ADMINISTRADOR, permissions: [P.MOVE_ORDERS, P.START_PRODUCTION] }, role: ROLES.ADMINISTRADOR, identityProvider: 'keycloak', permissions: [P.MOVE_ORDERS, P.START_PRODUCTION] };
 const validDate = new Date('2026-10-29T00:00:00Z');
 function fixture(date = validDate) {
  const state = { id_pedido: 1, id_estado_pedido: 2, id_estado_pago: 2, id_etapa_general: 1, estado_pago: 'Confirmado', fecha_estimada_termino: date };
