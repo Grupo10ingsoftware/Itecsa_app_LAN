@@ -9,6 +9,11 @@ import { resolveDatabaseConnection } from "../database/connectionConfig.js";
 import { safeLogger } from "../shared/safeLogger.js";
 import { startTemporaryDataCleanup } from "../modules/security/service/temporaryDataCleanup.service.js";
 import { resolveIdentityConfiguration } from '../config/identity.js';
+import {
+    disconnectManagerPool,
+    readManagerConfiguration,
+    readManagerLookbackDays,
+} from "../database/managerConnection.js";
 
 loadEnvironment(process.env.DOTENV_PATH
     ? { path: process.env.DOTENV_PATH, override: true }
@@ -23,8 +28,12 @@ const requiredEnvironmentVariables = [
 ];
 
 function validateEnvironment() {
-    resolveEnvironmentConfig(process.env);
+    const environment = resolveEnvironmentConfig(process.env);
     resolveDatabaseConnection(process.env, { allowUnconfigured: true });
+    if (environment.salesNoteSource === "manager") {
+        readManagerConfiguration(process.env);
+        readManagerLookbackDays(process.env);
+    }
 
     const appEnvironment = currentAppEnvironment({ required: true });
     resolveIdentityConfiguration(process.env);
@@ -52,7 +61,10 @@ function validateEnvironment() {
         const stopCleanup = appEnvironment === "production" ? startTemporaryDataCleanup() : () => {};
         registerShutdown(httpServer, async () => {
             stopCleanup();
-            await disconnectPrismaClient();
+            await Promise.all([
+                disconnectPrismaClient(),
+                disconnectManagerPool(),
+            ]);
         });
     } catch ( err ){
         safeLogger.error("server.start_failed", { code: err?.code ?? "START_FAILED", outcome: "error" });

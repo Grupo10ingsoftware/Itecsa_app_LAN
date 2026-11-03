@@ -1,6 +1,6 @@
 const VALID_NODE_ENVIRONMENTS = new Set(["development", "test", "production"]);
 const VALID_DEMO_FLAGS = new Set(["true", "false"]);
-const VALID_SALES_NOTE_SOURCES = new Set(["fixture", "unavailable"]);
+const VALID_SALES_NOTE_SOURCES = new Set(["fixture", "manager", "unavailable"]);
 
 export function resolveEnvironmentConfig(env = process.env) {
     const nodeEnv = env.NODE_ENV?.trim();
@@ -27,7 +27,7 @@ export function resolveEnvironmentConfig(env = process.env) {
 
     const salesNoteSource = env.SALES_NOTE_SOURCE ?? "unavailable";
     if (!VALID_SALES_NOTE_SOURCES.has(salesNoteSource)) {
-        throw new Error("SALES_NOTE_SOURCE debe ser fixture o unavailable.");
+        throw new Error("SALES_NOTE_SOURCE debe ser fixture, manager o unavailable.");
     }
     if (nodeEnv === "production" && salesNoteSource === "fixture") {
         throw new Error("SALES_NOTE_SOURCE=fixture no puede habilitarse en production.");
@@ -36,6 +36,7 @@ export function resolveEnvironmentConfig(env = process.env) {
     return Object.freeze({
         nodeEnv,
         demoFeaturesEnabled,
+        salesNoteSource,
     });
 }
 
