@@ -45,6 +45,34 @@ test('identity JOIN binds provider/issuer/subject, preserves nulls, Unicode and 
   }
 });
 
+test('role reconciliation binds subject and issuer and audits the local change atomically', async t => {
+  const previous = process.env.KEYCLOAK_ISSUER;
+  process.env.KEYCLOAK_ISSUER = issuer;
+  t.after(() => { if (previous === undefined) delete process.env.KEYCLOAK_ISSUER; else process.env.KEYCLOAK_ISSUER = previous; });
+  const calls = [];
+  const prisma = { $transaction: async callback => callback({
+    usuario: { updateMany: async input => { calls.push(['update', input]); return { count: 1 }; } },
+    securityAuditEvent: { createMany: async input => { calls.push(['audit', input]); return { count: 1 }; } },
+  }) };
+  await new UserRepository({ prisma }).reconcileRole('alice', actor(), ROLES.GERENCIA);
+  assert.deepEqual(calls.map(([name]) => name), ['update', 'audit']);
+  assert.deepEqual(calls[0][1].where.ExternalIdentity.is,
+    { provider: 'keycloak', issuer, subject: 'alice' });
+  assert.equal(calls[0][1].where.rol_usuario, ROLES.PRODUCCION);
+  assert.equal(calls[0][1].data.rol_usuario, ROLES.GERENCIA);
+  assert.deepEqual(calls[1][1].data[0].metadata,
+    { fromRole: ROLES.PRODUCCION, toRole: ROLES.GERENCIA });
+  calls.length = 0;
+  prisma.$transaction = async callback => callback({
+    usuario: { updateMany: async () => ({ count: 0 }) },
+    securityAuditEvent: { createMany: () => assert.fail('no audit for a lost race') },
+  });
+  await new UserRepository({ prisma }).reconcileRole('alice', actor(), ROLES.GERENCIA);
+  assert.deepEqual(calls, []);
+  await assert.rejects(new UserRepository({ prisma }).reconcileRole('other', actor(), ROLES.GERENCIA),
+    { code: 'USER_REPOSITORY_ERROR' });
+});
+
 for (const [name, user] of [
   ['removed or missing binding', null], ['inconsistent subject', actor('other')],
   ['disabled', { ...actor(), estadoUsuario: 'Desvinculado' }],
@@ -53,11 +81,76 @@ for (const [name, user] of [
 ]) {
   test(`middleware refuses ${name}`, async () => {
     const req = request(), res = response();
-    await createRequireActiveIdentity({ repository: { findBySubject: async () => user } })(req, res, () => assert.fail());
+    await createRequireActiveIdentity({ repository: { findBySubject: async () => user },
+      readKeycloakRoles: async () => [] })(req, res, () => assert.fail());
     assert.equal(res.statusCode, 403);
     assert.equal(req.currentUser, undefined);
   });
 }
+
+test('a current singular Keycloak role replaces a local ordinary role for all protected roles', async () => {
+  for (const role of [ROLES.GERENCIA, ROLES.SOPORTE, ROLES.DESARROLLADOR]) {
+    let user = { ...actor(), rolUsuario: ROLES.PRODUCCION };
+    const events = [];
+    const req = request();
+    req.auth.payload[ROLES_CLAIM] = [role];
+    const res = response();
+    await createRequireActiveIdentity({
+      repository: {
+        findBySubject: async () => user,
+        reconcileRole: async (subject, previous, nextRole) => {
+          assert.equal(subject, 'alice');
+          assert.equal(previous.rolUsuario, ROLES.PRODUCCION);
+          assert.equal(nextRole, role);
+          events.push('reconcile');
+          user = { ...user, rolUsuario: role };
+        },
+      },
+      readKeycloakRoles: async subject => {
+        assert.equal(subject, 'alice');
+        events.push('keycloak');
+        return [{ name: role }];
+      },
+    })(req, res, () => events.push('next'));
+    assert.deepEqual(events, ['keycloak', 'reconcile', 'next']);
+    assert.equal(req.currentUser.rolUsuario, role);
+  }
+});
+
+test('role reconciliation checks current Keycloak mapping and fails closed', async () => {
+  for (const roles of [[], [{ name: ROLES.PRODUCCION }],
+    [{ name: ROLES.GERENCIA }, { name: ROLES.PRODUCCION }]]) {
+    const req = request(), res = response();
+    req.auth.payload[ROLES_CLAIM] = [ROLES.GERENCIA];
+    await createRequireActiveIdentity({ repository: {
+      findBySubject: async () => actor(), reconcileRole: () => assert.fail('must not write'),
+    }, readKeycloakRoles: async () => roles })(req, res, () => assert.fail());
+    assert.equal(res.statusCode, 403);
+  }
+  const req = request(), res = response();
+  req.auth.payload[ROLES_CLAIM] = [ROLES.GERENCIA];
+  await createRequireActiveIdentity({ repository: { findBySubject: async () => actor() },
+    readKeycloakRoles: async () => { throw Error('Keycloak unavailable'); } })(req, res, () => assert.fail());
+  assert.equal(res.statusCode, 503);
+});
+
+test('a protected role can be reconciled before first activation', async () => {
+  let user = { ...actor(), estadoUsuario: 'Pendiente' };
+  const req = request(), res = response();
+  req.auth.payload[ROLES_CLAIM] = [ROLES.GERENCIA];
+  await createRequireActiveIdentity({ repository: {
+    findBySubject: async () => user,
+    reconcileRole: async () => { user = { ...user, rolUsuario: ROLES.GERENCIA }; },
+    activateOnFirstAccess: async (_subject, role) => {
+      assert.equal(role, ROLES.GERENCIA);
+      user = { ...user, estadoUsuario: 'Activo' };
+      return user;
+    },
+  }, readKeycloakRoles: async () => [{ name: ROLES.GERENCIA }] })(req, res, () => {});
+  assert.equal(res.statusCode, 200);
+  assert.equal(req.currentUser.rolUsuario, ROLES.GERENCIA);
+  assert.equal(req.currentUser.estadoUsuario, 'Activo');
+});
 test('middleware preserves first-access revalidation and rejects revocation during activation', async () => {
   for (const active of [actor(), null, { ...actor(), estadoUsuario: 'Desvinculado' }, actor('other')]) {
     const events = [], req = request(), res = response();
@@ -136,7 +229,7 @@ test('parallel and subsequent requests resolve separately; revocation and role c
   const states = new Map([['alice', actor()], ['bob', actor('bob', 2)]]);
   const middleware = createRequireActiveIdentity({ repository: { findBySubject: async sub => {
     lookups++; await new Promise(resolve => setImmediate(resolve)); return states.get(sub);
-  } } });
+  } }, readKeycloakRoles: async () => [{ name: ROLES.VENTAS }] });
   const service = new MessageService({ repo: { listInbox: async ({ userId }) => userId }, userRepo: { findBySubject: () => assert.fail() } });
   async function run(sub) {
     const req = request(sub), res = response();

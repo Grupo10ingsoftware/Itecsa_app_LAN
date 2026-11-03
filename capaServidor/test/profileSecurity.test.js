@@ -31,7 +31,8 @@ test('profile JWT/capabilities, fresh identity, roles, own-user SQL and no-store
     const origin = `http://127.0.0.1:${server.address().port}`;
     const environment = { APP_ENV: 'test', KEYCLOAK_ALLOW_HTTP: 'true', KEYCLOAK_ISSUER: origin, KEYCLOAK_JWKS_URI: origin + '/certs',
         KEYCLOAK_AUDIENCE: 'api', KEYCLOAK_CLIENT_ID: 'web', KEYCLOAK_ROLE_CLIENT_ID: 'roles' };
-    const authenticate = createCheckJwt({ environment, requireIdentity: createRequireActiveIdentity({ repository: identity }),
+    const authenticate = createCheckJwt({ environment, requireIdentity: createRequireActiveIdentity({ repository: identity,
+        readKeycloakRoles: async () => [{ name: ROLES.GERENCIA }] }),
         rateLimit: createThrottleMiddleware({ throttle: new MemoryThrottleService(), rules: () => [{ scope: 'opt08', subject: 'fixture', limit: 100, windowMs: 60000 }] }) });
     app.use('/auth', createAuthRouter({ authenticate, users })); app.use((error, req, res, _next) => respondError(error, req, res));
     const token = (changes = {}, signingKey = privateKey) => new SignJWT({ sub: 'a', typ: 'Bearer', azp: 'web',

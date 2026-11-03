@@ -42,7 +42,8 @@ async function fixture(t, { limit = 120, modules = false } = {}) {
     lookups++; await new Promise(resolve => setImmediate(resolve)); return users.get(sub);
   } };
   const throttle = new MemoryThrottleService();
-  const authenticate = createCheckJwt({ environment, requireIdentity: createRequireActiveIdentity({ repository }),
+  const authenticate = createCheckJwt({ environment, requireIdentity: createRequireActiveIdentity({ repository,
+    readKeycloakRoles: async subject => [{ name: users.get(subject)?.rolUsuario }] }),
     rateLimit: createThrottleMiddleware({ throttle, rules: req => [{ scope: 'authenticated-read',
       subject: req.currentUser.idUsuario, limit, windowMs: 60_000 }] }) });
   const service = new MessageService({ userRepo: { findBySubject: () => assert.fail('duplicate identity') }, repo: {

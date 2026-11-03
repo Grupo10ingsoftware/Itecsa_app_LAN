@@ -1,5 +1,6 @@
 import { movementsQuery, movementsCountQuery, mapMovement } from './movementsRead.repo.js';
 import { identityKey, identityUserWhere } from '../../../database/identityBinding.js';
+import { RECOGNIZED_ROLES } from '../../../../../shared/keycloakAuthorization.js';
 import getPrismaClient from "../../../database/prisma.js";
 import {
     USER_STATUS,
@@ -74,6 +75,36 @@ export class UserRepository {
                 LIMIT 1
             `;
             return users[0] ?? null;
+        } catch (error) {
+            throw mapRepositoryError(error);
+        }
+    }
+
+    async reconcileRole(identitySubject, previousUser, role) {
+        if (!RECOGNIZED_ROLES.includes(role) || !Number.isSafeInteger(previousUser?.idUsuario)
+            || previousUser.idUsuario <= 0 || previousUser.identitySubject !== identitySubject) {
+            throw new UserRepositoryError('USER_REPOSITORY_ERROR', 'No fue posible conciliar el rol.');
+        }
+        try {
+            const { provider, issuer, subject } = identityKey(identitySubject);
+            await this.client.$transaction(async transaction => {
+                const updated = await transaction.usuario.updateMany({
+                    where: {
+                        id_usuario: previousUser.idUsuario,
+                        rol_usuario: previousUser.rolUsuario,
+                        estado_usuario: { in: [USER_STATUS.ACTIVE, USER_STATUS.LEGACY_LINKED, USER_STATUS.PENDING_FIRST_LOGIN] },
+                        ExternalIdentity: { is: { provider, issuer, subject } },
+                    },
+                    data: { rol_usuario: role },
+                });
+                if (updated.count !== 1) return;
+                const audit = await transaction.securityAuditEvent.createMany({ data: [{
+                    event_type: 'identity.role_sync', action: 'sync', resource_type: 'user',
+                    resource_id: String(previousUser.idUsuario), outcome: 'updated',
+                    metadata: { fromRole: previousUser.rolUsuario, toRole: role },
+                }] });
+                if (audit.count !== 1) throw new Error('USER_ROLE_AUDIT_FAILED');
+            });
         } catch (error) {
             throw mapRepositoryError(error);
         }
