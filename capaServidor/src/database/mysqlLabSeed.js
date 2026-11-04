@@ -1,3 +1,4 @@
+import { isValidLanyardCapacity, PRODUCT_ID } from "../../../shared/businessCatalog.js";
 import { MYSQL_LAB_CATALOG, MYSQL_LAB_CATALOG_DIAGNOSTICS } from "./mysqlLabCatalog.js";
 
 const definitions = [
@@ -23,6 +24,13 @@ export async function planMysqlLabCatalog(client) {
 
   for (const definition of definitions) {
     const existing = await client[definition.client].findMany();
+    if (definition.client !== "etiqueta") {
+      for (const row of existing) {
+        if (!definition.rows.some((expected) => sameFields(row, expected, definition.id))) {
+          conflicts.push(`${definition.client} inesperado (${rowLabel(definition, row)})`);
+        }
+      }
+    }
     for (const expected of definition.rows) {
       const matches = existing.filter((row) => sameFields(row, expected, definition.id) ||
         definition.identities.some((fields) => sameFields(row, expected, fields)));
@@ -30,7 +38,11 @@ export async function planMysqlLabCatalog(client) {
         creates.push({ client: definition.client, data: { ...expected } });
         continue;
       }
-      if (matches.length !== 1 || !sameFields(matches[0], expected, Object.keys(expected))) {
+      const invariantFields = Object.keys(expected).filter((field) => field !== "capacidad_diaria");
+      const invalidCapacity = definition.client === "tipo_Producto"
+        && expected.id_tipo_producto === PRODUCT_ID.LANYARD
+        && !isValidLanyardCapacity(matches[0]?.capacidad_diaria);
+      if (matches.length !== 1 || invalidCapacity || !sameFields(matches[0], expected, invariantFields)) {
         conflicts.push(`${definition.client}(${rowLabel(definition, expected)})`);
       }
     }

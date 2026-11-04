@@ -1,3 +1,4 @@
+import { ORDER_STATUS_ID } from "../../../config/status.js";
 import { safeLogger } from '../../../shared/safeLogger.js';
 
 const BATCH_SIZE = 100;
@@ -24,7 +25,7 @@ export function sixMonthsAgo(now) {
 export function retentionDefinitions(cutoff) {
     // Fail closed for unknown states, missing dates, active details or recent activity.
     const closedOrder = {
-        Estado_Pedido: { is: { nombre_etapa: { in: ['Terminado', 'Finalizado', 'Cancelado'] } } },
+        id_estado_pedido: { in: [ORDER_STATUS_ID.TERMINADO, ORDER_STATUS_ID.CANCELADO] },
         fecha_creacion: { lt: cutoff },
         Registros: { none: { FECHA_HORA: { gte: cutoff } } },
         Detalle_pedido: { none: { OR: [

@@ -89,3 +89,25 @@ it('session/API change aborts its read, hides old load dialog and ignores old wr
   await act(async () => { pending.resolve(load(200)) })
   expect(state.success).not.toHaveBeenCalled(); expect(screen.getByTestId('refresh').textContent).toBe('0')
 })
+
+
+it('edita solo Lanyard=1 y vuelve a consultar la carga con la capacidad guardada', async () => {
+  state.api.updateCapacities = vi.fn().mockResolvedValue([{ id: 1, capacity: 1500 }])
+  render(<MemoryRouter><KanbanBoardPage /></MemoryRouter>)
+  const button = await screen.findByLabelText('Configurar carga operativa')
+  await waitFor(() => expect(button.disabled).toBe(false))
+  fireEvent.click(button)
+  fireEvent.change(screen.getByLabelText('Capacidad diaria de Lanyard'), { target: { value: '1500' } })
+  state.api.getProductionLoad.mockResolvedValue({ ...load(), capacity: 1500 })
+  fireEvent.click(screen.getByRole('button', { name: 'Guardar capacidad' }))
+  await waitFor(() => expect(state.success).toHaveBeenCalledWith('Capacidad de Lanyard guardada.'))
+  expect(state.api.updateCapacities).toHaveBeenCalledWith([{ id: 1, capacity: 1500 }])
+  expect(screen.getByLabelText('Capacidad diaria de Lanyard').value).toBe('1500')
+})
+
+it('no inventa 1200 cuando la respuesta omite la capacidad', async () => {
+  state.api.getProductionLoad.mockResolvedValue({ ...load(), capacity: null })
+  render(<MemoryRouter><KanbanBoardPage /></MemoryRouter>)
+  await screen.findByText('No disponible')
+  expect(screen.queryByText(/1200/)).toBeNull()
+})

@@ -1,3 +1,4 @@
+import { readProductFlow } from './productFlow.js';
 import { supportsOrderSnapshots, snapshotOmit, snapshotData } from './orderSnapshotSchema.js';
 import { createLineSnapshots, salesNoteLineIdentity } from '../service/salesOrder.snapshot.js';
 import { AppError } from '../../../errors/AppError.js';
@@ -75,7 +76,11 @@ export async function reevaluateFromSalesNoteOperation(repository, { orderId, sa
       where: { nombre_producto: item.tipoProducto },
     }));
     const type = types.get(item.tipoProducto);
-    if (!type) continue;
+    if (!type) throw new AppError(500, "Configuracion inconsistente: tipo de producto ausente.", "INVALID_PRODUCT_FLOW");
+    if (!firstSubprocesses.has(type.id_tipo_producto)) {
+      firstSubprocesses.set(type.id_tipo_producto, (await readProductFlow(repository.client, type.id_tipo_producto))[0]);
+    }
+    const first = firstSubprocesses.get(type.id_tipo_producto);
     const existing = existingByIdentity.get(salesNoteLineIdentity(item));
     if (existing) {
       const accumulated = Number(existing.Avance_Lanyard?.[0]?.cantidad_acumulada ?? 0);
@@ -87,19 +92,17 @@ export async function reevaluateFromSalesNoteOperation(repository, { orderId, sa
       }
       await repository.client.detalle_pedido.update({
         where: { id_detalle_pedido: existing.id_detalle_pedido },
-        data: snapshotData({ ...snapshots[index], cantidad: Number(item.cantidad), id_tipo_producto: type.id_tipo_producto }, snapshotsSupported),
+        data: snapshotData({ ...snapshots[index], cantidad: Number(item.cantidad), id_tipo_producto: type.id_tipo_producto,
+          ...(existing.id_tipo_producto !== type.id_tipo_producto ? { id_estado_subproceso: first.id_estado_subproceso, fecha_real_termino: null } : {}),
+        }, snapshotsSupported),
         ...snapshotOmit(snapshotsSupported),
       });
     } else {
-      if (!firstSubprocesses.has(type.id_tipo_producto)) firstSubprocesses.set(type.id_tipo_producto, await repository.client.producto_Subproceso.findFirst({
-        where: { id_tipo_producto: type.id_tipo_producto }, orderBy: { orden_flujo: "asc" },
-      }));
-      const first = firstSubprocesses.get(type.id_tipo_producto);
       await repository.client.detalle_pedido.create({ data: {
         ...snapshotData(snapshots[index], snapshotsSupported),
         id_pedido: Number(orderId), id_tipo_producto: type.id_tipo_producto,
         cantidad: Number(item.cantidad), fecha_estimada_termino: order.fecha_estimada_termino ?? null,
-        id_estado_subproceso: first?.id_estado_subproceso ?? null,
+        id_estado_subproceso: first.id_estado_subproceso,
       }, ...snapshotOmit(snapshotsSupported) });
     }
   }

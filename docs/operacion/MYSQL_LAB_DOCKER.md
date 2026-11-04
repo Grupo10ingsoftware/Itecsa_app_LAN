@@ -134,22 +134,24 @@ inicializador rechaza una base con tablas de aplicacion y sin
 cadena anterior de 15 migraciones fue validada fisicamente; la cadena provisional
 actual debe validarse nuevamente desde una base vacia antes del despliegue LAN.
 
-El seed toma sus valores de las constantes que ya consume la aplicacion y de
-las relaciones cubiertas por la regresion integral. Prepara:
+El catálogo funcional v1 está en `shared/businessCatalog.js` y
+`capaServidor/src/database/mysqlLabCatalog.js`. Prepara siete estados de pedido
+(final `Terminado`, ID 5, orden 4), tres estados de pago, tres productos
+(1 Lanyard, 2 Tarjeta, 3 Yoyo), diez subprocesos y doce relaciones.
 
-- estados de pago y etapas del pedido;
-- productos Yoyo, Lanyard y Tarjeta;
-- etiquetas Urgencia y Prioridad por contrato;
-- subprocesos Impresion, Corte y Empaquetado;
-- relaciones de Tarjeta y Lanyard con esos tres subprocesos;
-- capacidad Lanyard de 1200.
+- Lanyard: 1 → 2 → 3 → 4 → 5.
+- Tarjeta: 6 → 7 → 8 → 9 → 5.
+- Yoyo: 10 → 5.
 
-Las capacidades de Tarjeta y Yoyo se escriben como `NULL`. Yoyo no recibe una
-relacion de subprocesos no versionada; la validacion informa que una linea nueva
-conservara `id_estado_subproceso = null`. El seed se ejecuta en una transaccion:
-crea filas ausentes, acepta coincidencias exactas, permite catalogos ajenos y
-aborta antes de escribir cuando un identificador o identidad esperada entra en
-conflicto. Una segunda ejecucion exacta no crea filas.
+Lanyard comienza con capacidad 1200, editable entre 1 y 10000. Repetir el seed
+conserva la capacidad guardada. Tarjeta y Yoyo comienzan sin capacidad configurable.
+El seed no duplica registros y rechaza identificadores, orden o pertenencia
+incompatibles; la validación también rechaza faltantes y filas extra en los
+catálogos funcionales. Las etiquetas de negocio pueden agregarse por sus flujos.
+
+Esta rama admite instalaciones nuevas, con volúmenes nuevos. El preflight rechaza
+catálogos anteriores incompatibles antes de aplicar migraciones; no convierte
+instalaciones existentes ni importa datos operacionales de Aiven.
 
 ## Secuencia controlada para la tarea de puesta en marcha
 

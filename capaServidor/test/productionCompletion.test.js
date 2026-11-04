@@ -21,7 +21,7 @@ function fixture() {
     notifyOrderReady: async () => {},
     client: {
       detalle_pedido: { findMany: async () => { assert.ok(locked); return details; } },
-      estado_Pedido: { findFirst: async ({ where }) => where.nombre_etapa === 'Terminado'
+      estado_Pedido: { findFirst: async ({ where }) => where.id_estado_pedido === 5
         ? { id_estado_pedido: 5, orden_kanban: 4, nombre_etapa: 'Terminado' }
         : { id_estado_pedido: 4, orden_kanban: 3, nombre_etapa: 'Listo para entrega' } },
       pedidos: {
@@ -155,9 +155,9 @@ test('active Kanban keeps ready-for-delivery and excludes terminal orders; calen
     pedidos: { findMany: async () => { legacyReads++; return []; } },
   } };
   await listOrderViewsOperation(repo, { view: 'kanban', limit: 50 });
-  assert.match(sql, /ep\.orden_kanban <> 4/);
+  assert.match(sql, /ep\.id_estado_pedido NOT IN \(\?, \?\)/);
   assert.ok(!sql.includes('Listo para entrega'));
-  assert.match(sql, /ep\.nombre_etapa NOT IN \('Terminado', 'Cancelado'\)/);
+  assert.match(sql, /ep\.id_estado_pedido NOT IN \(\?, \?\)/);
   await listOrderViewsOperation(repo, { view: 'calendar', limit: 50 });
   assert.doesNotMatch(sql, /ep\.orden_kanban <> 4|ep\.nombre_etapa NOT IN/);
   assert.equal(legacyReads, 0);

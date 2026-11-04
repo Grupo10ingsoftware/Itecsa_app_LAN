@@ -30,8 +30,8 @@ test("la tarea de inicializacion fija exactamente la cadena Prisma provisional",
     .filter((entry) => entry.isDirectory() && existsSync(path.join(migrationsRoot, entry.name, "migration.sql")))
     .map((entry) => entry.name)
     .sort();
-  assert.deepEqual(directories, Object.keys(expected).sort());
-  for (const directory of directories) {
+  assert.deepEqual(directories, [...Object.keys(expected), "202611030001_catalog_identity_integrity"].sort());
+  for (const directory of Object.keys(expected)) {
     const sql = readFileSync(path.join(migrationsRoot, directory, "migration.sql"));
     assert.equal(createHash("sha256").update(sql).digest("hex"), expected[directory], directory);
   }

@@ -3,7 +3,7 @@ import getPrismaClient from "../../../database/prisma.js";
 import { Prisma } from "@prisma/client";
 import { snapshotOmit, supportsOrderSnapshots } from "../../orders/repo/orderSnapshotSchema.js";
 
-const LANYARD_DAILY_CAPACITY = 1200;
+import { PRODUCT_ID, isValidLanyardCapacity } from "../../../../../shared/businessCatalog.js";
 const KANBAN_EN_PRODUCCION_STEP = 2;
 
 function normalizeText(value) {
@@ -61,7 +61,11 @@ export default class ProductionLoadRepository {
   }
 
   async getCapacity() {
-    return LANYARD_DAILY_CAPACITY;
+    const product = await this.client.tipo_Producto.findUnique({ where: { id_tipo_producto: PRODUCT_ID.LANYARD }, select: { capacidad_diaria: true } });
+    if (!isValidLanyardCapacity(product?.capacidad_diaria)) {
+      throw new AppError(500, "Configuracion inconsistente: falta una capacidad valida para Lanyard.", "INVALID_PRODUCTION_CAPACITY");
+    }
+    return product.capacidad_diaria;
   }
 
   async listLanyardDetails(dateKey) {
@@ -90,7 +94,7 @@ export default class ProductionLoadRepository {
     }));
   }
 
-  async updateDailyLoads({ dateKey, entries, userId, capacity }) {
+  async updateDailyLoads({ dateKey, entries, userId }) {
     const date = toDateOnly(dateKey);
     const normalizedEntries = deduplicateEntries(entries);
 
@@ -99,6 +103,7 @@ export default class ProductionLoadRepository {
     }
 
     return this.client.$transaction(async (tx) => {
+      const capacity = await new ProductionLoadRepository({ prisma: tx }).getCapacity();
       const detailIds = normalizedEntries.map((entry) => entry.detailId);
       const details = await tx.detalle_pedido.findMany({
         ...snapshotOmit(await supportsOrderSnapshots(tx)),
@@ -197,5 +202,3 @@ export default class ProductionLoadRepository {
     }, { timeout: 15000 });
   }
 }
-
-export { LANYARD_DAILY_CAPACITY };

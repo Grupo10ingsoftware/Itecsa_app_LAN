@@ -1,3 +1,4 @@
+import { ORDER_STATUS_ID } from "../../../config/status.js";
 ﻿import { readPaymentPage, readPaymentCounts } from './paymentWorkspaceRead.repo.js';
 import { listKanbanRows, getKanbanRow } from './kanbanRead.repo.js';
 import { toOrderSummaryDTO } from './orderMapping.js';
@@ -121,7 +122,8 @@ export async function listOrderViewsOperation(repository, { view, limit, cursor,
     ...(view === 'kanban'
       ? { Estado_Pedido: { is: {
         orden_kanban: { not: 4 },
-        nombre_etapa: { notIn: ['Terminado', 'Cancelado'], ...(status ? { equals: status } : {}) },
+        id_estado_pedido: { notIn: [ORDER_STATUS_ID.TERMINADO, ORDER_STATUS_ID.CANCELADO] },
+        ...(status ? { nombre_etapa: status } : {}),
       } } }
       : status ? { Estado_Pedido: { is: { nombre_etapa: status } } } : {}),
     ...(search ? { OR: [

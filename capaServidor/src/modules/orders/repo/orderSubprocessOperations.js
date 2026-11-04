@@ -1,3 +1,4 @@
+import { ORDER_STATUS_ID } from "../../../config/status.js";
 import { isLanyardProduct, isPackagingSubprocess } from './orderProductionRules.js';
 import { snapshotOmit, supportsOrderSnapshots } from './orderSnapshotSchema.js';
 import { AppError } from '../../../errors/AppError.js';
@@ -102,7 +103,7 @@ export async function completeSubprocessOperation(repository, { orderId, detailI
     : await repository.client.registro_Etapas.findFirst({
         where: {
           Registros: { id_pedido: Number(orderId) },
-          Estado_Pedido: { nombre_etapa: "En producción" },
+          id_estado_pedido: ORDER_STATUS_ID.EN_PRODUCCION,
         },
         orderBy: { fecha_hora_entrada: "desc" },
       });

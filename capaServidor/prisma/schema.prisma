@@ -97,7 +97,7 @@ model Estado_Pago {
 model Estado_Pedido {
   id_estado_pedido   Int               @id @default(autoincrement())
   nombre_etapa       String?           @db.VarChar(100)
-  orden_kanban       Int?
+  orden_kanban       Int               @unique
   descripcion_estado String?           @db.VarChar(45)
   Pedidos            Pedidos[]
   Registro_Etapas    Registro_Etapas[]
@@ -148,11 +148,12 @@ model Pedidos {
 model Producto_Subproceso {
   id_tipo_producto     Int
   id_estado_subproceso Int
-  orden_flujo          Int?
+  orden_flujo          Int
   Tipo_Producto        Tipo_Producto      @relation(fields: [id_tipo_producto], references: [id_tipo_producto], onDelete: NoAction, onUpdate: NoAction, map: "Producto_Subproceso_Tipo_Producto_FK")
   Estado_Subprocesos   Estado_Subprocesos @relation(fields: [id_estado_subproceso], references: [id_estado_subproceso], onDelete: NoAction, onUpdate: NoAction, map: "fk_Producto_Subproceso_estado_subproceso")
 
   @@id([id_tipo_producto, id_estado_subproceso])
+  @@unique([id_tipo_producto, orden_flujo])
   @@index([id_estado_subproceso], map: "id_estado_subproceso_idx")
 }
 
@@ -192,7 +193,7 @@ model Tipo_Producto {
 
 model Usuario {
   id_usuario             Int                     @id @default(autoincrement())
-  id_keycloak            String?                 @unique @db.VarChar(128)
+  id_keycloak            String                  @unique @db.VarChar(128)
   correo_usuario         String?                 @unique @db.VarChar(255)
   rut_usuario            String?                 @db.VarChar(12)
   nombre_usuario         String?                 @db.VarChar(100)
@@ -217,6 +218,8 @@ model Usuario {
   Registros              Registros[]
   SecurityAuditEvent     SecurityAuditEvent[]
   ExternalIdentity       ExternalIdentity?
+
+  @@unique([id_usuario, id_keycloak], map: "usuario_keycloak_identity")
 }
 
 model ExternalIdentity {
@@ -226,8 +229,9 @@ model ExternalIdentity {
   subject              String  @db.VarChar(128)
   username             String  @db.VarChar(255)
   user_id              Int     @unique(map: "external_identity_user")
-  Usuario              Usuario @relation(fields: [user_id], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+  Usuario              Usuario @relation(fields: [user_id, subject], references: [id_usuario, id_keycloak], onDelete: NoAction, onUpdate: NoAction, map: "ExternalIdentity_user_id_fkey")
 
+  @@unique([user_id, subject], map: "external_identity_user_subject")
   @@unique([provider, issuer, subject], map: "external_identity_subject")
   @@unique([provider, issuer, username], map: "external_identity_username")
 }

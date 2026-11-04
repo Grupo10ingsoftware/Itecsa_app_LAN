@@ -1,0 +1,224 @@
+{
+  "branch": "fix/integridad-prisma-catalogos",
+  "base": "312e28b",
+  "lab": "itecsa-integrity-20261103",
+  "migrations": 17,
+  "schemaDiff": "none",
+  "backend": {
+    "tests": 434,
+    "suites": [
+      {
+        "suite": "businessPinActor.test.js",
+        "tests": 4,
+        "failed": 0
+      },
+      {
+        "suite": "calendarIntegrity.test.js",
+        "tests": 6,
+        "failed": 0
+      },
+      {
+        "suite": "catalogIntegrity.test.js",
+        "tests": 8,
+        "failed": 0
+      },
+      {
+        "suite": "databaseConnectionConfig.test.js",
+        "tests": 10,
+        "failed": 0
+      },
+      {
+        "suite": "deploymentRecovery.test.js",
+        "tests": 4,
+        "failed": 0
+      },
+      {
+        "suite": "dockerDevelopmentEnvironment.test.js",
+        "tests": 3,
+        "failed": 0
+      },
+      {
+        "suite": "globalConnections.test.js",
+        "tests": 6,
+        "failed": 0
+      },
+      {
+        "suite": "historyPerformance.test.js",
+        "tests": 36,
+        "failed": 0
+      },
+      {
+        "suite": "historySecurity.test.js",
+        "tests": 1,
+        "failed": 0
+      },
+      {
+        "suite": "kanbanPerformance.test.js",
+        "tests": 23,
+        "failed": 0
+      },
+      {
+        "suite": "kanbanWorkflows.test.js",
+        "tests": 16,
+        "failed": 0
+      },
+      {
+        "suite": "messagePerformance.test.js",
+        "tests": 23,
+        "failed": 0
+      },
+      {
+        "suite": "metricsPerformance.test.js",
+        "tests": 27,
+        "failed": 0
+      },
+      {
+        "suite": "metricsRefinement.test.js",
+        "tests": 5,
+        "failed": 0
+      },
+      {
+        "suite": "metricsSecurity.test.js",
+        "tests": 1,
+        "failed": 0
+      },
+      {
+        "suite": "mysqlDeployment.test.js",
+        "tests": 6,
+        "failed": 0
+      },
+      {
+        "suite": "mysqlLabAccounts.test.js",
+        "tests": 2,
+        "failed": 0
+      },
+      {
+        "suite": "mysqlLabInitializer.test.js",
+        "tests": 6,
+        "failed": 0
+      },
+      {
+        "suite": "mysqlLabMigrationHistory.test.js",
+        "tests": 1,
+        "failed": 0
+      },
+      {
+        "suite": "mysqlLabSeed.test.js",
+        "tests": 7,
+        "failed": 0
+      },
+      {
+        "suite": "orderCreationPerformance.test.js",
+        "tests": 39,
+        "failed": 0
+      },
+      {
+        "suite": "orderCreationSecurity.test.js",
+        "tests": 2,
+        "failed": 0
+      },
+      {
+        "suite": "orderCreationSource.test.js",
+        "tests": 5,
+        "failed": 0
+      },
+      {
+        "suite": "paymentPerformance.test.js",
+        "tests": 28,
+        "failed": 0
+      },
+      {
+        "suite": "phase1Connections.test.js",
+        "tests": 4,
+        "failed": 0
+      },
+      {
+        "suite": "phase1Identity.test.js",
+        "tests": 17,
+        "failed": 0
+      },
+      {
+        "suite": "phase1Security.test.js",
+        "tests": 7,
+        "failed": 0
+      },
+      {
+        "suite": "productionCompletion.test.js",
+        "tests": 17,
+        "failed": 0
+      },
+      {
+        "suite": "productionScheduling.test.js",
+        "tests": 15,
+        "failed": 0
+      },
+      {
+        "suite": "profilePerformance.test.js",
+        "tests": 15,
+        "failed": 0
+      },
+      {
+        "suite": "profileSecurity.test.js",
+        "tests": 1,
+        "failed": 0
+      },
+      {
+        "suite": "userCreation.test.js",
+        "tests": 47,
+        "failed": 0
+      },
+      {
+        "suite": "userDepartmentFilters.test.js",
+        "tests": 5,
+        "failed": 0
+      },
+      {
+        "suite": "userUpdate.test.js",
+        "tests": 21,
+        "failed": 0
+      },
+      {
+        "suite": "usersPerformance.test.js",
+        "tests": 16,
+        "failed": 0
+      }
+    ]
+  },
+  "frontend": {
+    "fullSuitePassed": 534,
+    "focusedIncludingNewCapacityTestsPassed": 34,
+    "lint": "passed",
+    "build": "passed"
+  },
+  "physicalChecks": {
+    "catalogs": "passed",
+    "identityConstraints": "passed",
+    "flows": [
+      5,
+      5,
+      2
+    ],
+    "mixedOrder": "passed",
+    "capacityAfterRestartAndSeed": 1500,
+    "concurrentTransitions": "passed",
+    "keycloak": [
+      "first user",
+      "normal creation",
+      "first login",
+      "PIN",
+      "Gerencia",
+      "Soporte",
+      "Desarrollador",
+      "stale token after reconciliation"
+    ],
+    "httpViews": [
+      "history Terminado",
+      "calendar Terminado",
+      "active Kanban excludes terminal orders"
+    ]
+  },
+  "pending": [
+    "Integrated browser: ERR_CERT_AUTHORITY_INVALID; temporary CA approval requested"
+  ],
+  "readyForDeployment": false
+}

@@ -70,7 +70,7 @@ export class UserRepository {
                     u.nombre_usuario AS nombreUsuario, u.apellido_usuario AS apellidoUsuario,
                     u.rol_usuario AS rolUsuario, u.estado_usuario AS estadoUsuario
                 FROM ExternalIdentity e
-                INNER JOIN Usuario u ON u.id_usuario = e.user_id
+                INNER JOIN Usuario u ON u.id_usuario = e.user_id AND u.id_keycloak = e.subject
                 WHERE e.provider = ${provider} AND e.issuer = ${issuer} AND e.subject = ${subject}
                 LIMIT 1
             `;

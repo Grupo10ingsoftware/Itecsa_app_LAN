@@ -1,21 +1,14 @@
+import { readProductFlow } from './productFlow.js';
 import { AppError } from '../../../errors/AppError.js';
 import { Prisma } from '@prisma/client';
 import { ROLES } from '../../../config/roles.js';
 import { snapshotData, supportsOrderSnapshots } from './orderSnapshotSchema.js';
 
-// Creation needs only the first state, not the whole subprocess catalogue.
 export async function getCreationProductContextOperation(repository, name) {
-  const rows = await repository.client.$queryRaw`
-    SELECT t.id_tipo_producto,
-      (SELECT ps.id_estado_subproceso FROM Producto_Subproceso ps
-       WHERE ps.id_tipo_producto=t.id_tipo_producto ORDER BY ps.orden_flujo ASC LIMIT 1) AS firstSubprocessId
-    FROM Tipo_Producto t WHERE t.nombre_producto=${name} LIMIT 1`;
-  const row = rows[0];
-  if (!row) throw new AppError(404, 'Tipo de producto no encontrado');
-  return {
-    productType: { id_tipo_producto: row.id_tipo_producto },
-    firstSubprocess: row.firstSubprocessId == null ? null : { id_estado_subproceso: row.firstSubprocessId },
-  };
+  const productType = await repository.client.tipo_Producto.findFirst({ where: { nombre_producto: name } });
+  if (!productType) throw new AppError(500, 'Configuracion inconsistente: tipo de producto ausente.', 'INVALID_PRODUCT_FLOW');
+  const steps = await readProductFlow(repository.client, productType.id_tipo_producto);
+  return { productType, firstSubprocess: steps[0] };
 }
 
 function assertCount(result, expected) {

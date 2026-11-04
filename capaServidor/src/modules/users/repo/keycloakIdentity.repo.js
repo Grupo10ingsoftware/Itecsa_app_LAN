@@ -1,5 +1,5 @@
 import { departmentRoles } from '../../../../../shared/userDepartments.js';
-import { identityUserWhere } from '../../../database/identityBinding.js';
+import { identityKey, identityUserWhere } from '../../../database/identityBinding.js';
 import { Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import getPrismaClient from '../../../database/prisma.js';
@@ -148,6 +148,7 @@ export class KeycloakIdentityRepository {
     });
   }
   async complete(operation, subject, actorId, actorSubject, actorRole) {
+    identityKey(subject, operation.issuer);
     return this.client.$transaction(async tx => {
       const actors = await tx.$queryRaw`SELECT u.rol_usuario, u.estado_usuario, e.subject, e.issuer, e.provider FROM Usuario u JOIN ExternalIdentity e ON e.user_id = u.id_usuario WHERE u.id_usuario=${actorId} FOR UPDATE`;
       if (actors[0]?.subject !== actorSubject || actors[0]?.provider !== 'keycloak' || actors[0]?.issuer !== operation.issuer || actors[0]?.rol_usuario !== actorRole

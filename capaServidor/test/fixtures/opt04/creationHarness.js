@@ -19,7 +19,7 @@ export function creationHarness({ existingClient = true, failAt, snapshots = tru
     return work(...args);
   };
   const types = ['Lanyard', 'Tarjeta', 'Yoyo'].map((nombre_producto, i) => ({ id_tipo_producto: i + 1, nombre_producto }));
-  const flow = id => noSubprocess ? [] : [{ id_tipo_producto: id, id_estado_subproceso: id * 10, orden_flujo: 1, Estado_Subprocesos: { nombre_estado: 'Inicio' } }];
+  const flow = id => noSubprocess ? [] : ({1:[1,2,3,4,5],2:[6,7,8,9,5],3:[10,5]})[id].map((step,index)=>({id_tipo_producto:id,id_estado_subproceso:step,orden_flujo:index+1,Estado_Subprocesos:{nombre_estado:'Paso '+step}}));
   const users = noRecipients ? [] : [{ id_usuario: 2, rol_usuario: ROLES.ADMIN_COBRANZAS }, { id_usuario: 3, rol_usuario: ROLES.ADMINISTRADOR }];
   const insert = (s, table, key, data) => {
     const row = { ...(key ? { [key]: s[table].length + 1 } : {}), ...data };
@@ -49,7 +49,7 @@ export function creationHarness({ existingClient = true, failAt, snapshots = tru
       etiqueta: { findMany: invoke('label.findMany', () => missingLabel ? [] : [{ id_etiqueta: 1, nombre_etiqueta: 'Urgencia', esta_activa: 1 }]) },
       pedido_Etiqueta: model('labels', null, 'label'), registros: model('records', 'ID_REGISTRO', 'record'), registro_Etapas: model('stages', null, 'stage'),
       detalle_pedido: model('details', 'id_detalle_pedido', 'detail'), pedido_Item_Sin_Seguimiento: model('accessories', 'id_item', 'accessory'),
-      tipo_Producto: { findFirst: invoke('product.findFirst', ({ where }) => missingType ? null : types.find(t => t.nombre_producto === where.nombre_producto.equals)) },
+      tipo_Producto: { findFirst: invoke('product.findFirst', ({ where }) => missingType ? null : types.find(t => t.nombre_producto === (where.nombre_producto.equals ?? where.nombre_producto))) },
       producto_Subproceso: { findMany: invoke('flow.findMany', ({ where }) => flow(where.id_tipo_producto)) },
       usuario: { findMany: invoke('recipients.findMany', ({ where }) => users.filter(u => u.rol_usuario === where.rol_usuario)) },
       mensaje: model('messages', 'id_mensaje', 'message'), mENSAJE_USUARIO: model('assignments', null, 'assignment'), securityAuditEvent: model('audits', 'id', 'audit'),

@@ -1,3 +1,4 @@
+import { AppError } from "../../../errors/AppError.js";
 
 
 export async function lockPaymentOrderOperation(repository, id) {
@@ -25,7 +26,7 @@ export async function updatePaymentStatusOperation(repository, id, paymentStatus
       })
     : null;
 
-  if (shouldUpdateOrderStage && !status) return null;
+  if (shouldUpdateOrderStage && !status) throw new AppError(500, "Configuracion inconsistente: falta el estado del pedido.", "INVALID_ORDER_CATALOG");
 
   try {
     await repository.client.pedidos.update({

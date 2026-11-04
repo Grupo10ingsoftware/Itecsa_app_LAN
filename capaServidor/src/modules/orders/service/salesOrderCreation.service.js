@@ -1,3 +1,4 @@
+import { assertProductFlow } from '../repo/productFlow.js';
 import { createLineSnapshots } from "./salesOrder.snapshot.js";
 import { SalesOrderError } from "./salesOrder.errors.js";
 import { validateCreateSalesOrder, validateSalesNoteSource } from "./salesOrder.validator.js";
@@ -124,7 +125,8 @@ export default class SalesOrderCreationService {
             const productType = await productTypeService.getProductTypeByName(item.tipoProducto);
             const subprocesses = await repo.getProductSubprocesses(productType.id_tipo_producto);
 
-            productContext = { productType, firstSubprocess: subprocesses[0] ?? null };
+            assertProductFlow(productType.id_tipo_producto, subprocesses);
+            productContext = { productType, firstSubprocess: subprocesses[0] };
           }
           productContextByName.set(item.tipoProducto, productContext);
         }
@@ -136,7 +138,7 @@ export default class SalesOrderCreationService {
           fecha_estimada_termino: estimatedCompletionDate,
           fecha_real_termino: null,
           id_estado_subproceso:
-            productContext.firstSubprocess?.id_estado_subproceso ?? null,
+            productContext.firstSubprocess.id_estado_subproceso,
         };
 
         if (receipt) {

@@ -1,3 +1,4 @@
+import { PRODUCT_ID, isValidLanyardCapacity } from '../../../../../shared/businessCatalog.js'
 import FilterContent from '../../../shared/components/filters/FilterContent'
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -32,9 +33,12 @@ function formatDate(value) {
 }
 
 function normalizeLoad(result = {}) {
+  if (!isValidLanyardCapacity(result.capacity)) {
+    throw new Error('Configuración inconsistente: capacidad de Lanyard inválida.')
+  }
   return {
     date: result.date ?? null,
-    capacity: toInteger(result.capacity, 1200),
+    capacity: result.capacity,
     lanyardsInProduction: toInteger(result.lanyardsInProduction, 0),
     percentage: toInteger(result.percentage, 0),
     details: Array.isArray(result.details) ? result.details : [],
@@ -70,6 +74,7 @@ export default function KanbanBoardPage() {
   const { hasPermission } = useAuth()
   const [capacityApi, setCapacityApi] = useState(null)
   const isCapacityOpen = capacityApi === api
+  const [draftCapacity, setDraftCapacity] = useState(null)
   const [capacityError, setCapacityError] = useState('')
   const [savingCapacity, setSavingCapacity] = useState({ api: null, busy: false })
   const isSavingCapacity = savingCapacity.api === api && savingCapacity.busy
@@ -81,7 +86,7 @@ export default function KanbanBoardPage() {
   const [kanbanRefreshKey, setKanbanRefreshKey] = useState(0)
   const [operationalLoad, setOperationalLoad] = useState({
     date: null,
-    capacity: 1200,
+    capacity: null,
     lanyardsInProduction: 0,
     percentage: 0,
     details: [],
@@ -138,6 +143,33 @@ export default function KanbanBoardPage() {
     const value = Math.min(max, toInteger(rawValue))
     setDraftQuantities((current) => ({ ...current, [detail.detailId]: value }))
     setCapacityError('')
+  }
+
+  async function saveDailyCapacity() {
+    const capacity = Number(draftCapacity ?? operationalLoad.capacity)
+    if (!isValidLanyardCapacity(capacity)) {
+      notify.error('La capacidad debe ser un entero entre 1 y 10000.')
+      return
+    }
+    if (capacityPending.current) return
+    capacityPending.current = true
+    const version = operationScope.current
+    setSavingCapacity({ api, busy: true })
+    try {
+      await api.updateCapacities([{ id: PRODUCT_ID.LANYARD, capacity }])
+      const load = normalizeLoad(await api.getProductionLoad())
+      if (version !== operationScope.current) return
+      setOperationalLoad(load)
+      setDraftCapacity(null)
+      notify.success('Capacidad de Lanyard guardada.')
+    } catch (error) {
+      if (version === operationScope.current) notify.error(operationFailureMessage(error, 'No fue posible guardar la capacidad.'))
+    } finally {
+      if (version === operationScope.current) {
+        capacityPending.current = false
+        setSavingCapacity({ api, busy: false })
+      }
+    }
   }
 
   async function saveProductionLoad(event) {
@@ -202,12 +234,12 @@ export default function KanbanBoardPage() {
                   <span className={styles.capacityFill} style={{ width: progressWidth }} />
                 </div>
                 <div className={styles.capacityNumbers}>
-                  <strong>{operationalLoad.lanyardsInProduction}</strong> / {operationalLoad.capacity} lanyards por día
+                  <strong>{operationalLoad.lanyardsInProduction}</strong> / {operationalLoad.capacity ?? '—'} lanyards por día
                 </div>
               </div>
-              <strong className={styles.capacityPercentage}>{isLoadingCapacity ? <LoadingIndicator scope="action" surface="dark" context="Carga operativa" /> : `${operationalLoad.percentage}%`}</strong>
+              <strong className={styles.capacityPercentage}>{isLoadingCapacity ? <LoadingIndicator scope="action" surface="dark" context="Carga operativa" /> : operationalLoad.capacity ? `${operationalLoad.percentage}%` : 'No disponible'}</strong>
               {canManageProductionLoad && (
-                <button className={styles.capacitySettings} aria-label="Configurar carga operativa" disabled={isLoadingCapacity} onClick={() => setCapacityApi(api)} title="Configurar carga operativa" type="button">
+                <button className={styles.capacitySettings} aria-label="Configurar carga operativa" disabled={isLoadingCapacity} onClick={() => { setDraftCapacity(null); setCapacityApi(api) }} title="Configurar carga operativa" type="button">
                   <i className="bi bi-gear" aria-hidden="true" />
                 </button>
               )}
@@ -234,8 +266,21 @@ export default function KanbanBoardPage() {
             <div className={styles.capacityFields}>
               <div className={styles.capacityModalSummary}>
                 <span>{formatDate(operationalLoad.date)}</span>
-                <strong>{operationalLoad.lanyardsInProduction} / {operationalLoad.capacity} lanyards asignados para la jornada</strong>
+                <strong>{operationalLoad.lanyardsInProduction} / {operationalLoad.capacity ?? '—'} lanyards asignados para la jornada</strong>
               </div>
+              {hasPermission(PERMISSIONS.MANAGE_CAPACITY) && (
+                <div className={styles.volumeControl}>
+                  <label className={styles.volumeHeading}>
+                    <span>Capacidad diaria de Lanyard</span>
+                    <input type="number" min="1" max="10000" step="1"
+                      value={draftCapacity ?? operationalLoad.capacity ?? ''}
+                      onChange={event => setDraftCapacity(event.target.value)} disabled={isSavingCapacity} />
+                  </label>
+                  <button type="button" disabled={isSavingCapacity || !operationalLoad.capacity} onClick={saveDailyCapacity}>
+                    Guardar capacidad
+                  </button>
+                </div>
+              )}
               {draftDetails.length === 0 && (
                 <p className={styles.capacityEmpty}>No hay detalles Lanyard en En produccion.</p>
               )}

@@ -1,16 +1,19 @@
+import { ORDER_STATUS, ORDER_STATUS_ID } from "../../../config/status.js";
 import { AppError } from '../../../errors/AppError.js';
 import { isLanyardProduct } from './orderProductionRules.js';
 import { hasValidProductionSchedule, PRODUCTION_SCHEDULE_REQUIRED_MESSAGE } from '../../../../../shared/productionScheduling.js';
 
 export async function transitionGeneralStageOperation(repository, { id, ordenKanban, statusName, userId, comment, now = new Date(), compact = false, expectedState }) {
+  const statusId = statusName
+    ? ORDER_STATUS_ID[Object.keys(ORDER_STATUS).find(key => ORDER_STATUS[key] === statusName)]
+    : Object.values(ORDER_STATUS_ID).find(id => id - 1 === Number(ordenKanban));
+  if (!statusId) throw new AppError(500, "Configuracion inconsistente: estado de pedido desconocido.", "INVALID_ORDER_CATALOG");
   const status = await repository.client.estado_Pedido.findFirst({
-    where: statusName
-      ? { nombre_etapa: statusName }
-      : { orden_kanban: Number(ordenKanban) },
+    where: { id_estado_pedido: statusId },
     select: { id_estado_pedido: true, orden_kanban: true, nombre_etapa: true },
   });
 
-  if (!status) return null;
+  if (!status || status.orden_kanban !== statusId - 1) throw new AppError(500, "Configuracion inconsistente: falta el estado del pedido.", "INVALID_ORDER_CATALOG");
 
   try {
     const transition = await repository.client.pedidos.updateMany({
@@ -135,7 +138,7 @@ export async function updateGeneralStepOperation(repository, id, ordenKanban, au
   return repository.transitionGeneralStage({
     id,
     ordenKanban,
-    ...(Number(ordenKanban) === 4 ? { statusName: "Terminado" } : {}),
+    ...(Number(ordenKanban) === 4 ? { statusName: ORDER_STATUS.TERMINADO } : {}),
     userId: audit.userId,
     comment: audit.comment,
     now: audit.now,
@@ -147,7 +150,7 @@ export async function updateGeneralStepOperation(repository, id, ordenKanban, au
 export async function sendToReviewOperation(repository, id, audit = {}) {
   const updatedOrder = await repository.transitionGeneralStage({
     id,
-    statusName: "En revisión",
+    statusName: ORDER_STATUS.EN_REVISION,
     userId: audit.userId,
     comment: audit.comment,
     now: audit.now,
@@ -193,7 +196,7 @@ export async function sendToReviewOperation(repository, id, audit = {}) {
 export async function cancelProductionOperation(repository, id, audit = {}) {
   return repository.transitionGeneralStage({
     id,
-    statusName: "Cancelado",
+    statusName: ORDER_STATUS.CANCELADO,
     userId: audit.userId,
     comment: audit.comment,
     now: audit.now,
