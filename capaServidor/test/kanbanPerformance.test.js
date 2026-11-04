@@ -155,7 +155,7 @@ test('reevaluation resolves repeated product names/first subprocess only once, w
   let typeReads = 0, flowReads = 0, creates = 0;
   const repo = { client: { pedidos: { findUnique: async () => ({ id_cliente: 1, Detalle_pedido: [] }), update: async () => {} },
     cliente: { update: async () => {} }, tipo_Producto: { findFirst: async () => { typeReads++; return { id_tipo_producto: 1 }; } },
-    producto_Subproceso: { findFirst: async () => { flowReads++; return { id_estado_subproceso: 1 }; } },
+    producto_Subproceso: { findMany: async () => { flowReads++; return [1,2,3,4,5].map((id, index) => ({ id_estado_subproceso: id, orden_flujo: index + 1 })); } },
     detalle_pedido: { create: async () => { creates++; } }, usuario: { findMany: async () => [] } },
     transitionGeneralStage: async values => { assert.equal(values.compact, true); return { id_pedido: 1 }; } };
   await reevaluateFromSalesNoteOperation(repo, { orderId: 1, userId: 9, compact: true, salesNote: {

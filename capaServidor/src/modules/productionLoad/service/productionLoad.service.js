@@ -1,5 +1,5 @@
 import { AppError } from "../../../errors/AppError.js";
-import ProductionLoadRepository, { LANYARD_DAILY_CAPACITY } from "../repo/productionLoad.repo.js";
+import ProductionLoadRepository from "../repo/productionLoad.repo.js";
 import { UserRepository } from "../../users/repo/users.repo.js";
 
 function todayKey() {
@@ -80,7 +80,7 @@ export default class ProductionLoadService {
 
     return {
       date: dateKey,
-      ...summarize(details, capacity || LANYARD_DAILY_CAPACITY),
+      ...summarize(details, capacity),
       details,
     };
   }
@@ -95,12 +95,10 @@ export default class ProductionLoadService {
       throw error;
     }
 
-    const capacity = await this.repo.getCapacity();
     await this.repo.updateDailyLoads({
       dateKey,
       entries: normalizedEntries,
       userId: user.idUsuario,
-      capacity: capacity || LANYARD_DAILY_CAPACITY,
     });
 
     return this.getDailyLoad({ date: dateKey });

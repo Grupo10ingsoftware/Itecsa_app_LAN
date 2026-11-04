@@ -4,15 +4,7 @@ export const PAYMENT_STATUS = Object.freeze({
     RECHAZADO: "Rechazado",
 });
 
-export const ORDER_STATUS = Object.freeze({
-    CONFIRMACION_PAGO: "Confirmacion de pago",
-    LISTO_PRODUCCION: "Listo para produccion",
-    EN_PRODUCCION: "En produccion",
-    LISTO_ENTREGA: "Listo para entrega",
-    ENTREGADO: "Entregado",
-    CANCELADO: "Cancelado",
-    EN_REVISION: "En revisión",
-});
+export { ORDER_STATUS, ORDER_STATUS_ID } from "../../../shared/businessCatalog.js";
 
 export const PAYMENT_CONFIRMATION_REQUIRED_MESSAGE =
     "Pedido en espera de confirmacion de pago";

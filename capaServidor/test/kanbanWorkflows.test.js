@@ -88,7 +88,7 @@ test('reevaluation never deletes a line with progress/history and rejects ambigu
 function loadFixture({ product = 'Lanyard', stage = 2, quantity = 100, fail = false } = {}) {
   let statements = 0, values, committed = false;
   const prisma = { $transaction: async callback => {
-    const tx = { detalle_pedido: { findMany: async () => [{ id_detalle_pedido: 1, cantidad: quantity,
+    const tx = { tipo_Producto: { findUnique: async () => ({ capacidad_diaria: 1200 }) }, detalle_pedido: { findMany: async () => [{ id_detalle_pedido: 1, cantidad: quantity,
       Tipo_Producto: { nombre_producto: product }, Pedidos: { Estado_Pedido: { orden_kanban: stage } } }] },
     avance_Lanyard: { findMany: async ({ where }) => { assert.equal(where.fecha_produccion.lt.toISOString(), '2026-10-27T00:00:00.000Z');
       return [{ id_detalle_pedido: 1, cantidad_acumulada: 30 }]; } },

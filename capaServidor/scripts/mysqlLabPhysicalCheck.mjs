@@ -50,7 +50,8 @@ try {
       include: { Tipo_Producto: true },
     });
     assert.equal(detail?.Tipo_Producto?.nombre_producto, "Yoyo");
-    assert.equal(detail?.id_estado_subproceso, null);
+    assert.equal(detail?.id_tipo_producto, 3);
+    assert.equal(detail?.id_estado_subproceso, 10);
     checked = true;
     throw rollback;
   }, { timeout: 20000, maxWait: 10000 });
@@ -63,4 +64,4 @@ try {
   assert.deepEqual(after, before, "La comprobacion Yoyo dejo datos persistidos.");
 }
 
-console.log("MYSQL_LAB_PHYSICAL_CHECK: Yoyo conserva subproceso NULL y la transaccion fue revertida sin residuos.");
+console.log("MYSQL_LAB_PHYSICAL_CHECK: Yoyo=3 comienza en Ensamblado=10 y la transaccion fue revertida sin residuos.");

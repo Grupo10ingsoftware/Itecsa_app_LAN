@@ -1,3 +1,4 @@
+import { ORDER_STATUS_ID } from "../../../config/status.js";
 import { AppError } from "../../../errors/AppError.js";
 import MetricsRepository from "../repo/metrics.repo.js";
 
@@ -75,7 +76,7 @@ function buildSellerCompliance(orders) {
 
 function buildFlowTime(orders) {
     return orders.map((order) => {
-        const readyEvent = order.Registros.find((record) => record.Registro_Etapas?.Estado_Pedido?.nombre_etapa === "Listo para entrega");
+        const readyEvent = order.Registros.find((record) => record.Registro_Etapas?.Estado_Pedido?.id_estado_pedido === ORDER_STATUS_ID.LISTO_ENTREGA);
         const start = order.fecha_creacion ? new Date(order.fecha_creacion) : null;
         const end = readyEvent?.Registro_Etapas?.fecha_hora_entrada
             ? new Date(readyEvent.Registro_Etapas.fecha_hora_entrada)

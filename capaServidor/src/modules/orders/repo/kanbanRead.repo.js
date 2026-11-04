@@ -1,3 +1,4 @@
+import { ORDER_STATUS_ID } from "../../../config/status.js";
 import { Prisma } from '@prisma/client';
 
 // Each query has at most one expanding relation. Histories and product flows
@@ -25,7 +26,7 @@ function root(row) {
 }
 
 export async function listKanbanRows(client, { limit, cursor, status, search, productType, from, to, calendar = false, unscheduled = false }) {
-  const conditions = [calendar ? Prisma.sql`1=1` : Prisma.sql`ep.orden_kanban <> 4 AND ep.nombre_etapa NOT IN ('Terminado', 'Cancelado')`];
+  const conditions = [calendar ? Prisma.sql`1=1` : Prisma.sql`ep.id_estado_pedido NOT IN (${ORDER_STATUS_ID.TERMINADO}, ${ORDER_STATUS_ID.CANCELADO})`];
   if (calendar && unscheduled) conditions.push(Prisma.sql`p.fecha_estimada_termino IS NULL`);
   if (cursor) conditions.push(Prisma.sql`p.id_pedido < ${cursor.id}`);
   if (status) conditions.push(Prisma.sql`ep.nombre_etapa = ${status}`);

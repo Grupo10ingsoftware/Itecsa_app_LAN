@@ -1,3 +1,4 @@
+import { planMysqlLabCatalog } from "./mysqlLabSeed.js";
 import fs from "node:fs";
 import mariadb from "mariadb";
 import { createStrictTlsOptions, resolveDatabaseConnection } from "./connectionConfig.js";
@@ -148,6 +149,18 @@ export async function assertSafeMigrationState(connection, database) {
       "SELECT migration_name FROM _prisma_migrations WHERE finished_at IS NULL OR rolled_back_at IS NOT NULL",
     );
     if (failed.length) fail("el historial Prisma contiene migraciones fallidas o revertidas.");
+  }
+  const catalogTables = { estado_Pago: 'Estado_Pago', estado_Pedido: 'Estado_Pedido',
+    tipo_Producto: 'Tipo_Producto', etiqueta: 'etiqueta', estado_Subprocesos: 'Estado_Subprocesos', producto_Subproceso: 'Producto_Subproceso' };
+  let populated = false;
+  const client = Object.fromEntries(await Promise.all(Object.entries(catalogTables).map(async ([model, table]) => {
+    const rows = names.has(table) ? await connection.query(`SELECT * FROM \`${table}\``) : [];
+    if (rows.length) populated = true;
+    return [model, { findMany: async () => rows }];
+  })));
+  if (populated) {
+    const catalog = await planMysqlLabCatalog(client);
+    if (catalog.conflicts.length || catalog.creates.length) fail('catalogo existente incompatible; se requiere una instalacion nueva con volumen nuevo.');
   }
   return { fresh: !hasHistory, tableCount: applicationTables.length };
 }

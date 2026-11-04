@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { ORDER_STATUS } from '../../../config/status.js';
+import { ORDER_STATUS_ID } from '../../../config/status.js';
 
 // Keep individual rows and JS rounding: SQL collation/grouping and date arithmetic
 // need not have the same semantics as the public metrics calculations.
@@ -29,13 +29,13 @@ export const performanceQuery = ({ start, end }) => Prisma.sql`
  (SELECT e.fecha_hora_entrada FROM Registros r
  JOIN Registro_Etapas e ON e.id_registro=r.ID_REGISTRO
  JOIN Estado_Pedido s ON s.id_estado_pedido=e.id_estado_pedido
- WHERE r.id_pedido=p.id_pedido AND s.nombre_etapa=${ORDER_STATUS.LISTO_ENTREGA}
+ WHERE r.id_pedido=p.id_pedido AND s.id_estado_pedido=${ORDER_STATUS_ID.LISTO_ENTREGA}
  AND e.fecha_hora_entrada IS NOT NULL
  ORDER BY e.fecha_hora_entrada DESC, r.ID_REGISTRO DESC LIMIT 1) AS readyAt
  FROM Pedidos p WHERE EXISTS (SELECT 1 FROM Registros r
  JOIN Registro_Etapas e ON e.id_registro=r.ID_REGISTRO
  JOIN Estado_Pedido s ON s.id_estado_pedido=e.id_estado_pedido
- WHERE r.id_pedido=p.id_pedido AND s.nombre_etapa=${ORDER_STATUS.LISTO_ENTREGA}
+ WHERE r.id_pedido=p.id_pedido AND s.id_estado_pedido=${ORDER_STATUS_ID.LISTO_ENTREGA}
  AND e.fecha_hora_entrada>=${start} AND e.fecha_hora_entrada<${new Date(end.getTime()+86400000)})
  ORDER BY p.id_pedido`;
 
@@ -63,7 +63,7 @@ export function reportOrdersQuery({ start, end }) {
  JOIN Registro_Etapas first_e ON first_e.id_registro=first_r.ID_REGISTRO
  JOIN Estado_Pedido first_s ON first_s.id_estado_pedido=first_e.id_estado_pedido
  WHERE first_r.id_pedido=p.id_pedido
- AND CAST(first_s.nombre_etapa AS BINARY)=CAST(${ORDER_STATUS.LISTO_ENTREGA} AS BINARY)
+ AND first_s.id_estado_pedido=${ORDER_STATUS_ID.LISTO_ENTREGA}
  ORDER BY first_r.FECHA_HORA,first_r.ID_REGISTRO LIMIT 1)
  JOIN Registro_Etapas e ON e.id_registro=r.ID_REGISTRO
  JOIN Estado_Pedido s ON s.id_estado_pedido=e.id_estado_pedido
@@ -80,6 +80,6 @@ export async function readReportOrders(client, range) {
   Detalle_pedido:[],Registros:[],
  }]));
  for(const d of rows)if(Number(d.kind)===1)byId.get(d.id_pedido).Detalle_pedido.push({cantidad:d.cantidad,fecha_estimada_termino:d.fecha_estimada_termino,fecha_real_termino:d.fecha_real_termino,Tipo_Producto:d.nombre_producto==null?null:{nombre_producto:d.nombre_producto}});
- for(const e of rows)if(Number(e.kind)===2)byId.get(e.id_pedido).Registros.push({FECHA_HORA:e.sortDate,Registro_Etapas:{fecha_hora_entrada:e.fecha_hora_entrada,Estado_Pedido:{nombre_etapa:e.nombre_etapa}}});
+ for(const e of rows)if(Number(e.kind)===2)byId.get(e.id_pedido).Registros.push({FECHA_HORA:e.sortDate,Registro_Etapas:{fecha_hora_entrada:e.fecha_hora_entrada,Estado_Pedido:{id_estado_pedido:ORDER_STATUS_ID.LISTO_ENTREGA,nombre_etapa:e.nombre_etapa}}});
  return [...byId.values()];
 }

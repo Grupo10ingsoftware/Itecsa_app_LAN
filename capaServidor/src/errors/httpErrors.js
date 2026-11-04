@@ -39,7 +39,16 @@ export function requestContext(req, res, next) {
     next();
 }
 
+const CATALOG_ERRORS = Object.freeze({
+    INVALID_ORDER_CATALOG: 'Configuracion inconsistente: falta un estado valido del pedido.',
+    INVALID_PRODUCT_FLOW: 'Configuracion inconsistente: el flujo del producto esta incompleto o es incompatible.',
+    INVALID_PRODUCTION_CAPACITY: 'Configuracion inconsistente: la capacidad de Lanyard no es valida.',
+});
+
 function publicError(error) {
+    if (error instanceof AppError && error.statusCode === 500 && Object.hasOwn(CATALOG_ERRORS, error.code)) {
+        return { status: 500, code: error.code, message: CATALOG_ERRORS[error.code] };
+    }
     if (error?.code === 'SALES_NOTE_SOURCE_UNAVAILABLE' || error?.code === 'EXTERNAL_SALES_NOTE_SOURCE_UNAVAILABLE') {
         return { status: 503, code: 'SALES_NOTE_SOURCE_UNAVAILABLE', message: 'La fuente de Notas de Venta no esta disponible.' };
     }

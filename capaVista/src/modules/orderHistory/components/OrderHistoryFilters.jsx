@@ -1,14 +1,15 @@
+import { ORDER_STATUS } from '../../../../../shared/businessCatalog.js'
 import FilterPanel from '../../../shared/components/filters/FilterPanel'
 import { FilterChipGroup, FilterDateRange, FilterRow, FilterSearch } from '../../../shared/components/filters/FilterControls'
 
 const STATUS_FILTERS = [
   { label: 'Todos', value: '' },
-  { label: 'Confirmación de Pago', value: 'Confirmación de Pago' },
-  { label: 'Listo para producción', value: 'Listo para Producción' },
-  { label: 'En producción', value: 'En producción' },
-  { label: 'Listo para entrega', value: 'Listo para Entrega' },
-  { label: 'Finalizado', value: 'Terminado' },
-  { label: 'Cancelado', value: 'Cancelado' },
+  { label: 'Confirmación de Pago', value: ORDER_STATUS.CONFIRMACION_PAGO },
+  { label: 'Listo para producción', value: ORDER_STATUS.LISTO_PRODUCCION },
+  { label: 'En producción', value: ORDER_STATUS.EN_PRODUCCION },
+  { label: 'Listo para entrega', value: ORDER_STATUS.LISTO_ENTREGA },
+  { label: 'Terminado', value: ORDER_STATUS.TERMINADO },
+  { label: 'Cancelado', value: ORDER_STATUS.CANCELADO },
 ]
 
 export default function OrderHistoryFilters({ value, onChange, onApply, onClear, error, loading }) {

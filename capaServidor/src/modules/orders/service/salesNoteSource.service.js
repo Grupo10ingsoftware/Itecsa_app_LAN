@@ -12,11 +12,8 @@ const DEFAULT_FIXTURE_PATH = path.resolve(
 );
 const fixtureRepositories = new Set();
 
-export const PRODUCT_TYPE = Object.freeze({
-  YOYO: "Yoyo",
-  LANYARD: "Lanyard",
-  TARJETA: "Tarjeta",
-});
+import { PRODUCT_TYPE } from "../../../../../shared/businessCatalog.js";
+export { PRODUCT_TYPE };
 
 function normalizeText(value) {
   return typeof value === "string" ? value.trim() : "";

@@ -40,7 +40,7 @@ for(const failAt of ['order.findFirst','client.create','label.findMany','order.c
 test('snapshot identity and repeated lines remain exact, accessories never become productive details',async()=>{
  const note=sourceNote({lines:5,accessories:5}),h=creationHarness();await service(h,SalesOrderCreationService,note).create(input,options);
  const state=h.state(),snapshots=createLineSnapshots(note.items);
- state.details.forEach((d,i)=>{for(const [key,value]of Object.entries(snapshots[i]))assert.equal(d[key],value);assert.equal(d.cantidad,note.items[i].cantidad);assert.equal(d.id_estado_subproceso,10);});
+ state.details.forEach((d,i)=>{for(const [key,value]of Object.entries(snapshots[i]))assert.equal(d[key],value);assert.equal(d.cantidad,note.items[i].cantidad);assert.equal(d.id_estado_subproceso,1);});
  assert.equal(state.accessories.length,5);assert.equal(state.details.length,5);
  assert.deepEqual(state.records[0].FECHA_HORA,state.stages[0].fecha_hora_entrada);assert.equal(state.records[0].id_usuario,9);assert.equal(state.orders[0].id_usuario,9);
 });
@@ -61,7 +61,7 @@ for(const snapshots of [false,true])test(`snapshot schema compatibility is retai
 
 for(const config of [{noSubprocess:true},{noRecipients:true},{missingLabel:true},{missingType:true},{shortBatch:true}])test(`creation boundary ${JSON.stringify(config)}`,async()=>{
  const h=creationHarness(config);
- if(config.missingLabel||config.missingType||config.shortBatch){await assert.rejects(service(h).create(input,options));assert.equal(h.state().orders.length,0);}
+ if(config.noSubprocess||config.missingLabel||config.missingType||config.shortBatch){await assert.rejects(service(h).create(input,options));assert.equal(h.state().orders.length,0);}
  else{await service(h).create(input,options);if(config.noSubprocess)assert.equal(h.state().details[0].id_estado_subproceso,null);if(config.noRecipients){assert.equal(h.state().messages.length,0);assert.equal(h.state().assignments.length,0);}}
 });
 
@@ -102,10 +102,10 @@ test('batches are all-or-fail and do not request skipDuplicates or generated-ID 
  await assert.rejects(createCreationDetailsOperation({client},1,[{id_tipo_producto:2}]),{statusCode:400});
 });
 
-test('product projection is parameterized and missing catalog retains the 404',async()=>{
- let query;const client={$queryRaw:async(input,...values)=>{query={text:input.join('?'),values};return[];}};
- await assert.rejects(getCreationProductContextOperation({client},"Lanyard' OR 1=1"),{statusCode:404});
- assert(!query.text.includes("Lanyard'"));assert.deepEqual(query.values,["Lanyard' OR 1=1"]);
+test('product projection rejects missing configuration and passes the name as data',async()=>{
+ let query;const client={tipo_Producto:{findFirst:async input=>{query=input;return null;}}};
+ await assert.rejects(getCreationProductContextOperation({client},"Lanyard' OR 1=1"),{statusCode:500});
+ assert.deepEqual(query.where,{nombre_producto:"Lanyard' OR 1=1"});
 });
 
 test('source normalization preserves classification, line order, duplicates and untracked quantities',()=>{
