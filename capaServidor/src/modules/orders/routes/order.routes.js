@@ -9,7 +9,7 @@ import requireAdministratorRole from "../../../middlewares/requireAdministratorR
 import requireSalesRole from "../../../middlewares/requireSalesRole.js";
 import OrderController from "../controller/orders.controller.js";
 import orderDetailRoutes from "./orderDetail.routes.js";
-import paymentRecordRoutes from "../../payments/routes/paymentRecord.routes.js";
+import { createPaymentRecordRouter } from "../../payments/routes/paymentRecord.routes.js";
 
 export function createOrderRouter({
     authenticate = checkJwt,
@@ -61,7 +61,7 @@ export function createOrderRouter({
     router.get("/payments", authenticate, requireCapability(P.READ_PAYMENTS), routeController.getPaymentWorkspace);
     router.get("/sales-notes/:numeroNota", authenticate, requireCapability(P.READ_SALES_NOTES), routeController.getSalesNote);
     router.use("/:orderId/details", orderDetailRoutes);
-    router.use("/:orderId/payment-records", paymentRecordRoutes);
+    router.use("/:orderId/payment-records", createPaymentRecordRouter());
     router.get("/:orderId/kanban-detail", authenticate, requireCapability(P.READ_ORDERS), routeController.getKanbanDetail);
     router.get("/:orderId/kanban-precheck", authenticate, requireCapability(P.READ_ORDERS), routeController.getKanbanPrecheck);
     router.get("/:orderId/calendar-detail", authenticate, requireCapability(P.READ_CALENDAR), routeController.getCalendarDetail);

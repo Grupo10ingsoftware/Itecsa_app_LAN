@@ -33,7 +33,9 @@
     "keycloak:mysql-bootstrap": "node scripts/keycloakMysqlBootstrap.mjs",
     "keycloak:mysql-backup": "node scripts/keycloakMysqlBackup.mjs backup",
     "keycloak:mysql-restore": "node scripts/keycloakMysqlBackup.mjs restore",
-    "keycloak:first-user": "node scripts/keycloakFirstUser.mjs"
+    "keycloak:first-user": "node scripts/keycloakFirstUser.mjs",
+    "test:manager": "node --test test/managerConnection.test.js test/managerSalesNoteSource.test.js",
+    "manager:verify": "node scripts/managerVerify.mjs"
   },
   "nodemonConfig": {
     "watch": [
@@ -57,7 +59,8 @@
     "express": "^5.2.1",
     "express-oauth2-jwt-bearer": "^1.10.0",
     "jose": "4.15.9",
-    "mariadb": "3.5.4"
+    "mariadb": "3.5.4",
+    "mssql": "^12.7.13"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

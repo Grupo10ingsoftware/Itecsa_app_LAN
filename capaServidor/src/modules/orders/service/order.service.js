@@ -15,7 +15,8 @@ import ProductTypeService from '../../products/service/product.service.js';
 import PaymentRecordService from '../../payments/service/paymentRecord.service.js';
 import PaymentStatusRepo from '../../payments/repo/paymentStatus.repo.js';
 import defaultUserRepository from '../../users/repo/users.repo.js';
-import SalesNoteSourceService, { normalizeSalesNoteNumber } from './salesNoteSource.service.js';
+import { normalizeSalesNoteNumber } from './salesNoteSource.service.js';
+import { createSalesNoteSource } from './salesNoteSourceFactory.js';
 import getPrismaClient from '../../../database/prisma.js';
 import ClientRepo from '../../clients/repo/clients.repo.js';
 import OrderDetailRepo from '../repo/orderDetail.repo.js';
@@ -43,15 +44,17 @@ class OrderService {
     prisma,
     salesOrderTransaction,
   } = {}) {
+    const resolvedSalesNoteSource = salesNoteSourceService ?? createSalesNoteSource();
     this.repo = repo ?? new OrderRepository();
     this.clientService = clientService ?? new ClientService();
     this.orderDetailService = orderDetailService ?? new OrderDetailService();
     this.productTypeService = productTypeService ?? new ProductTypeService();
-    this.paymentRecordService = paymentRecordService ?? new PaymentRecordService();
+    this.paymentRecordService = paymentRecordService ?? new PaymentRecordService({
+      salesNoteSourceService: resolvedSalesNoteSource,
+    });
     this.paymentRepo = paymentRepo ?? new PaymentStatusRepo();
     this.userRepo = userRepo ?? defaultUserRepository;
-    this.salesNoteSourceService =
-      salesNoteSourceService ?? new SalesNoteSourceService();
+    this.salesNoteSourceService = resolvedSalesNoteSource;
     this.repoClient = repoClient ?? null;
     this.prisma = prisma;
     this.salesOrderTransaction = salesOrderTransaction;
@@ -102,6 +105,7 @@ class OrderService {
         }),
         paymentRecordService: new PaymentRecordService({
           repo: new PaymentRecordRepo({ prisma: tx }),
+          salesNoteSourceService: this.salesNoteSourceService,
         }),
         paymentRepo: new PaymentStatusRepo({ prisma: tx }),
         repoClient: tx,

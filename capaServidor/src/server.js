@@ -10,7 +10,7 @@ import { createInternalHealthRouter } from './modules/health/routes/health.route
 import productionCapacityRoutes from './modules/productionCapacity/routes/productionCapacity.routes.js';
 import productionLoadRoutes from './modules/productionLoad/routes/productionLoad.routes.js';
 
-import orderRoutes from './modules/orders/routes/order.routes.js';
+import { createOrderRouter } from './modules/orders/routes/order.routes.js';
 import orderDetailRoutes from './modules/orders/routes/orderDetail.routes.js';
 import orderStatusRoutes from './modules/orders/routes/orderStatus.routes.js';
 
@@ -120,7 +120,7 @@ class Server {
     this.app.use('/api/privacy', createPrivacyRouter({ controller: new PrivacyController({ service: new PrivacyRequestService({ env: this.env }) }) }));
 
     // Configurar rutas
-    this.app.use(this.paths.orders, orderRoutes)
+    this.app.use(this.paths.orders, createOrderRouter())
     this.app.use(
       this.paths.auth,
       createAuthRouter({

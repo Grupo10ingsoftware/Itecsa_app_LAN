@@ -1,6 +1,6 @@
 import { AppError } from "../../../errors/AppError.js";
 import PaymentRecordRepo from "../repo/paymentRecord.repo.js";
-import SalesNoteSourceService from "../../orders/service/salesNoteSource.service.js";
+import { createSalesNoteSource } from "../../orders/service/salesNoteSourceFactory.js";
 import { paymentId } from './paymentId.js';
 
 function normalizeText(value) {
@@ -89,7 +89,7 @@ class PaymentRecordService {
   constructor({ repo, salesNoteSourceService } = {}) {
     this.repo = repo ?? new PaymentRecordRepo();
     this.salesNoteSourceService =
-      salesNoteSourceService ?? new SalesNoteSourceService();
+      salesNoteSourceService ?? createSalesNoteSource();
   }
 
   async createPaymentRecord(orderId, data) {
