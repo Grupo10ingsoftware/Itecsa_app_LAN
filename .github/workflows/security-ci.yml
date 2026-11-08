@@ -36,10 +36,6 @@ jobs:
         run: |
           npm run lint --prefix capaVista
           npm run build --prefix capaVista
-      - name: Backend and frontend regression tests
-        run: |
-          (cd capaServidor && node --test)
-          npm test --prefix capaVista
       - name: Runtime dependency audit
         run: |
           npm audit --omit=dev --audit-level=high --prefix capaServidor

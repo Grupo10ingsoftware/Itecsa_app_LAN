@@ -37,6 +37,7 @@ pnpm-debug.log*
 
 # Build / cobertura
 dist/
+tmp/
 capaVista/**/dist-ssr/
 capaServidor/**/build/
 capaServidor/**/coverage/

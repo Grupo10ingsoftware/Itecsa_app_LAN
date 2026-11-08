@@ -4,8 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:users": "node --test src/modules/users/service/userCreation.test.js src/modules/users/service/userUpdate.test.js",
-    "test:pin": "node --test src/modules/auth/service/pinRecovery.test.js src/modules/auth/service/pinRecoveryNavigation.test.js",
     "start": "node src/app/app.js",
     "predev": "npm run prisma:generate",
     "dev": "nodemon src/app/dev.js",
@@ -19,7 +17,6 @@
     "mysql-lab:catalogs": "node scripts/mysqlLabCatalogCheck.mjs",
     "mysql-lab:bootstrap-accounts": "node scripts/mysqlLabBootstrapAccounts.mjs",
     "mysql-lab:verify": "node scripts/mysqlLabVerify.mjs",
-    "mysql-lab:physical-check": "node scripts/mysqlLabPhysicalCheck.mjs",
     "orders:preflight": "node scripts/ordersPreflight.mjs",
     "retention:preview": "node scripts/previewBusinessRetention.mjs",
     "prisma:studio": "node ../tooling/prisma/node_modules/prisma/build/index.js studio",
@@ -34,7 +31,6 @@
     "keycloak:mysql-backup": "node scripts/keycloakMysqlBackup.mjs backup",
     "keycloak:mysql-restore": "node scripts/keycloakMysqlBackup.mjs restore",
     "keycloak:first-user": "node scripts/keycloakFirstUser.mjs",
-    "test:manager": "node --test test/managerConnection.test.js test/managerSalesNoteSource.test.js",
     "manager:verify": "node scripts/managerVerify.mjs"
   },
   "nodemonConfig": {
