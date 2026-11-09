@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { RECOGNIZED_ROLES, BUSINESS_PERMISSIONS, ROLE_PERMISSIONS } from '../../shared/keycloakAuthorization.js';
-import { validateOrigin, managementRoles, usernameMapper } from './render-realm.mjs';
+import { validateOrigin, managementRoles, usernameMapper, registrationDateMapper } from './render-realm.mjs';
 
 const fail = message => { throw Error('KEYCLOAK_BOOTSTRAP: ' + message); };
 const sameUser = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
@@ -79,16 +79,19 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
     request('/clients/' + web + '/protocol-mappers/models'),
     request('/clients/' + web + '/default-client-scopes'),
   ]);
-  const expectedUsername = usernameMapper();
-  const currentUsername = webMappers.find(value => value.name === expectedUsername.name);
-  const matchesUsername = value => value?.protocol === expectedUsername.protocol
-    && value.protocolMapper === expectedUsername.protocolMapper
+  const expectedProfileMappers = [usernameMapper(), registrationDateMapper()];
+  const matchesProfileMapper = (value, expected) => value?.protocol === expected.protocol
+    && value.protocolMapper === expected.protocolMapper
     && value.consentRequired === false
-    && equal(Object.keys(value.config ?? {}), Object.keys(expectedUsername.config))
-    && Object.entries(expectedUsername.config).every(([key, expected]) => value.config[key] === expected);
-  if (currentUsername && !matchesUsername(currentUsername)) {
-    fail('mapper Username incompatible; revisar su propiedad, claim y destinos antes de continuar');
+    && equal(Object.keys(value.config ?? {}), Object.keys(expected.config))
+    && Object.entries(expected.config).every(([key, setting]) => value.config[key] === setting);
+  for (const expected of expectedProfileMappers) {
+    const current = webMappers.filter(value => value.name === expected.name);
+    if (current.length > 1 || (current.length === 1 && !matchesProfileMapper(current[0], expected))) {
+      fail(`mapper ${expected.name} incompatible; revisar su propiedad, claim y destinos antes de continuar`);
+    }
   }
+  const missingProfileMappers = expectedProfileMappers.filter(expected => !webMappers.some(value => value.name === expected.name));
   const callback = origin + '/auth/pin-recovery/callback';
   const mapper = name => webMappers.find(value => value.name === name);
   if (!equal(webConfig.redirectUris ?? [], [origin, origin + '/*']) ||
@@ -96,7 +99,7 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
       webConfig.publicClient !== true || webConfig.directAccessGrantsEnabled !== false ||
       !webScopes.some(scope => scope.name === 'basic') ||
       !equal(webMappers.map(value => value.name), ['Application roles', 'ITECSA permissions', 'API audience',
-        ...(currentUsername ? [expectedUsername.name] : [])]) ||
+        ...expectedProfileMappers.filter(expected => !missingProfileMappers.includes(expected)).map(expected => expected.name)]) ||
       mapper('Application roles')?.config?.['claim.name'] !== 'resource_access.itecsa-api-v1.roles' ||
       mapper('ITECSA permissions')?.config?.['claim.name'] !== 'permissions' ||
       mapper('API audience')?.config?.['included.custom.audience'] !== 'https://api.itecsa.local' ||
@@ -106,8 +109,8 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
       adminConfig.serviceAccountsEnabled !== true || adminConfig.publicClient !== false) {
     fail('clients, scopes, mappers o callback inesperados');
   }
-  if (!currentUsername && readOnly) {
-    fail('falta mapper Username; aplicar manage.sh keycloak-configure y volver a iniciar sesion');
+  if (missingProfileMappers.length && readOnly) {
+    fail(`faltan mappers ${missingProfileMappers.map(value => value.name).join(', ')}; aplicar manage.sh keycloak-configure y volver a iniciar sesion`);
   }
   const [roles, capabilities, management] = await Promise.all([
     request('/clients/' + rolesClient + '/roles?max=1000'),
@@ -123,13 +126,16 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
   }
   const allowed = management.filter(role => managementRoles.includes(role.name));
   if (allowed.length !== managementRoles.length) fail('permisos de administracion incompletos');
-  if (!currentUsername) {
-    // Upgrade the known basic-only contract without replacing clients, scopes or users.
-    await request('/clients/' + web + '/protocol-mappers/models', 'POST', expectedUsername);
+  const confirmedMapperNames = webMappers.map(value => value.name);
+  for (const expected of missingProfileMappers) {
+    // Extend the known profile contract without replacing clients, scopes or users.
+    await request('/clients/' + web + '/protocol-mappers/models', 'POST', expected);
+    confirmedMapperNames.push(expected.name);
     const actual = await request('/clients/' + web + '/protocol-mappers/models');
-    if (!equal(actual.map(value => value.name), [...webMappers.map(value => value.name), expectedUsername.name])
-        || !matchesUsername(actual.find(value => value.name === expectedUsername.name))) {
-      fail('no se pudo verificar el mapper Username aplicado');
+    if (!equal(actual.map(value => value.name), confirmedMapperNames)
+        || expectedProfileMappers.filter(value => confirmedMapperNames.includes(value.name))
+          .some(value => !matchesProfileMapper(actual.find(mapper => mapper.name === value.name), value))) {
+      fail(`no se pudo verificar el mapper ${expected.name} aplicado`);
     }
   }
   await ensureRoles('/clients/' + web + '/scope-mappings/clients/' + rolesClient, roles);

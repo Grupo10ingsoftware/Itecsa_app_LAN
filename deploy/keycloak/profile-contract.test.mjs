@@ -16,13 +16,23 @@ const expectedUsernameMapper = {
     'userinfo.token.claim': 'false', 'introspection.token.claim': 'false',
   },
 };
+const expectedRegistrationMapper = {
+  name: 'Account creation date', protocol: 'openid-connect', protocolMapper: 'oidc-usermodel-property-mapper',
+  consentRequired: false,
+  config: {
+    'user.attribute': 'createdTimestamp', 'claim.name': 'itecsa_account_created_at_ms', 'jsonType.label': 'long',
+    'access.token.claim': 'true', 'id.token.claim': 'false',
+    'userinfo.token.claim': 'false', 'introspection.token.claim': 'false',
+  },
+};
+const profileMappers = [expectedUsernameMapper, expectedRegistrationMapper];
 const legacyMappers = [
   { id: 'application-roles', name: 'Application roles', config: { 'claim.name': 'resource_access.itecsa-api-v1.roles' } },
   { id: 'permissions', name: 'ITECSA permissions', config: { 'claim.name': 'permissions' } },
   { id: 'audience', name: 'API audience', config: { 'included.custom.audience': 'https://api.itecsa.local' } },
 ];
 const mapperPath = '/admin/realms/itecsa/clients/web/protocol-mappers/models';
-const configuredMapper = () => ({ id: 'username', ...structuredClone(expectedUsernameMapper) });
+const configuredMapper = mapper => ({ id: 'configured-' + mapper.name, ...structuredClone(mapper) });
 const env = {
   PUBLIC_ORIGIN: origin,
   KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME: 'temporary-fixture',
@@ -32,11 +42,11 @@ const env = {
 };
 const json = (value, status = 200) => Response.json(value, { status });
 
-function fixture({ usernameMappers = [], createStatus = 201, persistCreated = true, alterCreated, alterLegacy } = {}) {
+function fixture({ existingMappers = [], createStatus = 201, persistCreated = true, alterCreated, alterLegacy } = {}) {
   const calls = [];
   const mappers = structuredClone(legacyMappers);
   alterLegacy?.(mappers);
-  mappers.push(...structuredClone(usernameMappers));
+  mappers.push(...structuredClone(existingMappers));
   const clients = {
     'itecsa-web': { id: 'web', clientId: 'itecsa-web', publicClient: true, directAccessGrantsEnabled: false,
       redirectUris: [origin, origin + '/*'], attributes: { 'pkce.code.challenge.method': 'S256' } },
@@ -79,11 +89,13 @@ function fixture({ usernameMappers = [], createStatus = 201, persistCreated = tr
     const body = options.body === undefined ? undefined : JSON.parse(options.body);
     calls.push({ method, pathname, ...(body === undefined ? {} : { body }) });
     if (pathname === mapperPath && method === 'POST') {
-      assert.deepEqual(body, expectedUsernameMapper, 'only the intended username mapper may be created');
+      const expected = profileMappers.find(mapper => mapper.name === body?.name);
+      assert.ok(expected, 'only the two intended profile mappers may be created');
+      assert.deepEqual(body, expected);
       if (createStatus >= 400) return json({ error: 'fixture request failure' }, createStatus);
       if (persistCreated) {
-        const created = { id: 'created-username', ...structuredClone(body) };
-        alterCreated?.(created);
+        const created = { id: 'created-' + body.name, ...structuredClone(body) };
+        alterCreated?.(created, mappers);
         mappers.push(created);
       }
       return new Response(null, { status: createStatus });
@@ -128,46 +140,63 @@ function fixture({ usernameMappers = [], createStatus = 201, persistCreated = tr
   return { calls, mappers, fetcher, mutations };
 }
 
-test('new realm exposes only username in the web access token without broadening public scopes', () => {
+test('new realm exposes username and account creation date only in the web access token without broadening scopes', () => {
   const realm = buildRealm({ origin, adminClientSecret: 'fixture-'.repeat(5) });
   const web = realm.clients.find(client => client.clientId === 'itecsa-web');
-  const username = web.protocolMappers.filter(mapper => mapper.name === 'Username');
-  assert.deepEqual(username, [expectedUsernameMapper]);
-  assert.deepEqual(web.protocolMappers.map(mapper => mapper.name).sort(), ['API audience', 'Application roles', 'ITECSA permissions', 'Username']);
+  for (const expected of profileMappers) {
+    assert.deepEqual(web.protocolMappers.filter(mapper => mapper.name === expected.name), [expected]);
+  }
+  assert.deepEqual(web.protocolMappers.map(mapper => mapper.name).sort(),
+    ['API audience', 'Account creation date', 'Application roles', 'ITECSA permissions', 'Username']);
   for (const client of realm.clients.filter(client => client.publicClient)) {
     assert.deepEqual(client.defaultClientScopes, ['basic']);
     assert.deepEqual(client.optionalClientScopes, []);
     assert.equal(client.fullScopeAllowed, false);
     assert.equal(client.directAccessGrantsEnabled, false);
   }
+  const profileClaims = profileMappers.map(mapper => mapper.config['claim.name']);
   for (const client of realm.clients.filter(client => client.clientId !== 'itecsa-web')) {
-    assert.ok(!client.protocolMappers?.some(mapper => mapper.config?.['claim.name'] === 'preferred_username'));
+    assert.ok(!client.protocolMappers?.some(mapper => profileClaims.includes(mapper.config?.['claim.name'])));
   }
   assert.equal(realm.editUsernameAllowed, false);
 });
 
-test('check detects an existing realm missing username without changing configuration', async () => {
-  const state = fixture();
-  await assert.rejects(bootstrap(env, state.fetcher, { readOnly: true }), /KEYCLOAK_BOOTSTRAP/);
-  assert.deepEqual(state.mutations(), []);
-  assert.deepEqual(state.mappers, legacyMappers);
-});
+const incompleteConfigurations = [
+  ['both profile mappers', []],
+  ['account creation date', [expectedUsernameMapper]],
+  ['username', [expectedRegistrationMapper]],
+];
+for (const [label, existing] of incompleteConfigurations) {
+  test(`check detects missing ${label} without changing the existing realm`, async () => {
+    const state = fixture({ existingMappers: existing.map(configuredMapper) });
+    const before = structuredClone(state.mappers);
+    await assert.rejects(bootstrap(env, state.fetcher, { readOnly: true }), /KEYCLOAK_BOOTSTRAP/);
+    assert.deepEqual(state.mutations(), []);
+    assert.deepEqual(state.mappers, before);
+  });
 
-test('existing realm receives one mapper, confirms readback, and is idempotent on configure and check', async () => {
-  const state = fixture();
-  await bootstrap(env, state.fetcher);
-  assert.deepEqual(state.mutations(), [{ method: 'POST', pathname: mapperPath, body: expectedUsernameMapper }]);
-  assert.deepEqual(state.mappers.slice(0, legacyMappers.length), legacyMappers);
-  assert.equal(state.mappers.filter(mapper => mapper.name === 'Username').length, 1);
-  const createdAt = state.calls.findIndex(call => call.method === 'POST' && call.pathname === mapperPath);
-  assert.ok(state.calls.slice(createdAt + 1).some(call => call.method === 'GET' && call.pathname === mapperPath), 'the newly created mapper must be read back');
-  await bootstrap(env, state.fetcher);
-  await bootstrap(env, state.fetcher, { readOnly: true });
-  assert.equal(state.mutations().length, 1, 'repeated runs must not create, update, or duplicate configuration');
-});
+  test(`configure adds missing ${label}, confirms readback, and is idempotent`, async () => {
+    const state = fixture({ existingMappers: existing.map(configuredMapper) });
+    const before = structuredClone(state.mappers);
+    const missing = profileMappers.filter(mapper => !existing.includes(mapper));
+    await bootstrap(env, state.fetcher);
+    assert.deepEqual(state.mutations(), missing.map(body => ({ method: 'POST', pathname: mapperPath, body })));
+    assert.deepEqual(state.mappers.slice(0, before.length), before, 'existing mappers remain intact');
+    for (const expected of profileMappers) {
+      assert.equal(state.mappers.filter(mapper => mapper.name === expected.name).length, 1);
+    }
+    const lastCreation = state.calls.findLastIndex(call => call.method === 'POST' && call.pathname === mapperPath);
+    assert.ok(state.calls.slice(lastCreation + 1).some(call => call.method === 'GET' && call.pathname === mapperPath),
+      'the final mapper configuration must be read back');
+    await bootstrap(env, state.fetcher);
+    await bootstrap(env, state.fetcher, { readOnly: true });
+    assert.equal(state.mutations().length, missing.length, 'repeated runs must not mutate configuration');
+  });
+}
 
-test('check accepts an already configured mapper returned with a server identifier', async () => {
-  const state = fixture({ usernameMappers: [configuredMapper()] });
+test('configure and check accept both already configured profile mappers with server identifiers', async () => {
+  const state = fixture({ existingMappers: profileMappers.map(configuredMapper) });
+  await bootstrap(env, state.fetcher);
   await bootstrap(env, state.fetcher, { readOnly: true });
   assert.deepEqual(state.mutations(), []);
 });
@@ -179,58 +208,93 @@ const incompatibleMappers = [
   ['user property', mapper => { mapper.config['user.attribute'] = 'email'; }],
   ['claim name', mapper => { mapper.config['claim.name'] = 'email'; }],
   ['JSON type', mapper => { mapper.config['jsonType.label'] = 'boolean'; }],
+  ['missing property', mapper => { delete mapper.config['user.attribute']; }],
+  ['unexpected config', mapper => { mapper.config.multivalued = 'true'; }],
   ['missing access token claim', mapper => { mapper.config['access.token.claim'] = 'false'; }],
   ['extra ID token disclosure', mapper => { mapper.config['id.token.claim'] = 'true'; }],
   ['extra userinfo disclosure', mapper => { mapper.config['userinfo.token.claim'] = 'true'; }],
   ['extra introspection disclosure', mapper => { mapper.config['introspection.token.claim'] = 'true'; }],
 ];
-for (const [label, alter] of incompatibleMappers) {
-  test(`incompatible Username mapper (${label}) fails without changing realm in either mode`, async () => {
+for (const expected of profileMappers) {
+  for (const [label, alter] of incompatibleMappers) {
+    test(`incompatible ${expected.name} mapper (${label}) fails without changing the realm in either mode`, async () => {
+      for (const readOnly of [true, false]) {
+        const mapper = configuredMapper(expected);
+        alter(mapper);
+        const existingMappers = profileMappers.map(value => value === expected ? mapper : configuredMapper(value));
+        const state = fixture({ existingMappers });
+        const before = structuredClone(state.mappers);
+        await assert.rejects(bootstrap(env, state.fetcher, { readOnly }), /KEYCLOAK_BOOTSTRAP/);
+        assert.deepEqual(state.mutations(), []);
+        assert.deepEqual(state.mappers, before);
+      }
+    });
+  }
+
+  test(`duplicate ${expected.name} mappers are rejected in either mode`, async () => {
     for (const readOnly of [true, false]) {
-      const mapper = configuredMapper();
-      alter(mapper);
-      const state = fixture({ usernameMappers: [mapper] });
+      const state = fixture({ existingMappers: [...profileMappers.map(configuredMapper),
+        { ...configuredMapper(expected), id: 'duplicate' }] });
       await assert.rejects(bootstrap(env, state.fetcher, { readOnly }), /KEYCLOAK_BOOTSTRAP/);
       assert.deepEqual(state.mutations(), []);
-      assert.deepEqual(state.mappers.at(-1), mapper);
     }
+  });
+
+  test(`an unrelated mapper claiming ${expected.config['claim.name']} is rejected without adding a competitor`, async () => {
+    const state = fixture({ existingMappers: [{ ...configuredMapper(expected), name: 'Unexpected mapper' }] });
+    await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP/);
+    assert.deepEqual(state.mutations(), []);
+  });
+
+  test(`incompatible ${expected.name} is detected before adding the other missing mapper`, async () => {
+    const mapper = configuredMapper(expected);
+    mapper.config['user.attribute'] = 'email';
+    const state = fixture({ existingMappers: [mapper] });
+    await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP/);
+    assert.deepEqual(state.mutations(), []);
+  });
+
+  const other = profileMappers.filter(value => value !== expected).map(configuredMapper);
+  test(`failed creation of ${expected.name} does not report a configured realm`, async () => {
+    const state = fixture({ existingMappers: other, createStatus: 500 });
+    const before = structuredClone(state.mappers);
+    await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP.*HTTP 500/);
+    assert.equal(state.mutations().length, 1);
+    assert.deepEqual(state.mappers, before);
+  });
+
+  test(`creation of ${expected.name} without persistence is rejected by readback`, async () => {
+    const state = fixture({ existingMappers: other, persistCreated: false });
+    const before = structuredClone(state.mappers);
+    await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP/);
+    assert.equal(state.mutations().length, 1);
+    assert.deepEqual(state.mappers, before);
+  });
+
+  test(`incorrect ${expected.name} property after creation is rejected by readback`, async () => {
+    const state = fixture({ existingMappers: other, alterCreated(mapper) { mapper.config['user.attribute'] = 'email'; } });
+    await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP/);
+    assert.equal(state.mutations().length, 1);
   });
 }
 
-test('duplicate Username mappers are rejected instead of selecting one arbitrarily', async () => {
-  const state = fixture({ usernameMappers: [configuredMapper(), { ...configuredMapper(), id: 'duplicate' }] });
+test('account creation date uses the lowercase long JSON type required by Keycloak', async () => {
+  const mapper = configuredMapper(expectedRegistrationMapper);
+  mapper.config['jsonType.label'] = 'Long';
+  const state = fixture({ existingMappers: [configuredMapper(expectedUsernameMapper), mapper] });
   await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP/);
   assert.deepEqual(state.mutations(), []);
 });
 
-test('an unrelated mapper claiming preferred_username is rejected without adding a competing mapper', async () => {
-  const state = fixture({ usernameMappers: [{ ...configuredMapper(), name: 'Unexpected username mapper' }] });
-  await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP/);
-  assert.deepEqual(state.mutations(), []);
-});
-
-test('incompatible existing audience is rejected before attempting the username addition', async () => {
+test('incompatible existing audience is rejected before attempting profile mapper additions', async () => {
   const state = fixture({ alterLegacy(mappers) { mappers.find(mapper => mapper.name === 'API audience').config['included.custom.audience'] = 'wrong-audience'; } });
   await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP/);
   assert.deepEqual(state.mutations(), []);
 });
 
-test('failed mapper creation remains an error and does not report a configured realm', async () => {
-  const state = fixture({ createStatus: 500 });
-  await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP.*HTTP 500/);
-  assert.equal(state.mutations().length, 1);
-  assert.deepEqual(state.mappers, legacyMappers);
-});
-
-test('successful HTTP creation without persistence is rejected by readback', async () => {
-  const state = fixture({ persistCreated: false });
-  await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP/);
-  assert.equal(state.mutations().length, 1);
-  assert.deepEqual(state.mappers, legacyMappers);
-});
-
-test('mapper persisted with an incorrect property is rejected by readback', async () => {
-  const state = fixture({ alterCreated(mapper) { mapper.config['user.attribute'] = 'email'; } });
+test('readback also rejects an existing profile mapper changed during creation of the missing mapper', async () => {
+  const state = fixture({ existingMappers: [configuredMapper(expectedUsernameMapper)],
+    alterCreated(_created, mappers) { mappers.find(mapper => mapper.name === 'Username').config['user.attribute'] = 'email'; } });
   await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP/);
   assert.equal(state.mutations().length, 1);
 });
