@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { RECOGNIZED_ROLES, BUSINESS_PERMISSIONS, ROLE_PERMISSIONS } from '../../shared/keycloakAuthorization.js';
-import { validateOrigin, managementRoles } from './render-realm.mjs';
+import { validateOrigin, managementRoles, usernameMapper } from './render-realm.mjs';
 
 const fail = message => { throw Error('KEYCLOAK_BOOTSTRAP: ' + message); };
 const sameUser = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
@@ -79,13 +79,24 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
     request('/clients/' + web + '/protocol-mappers/models'),
     request('/clients/' + web + '/default-client-scopes'),
   ]);
+  const expectedUsername = usernameMapper();
+  const currentUsername = webMappers.find(value => value.name === expectedUsername.name);
+  const matchesUsername = value => value?.protocol === expectedUsername.protocol
+    && value.protocolMapper === expectedUsername.protocolMapper
+    && value.consentRequired === false
+    && equal(Object.keys(value.config ?? {}), Object.keys(expectedUsername.config))
+    && Object.entries(expectedUsername.config).every(([key, expected]) => value.config[key] === expected);
+  if (currentUsername && !matchesUsername(currentUsername)) {
+    fail('mapper Username incompatible; revisar su propiedad, claim y destinos antes de continuar');
+  }
   const callback = origin + '/auth/pin-recovery/callback';
   const mapper = name => webMappers.find(value => value.name === name);
   if (!equal(webConfig.redirectUris ?? [], [origin, origin + '/*']) ||
       webConfig.attributes?.['pkce.code.challenge.method'] !== 'S256' ||
       webConfig.publicClient !== true || webConfig.directAccessGrantsEnabled !== false ||
       !webScopes.some(scope => scope.name === 'basic') ||
-      !equal(webMappers.map(value => value.name), ['Application roles', 'ITECSA permissions', 'API audience']) ||
+      !equal(webMappers.map(value => value.name), ['Application roles', 'ITECSA permissions', 'API audience',
+        ...(currentUsername ? [expectedUsername.name] : [])]) ||
       mapper('Application roles')?.config?.['claim.name'] !== 'resource_access.itecsa-api-v1.roles' ||
       mapper('ITECSA permissions')?.config?.['claim.name'] !== 'permissions' ||
       mapper('API audience')?.config?.['included.custom.audience'] !== 'https://api.itecsa.local' ||
@@ -94,6 +105,9 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
       pinConfig.attributes?.['pkce.code.challenge.method'] !== 'S256' ||
       adminConfig.serviceAccountsEnabled !== true || adminConfig.publicClient !== false) {
     fail('clients, scopes, mappers o callback inesperados');
+  }
+  if (!currentUsername && readOnly) {
+    fail('falta mapper Username; aplicar manage.sh keycloak-configure y volver a iniciar sesion');
   }
   const [roles, capabilities, management] = await Promise.all([
     request('/clients/' + rolesClient + '/roles?max=1000'),
@@ -109,6 +123,15 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
   }
   const allowed = management.filter(role => managementRoles.includes(role.name));
   if (allowed.length !== managementRoles.length) fail('permisos de administracion incompletos');
+  if (!currentUsername) {
+    // Upgrade the known basic-only contract without replacing clients, scopes or users.
+    await request('/clients/' + web + '/protocol-mappers/models', 'POST', expectedUsername);
+    const actual = await request('/clients/' + web + '/protocol-mappers/models');
+    if (!equal(actual.map(value => value.name), [...webMappers.map(value => value.name), expectedUsername.name])
+        || !matchesUsername(actual.find(value => value.name === expectedUsername.name))) {
+      fail('no se pudo verificar el mapper Username aplicado');
+    }
+  }
   await ensureRoles('/clients/' + web + '/scope-mappings/clients/' + rolesClient, roles);
   await ensureRoles('/clients/' + web + '/scope-mappings/clients/' + capabilitiesClient, capabilities);
   const service = await request('/clients/' + adminClient + '/service-account-user');
