@@ -36,6 +36,8 @@ jobs:
         run: |
           npm run lint --prefix capaVista
           npm run build --prefix capaVista
+      - name: Backup failure and recovery regression
+        run: node --test deploy/mysql/backup.test.mjs
       - name: Runtime dependency audit
         run: |
           npm audit --omit=dev --audit-level=high --prefix capaServidor
