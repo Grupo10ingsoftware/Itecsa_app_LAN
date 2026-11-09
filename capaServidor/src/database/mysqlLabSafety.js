@@ -1,4 +1,5 @@
 import { planMysqlLabCatalog } from "./mysqlLabSeed.js";
+import { BUSINESS_CATALOG_VERSION } from "../../../shared/businessCatalog.js";
 import fs from "node:fs";
 import mariadb from "mariadb";
 import { createStrictTlsOptions, resolveDatabaseConnection } from "./connectionConfig.js";
@@ -135,7 +136,7 @@ export async function openVerifiedLabConnection(env = process.env, { connector =
   }
 }
 
-export async function assertSafeMigrationState(connection, database) {
+export async function assertSafeMigrationState(connection, database, { requireExisting = false } = {}) {
   const tables = await connection.query(
     "SELECT TABLE_NAME AS tableName FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?",
     [database],
@@ -144,12 +145,16 @@ export async function assertSafeMigrationState(connection, database) {
   const hasHistory = names.has("_prisma_migrations");
   const applicationTables = [...names].filter((name) => name !== "_prisma_migrations");
   if (!hasHistory && applicationTables.length > 0) fail("hay tablas sin historial Prisma.");
+  let history = [];
   if (hasHistory) {
-    const failed = await connection.query(
-      "SELECT migration_name FROM _prisma_migrations WHERE finished_at IS NULL OR rolled_back_at IS NOT NULL",
+    history = await connection.query(
+      "SELECT migration_name, finished_at, rolled_back_at FROM _prisma_migrations ORDER BY started_at",
     );
-    if (failed.length) fail("el historial Prisma contiene migraciones fallidas o revertidas.");
+    if (history.some(row => !row.finished_at || row.rolled_back_at)) {
+      fail("el historial Prisma contiene migraciones fallidas o revertidas.");
+    }
   }
+  if (requireExisting && history.length === 0) fail("update requiere una instalacion con historial Prisma aplicado; no se inicializa una base vacia.");
   const catalogTables = { estado_Pago: 'Estado_Pago', estado_Pedido: 'Estado_Pedido',
     tipo_Producto: 'Tipo_Producto', etiqueta: 'etiqueta', estado_Subprocesos: 'Estado_Subprocesos', producto_Subproceso: 'Producto_Subproceso' };
   let populated = false;
@@ -158,9 +163,19 @@ export async function assertSafeMigrationState(connection, database) {
     if (rows.length) populated = true;
     return [model, { findMany: async () => rows }];
   })));
-  if (populated) {
+  if (populated || requireExisting) {
     const catalog = await planMysqlLabCatalog(client);
-    if (catalog.conflicts.length || catalog.creates.length) fail('catalogo existente incompatible; se requiere una instalacion nueva con volumen nuevo.');
+    if (catalog.conflicts.length || catalog.creates.length) {
+      const missing = catalog.creates.map(({ client, data }) => `${client}(${Object.entries(data)
+        .filter(([key]) => key.startsWith('id_')).map(([key, value]) => `${key}=${value}`).join(',')})`);
+      const lastMigration = history.at(-1)?.migration_name ?? 'sin historial';
+      fail(`catalogo existente incompatible con contrato v${BUSINESS_CATALOG_VERSION}; ultima migracion: ${lastMigration}. `
+        + `Conflictos (${catalog.conflicts.length}): ${catalog.conflicts.join(', ') || 'ninguno'}. `
+        + `Faltantes (${missing.length}): ${missing.join(', ') || 'ninguno'}. `
+        + 'Conservar datos y referencias; revisar deploy/mysql/UPDATE.md antes de continuar.');
+    }
   }
-  return { fresh: !hasHistory, tableCount: applicationTables.length };
+  return { fresh: !hasHistory, tableCount: applicationTables.length,
+    catalogVersion: BUSINESS_CATALOG_VERSION, appliedMigrations: history.length,
+    lastMigration: history.at(-1)?.migration_name ?? null };
 }

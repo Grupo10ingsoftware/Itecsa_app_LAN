@@ -162,6 +162,9 @@ state_exists() {
 }
 start_mysql() { compose up -d --wait mysql; }
 bootstrap_accounts() { MYSQL_REQUIRE_EMPTY=1 compose --profile tools run --rm --no-deps account-bootstrap; }
+preflight_database() {
+  compose --profile tools run --rm --no-deps db-deploy node scripts/mysqlDeploy.mjs --check
+}
 deploy_database() { compose --profile tools run --rm --no-deps db-deploy; }
 verify_database() { compose --profile tools run --rm --no-deps db-verify; }
 verify_database_read_only() { MYSQL_EXPECT_API_READ_ONLY=1 compose --profile tools run --rm --no-deps db-verify; }
@@ -284,6 +287,10 @@ install_database() {
 update_database() {
   prepare_images
   require_completed_installation
+  # Reject known incompatibilities before changing runtime files, services or grants.
+  if ! preflight_database; then
+    fail "preflight de update rechazado antes del mantenimiento; no se detuvieron servicios ni se cambiaron permisos. Revisar deploy/mysql/UPDATE.md"
+  fi
   prepare_runtime
   compose stop api
   start_mysql

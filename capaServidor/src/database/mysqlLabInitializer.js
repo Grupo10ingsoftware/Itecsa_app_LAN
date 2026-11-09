@@ -19,16 +19,27 @@ export function runChild(command, args, { env, secrets = [] } = {}) {
   if (output.trim()) process.stdout.write(output);
 }
 
+export async function preflightMysqlLab(env = process.env, {
+  openConnection = openVerifiedLabConnection,
+  requireExisting = false,
+} = {}) {
+  const connection = await openConnection(env);
+  try {
+    // A consistent snapshot for catalog reads; never run DML/DDL or seed here.
+    await connection.query("START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY");
+    return await assertSafeMigrationState(connection, env.DB_NAME, { requireExisting });
+  } finally {
+    try { await connection.query("ROLLBACK"); }
+    finally { await connection.end(); }
+  }
+}
+
 export async function initializeMysqlLab(env = process.env, {
   openConnection = openVerifiedLabConnection,
   runner = runChild,
 } = {}) {
-  const connection = await openConnection(env);
-  try {
-    await assertSafeMigrationState(connection, env.DB_NAME);
-  } finally {
-    await connection.end();
-  }
+  // Recheck after maintenance starts: the earlier update check is not a lock.
+  await preflightMysqlLab(env, { openConnection });
 
   const databaseUrl = buildMigrationDatabaseUrl(env);
   const childEnv = {
