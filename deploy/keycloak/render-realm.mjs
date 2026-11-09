@@ -3,6 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { RECOGNIZED_ROLES, BUSINESS_PERMISSIONS, ROLE_PERMISSIONS } from '../../shared/keycloakAuthorization.js';
 
+import { ACCOUNT_CREATED_AT_CLAIM } from '../../shared/identityProfile.js';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const audience = 'https://api.itecsa.local';
 const roleClient = 'itecsa-api-v1';
@@ -33,6 +35,15 @@ export const usernameMapper = () => ({
   name: 'Username', protocol: 'openid-connect', protocolMapper: 'oidc-usermodel-property-mapper',
   consentRequired: false, config: {
     'user.attribute': 'username', 'claim.name': 'preferred_username', 'jsonType.label': 'String',
+    'access.token.claim': 'true', 'id.token.claim': 'false',
+    'userinfo.token.claim': 'false', 'introspection.token.claim': 'false',
+  },
+});
+// Persisted Keycloak metadata, not a user-editable attribute or token issue time.
+export const registrationDateMapper = () => ({
+  name: 'Account creation date', protocol: 'openid-connect', protocolMapper: 'oidc-usermodel-property-mapper',
+  consentRequired: false, config: {
+    'user.attribute': 'createdTimestamp', 'claim.name': ACCOUNT_CREATED_AT_CLAIM, 'jsonType.label': 'long',
     'access.token.claim': 'true', 'id.token.claim': 'false',
     'userinfo.token.claim': 'false', 'introspection.token.claim': 'false',
   },
@@ -83,6 +94,7 @@ export function buildRealm({ origin, adminClientSecret }) {
         rootUrl: publicOrigin, baseUrl: publicOrigin + '/',
         protocolMappers: [
           usernameMapper(),
+          registrationDateMapper(),
           roleMapper('Application roles', roleClient, `resource_access.${roleClient}.roles`),
           roleMapper('ITECSA permissions', capabilityClient, 'permissions'),
           { name: 'API audience', protocol: 'openid-connect',

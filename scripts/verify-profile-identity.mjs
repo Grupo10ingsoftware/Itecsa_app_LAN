@@ -4,6 +4,7 @@
 import { access } from 'node:fs/promises';
 import { randomBytes, createHash, webcrypto } from 'node:crypto';
 import { createRequire } from 'node:module';
+import { ACCOUNT_CREATED_AT_CLAIM } from '../shared/identityProfile.js';
 
 const usage = `Uso: node scripts/verify-profile-identity.mjs [--help]
 
@@ -12,11 +13,14 @@ Requiere Node.js 22+, las dependencias de capaServidor instaladas y estas variab
   PUBLIC_ORIGIN       Origen HTTPS del despliegue, sin ruta (p. ej. https://servidor).
   PROFILE_USERNAME    Nombre exacto de una cuenta activa, con perfil y rol preparados.
   PROFILE_PASSWORD    Contraseña actual; proporcionar por entorno, nunca por argumentos.
+  PROFILE_EXPECT_CREATED_AT_MS Fecha Keycloak en ms esperada (opcional, para contrastar origen).
   NODE_EXTRA_CA_CERTS Archivo PEM de la CA de confianza, definido ANTES de iniciar Node.
 
 Usa el realm itecsa, cliente público itecsa-web y audiencia https://api.itecsa.local.
 Inicia sesión mediante authorization_code + PKCE S256, valida firma/issuer/audiencia,
-consulta /api/auth/profile y comprueba el usuario del adaptador de sesión del frontend.
+consulta /api/auth/profile y comprueba username y fecha de creación registrada por Keycloak.
+La cuenta de prueba debe conservar createdTimestamp; la prueba exige el claim firmado.
+Comprueba también el usuario del adaptador de sesión del frontend.
 Cierra su sesión con refresh_token, vuelve a entrar y repite las comprobaciones.
 No crea usuarios ni modifica PIN, roles o permisos. Aborta ante MFA o acciones requeridas.
 No omite TLS ni usa password grant. Solo imprime resultados sanitizados en JSON.
@@ -159,7 +163,10 @@ async function main() {
   const keys = createLocalJWKSet(json(jwks, 'JWKS_INVALID_JSON'));
   record('trusted-public-issuer');
 
-  let previousSubject;
+  let previousSubject, previousRegistrationDate;
+  const expectedCreation = process.env.PROFILE_EXPECT_CREATED_AT_MS;
+  if (expectedCreation !== undefined) expect(/^[1-9][0-9]*$/.test(expectedCreation)
+    && Number.isSafeInteger(Number(expectedCreation)), 'EXPECTED_CREATION_TIME_INVALID');
   for (const cycle of [1, 2]) {
     step = `login-${cycle}`;
     const { tokens, nonce } = await login();
@@ -189,6 +196,15 @@ async function main() {
       && profileData.rolUsuario && Array.isArray(profileData.records), 'PROFILE_CONTRACT_MISMATCH');
     // The API handler checks the local identity subject against the validated JWT.
     record('api-profile-active', cycle);
+    const createdAt = claims[ACCOUNT_CREATED_AT_CLAIM];
+    expect(Number.isSafeInteger(createdAt) && createdAt > 0 && createdAt <= 253402300799999
+      && Math.floor(createdAt / 1000) <= claims.iat, 'ACCOUNT_CREATION_CLAIM_INVALID');
+    expect(expectedCreation === undefined || createdAt === Number(expectedCreation), 'ACCOUNT_CREATION_SOURCE_MISMATCH');
+    expect(profileData.fechaRegistro === new Date(createdAt).toISOString(), 'PROFILE_REGISTRATION_DATE_MISMATCH');
+    expect(previousRegistrationDate === undefined || previousRegistrationDate === profileData.fechaRegistro,
+      'RELOGIN_REGISTRATION_DATE_CHANGED');
+    previousRegistrationDate = profileData.fechaRegistro;
+    record('signed-account-creation-and-profile-date', cycle);
 
     step = `frontend-identity-${cycle}`;
     // A minimal adapter supplies the actual, signature-verified Keycloak claims to

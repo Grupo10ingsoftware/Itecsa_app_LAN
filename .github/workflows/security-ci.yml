@@ -40,6 +40,8 @@ jobs:
         run: node --test deploy/mysql/backup.test.mjs
       - name: Keycloak profile identity contract
         run: node --test deploy/keycloak/profile-contract.test.mjs
+      - name: Profile registration date contract
+        run: node --test capaServidor/test/profileRegistrationDate.test.js capaVista/test/profileDates.test.mjs
       - name: MySQL update preflight regression
         run: node --test capaServidor/test/mysqlUpdatePreflight.test.js
       - name: Runtime dependency audit

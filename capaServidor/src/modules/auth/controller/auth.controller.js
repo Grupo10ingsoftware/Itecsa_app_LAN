@@ -6,6 +6,8 @@ import { safeLogger } from "../../../shared/safeLogger.js";
 import { validateUserMovementsQuery } from "../../users/validators/adminUsers.validator.js";
 import { authorizationForProvider } from '../../../../../shared/identityAuthorization.js';
 
+import { registrationDateFromClaims } from '../../../../../shared/identityProfile.js';
+
 const ROLES_CLAIM = "https://itecsa.local/roles";
 const PERMISSIONS_CLAIM = "permissions";
 
@@ -146,6 +148,7 @@ export function createGetProfileHandler({ users = userRepository } = {}) {
                 rolUsuario: user.rolUsuario,
                 rutUsuario: user.rutUsuario,
                 estadoUsuario: user.estadoUsuario,
+                fechaRegistro: registrationDateFromClaims(req.auth.payload),
                 records,
             });
         } catch (error) {
