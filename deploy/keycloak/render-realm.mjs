@@ -28,6 +28,15 @@ const roleMapper = (name, owner, claim) => ({
     'access.token.claim': 'true', 'id.token.claim': 'false', 'userinfo.token.claim': 'false',
   },
 });
+// Display identity only: authorization remains bound to sub, roles and permissions.
+export const usernameMapper = () => ({
+  name: 'Username', protocol: 'openid-connect', protocolMapper: 'oidc-usermodel-property-mapper',
+  consentRequired: false, config: {
+    'user.attribute': 'username', 'claim.name': 'preferred_username', 'jsonType.label': 'String',
+    'access.token.claim': 'true', 'id.token.claim': 'false',
+    'userinfo.token.claim': 'false', 'introspection.token.claim': 'false',
+  },
+});
 const bareClient = clientId => ({
   clientId, enabled: true, protocol: 'openid-connect', bearerOnly: true,
   publicClient: false, standardFlowEnabled: false, implicitFlowEnabled: false,
@@ -73,6 +82,7 @@ export function buildRealm({ origin, adminClientSecret }) {
         }),
         rootUrl: publicOrigin, baseUrl: publicOrigin + '/',
         protocolMappers: [
+          usernameMapper(),
           roleMapper('Application roles', roleClient, `resource_access.${roleClient}.roles`),
           roleMapper('ITECSA permissions', capabilityClient, 'permissions'),
           { name: 'API audience', protocol: 'openid-connect',

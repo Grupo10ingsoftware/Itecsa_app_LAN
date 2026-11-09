@@ -7,8 +7,8 @@ ACTION="${1:-}"
 shift || true
 fail() { echo "MYSQL_DEPLOY_ERROR: $*" >&2; exit 1; }
 case "$ACTION" in
-  check|install|resume|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|first-user) ;;
-  *) fail "uso: manage.sh check|install|resume|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|first-user" ;;
+  check|install|resume|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|keycloak-configure|first-user) ;;
+  *) fail "uso: manage.sh check|install|resume|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|keycloak-configure|first-user" ;;
 esac
 BACKUP_FILE=""
 RESTORE_CONFIRM=""
@@ -40,7 +40,7 @@ resolve_path() {
     *) printf '%s\n' "$ROOT_DIR/${1#./}" ;;
   esac
 }
-[[ -n "$ACTION" ]] || fail "uso: manage.sh install|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|first-user"
+[[ -n "$ACTION" ]] || fail "uso: manage.sh install|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|keycloak-configure|first-user"
 [[ -r "$ENV_FILE" ]] || fail "no se puede leer $ENV_FILE"
 PROJECT="$(read_value COMPOSE_PROJECT_NAME)"
 APP_VERSION="$(read_value APP_VERSION)"
@@ -335,6 +335,15 @@ case "$ACTION" in
     verify_database
     verify_application
     echo "MYSQL_DEPLOY: bases, HTTPS, Keycloak y Gestion de usuarios verificados." ;;
+  keycloak-configure)
+    # Reconcile an existing realm without stopping containers or changing SQL grants.
+    require_completed_installation
+    verify_release_images
+    verify_database
+    verify_public_issuer
+    post_bootstrap
+    verify_application
+    echo "MYSQL_DEPLOY: configuracion Keycloak aplicada y verificada; renovar sesion para recibir los claims." ;;
   backup|keycloak-backup) run_backup "$ACTION" ;;
   restore)
     [[ -n "$BACKUP_FILE" ]] || fail "restore requiere --backup archivo.sql"
