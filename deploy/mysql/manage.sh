@@ -91,17 +91,17 @@ compose() {
       up)
         shift
         "${base[@]}" up --pull never --no-build "$@"
-        return ;;
+        return $? ;;
       run)
         shift
         "${base[@]}" run --pull never "$@"
-        return ;;
+        return $? ;;
       --profile)
         if [[ "${3:-}" == run ]]; then
           local profile="$2"
           shift 3
           "${base[@]}" --profile "$profile" run --pull never "$@"
-          return
+          return $?
         fi ;;
     esac
   fi
@@ -240,8 +240,8 @@ start_application() {
   compose up -d --wait keycloak api web
 }
 verify_application() {
-  verify_public_issuer
-  post_bootstrap --check
+  verify_public_issuer || return $?
+  post_bootstrap --check || return $?
   compose exec -T api node -e 'if(process.env.IDENTITY_PREPARATION_ENABLED!=="true"||process.env.AUTH_PROVIDER!=="keycloak")process.exit(1); fetch("http://127.0.0.1:3000/api/admin/identity/users",{signal:AbortSignal.timeout(10000)}).then(r=>{if(r.status!==401)throw Error("ruta de usuarios no protegida o no montada")}).catch(e=>{console.error(e.message);process.exitCode=1})' \
     || fail "Gestion de usuarios no esta habilitada y protegida en la API"
   PUBLIC_ORIGIN="$PUBLIC_ORIGIN" NODE_EXTRA_CA_CERTS="$(resolve_path "$(read_value LAN_CA_FILE)")" \
@@ -306,6 +306,15 @@ update_database() {
   verify_application
   echo "MYSQL_DEPLOY: actualizacion completa para $PROJECT."
 }
+# Serialize mutations, including update, so backup recovery cannot undo another
+# operation's maintenance. The descriptor is released when this process exits.
+if [[ "$ACTION" != check && "$ACTION" != verify ]]; then
+  command -v flock >/dev/null || fail "falta flock (util-linux); se requiere para serializar operaciones"
+  mkdir -p "$ROOT_DIR/deploy/mysql/private"
+  exec {deployment_lock_fd}>"$ROOT_DIR/deploy/mysql/private/operation.lock"
+  flock -n "$deployment_lock_fd" || fail "otra operacion de despliegue esta en curso; esperar a que termine"
+fi
+source "$ROOT_DIR/deploy/mysql/backup.sh"
 if [[ "$ACTION" != stop ]]; then check_configuration; fi
 if [[ "$IMAGE_MODE" == preloaded && "$ACTION" != stop ]]; then
   verify_preloaded_images
@@ -326,26 +335,7 @@ case "$ACTION" in
     verify_database
     verify_application
     echo "MYSQL_DEPLOY: bases, HTTPS, Keycloak y Gestion de usuarios verificados." ;;
-  backup)
-    preflight
-    state_exists || fail "no existe identidad de instalacion"
-    compose stop api keycloak
-    start_mysql
-    lock_writes
-    backup_database
-    backup_keycloak_database
-    enable_migrations
-    unlock_writes
-    start_application
-    verify_public_issuer ;;
-  keycloak-backup)
-    preflight
-    state_exists || fail "no existe identidad de instalacion"
-    compose stop keycloak
-    start_mysql
-    backup_keycloak_database
-    start_application
-    verify_public_issuer ;;
+  backup|keycloak-backup) run_backup "$ACTION" ;;
   restore)
     [[ -n "$BACKUP_FILE" ]] || fail "restore requiere --backup archivo.sql"
     preflight
