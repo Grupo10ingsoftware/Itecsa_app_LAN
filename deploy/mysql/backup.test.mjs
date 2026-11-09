@@ -130,7 +130,12 @@ if (service === 'db-backup' || service === 'keycloak-db-backup') {
   fs.writeFileSync(path.join(root, 'data/backups', kind, 'completed.sql'), '-- completed synthetic dump\n');
   finish();
 }
-if (service === 'db-deploy') { action('migration'); finish(); }
+if (service === 'db-deploy') {
+  if (tail.length === 0) action('migration');
+  else if (JSON.stringify(tail) === JSON.stringify(['node', 'scripts/mysqlDeploy.mjs', '--check'])) action('update:preflight');
+  else error('unrecognized db-deploy command');
+  finish();
+}
 record('runtime:' + service); finish();
 `;
 
@@ -178,7 +183,7 @@ const assertFailure = result => { assert.notEqual(result.status, 0, result.stdou
 const assertUntouched = (f, services, grants) => {
   assert.deepEqual(f.state().services, services);
   assert.deepEqual(f.state().grants, grants);
-  assert.ok(!f.phases().some(phase => /^(stop|start|up|grants:)/.test(phase)), JSON.stringify(f.state().events));
+  assert.ok(!f.phases().some(phase => /^(stop$|start$|up$|grants:)/.test(phase)), JSON.stringify(f.state().events));
 };
 const assertRecovered = f => {
   assert.deepEqual(f.state().services, healthyServices(), f.diagnostic());
@@ -288,13 +293,48 @@ test('failed Keycloak restart leaves Keycloak stopped and never affects API gran
   assert.deepEqual(f.state().grants, { api: true, migrator: true });
   assert.ok(!f.phases().some(phase => phase.startsWith('grants:')));
 });
-test('update migration failure retains the existing fail-closed policy', t => {
+for (const priorMaintenance of [false, true]) {
+  test(`update preflight rejection preserves ${priorMaintenance ? 'prior maintenance' : 'healthy services and grants'} before runtime changes`, t => {
+    const services = healthyServices(), grants = { api: !priorMaintenance, migrator: !priorMaintenance };
+    if (priorMaintenance) services.api.running = false;
+    const f = fixture(t, { services, grants, faults: [{ phase: 'update:preflight' }] });
+    const result = f.run('update');
+    assertFailure(result);
+    assert.match(result.stderr, /preflight de update rechazado antes del mantenimiento/);
+    assert.equal(f.state().counts['update:preflight'], 1, f.diagnostic());
+    assertUntouched(f, services, grants);
+    assert.ok(!f.phases().some(phase => /^(runtime:|dump:|migration$)/.test(phase)), f.diagnostic());
+  });
+}
+test('update checks the database before preparing runtime or interrupting service, then applies migrations', t => {
+  const f = fixture(t);
+  assertSuccess(f.run('update'));
+  assertRecovered(f);
+  const phases = f.phases(), preflight = phases.indexOf('update:preflight'), firstStop = phases.indexOf('stop');
+  assert.equal(f.state().counts['update:preflight'], 1, f.diagnostic());
+  assert.equal(f.state().counts.migration, 1, f.diagnostic());
+  for (const phase of ['state:installation', 'state:identity']) {
+    assert.ok(phases.indexOf(phase) >= 0 && phases.indexOf(phase) < preflight, phase + ' must precede the database check');
+  }
+  for (const phase of ['runtime:tls', 'runtime:cert-install', 'runtime:realm', 'runtime:runtime-install', 'runtime:keycloak-trust-bootstrap', 'runtime:api']) {
+    assert.ok(phases.indexOf(phase) > preflight && phases.indexOf(phase) < firstStop, phase + ' must follow the database check and precede interruption');
+  }
+  for (const phase of ['stop', 'grants:lock', 'dump:mysql', 'migration']) {
+    assert.ok(phases.indexOf(phase) > preflight, phase + ' must follow the database check');
+  }
+  assert.ok(phases.indexOf('dump:mysql') < phases.indexOf('migration'));
+});
+test('update migration failure after a successful preflight retains the existing fail-closed policy', t => {
   const f = fixture(t, { faults: [{ phase: 'migration' }] });
   assertFailure(f.run('update'));
-  assert.ok(f.phases().includes('migration'), f.diagnostic());
+  const phases = f.phases();
+  assert.equal(f.state().counts['update:preflight'], 1, f.diagnostic());
+  assert.equal(f.state().counts.migration, 1, f.diagnostic());
+  assert.ok(phases.indexOf('update:preflight') < phases.indexOf('migration'), f.diagnostic());
   assert.equal(f.state().services.api.running, false);
+  for (const service of ['mysql', 'keycloak', 'web']) assert.equal(f.state().services[service].running, true);
   assert.deepEqual(f.state().grants, { api: false, migrator: false });
-  assert.ok(!f.phases().includes('grants:unlock'));
+  assert.ok(!phases.includes('grants:unlock'));
   assert.ok(!f.state().events.some(event => ['start', 'up'].includes(event.phase) && event.services.includes('api')));
 });
 
