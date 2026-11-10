@@ -2,34 +2,7 @@ import { AppError } from "../../../errors/AppError.js";
 import ProductionLoadRepository from "../repo/productionLoad.repo.js";
 import { UserRepository } from "../../users/repo/users.repo.js";
 
-function todayKey() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function normalizeDateKey(value) {
-  if (value === undefined || value === null || value === "") return todayKey();
-  const text = String(value);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) {
-    const error = new AppError(400, "La fecha debe tener formato YYYY-MM-DD.");
-    throw error;
-  }
-  const [year, month, day] = text.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-  if (
-    Number.isNaN(date.getTime()) ||
-    date.getFullYear() !== year ||
-    date.getMonth() !== month - 1 ||
-    date.getDate() !== day
-  ) {
-    const error = new AppError(400, "La fecha no es valida.");
-    throw error;
-  }
-  return text;
-}
+import { normalizeProductionDate } from "./productionDate.js";
 
 function normalizeEntries(entries) {
   if (!Array.isArray(entries)) {
@@ -68,13 +41,14 @@ function summarize(details, capacity) {
 }
 
 export default class ProductionLoadService {
-  constructor({ repo, userRepo } = {}) {
+  constructor({ repo, userRepo, now = () => new Date() } = {}) {
+    this.now = now;
     this.repo = repo ?? new ProductionLoadRepository();
     this.userRepo = userRepo ?? new UserRepository();
   }
 
   async getDailyLoad({ date } = {}) {
-    const dateKey = normalizeDateKey(date);
+    const dateKey = normalizeProductionDate(date, this.now);
     const capacity = await this.repo.getCapacity();
     const details = await this.repo.listLanyardDetails(dateKey);
 
@@ -86,7 +60,7 @@ export default class ProductionLoadService {
   }
 
   async saveDailyLoad({ date, entries, identitySubject } = {}) {
-    const dateKey = normalizeDateKey(date);
+    const dateKey = normalizeProductionDate(date, this.now);
     const normalizedEntries = normalizeEntries(entries);
     const user = await this.userRepo.findBySubject(identitySubject);
 
