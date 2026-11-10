@@ -35,7 +35,7 @@ function rememberCardExpansion(current, orders) {
   return { ...current, byOrder }
 }
 
-function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClearRequestedOrder }) {
+function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClearRequestedOrder, onProductionLoadChange }) {
   const notify = useToast()
   const [orders, setOrders] = useState([])
   const [cardExpansion, setCardExpansion] = useState({ byOrder: {}, byColumn: {} })
@@ -215,6 +215,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
       prevOrders.map((currentOrder) => applyOrderStagePatch(currentOrder, patch)).filter(item => Number(item.generalStepId) !== 4),
     )
     setSelectedOrder((currentOrder) => applyOrderStagePatch(currentOrder, patch))
+    onProductionLoadChange?.()
     return true
   }
 
@@ -409,6 +410,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
     const normalizedOrder = normalizeOrder(updatedOrder)
     setOrders(prevOrders => prevOrders.map(currentOrder => currentOrder.id === normalizedOrder.id ? normalizedOrder : currentOrder))
     setSelectedOrder(current => current?.id === normalizedOrder.id ? normalizedOrder : current)
+    onProductionLoadChange?.()
     notify.success('Subproceso completado correctamente.')
     return true
   }
@@ -418,15 +420,19 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
     const updatedOrder = await kanbanApi.sendToReview(order.id, comment)
     if (version !== sessionVersion.current) return false
     handleUpdateOrder(normalizeOrder(updatedOrder))
+    onProductionLoadChange?.()
     notify.success('Pedido enviado a revisión correctamente.')
     return true
   }
 
   async function handleFinishProduction(order, payload) {
+    const version = sessionVersion.current
     const finishingOrder = Number(order.generalStepId) === 3
     const patch = await kanbanApi.moveOrder(order.id, finishingOrder ? 4 : 3, payload)
+    if (version !== sessionVersion.current) return false
     setOrders(current => current.map(item => applyOrderStagePatch(item, patch)).filter(item => Number(item.generalStepId) !== 4))
     setSelectedOrder(current => applyOrderStagePatch(current, patch))
+    onProductionLoadChange?.()
     notify.success(finishingOrder ? 'Pedido terminado correctamente.' : 'Producción finalizada correctamente.')
     // The persisted stage is authoritative even if refreshing audit metadata fails.
     const requestId = ++detailRequestId.current
@@ -441,6 +447,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
     if (version !== sessionVersion.current) return false
     setOrders((currentOrders) => currentOrders.filter((item) => item.id !== order.id))
     setSelectedOrder(current => current?.id === order.id ? null : current)
+    onProductionLoadChange?.()
     notify.success('Producción cancelada correctamente.')
     return true
   }
@@ -450,6 +457,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
     const updated = await kanbanApi.rollbackSubprocess(order.id, item.id, process.id, payload)
     if (version !== sessionVersion.current) return false
     handleUpdateOrder(normalizeOrder(updated))
+    onProductionLoadChange?.()
     notify.success('Subproceso retrocedido correctamente.')
     return true
   }
@@ -459,6 +467,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
     const updated = normalizeOrder(await kanbanApi.reevaluate(order.id))
     if (version !== sessionVersion.current) return false
     handleUpdateOrder(updated)
+    onProductionLoadChange?.()
     notify.success('Pedido reevaluado correctamente.')
     return true
   }

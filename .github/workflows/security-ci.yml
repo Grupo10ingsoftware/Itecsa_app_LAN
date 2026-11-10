@@ -44,6 +44,8 @@ jobs:
         run: node --test capaServidor/test/profileRegistrationDate.test.js capaVista/test/profileDates.test.mjs
       - name: MySQL update preflight regression
         run: node --test capaServidor/test/mysqlUpdatePreflight.test.js
+      - name: Production load refresh regressions
+        run: node --test capaVista/test/productionLoadRefresh.test.mjs capaVista/test/productionLoadDrafts.test.mjs
       - name: Runtime dependency audit
         run: |
           npm audit --omit=dev --audit-level=high --prefix capaServidor
