@@ -42,6 +42,19 @@ const label = key => '{{if index .Config "Labels"}}{{json (index .Config.Labels 
 const imageFormat = '{"id":{{json .Id}},"revision":' + label('org.opencontainers.image.revision')
   + ',"repoDigests":{{json .RepoDigests}},"platform":"{{.Os}}/{{.Architecture}}","runtimeBase":' + label('io.itecsa.base.runtime')
   + ',"buildBase":' + label('io.itecsa.base.build') + '}';
+// Prove the MySQL base before issuing a receipt. A local tag may already point
+// at another version; unlike application images, MySQL carries no build label.
+// Verification of an existing offline receipt uses its immutable ID instead,
+// because docker load can discard RepoDigests and the original digest alias.
+export function verifyMysqlBase(image, reference, run = docker) {
+  const expectedDigest = reference.slice(reference.lastIndexOf('@') + 1);
+  if (!digest.test(expectedDigest)) fail('base MySQL fijada invalida');
+  if (image.repoDigests.some(value => value.slice(value.lastIndexOf('@') + 1) === expectedDigest)) return;
+  let resolvedId;
+  try { resolvedId = run(['image', 'inspect', '--format', '{{.Id}}', reference]); }
+  catch { fail('no se pudo demostrar la base MySQL; cargar la referencia fijada antes de registrar'); }
+  if (resolvedId !== image.id) fail('la imagen MySQL no corresponde a la base fijada');
+}
 export async function inspectImages(env, run = docker) {
   const bases = await readJson(path.join(root, 'deploy/image-bases.json'));
   const images = configuredImages(env).map(image => imageFacts(image,
@@ -176,6 +189,7 @@ export async function runProvenance({ action, env, output, inventory, active = f
   const current = await inspectImages(env, run);
   if (inventory) verifyOfflineInventory(await readFile(inventory, 'utf8'), current.images);
   if (action === 'record') {
+    verifyMysqlBase(current.images.find(image => image.service === 'mysql'), current.bases.mysql, run);
     const resources = await captureResources(current.images, run);
     const manifest = { schemaVersion: 1, appVersion: env.APP_VERSION, ...current, resources };
     await mkdir(path.dirname(output), { recursive: true });

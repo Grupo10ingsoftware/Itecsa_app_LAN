@@ -24,7 +24,12 @@ node deploy/keycloak/image-provenance.mjs verify --env-file deploy/mysql.env --o
 ```
 
 `record` exige revisión, bases y tema correctos y se niega a sobrescribir un
-recibo existente. Usar un archivo nuevo por entrega. Extrae recursos mediante
+recibo existente. Para MySQL exige el digest fijado en `RepoDigests` o comprueba
+que la referencia inmutable disponible localmente resuelve al mismo ID. Una
+etiqueta MySQL preexistente de otra versión no puede generar un recibo válido.
+La verificación offline posterior conserva la comparación por ID, aunque
+`docker load` no retenga esos metadatos de registro.
+Usar un archivo nuevo por entrega. Extrae recursos mediante
 contenedores temporales que nunca se arrancan, sin montar datos ni ejecutar
 código de las imágenes. Solo registra identificadores, versiones y hashes;
 no vuelca configuración, contraseñas, tokens ni variables de los servicios.

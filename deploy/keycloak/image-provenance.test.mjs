@@ -6,7 +6,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { configuredImages, imageFacts, verifyOfflineInventory, compareImages, verifyThemeDirectory,
-  verifyActiveImages, verifyHttp, runProvenance } from './image-provenance.mjs';
+  verifyActiveImages, verifyHttp, runProvenance, verifyMysqlBase } from './image-provenance.mjs';
 import { prepareTheme } from '../../scripts/prepare-keycloak-theme.mjs';
 
 const root = path.resolve(import.meta.dirname, '../..');
@@ -61,6 +61,35 @@ test('unknown bases and claimed revisions are rejected when recording a delivery
   assert.throws(() => imageFacts(image, { ...facts, revision: 'old' }, bases, env.APP_VERSION), /revision discordante/);
   assert.throws(() => imageFacts(image, { ...facts, runtimeBase: 'node:22' }, bases, env.APP_VERSION), /bases discordantes/);
   assert.throws(() => imageFacts(image, { ...facts, buildBase: null }, bases, env.APP_VERSION), /bases discordantes/);
+});
+
+test('a MySQL receipt proves the pinned base using its registry digest or a locally resolved immutable ID', () => {
+  const mysql = images.find(image => image.service === 'mysql');
+  verifyMysqlBase({ ...mysql, repoDigests: [bases.mysql] }, bases.mysql, () => {
+    assert.fail('a matching registry digest needs no additional Docker lookup');
+  });
+  const calls = [];
+  verifyMysqlBase(mysql, bases.mysql, args => { calls.push(args); return mysql.id; });
+  assert.deepEqual(calls, [['image', 'inspect', '--format', '{{.Id}}', bases.mysql]]);
+  assert.throws(() => verifyMysqlBase({ ...mysql, repoDigests: ['mysql@' + id(9)] }, bases.mysql,
+    () => id(9)), /MySQL no corresponde/);
+  assert.throws(() => verifyMysqlBase(mysql, bases.mysql, () => { throw Error('local image absent'); }),
+    /no se pudo demostrar la base MySQL/);
+});
+
+test('record rejects an unrelated cached MySQL tag before extracting resources or writing a receipt', async t => {
+  const directory = await temporary(t);
+  const calls = [];
+  const run = args => {
+    calls.push(args);
+    assert.equal(args[0], 'image', 'record must reject the base before creating inspection containers');
+    if (args.at(-1) === bases.mysql) return id(9);
+    return JSON.stringify(images.find(image => image.reference === args.at(-1)));
+  };
+  const output = path.join(directory, 'rejected-release.json');
+  await assert.rejects(runProvenance({ action: 'record', env, output }, { docker: run }), /MySQL no corresponde/);
+  await assert.rejects(readFile(output), { code: 'ENOENT' });
+  assert.equal(calls.length, images.length + 1);
 });
 
 test('theme verification detects modified CSS even if its embedded manifest was also modified', async t => {
@@ -153,9 +182,15 @@ test('record and verify use extracted resources; an existing receipt is never si
   await writeFile(path.join(web, 'assets/app.js'), 'const fixture = 1;');
   await writeFile(path.join(web, 'version.json'), JSON.stringify({ version: env.APP_VERSION }));
   const calls = [];
+  let loadedOffline = false;
   const run = args => {
     calls.push(args);
-    if (args[0] === 'image') return JSON.stringify(images.find(image => image.reference === args.at(-1)));
+    if (args[0] === 'image') {
+      const image = images.find(image => image.reference === args.at(-1));
+      assert.ok(image, 'offline verification must not require the original registry digest alias');
+      return JSON.stringify(image.service === 'mysql' && !loadedOffline
+        ? { ...image, repoDigests: [bases.mysql] } : image);
+    }
     if (args[0] === 'create') return args.at(-1).replace('sha256:', '');
     if (args[0] === 'rm') return '';
     if (args[0] === 'cp') {
@@ -172,6 +207,7 @@ test('record and verify use extracted resources; an existing receipt is never si
   assert.ok(!receipt.includes('PASSWORD'));
   await assert.rejects(runProvenance({ action: 'record', env, output }, { docker: run }), { code: 'EEXIST' });
   assert.equal(await readFile(output, 'utf8'), receipt);
+  loadedOffline = true; // The recorded ID survives docker load even when its registry metadata does not.
   assert.deepEqual(await runProvenance({ action: 'verify', env, output }, { docker: run }), { images: 5, active: false });
   await writeFile(path.join(web, 'assets/app.js'), 'changed asset with the same version');
   await assert.rejects(runProvenance({ action: 'verify', env, output }, { docker: run }), /web de la entrega/);
