@@ -1,3 +1,4 @@
+import { configureSupportDelegation, DELEGATED_QUERY_ROLES } from '../../shared/keycloakSupportDelegation.mjs';
 import { fileURLToPath } from 'node:url';
 import { RECOGNIZED_ROLES, BUSINESS_PERMISSIONS, ROLE_PERMISSIONS } from '../../shared/keycloakAuthorization.js';
 import { validateOrigin, managementRoles, usernameMapper, registrationDateMapper } from './render-realm.mjs';
@@ -8,7 +9,7 @@ const fail = message => { throw Error('KEYCLOAK_BOOTSTRAP: ' + message); };
 const sameUser = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
 const equal = (a, b) => JSON.stringify([...a].sort()) === JSON.stringify([...b].sort());
 
-export async function bootstrap(env = process.env, fetcher = fetch, { readOnly = false } = {}) {
+export async function bootstrap(env = process.env, fetcher = fetch, { readOnly = false, configureDelegation = configureSupportDelegation } = {}) {
   const origin = validateOrigin(env.PUBLIC_ORIGIN);
   if (!env.KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME ||
       !env.KEYCLOAK_OPERATOR_USERNAME || !env.KEYCLOAK_OPERATOR_PASSWORD ||
@@ -125,8 +126,12 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
       !equal(capabilities.map(role => role.name), BUSINESS_PERMISSIONS)) fail('catalogo de roles incompleto');
   for (const role of roles) {
     const actual = await request('/clients/' + rolesClient + '/roles/' + encodeURIComponent(role.name) + '/composites');
-    if (!equal(actual.map(value => value.name), ROLE_PERMISSIONS[role.name]) ||
-        actual.some(value => value.containerId !== capabilitiesClient)) fail('composicion invalida: ' + role.name);
+    const business = actual.filter(value => value.containerId === capabilitiesClient);
+    const administrative = actual.filter(value => value.containerId !== capabilitiesClient);
+    if (!equal(business.map(value => value.name), ROLE_PERMISSIONS[role.name])
+      || administrative.some(value => role.name !== 'Soporte' || value.containerId !== managementClient || !DELEGATED_QUERY_ROLES.includes(value.name))) {
+      fail('composicion invalida: ' + role.name);
+    }
   }
   const allowed = management.filter(role => managementRoles.includes(role.name));
   if (allowed.length !== managementRoles.length) fail('permisos de administracion incompletos');
@@ -213,6 +218,7 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
     if (temporary.length && readOnly) fail('bootstrap pendiente: administrador temporal activo');
     if (temporary.length) await master('/users/' + temporary[0].id, 'DELETE');
   }
+  await configureDelegation({ request, readOnly });
   console.log('KEYCLOAK_BOOTSTRAP: roles, scopes y cuenta tecnica verificados');
 }
 
