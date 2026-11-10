@@ -36,6 +36,8 @@ jobs:
         run: |
           npm run lint --prefix capaVista
           npm run build --prefix capaVista
+      - name: Yoyo production flow regression
+        run: node --test capaServidor/test/yoyoFlow.test.js capaVista/test/yoyoContract.test.mjs
       - name: Backup failure and recovery regression
         run: node --test deploy/mysql/backup.test.mjs
       - name: Keycloak profile identity contract
