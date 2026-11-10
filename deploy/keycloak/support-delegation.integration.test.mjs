@@ -200,3 +200,22 @@ test('drift fails closed without repairing an unexpected grant', async () => {
   for (const readOnly of [true, false]) await assert.rejects(configureSupportDelegation({ request, readOnly }), /permiso incompatible/);
   assert.equal(writes, before);
 });
+
+test('disabled FGAP cannot reactivate an incompatible preserved policy graph', async () => {
+  await request('', 'PUT', { adminPermissionsEnabled: false });
+  const preserved = await request('/clients?clientId=admin-permissions');
+  assert.equal(preserved.length, 1, 'Keycloak 26.8.1 retains the authorization client');
+  const before = writes;
+  await assert.rejects(configureSupportDelegation({ request }), /permiso incompatible/);
+  assert.equal(writes, before, 'no writes before incompatible graph rejection');
+  assert.equal((await request('')).adminPermissionsEnabled, false, 'drift must not be reactivated');
+  const policies = await request(authz + '/policy?first=0&max=1000');
+  const selected = policies.find(value => value.name === 'itecsa-support-business-roles');
+  await request(authz + '/permission/scope/' + selected.id, 'PUT', {
+    id: selected.id, name: selected.name, resourceType: 'Roles', scopes: ['map-role'],
+    resources: DELEGATED_BUSINESS_ROLES.map(role => roles.get(role).id), policies: ['itecsa-support-role'],
+  });
+  await configureSupportDelegation({ request });
+  await configureSupportDelegation({ request, readOnly: true });
+  assert.equal((await request('')).adminPermissionsEnabled, true, 'valid retained graph resumes');
+});

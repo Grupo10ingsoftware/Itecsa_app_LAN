@@ -32,11 +32,19 @@ export async function configureSupportDelegation({ request, readOnly = false }) 
     || composites.length !== businessComposites.length + adminComposites.length) fail('Soporte tiene composites administrativos incompatibles');
   const queryRoles = adminRoles.filter(role => DELEGATED_QUERY_ROLES.includes(role.name));
   if (queryRoles.length !== DELEGATED_QUERY_ROLES.length || queryRoles.some(role => role.composite !== false)) fail('roles de consulta ausentes');
+  let activateAfterValidation = false;
   if (realm.adminPermissionsEnabled !== true) {
     if (readOnly) fail('delegacion pendiente; ejecutar keycloak-configure');
-    await request('', 'PUT', { adminPermissionsEnabled: true });
-    realm = await request('');
-    if (realm.adminPermissionsEnabled !== true) fail('FGAP v2 no disponible');
+    // Keycloak retains the authorization client when FGAP is disabled. Never
+    // reactivate a retained policy graph before validating all its permissions.
+    const retained = (await request('/clients?clientId=admin-permissions')).filter(value => value.clientId === 'admin-permissions');
+    if (retained.length > 1) fail('client de permisos ambiguo');
+    if (retained.length) activateAfterValidation = true;
+    else {
+      await request('', 'PUT', { adminPermissionsEnabled: true });
+      realm = await request('');
+      if (realm.adminPermissionsEnabled !== true) fail('FGAP v2 no disponible');
+    }
   }
   const authz = '/clients/' + await client('admin-permissions') + '/authz/resource-server';
   const protectedUsers = [];
@@ -101,6 +109,7 @@ export async function configureSupportDelegation({ request, readOnly = false }) 
       ...expected, decisionStrategy: 'UNANIMOUS', logic: expected.logic ?? 'POSITIVE',
     });
   }
+  if (activateAfterValidation) await request('', 'PUT', { adminPermissionsEnabled: true });
   if (missingQuery.length) await request(compositePath, 'POST', missingQuery);
   if (!readOnly) await configureSupportDelegation({ request, readOnly: true });
   return { configured: true };
