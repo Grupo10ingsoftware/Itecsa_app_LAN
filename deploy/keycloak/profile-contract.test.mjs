@@ -42,7 +42,7 @@ const env = {
 };
 const json = (value, status = 200) => Response.json(value, { status });
 
-function fixture({ existingMappers = [], createStatus = 201, persistCreated = true, alterCreated, alterLegacy } = {}) {
+function fixture({ existingMappers = [], createStatus = 201, persistCreated = true, alterCreated, alterLegacy, realmSettings = {}, localeStatus = 204, persistLocale = true } = {}) {
   const calls = [];
   const mappers = structuredClone(legacyMappers);
   alterLegacy?.(mappers);
@@ -70,8 +70,10 @@ function fixture({ existingMappers = [], createStatus = 201, persistCreated = tr
   const realm = {
     realm: 'itecsa', sslRequired: 'all', registrationAllowed: false, resetPasswordAllowed: false,
     bruteForceProtected: true, loginTheme: 'itecsa',
+    internationalizationEnabled: true, supportedLocales: ['es'], defaultLocale: 'es',
     passwordPolicy: 'length(8) and upperCase(1) and lowerCase(1) and digits(1) and specialChars(1)',
     attributes: { itecsaBootstrapVersion: '1' },
+    ...realmSettings,
   };
   const fetcher = async (input, options = {}) => {
     const url = new URL(input);
@@ -88,6 +90,12 @@ function fixture({ existingMappers = [], createStatus = 201, persistCreated = tr
     assert.equal(options.headers?.authorization, 'Bearer fixture-admin-token');
     const body = options.body === undefined ? undefined : JSON.parse(options.body);
     calls.push({ method, pathname, ...(body === undefined ? {} : { body }) });
+    if (pathname === '/admin/realms/itecsa' && method === 'PUT') {
+      assert.deepEqual(body, { internationalizationEnabled: true, supportedLocales: ['es'], defaultLocale: 'es' });
+      if (localeStatus >= 400) return json({ error: 'fixture request failure' }, localeStatus);
+      if (persistLocale) Object.assign(realm, body);
+      return new Response(null, { status: localeStatus });
+    }
     if (pathname === mapperPath && method === 'POST') {
       const expected = profileMappers.find(mapper => mapper.name === body?.name);
       assert.ok(expected, 'only the two intended profile mappers may be created');
@@ -137,7 +145,7 @@ function fixture({ existingMappers = [], createStatus = 201, persistCreated = tr
     throw Error(`Unexpected fixture read: ${resource}`);
   };
   const mutations = () => calls.filter(call => call.method !== 'GET' && call.pathname.startsWith('/admin/'));
-  return { calls, mappers, fetcher, mutations };
+  return { calls, mappers, realm, fetcher, mutations };
 }
 
 test('new realm exposes username and account creation date only in the web access token without broadening scopes', () => {
@@ -297,4 +305,56 @@ test('readback also rejects an existing profile mapper changed during creation o
     alterCreated(_created, mappers) { mappers.find(mapper => mapper.name === 'Username').config['user.attribute'] = 'email'; } });
   await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP/);
   assert.equal(state.mutations().length, 1);
+});
+
+const desiredLocale = { internationalizationEnabled: true, supportedLocales: ['es'], defaultLocale: 'es' };
+const legacyLocale = { internationalizationEnabled: false, supportedLocales: [], defaultLocale: undefined };
+
+test('new realm explicitly serves the application in Spanish', () => {
+  const realm = buildRealm({ origin, adminClientSecret: 'fixture-'.repeat(5) });
+  for (const [key, value] of Object.entries(desiredLocale)) assert.deepEqual(realm[key], value);
+});
+
+test('legacy locale is detected read-only, configured minimally, read back, and remains idempotent', async () => {
+  const state = fixture({ existingMappers: profileMappers.map(configuredMapper), realmSettings: legacyLocale });
+  const before = structuredClone(state.realm);
+  await assert.rejects(bootstrap(env, state.fetcher, { readOnly: true }), /idioma del tema pendiente/);
+  assert.deepEqual(state.mutations(), []);
+  await bootstrap(env, state.fetcher);
+  assert.deepEqual(state.realm, { ...before, ...desiredLocale });
+  assert.deepEqual(state.mutations(), [{ method: 'PUT', pathname: '/admin/realms/itecsa', body: desiredLocale }]);
+  const applied = state.calls.findIndex(call => call.method === 'PUT');
+  assert.equal(state.calls[applied + 1].method, 'GET');
+  assert.equal(state.calls[applied + 1].pathname, '/admin/realms/itecsa');
+  await bootstrap(env, state.fetcher);
+  await bootstrap(env, state.fetcher, { readOnly: true });
+  assert.equal(state.mutations().length, 1);
+});
+
+for (const realmSettings of [
+  { internationalizationEnabled: true, supportedLocales: ['en'], defaultLocale: 'en' },
+  { internationalizationEnabled: true, supportedLocales: ['es', 'en'], defaultLocale: 'es' },
+  { internationalizationEnabled: false, defaultLocale: 'fr' },
+]) {
+  test(`unrecognized language policy is not overwritten: ${JSON.stringify(realmSettings)}`, async () => {
+    const state = fixture({ existingMappers: profileMappers.map(configuredMapper), realmSettings });
+    await assert.rejects(bootstrap(env, state.fetcher), /idioma del realm incompatible/);
+    assert.deepEqual(state.mutations(), []);
+  });
+}
+
+for (const options of [{ localeStatus: 500 }, { persistLocale: false }]) {
+  test(`locale write or readback failure does not report success: ${JSON.stringify(options)}`, async () => {
+    const state = fixture({ existingMappers: profileMappers.map(configuredMapper), realmSettings: legacyLocale, ...options });
+    await assert.rejects(bootstrap(env, state.fetcher), /KEYCLOAK_BOOTSTRAP/);
+    assert.deepEqual(state.realm, { ...state.realm, ...legacyLocale });
+  });
+}
+
+test('an incompatible mapper is rejected before applying a pending locale', async () => {
+  const broken = configuredMapper(expectedUsernameMapper);
+  broken.config['user.attribute'] = 'email';
+  const state = fixture({ existingMappers: [broken], realmSettings: legacyLocale });
+  await assert.rejects(bootstrap(env, state.fetcher), /mapper Username incompatible/);
+  assert.deepEqual(state.mutations(), []);
 });
