@@ -41,6 +41,8 @@ jobs:
           docker buildx build --load --platform linux/amd64 --target production --build-arg APP_VERSION="$RELEASE_SHA" -f capaServidor/Dockerfile -t itecsa-api:ci .
           docker buildx build --load --platform linux/amd64 --target database-tools --build-arg APP_VERSION="$RELEASE_SHA" -f capaServidor/Dockerfile -t itecsa-db-tools:ci .
           docker buildx build --load --platform linux/amd64 --target production --build-arg APP_VERSION="$RELEASE_SHA" -f capaVista/Dockerfile -t itecsa-web:ci .
+          docker buildx build --load --platform linux/amd64 --build-arg APP_VERSION="$RELEASE_SHA" -f deploy/keycloak/Dockerfile -t itecsa-keycloak:ci .
+          bash scripts/verify-release-images-ci.sh
   images:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -79,6 +81,7 @@ jobs:
           echo "API_REPO=$image_prefix-api" >> "$GITHUB_ENV"
           echo "WEB_REPO=$image_prefix-web" >> "$GITHUB_ENV"
           echo "DB_TOOLS_REPO=$image_prefix-db-tools" >> "$GITHUB_ENV"
+          echo "KEYCLOAK_REPO=$image_prefix-keycloak" >> "$GITHUB_ENV"
           echo "RELEASE_SHA=$RELEASE_SHA" >> "$GITHUB_ENV"
       - name: Install dependencies and build frontend
         run: |
@@ -125,6 +128,19 @@ jobs:
           build-args: APP_VERSION=${{ env.RELEASE_SHA }}
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
+      - name: Build Keycloak
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+        with:
+          context: .
+          file: deploy/keycloak/Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: itecsa-keycloak:ci
+          build-args: APP_VERSION=${{ env.RELEASE_SHA }}
+          cache-from: type=gha,scope=keycloak
+          cache-to: type=gha,mode=max,scope=keycloak
+      - name: Verify release images
+        run: bash scripts/verify-release-images-ci.sh
       - name: Login GHCR
         if: github.event_name != 'pull_request'
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
@@ -137,25 +153,35 @@ jobs:
           docker tag itecsa-api:ci "$API_REPO:sha-$RELEASE_SHA"
           docker tag itecsa-web:ci "$WEB_REPO:sha-$RELEASE_SHA"
           docker tag itecsa-db-tools:ci "$DB_TOOLS_REPO:sha-$RELEASE_SHA"
+          docker tag itecsa-keycloak:ci "$KEYCLOAK_REPO:sha-$RELEASE_SHA"
           docker push "$API_REPO:sha-$RELEASE_SHA"
           docker push "$WEB_REPO:sha-$RELEASE_SHA"
           docker push "$DB_TOOLS_REPO:sha-$RELEASE_SHA"
+          docker push "$KEYCLOAK_REPO:sha-$RELEASE_SHA"
+      - name: Record published image digests
+        env:
+          IMAGE_RECEIPT_OUTPUT: data/offline/itecsa-release-published.json
+        run: bash scripts/verify-release-images-ci.sh
       - name: Resolve immutable release
         if: github.event_name != 'pull_request'
         run: |
           api_digest="$(docker buildx imagetools inspect "$API_REPO:sha-$RELEASE_SHA" --format '{{json .Manifest}}' | jq -r .digest)"
           web_digest="$(docker buildx imagetools inspect "$WEB_REPO:sha-$RELEASE_SHA" --format '{{json .Manifest}}' | jq -r .digest)"
           db_tools_digest="$(docker buildx imagetools inspect "$DB_TOOLS_REPO:sha-$RELEASE_SHA" --format '{{json .Manifest}}' | jq -r .digest)"
+          keycloak_digest="$(docker buildx imagetools inspect "$KEYCLOAK_REPO:sha-$RELEASE_SHA" --format '{{json .Manifest}}' | jq -r .digest)"
+          [[ "$keycloak_digest" =~ ^sha256:[a-f0-9]{64}$ ]] || exit 1
           [[ "$api_digest" =~ ^sha256:[a-f0-9]{64}$ ]] || exit 1
           [[ "$web_digest" =~ ^sha256:[a-f0-9]{64}$ ]] || exit 1
           [[ "$db_tools_digest" =~ ^sha256:[a-f0-9]{64}$ ]] || exit 1
-          jq -n --arg version "$RELEASE_SHA" --arg api "$API_REPO@$api_digest" --arg web "$WEB_REPO@$web_digest" --arg dbTools "$DB_TOOLS_REPO@$db_tools_digest" '{version:$version,api:$api,web:$web,dbTools:$dbTools}' > release.json
+          jq -n --arg version "$RELEASE_SHA" --arg api "$API_REPO@$api_digest" --arg web "$WEB_REPO@$web_digest" --arg dbTools "$DB_TOOLS_REPO@$db_tools_digest" --arg keycloak "$KEYCLOAK_REPO@$keycloak_digest" '{version:$version,api:$api,web:$web,dbTools:$dbTools,keycloak:$keycloak}' > release.json
           printf '\nCommit: `%s`\n\nAPI: `%s@%s`\n\nWeb: `%s@%s`\n\nDB tools: `%s@%s`\n' "$RELEASE_SHA" "$API_REPO" "$api_digest" "$WEB_REPO" "$web_digest" "$DB_TOOLS_REPO" "$db_tools_digest" >> "$GITHUB_STEP_SUMMARY"
       - name: Save image references
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: release-${{ env.RELEASE_SHA }}
-          path: release.json
+          path: |
+            release.json
+            data/offline/itecsa-release-published.json
           retention-days: 90
           overwrite: true

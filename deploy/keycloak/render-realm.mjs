@@ -3,6 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { RECOGNIZED_ROLES, BUSINESS_PERMISSIONS, ROLE_PERMISSIONS } from '../../shared/keycloakAuthorization.js';
 
+import { themeLocaleSettings } from './theme-contract.mjs';
+
 import { ACCOUNT_CREATED_AT_CLAIM } from '../../shared/identityProfile.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -70,7 +72,7 @@ export function buildRealm({ origin, adminClientSecret }) {
   });
   return {
     realm: 'itecsa', enabled: true, sslRequired: 'all',
-    loginTheme: 'itecsa', registrationAllowed: false, resetPasswordAllowed: false,
+    loginTheme: 'itecsa', ...themeLocaleSettings(), registrationAllowed: false, resetPasswordAllowed: false,
     rememberMe: false, verifyEmail: false, loginWithEmailAllowed: false,
     duplicateEmailsAllowed: false, editUsernameAllowed: false,
     passwordPolicy: 'length(8) and upperCase(1) and lowerCase(1) and digits(1) and specialChars(1)',

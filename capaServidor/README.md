@@ -140,9 +140,10 @@ origen y secretos de la instalación al actualizar. No ejecutar `down -v`.
 
 El import de Keycloak omite un realm existente: editar el JSON generado no
 actualiza sus usuarios ni configuración. Los cambios administrativos requieren
-su procedimiento específico. El tema incluido en la imagen procede de
-`deploy/keycloak/themes/`; para una instalación Keycloak externa se conservan
-`scripts/prepare-keycloak-theme.mjs` y `scripts/keycloak-theme-admin.mjs`.
+su procedimiento específico. El tema incluido en la imagen y el instalable externo usan el mismo
+`scripts/prepare-keycloak-theme.mjs`, con respaldo de mensajes e idioma español
+explícito. Consultar [tema y actualización de realms existentes](../deploy/keycloak/THEME.md).
+`scripts/keycloak-theme-admin.mjs` permite activar el tema en un Keycloak externo.
 
 La API expone `/api/health/live`. La comprobación `/internal/ready` es opcional
 y protegida por la configuración de salud interna. Un estado saludable no
@@ -181,7 +182,7 @@ misma revisión y configurar sus referencias en el archivo de despliegue:
 bash deploy/keycloak/offline-images.sh pack deploy/mysql.env data/offline
 ```
 
-Transportar TAR, SHA-256 e inventario al servidor. Los entornos y certificados
+Transportar TAR, SHA-256, inventario y `itecsa-release.json` al servidor. Los entornos y certificados
 se entregan por un canal seguro separado:
 
 ```bash
@@ -192,6 +193,8 @@ bash deploy/keycloak/offline-images.sh verify deploy/mysql.env data/offline
 Configurar `DEPLOY_IMAGE_MODE=preloaded` antes de instalar o iniciar. Este modo
 exige todas las imágenes locales y evita descargas y compilaciones en destino.
 Mantener la etiqueta exportable de MySQL configurada en la plantilla.
+Consultar [trazabilidad de imágenes y verificación HTTP](../deploy/keycloak/IMAGES.md)
+para activar `IMAGE_MANIFEST_FILE` y contrastar los contenedores activos.
 
 ## 8. Desarrollo y mantenimiento
 

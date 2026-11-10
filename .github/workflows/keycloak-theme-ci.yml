@@ -1,0 +1,40 @@
+name: Keycloak theme image contract
+
+on:
+  pull_request:
+    paths:
+      - 'deploy/keycloak/**'
+      - 'scripts/prepare-keycloak-theme.mjs'
+      - 'shared/loading/**'
+      - '.github/workflows/keycloak-theme-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'deploy/keycloak/**'
+      - 'scripts/prepare-keycloak-theme.mjs'
+      - 'shared/loading/**'
+      - '.github/workflows/keycloak-theme-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      - name: Verify generated theme and native form behavior
+        run: node --test deploy/keycloak/profile-contract.test.mjs deploy/keycloak/theme-contract.test.mjs deploy/keycloak/theme-forms.test.mjs
+      - name: Compare the final image with the prepared artifact
+        run: |
+          node scripts/prepare-keycloak-theme.mjs --version 26.8.1
+          docker buildx build --load --platform linux/amd64 -f deploy/keycloak/Dockerfile -t itecsa-keycloak:theme-ci .
+          docker create --name itecsa-theme-ci itecsa-keycloak:theme-ci
+          trap 'docker rm -f itecsa-theme-ci >/dev/null' EXIT
+          docker cp itecsa-theme-ci:/opt/keycloak/themes/itecsa dist/image-theme
+          diff -r dist/keycloak-26.8.1/itecsa dist/image-theme

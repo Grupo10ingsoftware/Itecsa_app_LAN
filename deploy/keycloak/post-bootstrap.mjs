@@ -2,6 +2,8 @@ import { fileURLToPath } from 'node:url';
 import { RECOGNIZED_ROLES, BUSINESS_PERMISSIONS, ROLE_PERMISSIONS } from '../../shared/keycloakAuthorization.js';
 import { validateOrigin, managementRoles, usernameMapper, registrationDateMapper } from './render-realm.mjs';
 
+import { inspectThemeLocale, applyThemeLocale } from './theme-contract.mjs';
+
 const fail = message => { throw Error('KEYCLOAK_BOOTSTRAP: ' + message); };
 const sameUser = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
 const equal = (a, b) => JSON.stringify([...a].sort()) === JSON.stringify([...b].sort());
@@ -68,6 +70,8 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
       realm.passwordPolicy !== 'length(8) and upperCase(1) and lowerCase(1) and digits(1) and specialChars(1)') {
     fail('politica o seguridad del realm inesperada');
   }
+  const localePending = inspectThemeLocale(realm);
+  if (localePending && readOnly) fail('idioma del tema pendiente; aplicar manage.sh keycloak-configure');
   const [web, rolesClient, capabilitiesClient, adminClient, managementClient] = await Promise.all([
     client('itecsa-web'), client('itecsa-api-v1'), client('itecsa-api'),
     client('itecsa-backend-admin'), client('realm-management'),
@@ -126,6 +130,7 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
   }
   const allowed = management.filter(role => managementRoles.includes(role.name));
   if (allowed.length !== managementRoles.length) fail('permisos de administracion incompletos');
+  if (localePending) Object.assign(realm, await applyThemeLocale(request));
   const confirmedMapperNames = webMappers.map(value => value.name);
   for (const expected of missingProfileMappers) {
     // Extend the known profile contract without replacing clients, scopes or users.
