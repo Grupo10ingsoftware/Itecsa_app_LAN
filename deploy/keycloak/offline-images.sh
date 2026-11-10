@@ -65,18 +65,28 @@ case "$ACTION" in
       [[ -n "$revision" ]] || revision="-"
       printf '%s %s %s\n' "$image" "$(docker image inspect --format '{{.Id}}' "$image")" "$revision" >> "$OUT_DIR/itecsa-images.txt"
     done
-    chmod 0600 "$OUT_DIR/itecsa-images.tar" "$OUT_DIR/itecsa-images.sha256" "$OUT_DIR/itecsa-images.txt"
+    # Extend the existing transport inventory; never replace its image-ID check.
+    rm -f "$OUT_DIR/itecsa-release.json.pending"
+    node "$ROOT_DIR/deploy/keycloak/image-provenance.mjs" record --env-file "$ENV_FILE" \
+      --inventory "$OUT_DIR/itecsa-images.txt" --output "$OUT_DIR/itecsa-release.json.pending"
+    mv "$OUT_DIR/itecsa-release.json.pending" "$OUT_DIR/itecsa-release.json"
+    (cd "$OUT_DIR" && sha256sum itecsa-images.tar itecsa-images.txt itecsa-release.json > itecsa-images.sha256)
+    chmod 0600 "$OUT_DIR/itecsa-release.json" "$OUT_DIR/itecsa-images.tar" "$OUT_DIR/itecsa-images.sha256" "$OUT_DIR/itecsa-images.txt"
     echo "OFFLINE_IMAGES: paquete e inventario preparados"
     ;;
   load)
     (cd "$OUT_DIR" && sha256sum -c itecsa-images.sha256)
     docker image load -i "$OUT_DIR/itecsa-images.tar"
     verify_inventory
+    node "$ROOT_DIR/deploy/keycloak/image-provenance.mjs" verify --env-file "$ENV_FILE" \
+      --inventory "$OUT_DIR/itecsa-images.txt" --output "$OUT_DIR/itecsa-release.json"
     echo "OFFLINE_IMAGES: todas las imagenes cargadas"
     ;;
   verify)
     (cd "$OUT_DIR" && sha256sum -c itecsa-images.sha256)
     verify_inventory
+    node "$ROOT_DIR/deploy/keycloak/image-provenance.mjs" verify --env-file "$ENV_FILE" \
+      --inventory "$OUT_DIR/itecsa-images.txt" --output "$OUT_DIR/itecsa-release.json"
     echo "OFFLINE_IMAGES: checksum y versiones verificados"
     ;;
   *) fail "uso: offline-images.sh pack|load|verify [deploy/mysql.env] [directorio]" ;;
