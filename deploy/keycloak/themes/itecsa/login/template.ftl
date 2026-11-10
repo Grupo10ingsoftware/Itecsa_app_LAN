@@ -9,7 +9,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="robots" content="noindex, nofollow"/>
   <title><#nested "header"> · ITECSA</title>
-  <link rel="stylesheet" href="${url.resourcesPath}/css/itecsa.css"/>
+  <#if properties.styles?has_content>
+    <#list properties.styles?split(' ') as style>
+      <#if style?has_content><link rel="stylesheet" href="${url.resourcesPath}/${style}"/></#if>
+    </#list>
+  </#if>
   <#if properties.itecsaFont?has_content><link rel="stylesheet" href="${url.resourcesPath}/css/font.css"/></#if>
   <script type="importmap">{"imports":{"rfc4648":"${url.resourcesCommonPath}/vendor/rfc4648/rfc4648.js"}}</script>
   <script src="${url.resourcesPath}/js/menu-button-links.js" type="module"></script>

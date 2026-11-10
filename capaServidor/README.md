@@ -140,9 +140,10 @@ origen y secretos de la instalación al actualizar. No ejecutar `down -v`.
 
 El import de Keycloak omite un realm existente: editar el JSON generado no
 actualiza sus usuarios ni configuración. Los cambios administrativos requieren
-su procedimiento específico. El tema incluido en la imagen procede de
-`deploy/keycloak/themes/`; para una instalación Keycloak externa se conservan
-`scripts/prepare-keycloak-theme.mjs` y `scripts/keycloak-theme-admin.mjs`.
+su procedimiento específico. El tema incluido en la imagen y el instalable externo usan el mismo
+`scripts/prepare-keycloak-theme.mjs`, con respaldo de mensajes e idioma español
+explícito. Consultar [tema y actualización de realms existentes](../deploy/keycloak/THEME.md).
+`scripts/keycloak-theme-admin.mjs` permite activar el tema en un Keycloak externo.
 
 La API expone `/api/health/live`. La comprobación `/internal/ready` es opcional
 y protegida por la configuración de salud interna. Un estado saludable no
