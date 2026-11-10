@@ -121,7 +121,7 @@ export function initializeAuthForms(root = document) {
       buttons.forEach(button => button.setAttribute('aria-disabled', 'true'))
       const submitter = event.submitter
       if (submitter) {
-        submitter.innerHTML = '<span class="itecsa-loading" data-scope="action" data-surface="dark" role="status" aria-live="polite"><svg class="itecsa-loading__ring" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="itecsa-loading__track" cx="24" cy="24" r="20"/><circle class="itecsa-loading__arc" cx="24" cy="24" r="20"/></svg><span>Cargando...</span></span>'
+        submitter.innerHTML = '<span class="itecsa-loading" data-scope="action" data-surface="dark" role="status" aria-live="polite"><svg class="itecsa-loading__ring" width="16" height="16" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="itecsa-loading__track" cx="24" cy="24" r="20"/><circle class="itecsa-loading__arc" cx="24" cy="24" r="20"/></svg><span>Cargando...</span></span>'
       }
     })
   })

@@ -40,12 +40,18 @@ jobs:
         run: node --test deploy/mysql/backup.test.mjs
       - name: Keycloak profile identity contract
         run: node --test deploy/keycloak/profile-contract.test.mjs
+      - name: Keycloak theme packaging and native forms
+        run: node --test deploy/keycloak/theme-contract.test.mjs deploy/keycloak/theme-forms.test.mjs
+      - name: Image provenance and HTTP resource contract
+        run: node --test deploy/keycloak/image-provenance.test.mjs
       - name: Profile registration date contract
         run: node --test capaServidor/test/profileRegistrationDate.test.js capaVista/test/profileDates.test.mjs
       - name: MySQL update preflight regression
         run: node --test capaServidor/test/mysqlUpdatePreflight.test.js
       - name: Production load refresh regressions
         run: node --test capaVista/test/productionLoadRefresh.test.mjs capaVista/test/productionLoadDrafts.test.mjs
+      - name: Production business date regression
+        run: node --test capaServidor/test/productionDate.test.js
       - name: Kanban live refresh regressions
         run: node --test capaVista/test/kanbanLiveRefresh.test.mjs
       - name: Runtime dependency audit

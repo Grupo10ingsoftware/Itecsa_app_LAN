@@ -118,6 +118,10 @@ verify_release_images() {
   [[ "$web_revision" == "$APP_VERSION" ]] || fail "WEB_IMAGE no corresponde a APP_VERSION"
   [[ "$keycloak_revision" == "$APP_VERSION" ]] || fail "KEYCLOAK_IMAGE no corresponde a APP_VERSION"
   [[ "$api_revision" == "$tools_revision" ]] || fail "API y database-tools pertenecen a versiones distintas"
+  if [[ -n "$(read_value IMAGE_MANIFEST_FILE)" ]]; then
+    node "$ROOT_DIR/deploy/keycloak/image-provenance.mjs" verify --env-file "$ENV_FILE" \
+      --output "$(resolve_path "$(read_value IMAGE_MANIFEST_FILE)")"
+  fi
 }
 prepare_images() {
   case "$IMAGE_MODE" in
@@ -133,7 +137,13 @@ prepare_images() {
       docker tag mysql@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69 "$(read_value MYSQL_IMAGE)" ;;
     preloaded) : ;;
   esac
-  [[ "$IMAGE_MODE" == preloaded ]] || verify_release_images
+  if [[ "$IMAGE_MODE" != preloaded ]]; then
+    if [[ -n "$(read_value IMAGE_MANIFEST_FILE)" && ! -e "$(resolve_path "$(read_value IMAGE_MANIFEST_FILE)")" ]]; then
+      node "$ROOT_DIR/deploy/keycloak/image-provenance.mjs" record --env-file "$ENV_FILE" \
+        --output "$(resolve_path "$(read_value IMAGE_MANIFEST_FILE)")"
+    fi
+    verify_release_images
+  fi
 }
 verify_preloaded_images() {
   local image
@@ -248,7 +258,12 @@ verify_application() {
   compose exec -T api node -e 'if(process.env.IDENTITY_PREPARATION_ENABLED!=="true"||process.env.AUTH_PROVIDER!=="keycloak")process.exit(1); fetch("http://127.0.0.1:3000/api/admin/identity/users",{signal:AbortSignal.timeout(10000)}).then(r=>{if(r.status!==401)throw Error("ruta de usuarios no protegida o no montada")}).catch(e=>{console.error(e.message);process.exitCode=1})' \
     || fail "Gestion de usuarios no esta habilitada y protegida en la API"
   PUBLIC_ORIGIN="$PUBLIC_ORIGIN" NODE_EXTRA_CA_CERTS="$(resolve_path "$(read_value LAN_CA_FILE)")" \
-    node "$ROOT_DIR/deploy/keycloak/verify-service-client.mjs"
+    node "$ROOT_DIR/deploy/keycloak/verify-service-client.mjs" || return $?
+  if [[ -n "$(read_value IMAGE_MANIFEST_FILE)" ]]; then
+    NODE_EXTRA_CA_CERTS="$(resolve_path "$(read_value LAN_CA_FILE)")" \
+      node "$ROOT_DIR/deploy/keycloak/image-provenance.mjs" verify --env-file "$ENV_FILE" \
+      --output "$(resolve_path "$(read_value IMAGE_MANIFEST_FILE)")" --active --http
+  fi
 }
 install_database() {
   prepare_images
