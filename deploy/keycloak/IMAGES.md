@@ -3,9 +3,9 @@
 `APP_VERSION` y las etiquetas OCI comprueban la revisión declarada. El recibo
 `itecsa-release.json` añade los image ID inmutables, plataforma, `RepoDigests`
 disponibles, bases fijadas y hashes de los recursos de web y Keycloak. El ID
-es el hash de la configuración y sus capas; un digest de registro identifica
-el manifiesto. No son intercambiables, y `docker load` puede conservar el ID
-sin conservar `RepoDigests`. Una etiqueta local se puede renombrar sin cambiar
+es el identificador inmutable expuesto por Docker; `RepoDigests` conserva las
+referencias de manifiesto del registro. No se infiere uno a partir del otro, y
+`docker load` puede conservar el ID sin conservar `RepoDigests`. Una etiqueta local se puede renombrar sin cambiar
 el contenido verificado.
 
 El recibo se genera en el equipo que prepara la entrega con el checkout de

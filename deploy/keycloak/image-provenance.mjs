@@ -38,7 +38,10 @@ export function imageFacts(image, data, bases, version) {
     platform: data.platform, runtimeBase: image.service === 'mysql' ? bases.mysql : data.runtimeBase,
     ...(image.service === 'mysql' ? {} : { buildBase: data.buildBase }) };
 }
-const imageFormat = '{"id":{{json .Id}},"revision":{{json (index .Config.Labels "org.opencontainers.image.revision")}},"repoDigests":{{json .RepoDigests}},"platform":"{{.Os}}/{{.Architecture}}","runtimeBase":{{json (index .Config.Labels "io.itecsa.base.runtime")}},"buildBase":{{json (index .Config.Labels "io.itecsa.base.build")}}}';
+const label = key => '{{if index .Config "Labels"}}{{json (index .Config.Labels "' + key + '")}}{{else}}null{{end}}';
+const imageFormat = '{"id":{{json .Id}},"revision":' + label('org.opencontainers.image.revision')
+  + ',"repoDigests":{{json .RepoDigests}},"platform":"{{.Os}}/{{.Architecture}}","runtimeBase":' + label('io.itecsa.base.runtime')
+  + ',"buildBase":' + label('io.itecsa.base.build') + '}';
 export async function inspectImages(env, run = docker) {
   const bases = await readJson(path.join(root, 'deploy/image-bases.json'));
   const images = configuredImages(env).map(image => imageFacts(image,

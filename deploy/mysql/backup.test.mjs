@@ -63,6 +63,7 @@ if (path.basename(process.argv[1]) === 'node') {
   }
   if (args[0]?.endsWith('/render-realm.mjs')) { record('runtime:realm'); finish(); }
   if (args[0]?.endsWith('/post-bootstrap.mjs')) { action('verify:bootstrap'); finish(); }
+  if (args[0]?.endsWith('/image-provenance.mjs')) { action(args.includes('--active') ? 'verify:release-active' : 'verify:release'); finish(); }
   if (args[0]?.endsWith('/verify-service-client.mjs')) { action('verify:application'); finish(); }
   error('unrecognized host node command');
 }
@@ -139,7 +140,7 @@ if (service === 'db-deploy') {
 record('runtime:' + service); finish();
 `;
 
-function fixture(t, { services = healthyServices(), grants = { api: true, migrator: true }, faults = [] } = {}) {
+function fixture(t, { services = healthyServices(), grants = { api: true, migrator: true }, faults = [], releaseReceipt = false } = {}) {
   const root = mkdtempSync(path.join(tmpdir(), 'itecsa-backup-regression-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   for (const folder of ['deploy/mysql/private', 'deploy/keycloak/private', 'shared', 'bin', 'certs', 'data/backups']) {
@@ -154,6 +155,7 @@ function fixture(t, { services = healthyServices(), grants = { api: true, migrat
   for (const file of ['ca.pem', 'tls.crt', 'tls.key', 'certs/ca.pem', 'certs/server-cert.pem', 'certs/server-key.pem']) writeFileSync(path.join(root, file), 'fixture\n');
   writeFileSync(path.join(root, 'deploy/keycloak/private/itecsa-realm.json'), '{}\n');
   const env = {
+    IMAGE_MANIFEST_FILE: releaseReceipt ? './data/offline/itecsa-release.json' : '',
     COMPOSE_PROJECT_NAME: 'itecsa-test', APP_VERSION: 'release-test', DEPLOY_IMAGE_MODE: 'preloaded',
     MYSQL_IMAGE: 'mysql:test', API_IMAGE: 'api:test', WEB_IMAGE: 'web:test', DB_TOOLS_IMAGE: 'tools:test', KEYCLOAK_IMAGE: 'keycloak:test',
     API_ENV_FILE: './api.env', WEB_ENV_FILE: './web.env', MYSQL_CERTS_DIR: './certs', MYSQL_PRIVATE_DIR: './private',
@@ -398,3 +400,25 @@ for (const protection of ['stop', 'lock']) {
     }
   });
 }
+
+
+test('a configured release receipt failure rejects backup before any interruption', t => {
+  const f = fixture(t, { releaseReceipt: true, faults: [{ phase: 'verify:release' }] });
+  assertFailure(f.run('backup'));
+  assertUntouched(f, healthyServices(), { api: true, migrator: true });
+});
+
+test('an active-image or HTTP mismatch rejects backup before any interruption', t => {
+  const f = fixture(t, { releaseReceipt: true, faults: [{ phase: 'verify:release-active' }] });
+  assertFailure(f.run('backup'));
+  assertUntouched(f, healthyServices(), { api: true, migrator: true });
+});
+
+test('an active-image or HTTP mismatch during recovery preserves the fail-closed state', t => {
+  const f = fixture(t, { releaseReceipt: true, faults: [
+    { phase: 'dump:keycloak', code: 71 }, { phase: 'verify:release-active', occurrence: 2 },
+  ] });
+  assert.equal(f.run('backup').status, 71);
+  assertClosed(f);
+  assert.equal(f.state().counts['verify:release-active'], 2);
+});
