@@ -1,7 +1,7 @@
 import { PRODUCT_ID, isValidLanyardCapacity } from '../../../../../shared/businessCatalog.js'
 import FilterContent from '../../../shared/components/filters/FilterContent'
 import LoadingIndicator, { LoadingAction } from '../../../shared/components/loading/LoadingIndicator'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import KanbanColumn from '../components/KanbanColumn'
 import KanbanFilters from '../components/KanbanFilters'
@@ -11,6 +11,8 @@ import PageHeader from '../../../shared/components/layout/PageHeader'
 import { useAuth } from '../../../hooks/useAuth'
 import { PERMISSIONS } from '../../../config/permissions'
 import { useKanbanApi } from '../hooks/useKanbanApi'
+import { createProductionLoadRefresh } from '../utils/productionLoadRefresh.js'
+import { updateLoadDraft, loadDraftConflicts, loadDraftEntries } from '../utils/productionLoadDrafts.js'
 import { useToast } from '../../../shared/notifications/useToast'
 import { operationFailureMessage, requiresContext, uncertainOperation } from '../../../shared/notifications/operationFeedback'
 
@@ -55,10 +57,6 @@ function getProgressPercentage(detail) {
   return Number.isFinite(percentage) ? Math.round(percentage) : 0
 }
 
-function hasDailyLoadChange(detail) {
-  return toInteger(detail.draftQuantity) !== toInteger(detail.dailyQuantity)
-}
-
 export default function KanbanBoardPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedOrderId = searchParams.getAll('pedido').length > 1 ? '' : searchParams.get('pedido')
@@ -76,6 +74,10 @@ export default function KanbanBoardPage() {
   const isCapacityOpen = capacityApi === api
   const [draftCapacity, setDraftCapacity] = useState(null)
   const [capacityError, setCapacityError] = useState('')
+  const [loadError, setLoadError] = useState('')
+  const [refreshingLoad, setRefreshingLoad] = useState({ api: null, busy: false })
+  const isRefreshingLoad = refreshingLoad.api === api && refreshingLoad.busy
+  const loadRefresh = useRef(null)
   const [savingCapacity, setSavingCapacity] = useState({ api: null, busy: false })
   const isSavingCapacity = savingCapacity.api === api && savingCapacity.busy
   const capacityPending = useRef(false)
@@ -84,13 +86,16 @@ export default function KanbanBoardPage() {
   const isLoadingCapacity = loadedCapacityApi !== api
   const [appliedFilters, setAppliedFilters] = useState({})
   const [kanbanRefreshKey, setKanbanRefreshKey] = useState(0)
-  const [operationalLoad, setOperationalLoad] = useState({
+  const [loadSnapshot, setOperationalLoad] = useState({
     date: null,
     capacity: null,
     lanyardsInProduction: 0,
     percentage: 0,
     details: [],
   })
+  const operationalLoad = loadedCapacityApi === api ? loadSnapshot : {
+    date: null, capacity: null, lanyardsInProduction: 0, percentage: 0, details: [],
+  }
   const [draftQuantities, setDraftQuantities] = useState({})
   const canManageProductionLoad =
     hasPermission(PERMISSIONS.MANAGE_PRODUCTION_LOAD) ||
@@ -104,35 +109,47 @@ export default function KanbanBoardPage() {
   const progressWidth = `${Math.min(operationalLoad.percentage, 100)}%`
   const draftDetails = useMemo(() => operationalLoad.details.map((detail) => ({
     ...detail,
-    draftQuantity: draftQuantities[detail.detailId] ?? toInteger(detail.dailyQuantity),
+    draftQuantity: draftQuantities[detail.detailId]?.quantity ?? toInteger(detail.dailyQuantity),
   })), [draftQuantities, operationalLoad.details])
 
+  const draftConflict = loadDraftConflicts(draftQuantities, operationalLoad)[0]
+  const refreshOperationalLoad = useCallback(() => {
+    if (loadRefresh.current?.api === api) loadRefresh.current.controller.refresh()
+  }, [api])
+
   useEffect(() => {
-    let isMounted = true
-    const controller = new AbortController()
+    let firstLoad = true
     const scope = operationScope
     const pending = capacityPending
-
-    api.getProductionLoad({ signal: controller.signal })
-      .then((result) => {
-        if (!isMounted) return
-        const nextLoad = normalizeLoad(result)
-        setOperationalLoad(nextLoad)
-        setDraftQuantities(Object.fromEntries(
-          nextLoad.details.map((detail) => [detail.detailId, toInteger(detail.dailyQuantity)]),
-        ))
-        setCapacityError('')
-      })
-      .catch((error) => {
-        if (isMounted) {
-          setCapacityError(error?.payload?.message ?? 'No fue posible cargar la carga operativa.')
+    const refresh = loadRefresh
+    const controller = createProductionLoadRefresh({
+      read: async options => normalizeLoad(await api.getProductionLoad(options)),
+      onPending: () => {
+        setRefreshingLoad({ api, busy: true })
+        if (firstLoad) {
+          setOperationalLoad({ date: null, capacity: null, lanyardsInProduction: 0, percentage: 0, details: [] })
+          setDraftQuantities({})
+          setDraftCapacity(null)
+          setCapacityError('')
+          setLoadError('')
+          firstLoad = false
         }
-      })
-      .finally(() => { if (isMounted) setLoadedCapacityApi(api) })
-
+      },
+      onLoad: nextLoad => {
+        setOperationalLoad(nextLoad)
+        setLoadError('')
+      },
+      onError: () => setLoadError('La carga operativa no está actualizada. Reintenta la consulta; los cambios de pedidos confirmados se mantienen.'),
+      onSettled: () => {
+        setLoadedCapacityApi(api)
+        setRefreshingLoad({ api, busy: false })
+      },
+    })
+    refresh.current = { api, controller }
+    controller.refresh()
     return () => {
-      isMounted = false
-      controller.abort()
+      controller.dispose()
+      if (refresh.current?.controller === controller) refresh.current = null
       scope.current++
       pending.current = false
     }
@@ -141,7 +158,7 @@ export default function KanbanBoardPage() {
   function updateDraftQuantity(detail, rawValue) {
     const max = getEditableMax(detail)
     const value = Math.min(max, toInteger(rawValue))
-    setDraftQuantities((current) => ({ ...current, [detail.detailId]: value }))
+    setDraftQuantities(current => updateLoadDraft(current, detail, value, operationalLoad.date))
     setCapacityError('')
   }
 
@@ -151,20 +168,20 @@ export default function KanbanBoardPage() {
       notify.error('La capacidad debe ser un entero entre 1 y 10000.')
       return
     }
-    if (capacityPending.current) return
+    if (capacityPending.current || isLoadingCapacity || isRefreshingLoad || loadError) return
     capacityPending.current = true
     const version = operationScope.current
+    const resumeRefresh = loadRefresh.current.controller.suspend()
     setSavingCapacity({ api, busy: true })
     try {
       await api.updateCapacities([{ id: PRODUCT_ID.LANYARD, capacity }])
-      const load = normalizeLoad(await api.getProductionLoad())
       if (version !== operationScope.current) return
-      setOperationalLoad(load)
       setDraftCapacity(null)
       notify.success('Capacidad de Lanyard guardada.')
     } catch (error) {
       if (version === operationScope.current) notify.error(operationFailureMessage(error, 'No fue posible guardar la capacidad.'))
     } finally {
+      resumeRefresh()
       if (version === operationScope.current) {
         capacityPending.current = false
         setSavingCapacity({ api, busy: false })
@@ -174,30 +191,17 @@ export default function KanbanBoardPage() {
 
   async function saveProductionLoad(event) {
     event.preventDefault()
-    if (capacityPending.current || isLoadingCapacity) return
+    if (capacityPending.current || isLoadingCapacity || isRefreshingLoad || loadError || draftConflict) return
     capacityPending.current = true
     const version = operationScope.current
+    const resumeRefresh = loadRefresh.current.controller.suspend()
     setSavingCapacity({ api, busy: true })
     try {
-      const entries = draftDetails.filter(hasDailyLoadChange).map((detail) => {
-        const quantity = toInteger(detail.draftQuantity)
-        const max = getEditableMax(detail)
-
-        if (quantity > max) {
-          throw new Error(`La carga de ${detail.salesNoteNumber ?? detail.detailId} supera lo pendiente.`)
-        }
-
-        return {
-          detailId: detail.detailId,
-          quantity,
-        }
-      })
+      const entries = loadDraftEntries(draftQuantities, operationalLoad)
       const result = normalizeLoad(await api.updateProductionLoad(entries))
       if (version !== operationScope.current) return
       setOperationalLoad(result)
-      setDraftQuantities(Object.fromEntries(
-        result.details.map((detail) => [detail.detailId, toInteger(detail.dailyQuantity)]),
-      ))
+      setDraftQuantities({})
       setKanbanRefreshKey((current) => current + 1)
       setCapacityApi(null)
       setCapacityError('')
@@ -208,6 +212,7 @@ export default function KanbanBoardPage() {
       if (requiresContext(error) || uncertainOperation(error)) setCapacityError(message)
       else notify.error(message)
     } finally {
+      resumeRefresh()
       if (version === operationScope.current) {
         capacityPending.current = false
         setSavingCapacity({ api, busy: false })
@@ -239,13 +244,20 @@ export default function KanbanBoardPage() {
               </div>
               <strong className={styles.capacityPercentage}>{isLoadingCapacity ? <LoadingIndicator scope="action" surface="dark" context="Carga operativa" /> : operationalLoad.capacity ? `${operationalLoad.percentage}%` : 'No disponible'}</strong>
               {canManageProductionLoad && (
-                <button className={styles.capacitySettings} aria-label="Configurar carga operativa" disabled={isLoadingCapacity} onClick={() => { setDraftCapacity(null); setCapacityApi(api) }} title="Configurar carga operativa" type="button">
+                <button className={styles.capacitySettings} aria-label="Configurar carga operativa" disabled={isLoadingCapacity} onClick={() => { setCapacityApi(api); refreshOperationalLoad() }} title="Configurar carga operativa" type="button">
                   <i className="bi bi-gear" aria-hidden="true" />
                 </button>
               )}
             </aside>
           </div>
+          {loadedCapacityApi === api && loadError && (
+            <div className={styles.loadNotice} role="alert">
+              <span>{loadError}</span>
+              <button type="button" disabled={isRefreshingLoad} onClick={refreshOperationalLoad}>Reintentar carga operativa</button>
+            </div>
+          )}
           <KanbanColumn filters={appliedFilters} refreshKey={kanbanRefreshKey}
+            onProductionLoadChange={refreshOperationalLoad}
             requestedOrderId={requestedOrderId}
             onClearRequestedOrder={clearRequestedOrder}
           />
@@ -268,6 +280,17 @@ export default function KanbanBoardPage() {
                 <span>{formatDate(operationalLoad.date)}</span>
                 <strong>{operationalLoad.lanyardsInProduction} / {operationalLoad.capacity ?? '—'} lanyards asignados para la jornada</strong>
               </div>
+              {isRefreshingLoad && <LoadingIndicator scope="action" context="Actualizando carga operativa" />}
+              {loadError && <div role="alert">
+                <p className={styles.capacityError}>{loadError}</p>
+                <button type="button" disabled={isRefreshingLoad} onClick={refreshOperationalLoad}>Reintentar carga operativa</button>
+              </div>}
+              {draftConflict && <p className={styles.capacityError} role="alert">{draftConflict}</p>}
+              {(Object.keys(draftQuantities).length > 0 || draftCapacity !== null) && (
+                <button type="button" disabled={isSavingCapacity} onClick={() => {
+                  setDraftQuantities({}); setDraftCapacity(null); setCapacityError('')
+                }}>Descartar cambios pendientes</button>
+              )}
               {hasPermission(PERMISSIONS.MANAGE_CAPACITY) && (
                 <div className={styles.volumeControl}>
                   <label className={styles.volumeHeading}>
@@ -276,7 +299,7 @@ export default function KanbanBoardPage() {
                       value={draftCapacity ?? operationalLoad.capacity ?? ''}
                       onChange={event => setDraftCapacity(event.target.value)} disabled={isSavingCapacity} />
                   </label>
-                  <button type="button" disabled={isSavingCapacity || !operationalLoad.capacity} onClick={saveDailyCapacity}>
+                  <button type="button" disabled={isSavingCapacity || isRefreshingLoad || !!loadError || !operationalLoad.capacity} onClick={saveDailyCapacity}>
                     Guardar capacidad
                   </button>
                 </div>
@@ -303,6 +326,7 @@ export default function KanbanBoardPage() {
                       <input
                         aria-label={`Carga diaria para ${detail.salesNoteNumber ?? detail.detailId}`}
                         max={max}
+                        disabled={isSavingCapacity}
                         min="0"
                         onChange={(event) => updateDraftQuantity(detail, event.target.value)}
                         step="1"
@@ -314,6 +338,7 @@ export default function KanbanBoardPage() {
                       <input
                         aria-label={`Selector de carga diaria para ${detail.salesNoteNumber ?? detail.detailId}`}
                         max={max}
+                        disabled={isSavingCapacity}
                         min="0"
                         onChange={(event) => updateDraftQuantity(detail, event.target.value)}
                         step="1"
@@ -332,7 +357,7 @@ export default function KanbanBoardPage() {
             </div>
             <footer>
               <button disabled={isSavingCapacity} onClick={() => setCapacityApi(null)} type="button">Cancelar</button>
-              <button disabled={isSavingCapacity || draftDetails.length === 0} type="submit" aria-busy={isSavingCapacity}>
+              <button disabled={isSavingCapacity || isRefreshingLoad || !!loadError || !!draftConflict || draftDetails.length === 0} type="submit" aria-busy={isSavingCapacity}>
                 <LoadingAction busy={isSavingCapacity} context="Confirmar carga">Confirmar carga</LoadingAction>
               </button>
             </footer>

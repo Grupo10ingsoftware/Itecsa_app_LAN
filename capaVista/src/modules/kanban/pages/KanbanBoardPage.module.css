@@ -149,6 +149,9 @@
 .capacityModal footer { border-top: 1px solid #d8dee4; gap: .6rem; justify-content: flex-end; }
 .capacityModal footer button { border: 1px solid #d0d7de; border-radius: .5rem; font-weight: 800; padding: .55rem .8rem; }
 .capacityModal footer button[type='submit'] { background: #111; color: #fff; }
+.loadNotice { align-items: center; background: #fff7ed; border: 1px solid #fed7aa; border-radius: .5rem; color: #9a3412; display: flex; flex-wrap: wrap; gap: .75rem; margin-block: .75rem; padding: .75rem; }
+.loadNotice button { flex-shrink: 0; }
+
 .capacityError { color: #b42318; margin: 0; }
 
 @media (max-width: 991.98px) {
