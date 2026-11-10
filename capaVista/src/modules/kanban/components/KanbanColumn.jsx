@@ -13,6 +13,8 @@ import { DroppableColumn } from './DroppableColumn.jsx';
 import { MoveToProductionModal } from './MoveToProductionModal.jsx';
 import { useState, useEffect, useEffectEvent, useRef } from 'react';
 import { useKanbanApi } from '../hooks/useKanbanApi';
+import { runtimeConfig } from '../../../config/runtimeConfig.js';
+import { createKanbanLiveRefresh, connectKanbanRefresh, reconcileKanbanOrders } from '../utils/kanbanLiveRefresh.js';
 import { useAuth } from '../../../hooks/useAuth';
 import { applyOrderStagePatch } from '../utils/orderStagePatch';
 import { PERMISSIONS } from '../../../config/permissions';
@@ -38,6 +40,7 @@ function rememberCardExpansion(current, orders) {
 function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClearRequestedOrder, onProductionLoadChange }) {
   const notify = useToast()
   const [orders, setOrders] = useState([])
+  const [ordersApi, setOrdersApi] = useState(null)
   const [cardExpansion, setCardExpansion] = useState({ byOrder: {}, byColumn: {} })
   const [columns, setColumns] = useState(baseColumns)
   const [loading, setLoading] = useState(true)
@@ -49,9 +52,12 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
   const [pageInfo, setPageInfo] = useState({ nextCursor: null, hasMore: false })
   const [loadingMore, setLoadingMore] = useState(false)
   const listRequestId = useRef(0)
-  const morePending = useRef(false)
+  const liveRefresh = useRef(null)
+  const activityHolds = useRef(new Set())
+  const dragRelease = useRef(null)
+  const modalRelease = useRef(null)
+  const [listError, setListError] = useState(null)
   const moveValidation = useRef(false)
-  const moreController = useRef(null)
   const detailController = useRef(null)
   const moveController = useRef(null)
   const sessionVersion = useRef(0)
@@ -60,6 +66,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
   const [validatingMove, setValidatingMove] = useState(false)
   const [pendingProductionMove, setPendingProductionMove] = useState(null)
   const kanbanApi = useKanbanApi()
+  const visibleOrders = ordersApi === kanbanApi ? orders : []
   const { hasPermission } = useAuth()
   const canFinishProduction = hasPermission(PERMISSIONS.MOVE_ORDERS)
   const canReadOrders = hasPermission(PERMISSIONS.VIEW_KANBAN_MODULE)
@@ -95,115 +102,115 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
     const requests = detailRequestId
     const version = sessionVersion
     const labels = pendingLabels.current
+    const holds = activityHolds.current
     return () => {
       requests.current++
       version.current++
       detailController.current?.abort()
       moveController.current?.abort()
       labels.clear()
+      for (const hold of holds) {
+        if (hold.api === kanbanApi) { hold.release?.(); holds.delete(hold) }
+      }
     }
   }, [kanbanApi])
+
+  const notifyProductionLoadRefresh = useEffectEvent(() => onProductionLoadChange?.())
 
   useEffect(() => {
     const requests = listRequestId
     const id = ++requests.current
-    const controller = new AbortController()
-    const loadOrders = async () => {
-      setLoading(true)
-      setLoadingMore(false)
-      morePending.current = false
-      try {
-
-        const orderWork = kanbanApi.getOrders({
-          limit: 100,
-          search: filters?.salesNoteNumber || filters?.clientName || '',
-          productType: filters?.productType || '',
-        }, { signal: controller.signal }).then(result => {
-          if (controller.signal.aborted || id !== listRequestId.current) return
-          const orderItems = result?.items ?? []
-          const normalizedOrders = Array.isArray(orderItems)
-            ? orderItems
-                .filter((order) => order?.salesNoteNumber)
-                .map(normalizeOrder)
-                .filter((order) => Number(order.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(order.orderStatus)))
-            : []
-          setOrders(normalizedOrders)
-          setCardExpansion(current => rememberCardExpansion(current, normalizedOrders))
-          setPageInfo(result?.pageInfo ?? { nextCursor: null, hasMore: false })
-        }).catch(() => {
-          if (!controller.signal.aborted && id === listRequestId.current) notify.error('No fue posible cargar las órdenes.')
-        }).finally(() => {
-          if (!controller.signal.aborted && id === listRequestId.current) setLoading(false)
-        })
-        const statusWork = kanbanApi.getOrderStatuses().then(result => {
-          if (controller.signal.aborted || id !== listRequestId.current) return
-          if (!Array.isArray(result)) { setColumns(baseColumns); return }
-          const normalizedStatuses = result
-            .map(normalizeStatus)
-            .filter((status) => Number(status.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(status.title)))
-            .sort((a, b) => a.order - b.order)
-
-          setColumns(normalizedStatuses.length > 0 ? normalizedStatuses : baseColumns)
-        }).catch(() => {
-          if (!controller.signal.aborted && id === listRequestId.current) {
-            notify.error('No fue posible cargar los estados del Kanban.')
-            setColumns(baseColumns)
-          }
-        })
-        await Promise.allSettled([orderWork, statusWork])
-      } catch {
-        if (id !== listRequestId.current) return
-        notify.error('No fue posible cargar las órdenes.')
-        setColumns(baseColumns)
-      } finally {
-        if (id === listRequestId.current) setLoading(false)
-      }
-    }
-
-    loadOrders()
-    return () => {
-      requests.current++
-      controller.abort()
-      moreController.current?.abort()
-      moveController.current?.abort()
-    }
-  }, [filters?.clientName, filters?.salesNoteNumber, filters?.productType, kanbanApi, refreshKey, notify])
-
-  async function loadMoreOrders() {
-    if (!pageInfo.hasMore || !pageInfo.nextCursor || loading || morePending.current) return
-    const id = listRequestId.current
-    const controller = new AbortController()
-    moreController.current = controller
-    morePending.current = true
-    setLoadingMore(true)
-    try {
-      const result = await kanbanApi.getOrders({
-        limit: 50,
-        cursor: pageInfo.nextCursor,
+    const refreshRef = liveRefresh
+    const controller = createKanbanLiveRefresh({
+      intervalMs: runtimeConfig.kanbanRefreshMs,
+      readPage: (pagination, options) => kanbanApi.getOrders({
+        ...pagination,
         search: filters?.salesNoteNumber || filters?.clientName || '',
         productType: filters?.productType || '',
-      }, { signal: controller.signal })
-      if (id !== listRequestId.current) return
-      const nextOrders = (result.items ?? [])
-        .filter((order) => order?.salesNoteNumber)
-        .map(normalizeOrder)
-        .filter((order) => Number(order.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(order.orderStatus)))
-      setOrders((current) => {
-        const ids = new Set(current.map(item => item.id))
-        return [...current, ...nextOrders.filter(next => {
-          if (ids.has(next.id)) return false
-          ids.add(next.id)
-          return true
-        })]
-      })
-      setCardExpansion(current => rememberCardExpansion(current, nextOrders))
-      setPageInfo(result.pageInfo ?? { nextCursor: null, hasMore: false })
-    } catch {
-      if (!controller.signal.aborted && id === listRequestId.current) {
-        notify.error('No fue posible cargar más órdenes.')
+      }, options),
+      onPage: result => {
+        const normalizedOrders = result.items
+          .filter(order => order?.salesNoteNumber)
+          .map(normalizeOrder)
+          .filter(order => Number(order.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(order.orderStatus)))
+        setOrders(current => reconcileKanbanOrders(current, normalizedOrders))
+        setOrdersApi(kanbanApi)
+        setCardExpansion(current => rememberCardExpansion(current, normalizedOrders))
+        setPageInfo(result.pageInfo)
+      },
+      onState: state => {
+        setLoading(state.busy && state.initial)
+        setLoadingMore(state.busy && state.more)
+      },
+      onError: setListError,
+      onRefresh: () => notifyProductionLoadRefresh(),
+    })
+    refreshRef.current = controller
+    // A filter change may recreate the reader while a write/modal is active.
+    // Transfer holds only within this identity; old sessions never block a new one.
+    for (const hold of activityHolds.current) {
+      if (hold.api === kanbanApi) hold.release = controller.suspend()
+    }
+    const disconnect = connectKanbanRefresh(controller, document, window)
+    kanbanApi.getOrderStatuses().then(result => {
+      if (id !== requests.current) return
+      const normalized = Array.isArray(result) ? result.map(normalizeStatus)
+        .filter(status => Number(status.generalStepId) !== 4 && !['terminado', 'cancelado'].includes(normalizeText(status.title)))
+        .sort((a, b) => a.order - b.order) : []
+      setColumns(normalized.length ? normalized : baseColumns)
+    }).catch(() => {
+      if (id === requests.current) {
+        notify.error('No fue posible cargar los estados del Kanban.')
+        setColumns(baseColumns)
       }
-    } finally {
-      if (id === listRequestId.current) { morePending.current = false; setLoadingMore(false) }
+    })
+    return () => {
+      requests.current++
+      disconnect()
+      if (refreshRef.current === controller) refreshRef.current = null
+      moveController.current?.abort()
+    }
+  }, [filters?.clientName, filters?.salesNoteNumber, filters?.productType, kanbanApi, notify])
+
+  // Local changes request a fresh loaded window, without resetting pagination,
+  // expansion, scroll or the open detail's independent DTO and drafts.
+  useEffect(() => { liveRefresh.current?.refresh() }, [refreshKey])
+
+  function loadMoreOrders() {
+    if (!loading) liveRefresh.current?.loadMore()
+  }
+
+  function holdBoardReads() {
+    const hold = { api: kanbanApi, release: liveRefresh.current?.suspend() }
+    activityHolds.current.add(hold)
+    return () => {
+      if (!activityHolds.current.delete(hold)) return
+      hold.release?.()
+    }
+  }
+
+  async function withBoardWrite(operation) {
+    const release = holdBoardReads()
+    try { return await operation() }
+    finally { release?.() }
+  }
+
+  function closeProductionMove() {
+    setPendingProductionMove(null)
+    modalRelease.current?.()
+    modalRelease.current = null
+  }
+
+  function startDrag() {
+    dragRelease.current?.()
+    dragRelease.current = holdBoardReads()
+  }
+
+  async function finishDrag(event) {
+    try { await handleDragEnd(event) }
+    finally {
+      dragRelease.current?.()
+      dragRelease.current = null
     }
   }
 
@@ -225,7 +232,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
     const { source, target } = event.operation
     if (!source || !target) return
 
-    const order = orders.find((currentOrder) => currentOrder.salesNoteNumber === source.id)
+    const order = visibleOrders.find((currentOrder) => currentOrder.salesNoteNumber === source.id)
     const targetColumn = columns.find((column) => column.title === target.id)
 
     if (!order || !targetColumn || Number(order.generalStepId) === Number(targetColumn.generalStepId)) return
@@ -309,6 +316,8 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
       }
     }
 
+    modalRelease.current?.()
+    modalRelease.current = holdBoardReads()
     setPendingProductionMove({ order: transitionOrder, targetColumn, api: kanbanApi })
   }
 
@@ -359,7 +368,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
 
   async function handleToggleIndicator(orderId, indicator) {
     if (pendingLabels.current.has(orderId)) return
-    const order = orders.find((item) => item.id === orderId)
+    const order = visibleOrders.find((item) => item.id === orderId)
     if (!order) return
     const config = {
       urgent: ['Urgencia', !order.isUrgent],
@@ -399,7 +408,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
 
     const { order, targetColumn } = pendingProductionMove
     if (await applyOrderMove(order, targetColumn, audit) === false) return
-    setPendingProductionMove(null)
+    closeProductionMove()
     notify.success('Etapa del pedido actualizada correctamente.')
   }
 
@@ -478,11 +487,19 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
         <LoadingIndicator scope="action" context="Consulta del pedido relacionado" />
       )}
       {validatingMove && <LoadingIndicator scope="action" context="Validación del pedido antes del traslado" />}
-      <DragDropProvider onDragEnd={handleDragEnd}>
+      {listError && <div className="alert alert-warning" role="status">
+        <span>{[401, 403].includes(listError.status) || listError.code === 'SESSION_INVALID'
+          ? 'La actualización del Kanban se detuvo por permisos o sesión. Vuelve a iniciar sesión.'
+          : 'El Kanban no está actualizado. Se conservan los pedidos visibles y se reintentará la consulta.'}</span>
+        {![401, 403].includes(listError.status) && listError.code !== 'SESSION_INVALID' && (
+          <button className="btn btn-link" type="button" onClick={() => liveRefresh.current?.refresh()}>Reintentar actualización</button>
+        )}
+      </div>}
+      <DragDropProvider onDragStart={startDrag} onDragEnd={finishDrag}>
         <div className={styles.kanbanWrapper}>
           {columns.map((column) => {
             const columnOrders = sortOrdersForColumn(
-              orders.filter(
+              visibleOrders.filter(
                 (order) => Number(column.generalStepId) === Number(order.generalStepId),
               ),
               column,
@@ -520,7 +537,7 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
                         indicatorsBusy={busyLabels.api === kanbanApi && busyLabels.ids.has(order.id)}
                         key={order.id}
                         onOpenDetail={() => openOrderDetail(order)}
-                        onToggleIndicator={(indicator) => handleToggleIndicator(order.id, indicator)}
+                        onToggleIndicator={(indicator) => withBoardWrite(() => handleToggleIndicator(order.id, indicator))}
                         {...order}
                         expanded={cardExpansion.byOrder[order.id] ?? true}
                         onExpandedChange={expanded => setCardExpansion(current => ({
@@ -547,25 +564,25 @@ function KanbanColumn({ filters, refreshKey = 0, requestedOrderId = null, onClea
         isLoading={detailLoading}
         loadError={detailError}
         onClose={closeOrderDetail}
-        onCompleteSubprocess={handleCompleteSubprocess}
-        onFinishProduction={handleFinishProduction}
+        onCompleteSubprocess={(...args) => withBoardWrite(() => handleCompleteSubprocess(...args))}
+        onFinishProduction={(...args) => withBoardWrite(() => handleFinishProduction(...args))}
         canFinishProduction={!isHistoricalDetail && canFinishProduction}
         canCompleteSubprocess={!isHistoricalDetail && hasPermission(PERMISSIONS.UPDATE_SUBPROCESSES)}
         canReview={!isHistoricalDetail && hasPermission(PERMISSIONS.REVIEW_ORDERS)}
         canRollbackSubprocess={!isHistoricalDetail && hasPermission(PERMISSIONS.ROLLBACK_SUBPROCESSES)}
         canCancelProduction={!isHistoricalDetail && hasPermission(PERMISSIONS.CANCEL_ORDERS)}
         canReevaluate={!isHistoricalDetail && hasPermission(PERMISSIONS.REEVALUATE_ORDERS) && Number(selectedOrder?.generalStepId) === KANBAN_REVISION_STEP}
-        onCancelProduction={handleCancelProduction}
-        onRollbackSubprocess={handleRollbackSubprocess}
-        onReevaluate={handleReevaluate}
-        onSendToReview={handleSendToReview}
+        onCancelProduction={(...args) => withBoardWrite(() => handleCancelProduction(...args))}
+        onRollbackSubprocess={(...args) => withBoardWrite(() => handleRollbackSubprocess(...args))}
+        onReevaluate={(...args) => withBoardWrite(() => handleReevaluate(...args))}
+        onSendToReview={(...args) => withBoardWrite(() => handleSendToReview(...args))}
         order={detailScope === kanbanApi ? selectedOrder : null}
       />
       </KanbanDetailBoundary>
       <MoveToProductionModal
         isOpen={pendingProductionMove?.api === kanbanApi}
-        onClose={() => setPendingProductionMove(null)}
-        onConfirm={confirmProductionMove}
+        onClose={closeProductionMove}
+        onConfirm={(audit) => withBoardWrite(() => confirmProductionMove(audit))}
         order={pendingProductionMove?.order}
       />
     </>

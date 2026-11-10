@@ -121,6 +121,7 @@ services:
       VITE_KEYCLOAK_CLIENT_ID: itecsa-web
       VITE_KEYCLOAK_AUDIENCE: https://api.itecsa.local
       VITE_API_BASE_URL: ${PUBLIC_ORIGIN}/api
+      VITE_KANBAN_REFRESH_MS: ${VITE_KANBAN_REFRESH_MS:-30000}
     volumes:
       - lan_tls:/run/lan-tls:ro
     depends_on:
