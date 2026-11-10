@@ -31,7 +31,7 @@ function uniqueOrders(items) {
 // consistent view: independent HTTP pages are not a database snapshot.
 export async function readKanbanWindow(readPage, previous = EMPTY_PAGE, options = {}) {
   const { signal } = options
-  const oldestId = previous.items.length ? oldestOrderId(previous.items) : null
+  const oldestId = previous.windowBoundaryId ?? (previous.items.length ? oldestOrderId(previous.items) : null)
   const maxPages = options.maxPages ?? Math.ceil(previous.items.length / 50) + 20
   const items = []
   const cursors = new Set()
@@ -44,7 +44,17 @@ export async function readKanbanWindow(readPage, previous = EMPTY_PAGE, options 
     const pageInfo = result.pageInfo ?? EMPTY_PAGE.pageInfo
     const lastId = result.items.length ? oldestOrderId(result.items) : null
     if (!pageInfo.hasMore || oldestId === null || (lastId !== null && lastId <= oldestId)) {
-      return { items: uniqueOrders(items), pageInfo }
+      const fresh = uniqueOrders(items)
+      // Keep the exact loaded boundary, not every row in its final 50-item page.
+      // Otherwise one new order could silently load 49 older ones each cycle.
+      // Existing cursors are signed, stable ID boundaries (not snapshots); retain
+      // that token for the next user-requested page while reading fresh cursors above.
+      if (oldestId !== null && previous.pageInfo.hasMore && fresh.some(item => Number(item.id) < oldestId)) {
+        return { items: fresh.filter(item => Number(item.id) >= oldestId),
+          pageInfo: previous.pageInfo, windowBoundaryId: oldestId }
+      }
+      return { items: fresh, pageInfo,
+        windowBoundaryId: oldestId ?? (fresh.length ? oldestOrderId(fresh) : null) }
     }
     if (!pageInfo.nextCursor || cursors.has(pageInfo.nextCursor)) break
     cursor = pageInfo.nextCursor
@@ -120,7 +130,8 @@ export function createKanbanLiveRefresh({
       if (request.mode === 'more') {
         if (!snapshot.pageInfo.hasMore || !snapshot.pageInfo.nextCursor) return
         const page = await readPage({ limit: 50, cursor: snapshot.pageInfo.nextCursor }, { signal: request.controller.signal })
-        next = { items: uniqueOrders([...snapshot.items, ...page.items]), pageInfo: page.pageInfo }
+        next = { items: uniqueOrders([...snapshot.items, ...page.items]), pageInfo: page.pageInfo,
+          windowBoundaryId: page.items.length ? oldestOrderId(page.items) : snapshot.windowBoundaryId }
       } else {
         next = await readKanbanWindow(readPage, snapshot, { signal: request.controller.signal })
       }

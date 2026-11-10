@@ -76,6 +76,8 @@ test('initial window reads 100, then revalidates all loaded pages with fresh 50-
   for (const id of [245, 155, 105]) assert.ok(!ids(result.items).includes(id))
   assert.equal(result.items.find(item => item.id === 120).generalStepId, 3)
   assert.equal(new Set(ids(result.items)).size, result.items.length)
+  assert.ok(result.items.every(item => item.id >= 101), 'do not silently load older rows while refreshing')
+  assert.equal(result.pageInfo.nextCursor, 'old-101', 'retain the signed ID boundary for subsequent pagination')
 })
 
 test('partial traversal failures never publish missing cards or a half-refreshed window', async () => {
@@ -109,8 +111,9 @@ test('bounded traversal and repeated cursors reject instead of deleting unvisite
 test('refresh covers deletion of oldest loaded row and an empty result', async () => {
   const previous = page([row(105), row(101)], 'old')
   const result = await readKanbanWindow(async () => page([row(104), row(100)], 'fresh'), previous)
-  assert.deepEqual(ids(result.items), [104, 100])
-  assert.deepEqual(await readKanbanWindow(async () => page([]), previous), page([]))
+  assert.deepEqual(ids(result.items), [104])
+  assert.equal(result.windowBoundaryId, 101, 'retain the deleted boundary for the next refresh')
+  assert.deepEqual((await readKanbanWindow(async () => page([]), previous)).items, [])
 })
 
 test('pagination and timer reads never overlap or truncate a loaded second page', async () => {
@@ -126,12 +129,27 @@ test('pagination and timer reads never overlap or truncate a loaded second page'
   assert.equal(s.requests[2].params.limit, 50, 'refresh continues to its old lower boundary first')
   s.requests[2].resolve(page(rows(101, 50), 'fresh-52'))
   await flush()
-  assert.deepEqual(s.requests[3].params, { limit: 50, cursor: 'fresh-52' })
-  s.requests[3].resolve(page(rows(51, 50), 'fresh-2'))
+  assert.deepEqual(s.requests[3].params, { limit: 50, cursor: 'cursor-101' })
+  s.requests[3].resolve(page(rows(100, 50), 'fresh-51'))
   await flush()
-  assert.equal(s.pages.at(-1).items.length, 200)
+  assert.equal(s.pages.at(-1).items.length, 151)
   assert.equal(s.loadRefreshes, 2)
   s.controller.dispose()
+})
+
+test('repeated new arrivals do not expand the loaded historical window by extra pages', async () => {
+  let snapshot = page(rows(200, 100), '101')
+  for (let newest = 201; newest <= 210; newest++) {
+    const source = rows(newest, newest)
+    snapshot = await readKanbanWindow(async ({ limit, cursor }) => {
+      const start = cursor ? source.findIndex(item => item.id === Number(cursor)) + 1 : 0
+      const items = source.slice(start, start + limit)
+      return page(items, start + limit < source.length ? String(items.at(-1).id) : null)
+    }, snapshot)
+    assert.equal(snapshot.items.length, 100 + newest - 200)
+    assert.equal(snapshot.items.at(-1).id, 101)
+    assert.equal(snapshot.pageInfo.nextCursor, '101')
+  }
 })
 
 test('multiple synchronous invalidations coalesce, and a 45-second response cannot overlap the next poll', async () => {

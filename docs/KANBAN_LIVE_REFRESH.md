@@ -18,7 +18,9 @@ sola actualización si la vista está vencida o se canceló una lectura. Cambiar
 
 La primera consulta conserva el límite de 100 pedidos y «Cargar más» agrega
 bloques de 50. Cada refresco recorre desde el primer bloque hasta alcanzar el ID
-más antiguo ya cargado, empleando los nuevos cursores. La vista se publica de una
+más antiguo ya cargado, empleando los nuevos cursores en el recorrido. Se recorta
+el último bloque en esa frontera y se conserva su cursor firmado para «Cargar
+más»; una alta nueva no carga automáticamente hasta 49 pedidos históricos extra. La vista se publica de una
 vez al completar la ventana; una falla intermedia no borra pedidos no visitados.
 Las altas se incorporan y las bajas/cancelaciones desaparecen de la ventana
 consultada, incluidas las páginas posteriores a la primera.
