@@ -5,6 +5,7 @@ export function resolveRuntimeConfig(runtime = {}, vite = {}) {
     keycloakRealm: runtime.keycloakRealm ?? vite.VITE_KEYCLOAK_REALM,
     keycloakClientId: runtime.keycloakClientId ?? vite.VITE_KEYCLOAK_CLIENT_ID,
     keycloakAudience: runtime.keycloakAudience ?? vite.VITE_KEYCLOAK_AUDIENCE,
+    kanbanRefreshMs: runtime.kanbanRefreshMs ?? vite.VITE_KANBAN_REFRESH_MS ?? '30000',
     apiBaseUrl: runtime.apiBaseUrl ?? vite.VITE_API_BASE_URL,
   }
   return Object.freeze(Object.fromEntries(

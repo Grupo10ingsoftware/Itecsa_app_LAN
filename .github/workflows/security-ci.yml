@@ -52,6 +52,8 @@ jobs:
         run: node --test capaVista/test/productionLoadRefresh.test.mjs capaVista/test/productionLoadDrafts.test.mjs
       - name: Production business date regression
         run: node --test capaServidor/test/productionDate.test.js
+      - name: Kanban live refresh regressions
+        run: node --test capaVista/test/kanbanLiveRefresh.test.mjs
       - name: Runtime dependency audit
         run: |
           npm audit --omit=dev --audit-level=high --prefix capaServidor
