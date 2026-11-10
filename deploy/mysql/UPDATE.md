@@ -37,3 +37,12 @@ node --test deploy/mysql/backup.test.mjs
 Cubren catálogo histórico, catálogo actual, discrepancias parciales, historial inválido, lectura sin escrituras, migraciones pendientes, orden de operaciones y fallo posterior de migración. Complementar con comprobación real en el Docker de prueba, disponibilidad y una escritura funcional después del rechazo anticipado y del update compatible.
 
 Referencias: [transacciones MySQL 8.4](https://dev.mysql.com/doc/refman/8.4/en/commit.html) y [migraciones de producción Prisma 7](https://www.prisma.io/docs/orm/v7/prisma-migrate/workflows/development-and-production).
+
+## Fecha operativa de producción
+
+La carga diaria usa el día calendario de `America/Santiago`, tanto al consultar
+como al guardar. No depende de `TZ` del host o contenedor ni de un offset fijo.
+Una operación de guardado conserva el día que seleccionó al comenzar, incluso
+si termina después de medianoche. Las fechas explícitas `YYYY-MM-DD` mantienen
+su significado de fecha calendario. Esta corrección no modifica ni migra
+registros existentes; los datos de prueba previos conservan su fecha original.

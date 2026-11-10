@@ -18,7 +18,7 @@ umask 022
 # jq escapes quotes, backslashes and newlines; never use raw envsubst for JavaScript.
 {
     printf 'window.__ITECSA_CONFIG__ = '
-    jq -cn --arg provider "$provider" '{authProvider: $provider, keycloakUrl: env.VITE_KEYCLOAK_URL, keycloakRealm: env.VITE_KEYCLOAK_REALM, keycloakClientId: env.VITE_KEYCLOAK_CLIENT_ID, keycloakAudience: env.VITE_KEYCLOAK_AUDIENCE, apiBaseUrl: env.VITE_API_BASE_URL}'
+    jq -cn --arg provider "$provider" '{authProvider: $provider, keycloakUrl: env.VITE_KEYCLOAK_URL, keycloakRealm: env.VITE_KEYCLOAK_REALM, keycloakClientId: env.VITE_KEYCLOAK_CLIENT_ID, keycloakAudience: env.VITE_KEYCLOAK_AUDIENCE, apiBaseUrl: env.VITE_API_BASE_URL, kanbanRefreshMs: (env.VITE_KANBAN_REFRESH_MS // "30000")}'
     printf ';\n'
 } > /tmp/runtime-config.js.tmp
 mv /tmp/runtime-config.js.tmp /tmp/runtime-config.js
