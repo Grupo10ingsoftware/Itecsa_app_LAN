@@ -42,6 +42,8 @@ jobs:
         run: node --test deploy/mysql/backup.test.mjs
       - name: Keycloak profile identity contract
         run: node --test deploy/keycloak/profile-contract.test.mjs
+      - name: Keycloak administrator rotation
+        run: python3 deploy/keycloak/sync_operator_password_test.py
       - name: Keycloak support delegation on real server
         run: node --test deploy/keycloak/support-delegation.integration.test.mjs
       - name: Keycloak theme packaging and native forms
