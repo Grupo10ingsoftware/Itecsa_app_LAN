@@ -1,59 +1,60 @@
-# Delegación de roles especiales al Soporte inicial (#45)
+# Asignar Gerencia y Soporte desde Keycloak (#45)
 
-Estado: diseño para revisión; **la delegación todavía no está implementada ni activada**. El trabajo se detuvo porque la revisión automática de herramientas rechazó modificar el código de autorización, incluso en la rama aislada para PR. Este documento no cambia permisos, datos, imágenes ni configuración de Keycloak.
+Todos los usuarios con el rol **Soporte** pueden sustituir roles de negocio desde la consola del realm `itecsa`, incluidos los Soporte existentes y los que se creen después. No se modifica el formulario ni la API de alta ordinaria de ITECSA.
 
-## Comportamiento solicitado
+## Uso
 
-El Soporte creado por `first-user` debe poder sustituir el rol de una cuenta ya creada en ITECSA por `Gerencia` o `Soporte`, desde la consola del realm `itecsa`. Crear otro Soporte no debe delegarle automáticamente esa facultad. El formulario y la API ordinarios mantienen sus roles actuales.
-
-La identidad inicial debe fijarse por su UUID de Keycloak, comprobando antes su binding local con el mismo issuer, subject y usuario. El nombre visible y pertenecer al rol Soporte por sí solos no son autorización suficiente.
-
-## Matriz propuesta
-
-| Actor | Acción | Resultado requerido |
-|---|---|---|
-| Soporte inicial fijado, todavía con rol Soporte | Consultar usuarios y el cliente `itecsa-api-v1` | Permitido |
-| Soporte inicial | Quitar el rol de negocio anterior y asignar un rol ordinario, Gerencia o Soporte a otra cuenta | Permitido |
-| Soporte inicial | Cambiar sus propios roles o roles de cuentas técnicas | Denegado |
-| Soporte inicial | Asignar Desarrollador, roles de `realm-management`, roles de otro cliente o composites | Denegado |
-| Soporte inicial | Crear/borrar usuarios en Keycloak, cambiar contraseñas, impersonar, modificar clientes, grupos, realm o políticas | Denegado |
-| Otro Soporte, Desarrollador u otros roles de negocio | Administrar roles desde la consola/API administrativa de Keycloak | Denegado |
-| Operador de despliegue | Instalar y comprobar la configuración delegada | Conserva su función administrativa existente |
-
-Los únicos roles administrativos directos propuestos son `query-users` y `query-clients`. La autorización de lectura y asignación se configura mediante FGAP v2. No se asignan `realm-admin`, `manage-users`, `view-users` ni `manage-clients` al Soporte inicial.
-
-## Contrato que debe implementar el PR funcional
-
-1. Política por UUID inicial más política que exija conservar Soporte. Ambas condiciones deben cumplirse.
-2. Permisos `Users: view/map-roles`, con una prohibición específica de `map-roles` sobre el propio actor y las cuentas técnicas.
-3. `Roles: map-role` limitado a los ocho roles de negocio, excluido Desarrollador. Incluir roles ordinarios permite retirar el rol anterior; no conceder `Clients: map-roles`, que ampliaría el alcance a todos los roles del cliente.
-4. `Clients: view` exclusivamente sobre `itecsa-api-v1`; los roles de consulta solo permiten entrar y buscar.
-5. Validación de privilegios directos e heredados del actor antes de configurar. Rechazar políticas ajenas o incompatibles; no sobrescribirlas automáticamente.
-6. Instalación idempotente después de confirmar el binding del Soporte inicial. Para instalaciones existentes, procedimiento explícito del operador que compruebe el usuario antes de fijar el UUID. Una vez fijado, nunca cambiarlo por coincidencia de nombre.
-7. Comprobación de solo lectura en `keycloak-configure`/verificación, sin duplicar políticas ni conceder privilegios adicionales. La configuración parcial debe poder reanudarse sin borrar una cuenta cuyo binding ya fue confirmado.
-8. Eventos administrativos habilitados sin guardar representaciones que puedan incluir credenciales. Mantener la auditoría existente de conciliación de rol local.
-
-## Procedimiento de uso previsto
-
-Cuando el PR funcional esté instalado y verificado:
-
-1. Crear primero la cuenta mediante Gestión de usuarios de ITECSA.
-2. Entrar como Soporte inicial en `https://<origen>/admin/itecsa/console/`.
+1. Crear primero la cuenta mediante **Gestión de usuarios** de ITECSA, con un rol ordinario.
+2. Entrar con la cuenta Soporte en `https://<origen>/admin/itecsa/console/`.
 3. Abrir **Users → usuario → Role mapping** y comprobar el nombre de usuario.
-4. Quitar el rol anterior del cliente `itecsa-api-v1`. Asignar exactamente uno: **Gerencia** o **Soporte**.
-5. Pedir al usuario que cierre su sesión y vuelva a entrar en ITECSA.
+4. Quitar el rol anterior del cliente `itecsa-api-v1`. En **Assign role**, filtrar por ese cliente y asignar exactamente uno: **Gerencia** o **Soporte**.
+5. Pedir al usuario que cierre su sesión y vuelva a entrar en ITECSA. La aplicación confirma el mapping actual y concilia el rol local conservando el mismo binding y su auditoría.
 
-La aplicación ya rechaza tokens sin un rol reconocido o con varios roles de negocio. La conciliación existente confirma el mapping actual de Keycloak antes de actualizar el rol local y conserva el mismo binding. Una cuenta creada solamente en Keycloak no obtiene acceso a ITECSA sin su binding local.
+`Gerencia` es el nombre técnico del rol de gerente. No crear un rol distinto llamado `Gerente`. No modificar roles de cuentas técnicas ni usar la consola para crear cuentas de aplicación: una cuenta que solo exista en Keycloak no tiene binding local y no puede acceder a ITECSA.
 
-Esto no constituye revocación instantánea de tokens ya emitidos: la sesión anterior puede conservar su acceso hasta la caducidad del token. El cliente web tiene un access token de cinco minutos. No debe prometerse bloqueo inmediato durante el cambio; hace falta probar explícitamente ese límite y documentar el procedimiento de cierre de sesión.
+La aplicación rechaza tokens nuevos sin un rol de negocio o con varios. El token anterior puede conservar su acceso hasta caducar: el cliente web tiene una duración de cinco minutos. El cambio desde consola no promete revocación instantánea. No quitar Soporte a la última cuenta que desempeñe esa función; la API de Keycloak no impone esa regla operativa. Si un usuario se quita su propio Soporte, pierde la delegación al renovar la sesión.
 
-## Evidencia disponible y pruebas pendientes
+## Instalación y actualización
 
-Se consultó la documentación oficial correspondiente a **Keycloak 26.8.1** y se ejecutó un prototipo en un contenedor temporal, separado del despliegue ITECSA. Una política por UUID y otra por Soporte permitieron consultar una cuenta con `access.mapRoles=true`, manteniendo `manage`, `resetPassword`, `impersonate` y `manageGroupMembership` en `false`. El endpoint de roles disponibles solo mostró los roles autorizados. La consulta general de clientes devolvió 403 sin `query-clients`, por lo que la consola necesita ese rol de consulta además del permiso de lectura del cliente concreto.
+Las instalaciones nuevas configuran los permisos durante el bootstrap; `first-user` hereda la delegación al recibir Soporte. Para un despliegue existente, después de actualizar las imágenes y el checkout al commit que incorpora este cambio:
 
-El prototipo no certifica el flujo completo. Antes de fusionar un PR funcional faltan las pruebas de la matriz mediante POST/DELETE reales, navegación en la consola, denegación del otro Soporte, autoasignación y cuentas técnicas, instalación y repetición sin escrituras, rechazo de drift, renovación de sesión, estados con cero/dos roles, cuenta sin binding y conciliación MySQL con auditoría. También debe comprobarse la conducta de tokens anteriores al cambio.
+```bash
+bash deploy/mysql/manage.sh keycloak-configure --env-file deploy/mysql.env
+```
 
-Referencias primarias de la versión utilizada:
+El comando usa el operador administrativo de despliegue, valida la configuración, aplica lo pendiente y comprueba el resultado. No migra MySQL ni cambia bindings o contraseñas. Repetirlo con una configuración correcta no escribe ni duplica políticas. Los Soporte deben volver a iniciar sesión en la consola para recibir los permisos nuevos.
 
-- [FGAP v2, recursos, scopes, políticas y precedencia](https://github.com/keycloak/keycloak/blob/26.8.1/docs/documentation/server_admin/topics/admin-console-permissions/fine-grain-v2.adoc).
-- [Cliente Admin API: mappings de roles por usuario](https://github.com/keycloak/keycloak/blob/26.8.1/js/libs/keycloak-admin-client/README.md).
+`verify` comprueba el mismo contrato en modo de solo lectura. Una política incompatible, un composite administrativo amplio o una autorización ajena al contrato se rechazan para revisión por el operador; no se sobrescriben. La lista protegida cubre las cuentas técnicas existentes al configurar. Si se agregan o retiran clients con service account fuera del despliegue, revisar también esa lista y el contrato antes de volver a operar.
+
+## Alcance de la delegación
+
+| Actor | Acción | Resultado |
+|---|---|---|
+| Cualquier Soporte | Consultar usuarios y el cliente `itecsa-api-v1` | Permitido |
+| Cualquier Soporte | Quitar/asignar los seis roles ordinarios, Gerencia o Soporte | Permitido |
+| Cualquier Soporte | Asignar Desarrollador, roles de `realm-management` o permisos directos de otros clients | Denegado |
+| Cualquier Soporte | Cambiar roles de cuentas técnicas protegidas | Denegado |
+| Cualquier Soporte | Crear/borrar usuarios en Keycloak, cambiar contraseñas, impersonar o cerrar sesiones ajenas | Denegado |
+| Cualquier Soporte | Modificar clientes, composites, grupos, realm o políticas FGAP | Denegado |
+| Gerencia, Desarrollador y roles ordinarios sin Soporte | Usar esta delegación en la consola/API administrativa | Denegado |
+| Operador de despliegue | Configurar y verificar la delegación | Conserva su función administrativa existente |
+
+Soporte incorpora únicamente `query-users` y `query-clients` como composites administrativos, para navegar y buscar en la consola. No recibe `realm-admin`, `manage-users`, `view-users`, `manage-clients`, `reset-password` ni impersonación. Los permisos efectivos de edición se limitan con **FGAP v2**: `Users: map-roles`, `Roles: map-role` para los ocho roles autorizados y `Clients: view` para el cliente de negocio. Una denegación específica protege las cuentas técnicas.
+
+Los tokens del cliente web mantienen el rol de negocio y sus permisos existentes. No incorporan los roles administrativos de consulta a `permissions` ni a `resource_access`. La comprobación de acceso en ITECSA sigue requiriendo un usuario local activo, vinculado al mismo issuer y subject.
+
+Los eventos administrativos quedan habilitados sin almacenar representaciones que puedan contener credenciales. La conciliación local conserva la auditoría `identity.role_sync` del cambio de rol. Los operadores siguen siendo responsables de no otorgar roles administrativos amplios directamente a usuarios o grupos: esos roles pueden evitar la evaluación FGAP.
+
+## Verificación reproducible
+
+```bash
+node --test deploy/keycloak/profile-contract.test.mjs
+node --test deploy/keycloak/support-delegation.integration.test.mjs
+```
+
+La segunda prueba necesita Docker y crea un Keycloak 26.8.1 desechable, con nombre, puerto y credenciales aleatorios; no acepta credenciales ni origen del despliegue existente y elimina su contenedor al terminar. Verifica Soporte existente/nuevo/promovido, sustitución real de roles, rechazo de escalada técnica y Desarrollador, restricciones de API, separación de claims, estados con cero o varios roles, pérdida de delegación al retirar Soporte, idempotencia y detección de drift. La navegación visual y la conciliación MySQL deben verificarse adicionalmente en el despliegue de revisión.
+
+Referencias primarias:
+
+- [FGAP v2 en Keycloak 26.8.1](https://github.com/keycloak/keycloak/blob/26.8.1/docs/documentation/server_admin/topics/admin-console-permissions/fine-grain-v2.adoc).
+- [Admin API: mappings de roles por usuario](https://github.com/keycloak/keycloak/blob/26.8.1/js/libs/keycloak-admin-client/README.md).

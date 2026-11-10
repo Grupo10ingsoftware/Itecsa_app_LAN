@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { buildRealm } from './render-realm.mjs';
-import { bootstrap } from './post-bootstrap.mjs';
+import { bootstrap as bootstrapFullContract } from './post-bootstrap.mjs';
 import { RECOGNIZED_ROLES, BUSINESS_PERMISSIONS, ROLE_PERMISSIONS } from '../../shared/keycloakAuthorization.js';
+
+// FGAP delegation has its own contract and live Keycloak regression suite.
+const bootstrap = (env, fetcher, options = {}) => bootstrapFullContract(env, fetcher, { ...options, configureDelegation: async () => {} });
 
 // These tests exercise the import/bootstrap contract against a strict Admin API
 // fixture. They do not claim to emulate Keycloak's actual token issuance.
