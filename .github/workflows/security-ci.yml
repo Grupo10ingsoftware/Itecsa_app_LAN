@@ -42,6 +42,8 @@ jobs:
         run: node --test deploy/keycloak/profile-contract.test.mjs
       - name: Keycloak theme packaging and native forms
         run: node --test deploy/keycloak/theme-contract.test.mjs deploy/keycloak/theme-forms.test.mjs
+      - name: Image provenance and HTTP resource contract
+        run: node --test deploy/keycloak/image-provenance.test.mjs
       - name: Profile registration date contract
         run: node --test capaServidor/test/profileRegistrationDate.test.js capaVista/test/profileDates.test.mjs
       - name: MySQL update preflight regression
