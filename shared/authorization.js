@@ -13,7 +13,10 @@ export const ROLES = Object.freeze({
 });
 export const RECOGNIZED_ROLES = Object.freeze(Object.values(ROLES));
 export const FUNCTIONAL_ROLES = Object.freeze(RECOGNIZED_ROLES.filter(role => ![ROLES.DESARROLLADOR, ROLES.SOPORTE].includes(role)));
-export const ADMIN_ROLES = Object.freeze([ROLES.SOPORTE, ROLES.DESARROLLADOR]);
+export const BUSINESS_ADMIN_ROLES = Object.freeze([ROLES.ADMINISTRADOR, ROLES.ADMIN_VENTAS, ROLES.ADMIN_COBRANZAS]);
+export const DISABLED_ROLES = Object.freeze([ROLES.SOPORTE]);
+export function isEnabledRole(role) { return RECOGNIZED_ROLES.includes(role) && !DISABLED_ROLES.includes(role); }
+export const ADMIN_ROLES = Object.freeze([...BUSINESS_ADMIN_ROLES, ROLES.DESARROLLADOR]);
 export const PRIVILEGED_ROLES = Object.freeze([ROLES.GERENCIA, ROLES.DESARROLLADOR, ROLES.SOPORTE]);
 export const ASSIGNABLE_ROLES = Object.freeze(FUNCTIONAL_ROLES.filter(role => !PRIVILEGED_ROLES.includes(role)));
 export const PERMISSIONS = Object.freeze({
@@ -46,6 +49,7 @@ export const PERMISSIONS = Object.freeze({
 export const BUSINESS_PERMISSIONS = Object.freeze(Object.values(PERMISSIONS));
 export const ROLE_PERMISSIONS = Object.freeze(Object.fromEntries(Object.entries({
   "Administrador Produccion": [
+    "manage:users",
     "read:own-profile",
     "manage:own-pin",
     "read:orders",
@@ -66,6 +70,7 @@ export const ROLE_PERMISSIONS = Object.freeze(Object.fromEntries(Object.entries(
     "view:metrics"
   ],
   "Administrador Ventas": [
+    "manage:users",
     "read:own-profile",
     "manage:own-pin",
     "read:orders",
@@ -78,6 +83,7 @@ export const ROLE_PERMISSIONS = Object.freeze(Object.fromEntries(Object.entries(
     "read:production-calendar"
   ],
   "Administrador Cobranzas": [
+    "manage:users",
     "read:own-profile",
     "manage:own-pin",
     "read:orders",
@@ -167,10 +173,10 @@ export const ROLE_PERMISSIONS = Object.freeze(Object.fromEntries(Object.entries(
 export const ROLES_CLAIM = 'https://itecsa.local/roles';
 export function roleFromPayload(payload) {
   const roles = payload?.[ROLES_CLAIM];
-  return Array.isArray(roles) && roles.length === 1 && RECOGNIZED_ROLES.includes(roles[0]) ? roles[0] : null;
+  return Array.isArray(roles) && roles.length === 1 && isEnabledRole(roles[0]) ? roles[0] : null;
 }
 export function can(role, permissions, permission) {
-  return RECOGNIZED_ROLES.includes(role) && ROLE_PERMISSIONS[role]?.includes(permission) === true && Array.isArray(permissions) && permissions.includes(permission);
+  return isEnabledRole(role) && ROLE_PERMISSIONS[role]?.includes(permission) === true && Array.isArray(permissions) && permissions.includes(permission);
 }
 const NO_ROLES = Object.freeze([]);
 export function manageableRoles(role) { return ADMIN_ROLES.includes(role) ? ASSIGNABLE_ROLES : NO_ROLES; }

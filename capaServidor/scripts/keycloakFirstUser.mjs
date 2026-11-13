@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { ROLES } from '../../shared/authorization.js';
 import getPrismaClient, { disconnectPrismaClient } from '../src/database/prisma.js';
 import { validateFirstUser } from '../../shared/deploymentValidation.mjs';
 
@@ -42,7 +43,7 @@ try {
   const roleClients = await request(base + '/clients?clientId=itecsa-api-v1', token);
   const roleClient = roleClients.find(value => value.clientId === 'itecsa-api-v1');
   if (!roleClient) fail('client de roles ausente');
-  const role = await request(base + '/clients/' + roleClient.id + '/roles/Soporte', token);
+  const role = await request(base + '/clients/' + roleClient.id + '/roles/' + encodeURIComponent(ROLES.ADMINISTRADOR), token);
   const marker = randomUUID();
   const location = await request(base + '/users', token, 'POST', {
     username: env.FIRST_USER_USERNAME, email: env.FIRST_USER_EMAIL.toLowerCase(),
@@ -61,7 +62,7 @@ try {
       id_keycloak: createdId, correo_usuario: env.FIRST_USER_EMAIL.toLowerCase(),
       rut_usuario: env.FIRST_USER_RUT.replaceAll('.', '').toUpperCase(),
       nombre_usuario: env.FIRST_USER_FIRST_NAME, apellido_usuario: env.FIRST_USER_LAST_NAME,
-      rol_usuario: 'Soporte', estado_usuario: 'Pendiente',
+      rol_usuario: ROLES.ADMINISTRADOR, estado_usuario: 'Pendiente',
     } });
     await tx.externalIdentity.create({ data: {
       provider: 'keycloak', issuer: origin.origin + '/realms/itecsa',
@@ -69,7 +70,7 @@ try {
     } });
   });
   createdId = null;
-  console.log('KEYCLOAK_FIRST_USER: Soporte inicial preparado; cambio de contraseña obligatorio');
+  console.log('KEYCLOAK_FIRST_USER: Administrador de Produccion inicial preparado; cambio de contraseña obligatorio');
 } catch (error) {
   if (createdId && adminToken) {
     try { await request(base + '/users/' + createdId, adminToken, 'DELETE'); }

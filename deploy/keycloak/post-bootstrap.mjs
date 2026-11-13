@@ -1,6 +1,7 @@
-import { configureSupportDelegation, DELEGATED_QUERY_ROLES } from '../../shared/keycloakSupportDelegation.mjs';
+import { configureSupportDelegation } from '../../shared/keycloakSupportDelegation.mjs';
+import { configureUserAdministration, disableSupportAccounts } from '../../shared/keycloakUserAdministration.mjs';
 import { fileURLToPath } from 'node:url';
-import { RECOGNIZED_ROLES, BUSINESS_PERMISSIONS, ROLE_PERMISSIONS } from '../../shared/keycloakAuthorization.js';
+import { RECOGNIZED_ROLES, BUSINESS_PERMISSIONS } from '../../shared/keycloakAuthorization.js';
 import { validateOrigin, managementRoles, usernameMapper, registrationDateMapper } from './render-realm.mjs';
 
 import { inspectThemeLocale, applyThemeLocale } from './theme-contract.mjs';
@@ -124,15 +125,7 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
   ]);
   if (!equal(roles.map(role => role.name), RECOGNIZED_ROLES) ||
       !equal(capabilities.map(role => role.name), BUSINESS_PERMISSIONS)) fail('catalogo de roles incompleto');
-  for (const role of roles) {
-    const actual = await request('/clients/' + rolesClient + '/roles/' + encodeURIComponent(role.name) + '/composites');
-    const business = actual.filter(value => value.containerId === capabilitiesClient);
-    const administrative = actual.filter(value => value.containerId !== capabilitiesClient);
-    if (!equal(business.map(value => value.name), ROLE_PERMISSIONS[role.name])
-      || administrative.some(value => role.name !== 'Soporte' || value.containerId !== managementClient || !DELEGATED_QUERY_ROLES.includes(value.name))) {
-      fail('composicion invalida: ' + role.name);
-    }
-  }
+  await configureUserAdministration({ request, rolesClient, capabilitiesClient, managementClient, roles, capabilities, readOnly });
   const allowed = management.filter(role => managementRoles.includes(role.name));
   if (allowed.length !== managementRoles.length) fail('permisos de administracion incompletos');
   if (localePending) Object.assign(realm, await applyThemeLocale(request));
@@ -219,6 +212,7 @@ export async function bootstrap(env = process.env, fetcher = fetch, { readOnly =
     if (temporary.length) await master('/users/' + temporary[0].id, 'DELETE');
   }
   await configureDelegation({ request, readOnly });
+  await disableSupportAccounts({ request, rolesClient, readOnly });
   console.log('KEYCLOAK_BOOTSTRAP: roles, scopes y cuenta tecnica verificados');
 }
 

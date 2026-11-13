@@ -29,7 +29,7 @@ export function createVerifyAuthSessionHandler({
         const hasSingleOfficialRole =
             Array.isArray(roles) &&
             roles.length === 1 &&
-            policy?.RECOGNIZED_ROLES.includes(roles[0]);
+            policy?.isEnabledRole(roles[0]);
         const hasValidPermissions =
             permissionsClaim === undefined || Array.isArray(permissionsClaim);
 

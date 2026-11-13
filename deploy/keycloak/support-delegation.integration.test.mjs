@@ -4,16 +4,17 @@ import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 import { buildRealm } from './render-realm.mjs';
+import { disableSupportAccounts } from '../../shared/keycloakUserAdministration.mjs';
 import { configureSupportDelegation, DELEGATED_BUSINESS_ROLES, DELEGATED_QUERY_ROLES } from '../../shared/keycloakSupportDelegation.mjs';
 import { normalizeKeycloakClaims } from '../../capaServidor/src/middlewares/keycloakClaims.js';
-import { ROLE_PERMISSIONS, ASSIGNABLE_ROLES, RECOGNIZED_ROLES } from '../../shared/keycloakAuthorization.js';
+import { BUSINESS_ADMIN_ROLES, ROLE_PERMISSIONS, ASSIGNABLE_ROLES, RECOGNIZED_ROLES } from '../../shared/keycloakAuthorization.js';
 
 // Always creates its own disposable server, with a random name/port and secrets.
 // No production origin, realm credentials or deployment env file are accepted.
 const name = 'itecsa-delegation-test-' + randomUUID().slice(0, 8);
 const password = randomUUID() + '!Aa1';
 const image = 'quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b';
-let origin, admin, business, management, capabilities, serviceSubject, request, first, second, ordinary, developer, authz;
+let origin, admin, business, management, capabilities, serviceSubject, request, first, second, third, support, ordinary, developer, authz;
 const roles = new Map(), managementRoles = new Map();
 let writes = 0;
 async function token(username, realm = 'itecsa', client = 'admin-cli') {
@@ -77,7 +78,8 @@ before(async () => {
   const web = id('itecsa-web');
   await request('/clients/' + web + '/scope-mappings/clients/' + business, 'POST', [...roles.values()]);
   await request('/clients/' + web + '/scope-mappings/clients/' + capabilities, 'POST', await request('/clients/' + capabilities + '/roles?max=1000'));
-  first = await user('support-existing', 'Soporte');
+  first = await user('administrator-existing', 'Administrador Produccion');
+  support = await user('support-existing', 'Soporte');
   ordinary = await user('ordinary', 'Operario Ventas');
   developer = await user('developer', 'Desarrollador');
 }, { timeout: 150000 });
@@ -93,12 +95,17 @@ test('existing deployment is configured once, read-only detects pending, and rep
   await configureSupportDelegation({ request, readOnly: true });
   assert.equal(writes, configuredWrites);
   first.access = await token(first.username);
-  second = await user('support-added-later', 'Soporte');
+  second = await user('administrator-sales', 'Administrador Ventas');
+  third = await user('administrator-collections', 'Administrador Cobranzas');
+  await assert.rejects(disableSupportAccounts({ request, rolesClient: business, readOnly: true }), /Soporte habilitadas/);
+  await disableSupportAccounts({ request, rolesClient: business });
+  assert.equal((await request(userPath(support))).enabled, false);
+  assert.ok([401, 403].includes((await as(support, '/users')).status));
   authz = '/clients/' + (await request('/clients?clientId=admin-permissions'))[0].id + '/authz/resource-server';
 });
 
-test('existing and later Soporte can use the console scope without user-management capabilities', async () => {
-  for (const actor of [first, second]) {
+test('all three administrators can use the delegated console scope', async () => {
+  for (const actor of [first, second, third]) {
     assert.equal((await as(actor, '/users')).status, 200);
     const detail = await as(actor, userPath(ordinary));
     assert.equal(detail.status, 200);
@@ -110,14 +117,14 @@ test('existing and later Soporte can use the console scope without user-manageme
     const available = await as(actor, mapping(ordinary) + '/available');
     assert.equal(available.status, 200);
     assert.ok(available.data.some(role => role.name === 'Gerencia'));
-    assert.ok(available.data.some(role => role.name === 'Soporte'));
+    assert.ok(!available.data.some(role => role.name === 'Soporte'));
     assert.ok(available.data.every(role => DELEGATED_BUSINESS_ROLES.includes(role.name)));
   }
 });
 
-test('replace ordinary role with Gerencia, then Soporte, preserves subject and exactly one final business role', async () => {
+test('replace ordinary role with Gerencia, then administrator, preserves identity and grants delegation', async () => {
   const old = await request(userPath(ordinary));
-  for (const [from, to, actor] of [['Operario Ventas', 'Gerencia', first], ['Gerencia', 'Soporte', second]]) {
+  for (const [from, to, actor] of [['Operario Ventas', 'Gerencia', first], ['Gerencia', 'Administrador Cobranzas', third]]) {
     assert.equal((await as(actor, mapping(ordinary), 'DELETE', [roles.get(from)])).status, 204);
     assert.deepEqual(await request(mapping(ordinary) + '/composite'), []);
     const without = JSON.parse(Buffer.from((await token(ordinary.username, 'itecsa', 'itecsa-web')).split('.')[1], 'base64url'));
@@ -128,19 +135,24 @@ test('replace ordinary role with Gerencia, then Soporte, preserves subject and e
   assert.equal((await request(userPath(ordinary))).id, old.id);
   assert.equal((await request(userPath(ordinary))).username, old.username);
   ordinary.access = await token(ordinary.username);
-  assert.equal((await as(ordinary, '/users')).status, 200, 'promoted Soporte receives the same delegation');
+  assert.equal((await as(ordinary, '/users')).status, 200, 'promoted administrator receives the same delegation');
+  await request(mapping(ordinary), 'DELETE', [roles.get('Administrador Cobranzas')]);
+  await request(mapping(ordinary), 'POST', [roles.get('Operario Ventas')]);
 });
 
-test('Soporte cannot escalate itself or others to developer, realm administration or direct capabilities', async () => {
-  for (const target of [first, second, ordinary]) {
-    assert.equal((await as(first, mapping(target), 'POST', [roles.get('Desarrollador')])).status, 403);
-    for (const role of ['realm-admin', 'manage-users', 'manage-clients', 'impersonation', 'manage-authorization']) {
-      assert.equal((await as(first, mapping(target, management), 'POST', [managementRoles.get(role)])).status, 403, role);
+test('administrators cannot escalate to developer, disabled support, realm administration or direct capabilities', async () => {
+  for (const actor of [first, second, third]) {
+    for (const target of [first, second, third, ordinary]) {
+      assert.equal((await as(actor, mapping(target), 'POST', [roles.get('Desarrollador')])).status, 403);
+      assert.equal((await as(actor, mapping(target), 'POST', [roles.get('Soporte')])).status, 403);
+      for (const role of ['realm-admin', 'manage-users', 'manage-clients', 'impersonation', 'manage-authorization']) {
+        assert.equal((await as(actor, mapping(target, management), 'POST', [managementRoles.get(role)])).status, 403, role);
+      }
+      const capability = (await request('/clients/' + capabilities + '/roles?max=1'))[0];
+      assert.equal((await as(actor, mapping(target, capabilities), 'POST', [capability])).status, 403);
     }
-    const capability = (await request('/clients/' + capabilities + '/roles?max=1'))[0];
-    assert.equal((await as(first, mapping(target, capabilities), 'POST', [capability])).status, 403);
+    assert.equal((await as(actor, '/users/' + serviceSubject + '/role-mappings/clients/' + business, 'POST', [roles.get('Gerencia')])).status, 403);
   }
-  assert.equal((await as(first, '/users/' + serviceSubject + '/role-mappings/clients/' + business, 'POST', [roles.get('Soporte')])).status, 403);
 });
 
 test('direct Admin API mutations remain forbidden beyond role mapping', async () => {
@@ -159,7 +171,7 @@ test('direct Admin API mutations remain forbidden beyond role mapping', async ()
   assert.equal((await call('/admin/realms/master/users', { access: first.access })).status, 403);
 });
 
-test('non-support business roles cannot use the delegated Admin API', async () => {
+test('operators and developer cannot use the delegated Admin API', async () => {
   const sales = await user('sales-after-delegation', 'Operario Ventas');
   for (const actor of [sales, developer]) {
     assert.equal((await as(actor, '/users')).status, 403);
@@ -170,9 +182,9 @@ test('non-support business roles cannot use the delegated Admin API', async () =
 test('ITECSA token keeps exactly the business role/permissions and rejects multi-role assignments', async () => {
   const payload = JSON.parse(Buffer.from((await token(first.username, 'itecsa', 'itecsa-web')).split('.')[1], 'base64url'));
   const normalized = normalizeKeycloakClaims(payload, 'itecsa-web', 'itecsa-api-v1');
-  assert.deepEqual(payload.resource_access['itecsa-api-v1'].roles, ['Soporte']);
+  assert.deepEqual(payload.resource_access['itecsa-api-v1'].roles, ['Administrador Produccion']);
   assert.equal(payload.resource_access['realm-management'], undefined);
-  assert.deepEqual([...normalized.permissions].sort(), [...ROLE_PERMISSIONS.Soporte].sort());
+  assert.deepEqual([...normalized.permissions].sort(), [...ROLE_PERMISSIONS['Administrador Produccion']].sort());
   assert.ok(normalized.permissions.every(value => !DELEGATED_QUERY_ROLES.includes(value)));
   for (const role of ['Gerencia', 'Soporte', 'Desarrollador']) assert.equal(ASSIGNABLE_ROLES.includes(role), false);
   await request(mapping(ordinary), 'POST', [roles.get('Gerencia')]);
@@ -181,12 +193,47 @@ test('ITECSA token keeps exactly the business role/permissions and rejects multi
   await request(mapping(ordinary), 'DELETE', [roles.get('Gerencia')]);
 });
 
-test('own business downgrade loses delegation on the next session without removing another Soporte', async () => {
-  assert.equal((await as(second, mapping(second), 'DELETE', [roles.get('Soporte')])).status, 204);
+test('own business downgrade loses delegation on the next session without removing another administrator', async () => {
+  assert.equal((await as(second, mapping(second), 'DELETE', [roles.get('Administrador Ventas')])).status, 204);
   await request(mapping(second), 'POST', [roles.get('Gerencia')]);
   second.access = await token(second.username);
   assert.equal((await as(second, '/users')).status, 403);
-  assert.deepEqual((await request(mapping(first) + '/composite')).map(role => role.name), ['Soporte']);
+  assert.deepEqual((await request(mapping(first) + '/composite')).map(role => role.name), ['Administrador Produccion']);
+});
+
+test('legacy support-only policies migrate without exposing technical accounts or retaining support delegation', async () => {
+  const policies = await request(authz + '/policy?first=0&max=1000');
+  for (const suffix of ['role', 'deny-technical']) {
+    const selected = policies.find(value => value.name === 'itecsa-support-' + suffix);
+    await request(authz + '/policy/role/' + selected.id, 'PUT', {
+      id: selected.id, name: selected.name, logic: suffix === 'role' ? 'POSITIVE' : 'NEGATIVE',
+      decisionStrategy: 'UNANIMOUS', roles: [{ id: roles.get('Soporte').id, required: true }],
+    });
+  }
+  const selected = policies.find(value => value.name === 'itecsa-support-business-roles');
+  await request(authz + '/permission/scope/' + selected.id, 'PUT', {
+    id: selected.id, name: selected.name, resourceType: 'Roles', scopes: ['map-role'],
+    decisionStrategy: 'UNANIMOUS', logic: 'POSITIVE',
+    resources: [...DELEGATED_BUSINESS_ROLES, 'Soporte'].map(role => roles.get(role).id), policies: ['itecsa-support-role'],
+  });
+  const realm = await request('');
+  await request('', 'PUT', { attributes: { ...realm.attributes, itecsaSupportDelegationVersion: '1' } });
+  const queries = DELEGATED_QUERY_ROLES.map(name => managementRoles.get(name));
+  await request('/clients/' + business + '/roles/Soporte/composites', 'POST', queries);
+  for (const name of BUSINESS_ADMIN_ROLES) {
+    await request('/clients/' + business + '/roles/' + encodeURIComponent(name) + '/composites', 'DELETE', queries);
+  }
+  const before = writes;
+  await assert.rejects(configureSupportDelegation({ request, readOnly: true }), /delegacion pendiente/);
+  assert.equal(writes, before);
+  await configureSupportDelegation({ request });
+  await configureSupportDelegation({ request, readOnly: true });
+  assert.equal((await request('')).adminPermissionsEnabled, true);
+  const supportComposites = await request('/clients/' + business + '/roles/Soporte/composites');
+  assert.ok(!supportComposites.some(role => role.containerId === management));
+  first.access = await token(first.username);
+  assert.equal((await as(first, '/users')).status, 200);
+  assert.equal((await as(first, '/users/' + serviceSubject + '/role-mappings/clients/' + business, 'POST', [roles.get('Gerencia')])).status, 403);
 });
 
 test('drift fails closed without repairing an unexpected grant', async () => {

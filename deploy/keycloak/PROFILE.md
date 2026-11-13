@@ -4,7 +4,7 @@ El nombre de usuario mostrado en «Mi perfil» proviene de `preferred_username` 
 
 ## Qué significa «Fecha de registro»
 
-Es la fecha de creación de la cuenta de acceso registrada por Keycloak (`UserModel.createdTimestamp`, milisegundos desde Unix epoch), tanto para el primer Soporte como para las cuentas creadas desde administración. No representa el primer login, el inicio de un intento de provisión ni el alta de una persona en otro sistema.
+Es la fecha de creación de la cuenta de acceso registrada por Keycloak (`UserModel.createdTimestamp`, milisegundos desde Unix epoch), tanto para el primer administrador como para las cuentas creadas desde administración. No representa el primer login, el inicio de un intento de provisión ni el alta de una persona en otro sistema.
 
 El mapper `Account creation date` lee esa propiedad interna y emite el número `itecsa_account_created_at_ms` únicamente en el access token de `itecsa-web`. La API toma el claim del token verificado para el mismo `sub` del usuario local y devuelve `fechaRegistro` como ISO 8601 UTC con `Z`, o `null` si no existe o no es válido. El dato es informativo y no concede permisos. La UI muestra día, mes, año, hora y minutos en `America/Santiago`, incluyendo sus cambios de horario.
 
@@ -23,13 +23,15 @@ bash deploy/mysql/manage.sh keycloak-configure
 bash deploy/mysql/manage.sh verify
 ```
 
-Para otro archivo de entorno, añadir `--env-file ruta/al/archivo.env` a ambos comandos. Se reutilizan la CA configurada y las credenciales del operador de Keycloak; no hay que volver a crear Soporte ni introducir contraseñas en los comandos.
+Para otro archivo de entorno, añadir `--env-file ruta/al/archivo.env` a ambos comandos. Se reutilizan la CA configurada y las credenciales del operador de Keycloak; no hay que volver a crear el administrador inicial ni introducir contraseñas en los comandos.
 
 `keycloak-configure` toma el bloqueo de operaciones del despliegue, verifica instalación, imágenes, base e issuer, y ejecuta el bootstrap idempotente. Si el realm conserva el contrato anterior, añade únicamente los mappers de perfil faltantes y vuelve a leerlo para comprobar su configuración. En un realm ya configurado no crea duplicados. Los contenedores permanecen en ejecución y no se ejecutan migraciones ni cambios de grants MySQL. El bootstrap también comprueba sus políticas, scopes y roles habituales; una configuración incompatible se rechaza y debe diagnosticarse, no se sobrescribe a ciegas.
 
+La politica vigente de roles y la deshabilitacion de Soporte se describen en [Administracion de usuarios](SUPPORT_DELEGATION.md); keycloak-configure tambien aplica ese contrato.
+
 Regenerar el JSON de importación o reiniciar Keycloak no actualiza por sí solo un realm existente. Aplicar este comando **antes de ejecutar `update` o un backup con los scripts nuevos**, porque sus verificaciones requieren ambos mappers. `verify` solo comprueba: si falta, informa cómo aplicarlo y no modifica Keycloak.
 
-Después, cerrar sesión e iniciar sesión nuevamente. Los tokens ya emitidos no cambian; una renovación posterior también incorpora el dato. Comprobar «Mi perfil» con el primer Soporte y una cuenta ordinaria, confirmando su username, rol y fecha de registro, y repetir tras cerrar y abrir sesión. Un fallo de verificación no exige eliminar el realm ni sus usuarios.
+Después, cerrar sesión e iniciar sesión nuevamente. Los tokens ya emitidos no cambian; una renovación posterior también incorpora el dato. Comprobar «Mi perfil» con el primer administrador y una cuenta ordinaria, confirmando su username, rol y fecha de registro, y repetir tras cerrar y abrir sesión. Un fallo de verificación no exige eliminar el realm ni sus usuarios.
 
 ## Pruebas
 

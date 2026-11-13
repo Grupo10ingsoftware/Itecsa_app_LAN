@@ -133,6 +133,7 @@ function fixture({ existingMappers = [], createStatus = 201, persistCreated = tr
     if (resource === '/clients/web/protocol-mappers/models') return json(mappers);
     if (resource === '/clients/web/default-client-scopes') return json([{ id: 'basic', name: 'basic' }]);
     if (resource === '/clients/roles/roles') return json(roles);
+    if (resource === '/clients/roles/roles/Soporte/users') return json([]);
     if (resource === '/clients/capabilities/roles') return json(capabilities);
     if (resource === '/clients/management/roles') return json(management);
     const composite = /^\/clients\/roles\/roles\/([^/]+)\/composites$/.exec(resource);

@@ -297,7 +297,7 @@ install_database() {
   post_bootstrap
   verify_application
   installation_state complete
-  echo "MYSQL_DEPLOY: instalacion completa para $PROJECT; ejecutar first-user para preparar Soporte inicial."
+  echo "MYSQL_DEPLOY: instalacion completa para $PROJECT; ejecutar first-user para preparar el Administrador de Produccion inicial."
 }
 update_database() {
   prepare_images
