@@ -1,4 +1,4 @@
-import { useId, useRef } from 'react'
+import { useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useModalDialog } from '../../../modules/users/hooks/useModalDialog'
 import { LoadingAction } from '../loading/LoadingIndicator'
@@ -48,18 +48,28 @@ export function PinError({ id, children }) {
 
 export function PinField({ value, onChange, disabled, error, inputRef, label = 'PIN personal' }) {
   const id = useId()
+  const [visible, setVisible] = useState(false)
+  const visibilityLabel = visible ? 'Ocultar PIN' : 'Mostrar PIN'
   return <>
-    <label className={styles.field} htmlFor={id}>{label}
+    <div className={styles.field}>
+      <label htmlFor={id}>{label}</label>
       <span className={styles.inputWrap}>
-        <input id={id} ref={inputRef} className={styles.input} type="password" inputMode="numeric"
+        <input id={id} ref={inputRef} className={styles.input} type={visible ? 'text' : 'password'} inputMode="numeric"
           autoComplete="off" maxLength={6} placeholder="000000" disabled={disabled} value={value}
           aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined}
           onChange={event => onChange(event.target.value.replace(/\D/g, '').slice(0, 6))} />
-        <svg className={styles.eye} aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M3 3l18 18M10 5c5-1 9 4 11 7-1 2-2 3-4 4M6 6c-2 2-4 4-5 6 3 5 8 8 13 6M10 10a3 3 0 004 4" />
-        </svg>
+        <button className={styles.visibilityToggle} type="button" disabled={disabled}
+          aria-label={visibilityLabel} title={visibilityLabel} aria-controls={id} aria-pressed={visible}
+          onClick={() => setVisible(current => !current)}>
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            {visible ? <>
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+              <circle cx="12" cy="12" r="3" />
+            </> : <path d="M3 3l18 18M10 5c5-1 9 4 11 7-1 2-2 3-4 4M6 6c-2 2-4 4-5 6 3 5 8 8 13 6M10 10a3 3 0 004 4" />}
+          </svg>
+        </button>
       </span>
-    </label>
+    </div>
     <PinError id={`${id}-error`}>{error}</PinError>
   </>
 }
