@@ -116,7 +116,8 @@ test('active containers are compared by image ID, not Config.Image tags or label
   assert.throws(() => verifyActiveImages({ images }, env.COMPOSE_PROJECT_NAME, () => ''), /contenedor activo/);
 });
 
-function httpFixture({ missingCss = false, wrongCss = false, wrongWeb = false, redirect = false } = {}) {
+function httpFixture({ missingCss = false, wrongCss = false, wrongWeb = false, redirect = false,
+  pinStockTheme = false, pinMissingCss = false, pinWrongCss = false } = {}) {
   const css = '.itecsa-loading__ring { width: 1rem; height: 1rem }';
   const js = 'export const theme = true;';
   const index = '<html><script src="/assets/app.js"></script></html>';
@@ -125,6 +126,7 @@ function httpFixture({ missingCss = false, wrongCss = false, wrongWeb = false, r
     theme: { requiredResources: themePaths,
       files: { 'login/resources/css/loading.css': sha(css), 'login/resources/js/itecsa.js': sha(js) } } } };
   const requests = [];
+  const clients = [];
   const fetch = async (input, options) => {
     const url = new URL(input);
     requests.push(url.pathname);
@@ -132,28 +134,38 @@ function httpFixture({ missingCss = false, wrongCss = false, wrongWeb = false, r
     assert.equal(url.origin, env.PUBLIC_ORIGIN);
     if (url.pathname.endsWith('/auth')) {
       assert.equal(url.searchParams.get('code_challenge_method'), 'S256');
+      assert.equal(options.method ?? 'GET', 'GET');
+      const client = url.searchParams.get('client_id');
+      clients.push(client);
+      const pin = client === 'itecsa-pin-recovery';
+      assert.equal(url.searchParams.get('redirect_uri'), env.PUBLIC_ORIGIN + (pin ? '/auth/pin-recovery/callback' : '/'));
       if (redirect) return new Response(null, { status: 302 });
+      const theme = pin ? (pinStockTheme ? 'keycloak' : 'itecsa-pin-recovery') : 'itecsa';
       return new Response('<form id="kc-form-login" action="/login" method="post"></form>'
-        + (missingCss ? '' : '<link rel="stylesheet" href="/resources/cache/login/itecsa/css/loading.css">')
-        + '<script src="/resources/cache/login/itecsa/js/itecsa.js"></script>');
+        + (missingCss || (pin && pinMissingCss) ? '' : '<link rel="stylesheet" href="/resources/cache/login/' + theme + '/css/loading.css">')
+        + '<script src="/resources/cache/login/' + theme + '/js/itecsa.js"></script>');
     }
     if (url.pathname === '/index.html') return new Response(index);
     if (url.pathname === '/assets/app.js') return new Response(wrongWeb ? index : js);
-    if (url.pathname.endsWith('loading.css')) return new Response(wrongCss ? index : css);
+    if (url.pathname.endsWith('loading.css')) return new Response(wrongCss || (pinWrongCss && url.pathname.includes('/itecsa-pin-recovery/')) ? index : css);
     if (url.pathname.endsWith('itecsa.js')) return new Response(js);
     return new Response('', { status: 404 });
   };
-  return { manifest, fetch, requests };
+  return { manifest, fetch, requests, clients };
 }
 
 test('HTTP check validates public bundles and the CSS/module linked by the native login without signing in', async () => {
   const fixture = httpFixture();
-  assert.deepEqual(await verifyHttp(fixture.manifest, env.PUBLIC_ORIGIN, fixture.fetch), { webResources: 2, themeResources: 2 });
-  assert.equal(fixture.requests.length, 5);
+  assert.deepEqual(await verifyHttp(fixture.manifest, env.PUBLIC_ORIGIN, fixture.fetch), { webResources: 2, themeResources: 4 });
+  assert.equal(fixture.requests.length, 8);
+  assert.deepEqual(fixture.clients, ['itecsa-web', 'itecsa-pin-recovery']);
 });
 for (const [options, message] of [
   [{ missingCss: true }, /recurso no enlazado/], [{ wrongCss: true }, /contenido HTTP discordante: tema/],
   [{ wrongWeb: true }, /contenido HTTP discordante: web/], [{ redirect: true }, /HTTP 302/],
+  [{ pinStockTheme: true }, /recurso no enlazado por login itecsa-pin-recovery/],
+  [{ pinMissingCss: true }, /recurso no enlazado por login itecsa-pin-recovery/],
+  [{ pinWrongCss: true }, /contenido HTTP discordante: tema.*itecsa-pin-recovery/],
 ]) {
   test(`HTTP negative check: ${JSON.stringify(options)}`, async () => {
     const fixture = httpFixture(options);

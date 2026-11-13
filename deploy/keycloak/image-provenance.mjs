@@ -169,20 +169,26 @@ export async function verifyHttp(manifest, origin, fetcher = fetch) {
     if (!/^[A-Za-z0-9_./-]+$/.test(file) || file.split('/').includes('..')) fail('ruta de recurso invalida');
     if (sha256(await get(new URL('/' + file, base))) !== expected) fail(`contenido HTTP discordante: web/${file}`);
   }
-  const auth = new URL('/realms/itecsa/protocol/openid-connect/auth', base);
-  auth.search = new URLSearchParams({ client_id: 'itecsa-web', redirect_uri: base.origin + '/', response_type: 'code',
-    scope: 'openid', prompt: 'login', state: randomBytes(16).toString('hex'), nonce: randomBytes(16).toString('hex'),
-    code_challenge: randomBytes(32).toString('base64url'), code_challenge_method: 'S256' });
-  const html = (await get(auth)).toString('utf8');
-  if (!/<form\b[^>]*\bid=["']kc-form-login["'][^>]*\bmethod=["']post["']/i.test(html)) fail('login nativo ausente');
-  const resources = [...html.matchAll(/\b(?:src|href)=["']([^"']+)["']/g)].map(match => new URL(decodeAttribute(match[1]), base));
-  for (const resource of manifest.resources.theme.requiredResources) {
-    const matches = resources.filter(url => url.pathname.endsWith('/login/itecsa/' + resource));
-    if (!matches.length) fail(`recurso no enlazado por login: ${resource}`);
-    const expected = manifest.resources.theme.files['login/resources/' + resource];
-    if (sha256(await get(matches[0])) !== expected) fail(`contenido HTTP discordante: tema/${resource}`);
+  const logins = [
+    { client: 'itecsa-web', redirect: '/', theme: 'itecsa' },
+    { client: 'itecsa-pin-recovery', redirect: '/auth/pin-recovery/callback', theme: 'itecsa-pin-recovery' },
+  ];
+  for (const login of logins) {
+    const auth = new URL('/realms/itecsa/protocol/openid-connect/auth', base);
+    auth.search = new URLSearchParams({ client_id: login.client, redirect_uri: base.origin + login.redirect, response_type: 'code',
+      scope: 'openid', prompt: 'login', state: randomBytes(16).toString('hex'), nonce: randomBytes(16).toString('hex'),
+      code_challenge: randomBytes(32).toString('base64url'), code_challenge_method: 'S256' });
+    const html = (await get(auth)).toString('utf8');
+    if (!/<form\b[^>]*\bid=["']kc-form-login["'][^>]*\bmethod=["']post["']/i.test(html)) fail('login nativo ausente: ' + login.client);
+    const resources = [...html.matchAll(/\b(?:src|href)=["']([^"']+)["']/g)].map(match => new URL(decodeAttribute(match[1]), base));
+    for (const resource of manifest.resources.theme.requiredResources) {
+      const matches = resources.filter(url => url.pathname.endsWith('/login/' + login.theme + '/' + resource));
+      if (!matches.length) fail(`recurso no enlazado por login ${login.client}: ${resource}`);
+      const expected = manifest.resources.theme.files['login/resources/' + resource];
+      if (sha256(await get(matches[0])) !== expected) fail(`contenido HTTP discordante: tema/${resource} (${login.client})`);
+    }
   }
-  return { webResources: Object.keys(manifest.resources.web).length, themeResources: manifest.resources.theme.requiredResources.length };
+  return { webResources: Object.keys(manifest.resources.web).length, themeResources: manifest.resources.theme.requiredResources.length * logins.length };
 }
 export async function runProvenance({ action, env, output, inventory, active = false, http = false }, dependencies = {}) {
   const run = dependencies.docker ?? docker;

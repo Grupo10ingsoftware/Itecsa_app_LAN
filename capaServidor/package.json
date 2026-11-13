@@ -31,6 +31,7 @@
     "keycloak:mysql-backup": "node scripts/keycloakMysqlBackup.mjs backup",
     "keycloak:mysql-restore": "node scripts/keycloakMysqlBackup.mjs restore",
     "keycloak:first-user": "node scripts/keycloakFirstUser.mjs",
+    "keycloak:initial-admins": "node scripts/keycloakInitialAdministrators.mjs",
     "manager:verify": "node scripts/managerVerify.mjs"
   },
   "nodemonConfig": {

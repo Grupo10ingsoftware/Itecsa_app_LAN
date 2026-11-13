@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateFirstUser } from '../../shared/deploymentValidation.mjs';
+import { validateInitialAdministrators } from '../../shared/deploymentValidation.mjs';
 
 const fail = message => { throw Error('MYSQL_PREFLIGHT: ' + message); };
 export function readEnvironment(file) {
@@ -75,7 +75,7 @@ export function validateDeployment(env, root, action) {
       if (/<[^>]+>/.test(value)) fail(`marcador sin reemplazar: ${key}`);
     }
   }
-  if (action === 'first-user') validateFirstUser(env);
+  if (action === 'install') validateInitialAdministrators(env);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
@@ -90,7 +90,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     } else if (mode === 'load') {
       // Only declared deployment keys can enter the shell. No eval/source, and no ambient override.
       const defaults = readEnvironment(path.join(root, 'deploy/mysql.env.example'));
-      for (const key of Object.keys(env)) if (!Object.hasOwn(defaults, key)) fail(`variable de despliegue desconocida: ${key}`);
+      // Keep old deployment files readable; first-user now provisions all three accounts.
+      const legacyFirstUser = /^FIRST_USER_(USERNAME|EMAIL|FIRST_NAME|LAST_NAME|RUT|TEMP_PASSWORD)$/;
+      for (const key of Object.keys(env)) if (!Object.hasOwn(defaults, key) && !legacyFirstUser.test(key)) fail(`variable de despliegue desconocida: ${key}`);
       for (const [key, value] of Object.entries(defaults)) {
         process.stdout.write(`${key}\0${env[key] ?? (/<[^>]+>/.test(value) ? '' : value)}\0`);
       }

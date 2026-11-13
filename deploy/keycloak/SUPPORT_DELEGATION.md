@@ -10,7 +10,8 @@ Desarrollador conserva su acceso previo en la aplicación.
 **Soporte queda deshabilitado**, sin eliminar cuentas, roles ni vínculos
 históricos. La aplicación rechaza también sus tokens anteriores al cambio.
 La configuración de Keycloak deshabilita sus cuentas y cierra sus sesiones.
-Las instalaciones nuevas crean un Administrador de Producción como primer usuario.
+Las instalaciones nuevas crean los administradores de Producción, Cobranzas y
+Ventas durante `install`. Ver [alta inicial](../mysql/INITIAL_ADMINISTRATORS.md).
 
 ## Instalaciones existentes
 

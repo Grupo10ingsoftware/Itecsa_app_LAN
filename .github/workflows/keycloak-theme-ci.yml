@@ -38,3 +38,5 @@ jobs:
           trap 'docker rm -f itecsa-theme-ci >/dev/null' EXIT
           docker cp itecsa-theme-ci:/opt/keycloak/themes/itecsa dist/image-theme
           diff -r dist/keycloak-26.8.1/itecsa dist/image-theme
+          docker cp itecsa-theme-ci:/opt/keycloak/themes/itecsa-pin-recovery dist/image-pin-recovery
+          diff -r deploy/keycloak/themes/itecsa-pin-recovery dist/image-pin-recovery

@@ -107,17 +107,39 @@ bash deploy/mysql/manage.sh verify
 
 `check` valida requisitos y configuración sin iniciar servicios. `install` crea
 las bases y cuentas separadas, configura TLS, aplica migraciones, carga catálogos,
-importa el realm nuevo y termina el bootstrap administrativo. No usar `install`
+importa el realm nuevo y crea los tres administradores iniciales. No usar `install`
 como una actualización de una instalación existente.
 
 Si la instalación se interrumpe, corregir la causa y ejecutar `resume` con el
 mismo proyecto y configuración. No eliminar volúmenes ni marcar migraciones
 fallidas como aplicadas para saltarse el diagnóstico.
 
-Para crear el primer usuario, con las tablas de usuarios e identidades vacías,
-completar `FIRST_USER_*` y ejecutar `first-user`. Crea un usuario Soporte y exige
-cambio de contraseña. Borrar `FIRST_USER_TEMP_PASSWORD` del archivo al terminar.
-El alta posterior se realiza mediante el flujo autorizado de la aplicación.
+Durante `install` se crean automáticamente estas cuentas:
+
+| Usuario | Nombre | Apellido | Rol |
+| --- | --- | --- | --- |
+| `ad.produccion` | Administrador | Producción | Administrador Produccion |
+| `ad.cobranzas` | Administrador | Cobranzas | Administrador Cobranzas |
+| `ad.ventas` | Administrador | Ventas | Administrador Ventas |
+
+La contraseña temporal solicitada para las tres es **`Admin12345.`**, incluido
+el punto final. Keycloak obliga a cambiarla en el primer acceso de cada cuenta.
+Correo y RUT quedan sin informar, salvo que se configuren los valores reales.
+Keycloak puede solicitar completar el correo durante el primer ingreso.
+Las variables `INITIAL_ADMIN_PRODUCTION_*`, `INITIAL_ADMIN_COLLECTIONS_*` e
+`INITIAL_ADMIN_SALES_*` permiten ajustar los datos antes del alta inicial.
+
+El alta prepara los roles y vínculos con MySQL antes de habilitar las cuentas.
+Si falla, `resume` utiliza un recibo persistente del volumen `mysql_state` para
+continuar sin duplicar usuarios ni reemitir contraseñas. Una vez completada,
+repetir el bootstrap no modifica las cuentas; `start`, `update` y los reinicios
+de contenedores no vuelven a ejecutar el alta. El alta posterior se realiza
+desde la gestión de usuarios de la aplicación.
+
+`first-user` se conserva como alias de `initial-admins`; ya no crea un Soporte.
+El bootstrap requiere una instalación inicial vacía o su recibo de recuperación;
+no convierte ni sobrescribe los usuarios de un despliegue existente.
+Ver [validación del alta inicial](../deploy/mysql/INITIAL_ADMINISTRATORS.md).
 Tras completar el bootstrap, retirar la contraseña del administrador temporal y
 conservar las credenciales del administrador permanente de forma segura.
 

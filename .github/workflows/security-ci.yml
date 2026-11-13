@@ -46,6 +46,8 @@ jobs:
         run: python3 deploy/keycloak/sync_operator_password_test.py
       - name: User administration authorization and deployment migration
         run: node --test capaServidor/test/userAdministrationAccess.test.js deploy/keycloak/user-administration.test.mjs
+      - name: Initial administrator installation and recovery
+        run: node --test capaServidor/test/initialAdministrators.test.js deploy/mysql/initial-administrators.test.mjs
       - name: Keycloak administrator delegation on real server
         run: node --test deploy/keycloak/support-delegation.integration.test.mjs
       - name: Keycloak theme packaging and native forms

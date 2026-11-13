@@ -7,8 +7,8 @@ ACTION="${1:-}"
 shift || true
 fail() { echo "MYSQL_DEPLOY_ERROR: $*" >&2; exit 1; }
 case "$ACTION" in
-  check|install|resume|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|keycloak-configure|first-user) ;;
-  *) fail "uso: manage.sh check|install|resume|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|keycloak-configure|first-user" ;;
+  check|install|resume|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|keycloak-configure|initial-admins|first-user) ;;
+  *) fail "uso: manage.sh check|install|resume|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|keycloak-configure|initial-admins" ;;
 esac
 BACKUP_FILE=""
 RESTORE_CONFIRM=""
@@ -40,7 +40,7 @@ resolve_path() {
     *) printf '%s\n' "$ROOT_DIR/${1#./}" ;;
   esac
 }
-[[ -n "$ACTION" ]] || fail "uso: manage.sh install|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|keycloak-configure|first-user"
+[[ -n "$ACTION" ]] || fail "uso: manage.sh install|update|start|stop|verify|backup|restore|keycloak-backup|keycloak-restore|keycloak-configure|initial-admins"
 [[ -r "$ENV_FILE" ]] || fail "no se puede leer $ENV_FILE"
 PROJECT="$(read_value COMPOSE_PROJECT_NAME)"
 APP_VERSION="$(read_value APP_VERSION)"
@@ -248,6 +248,9 @@ post_bootstrap() {
 bootstrap_keycloak_database() {
   compose --profile tools run --rm --no-deps keycloak-db-bootstrap
 }
+bootstrap_initial_administrators() {
+  compose --profile tools run --rm --no-deps keycloak-initial-admins
+}
 start_application() {
   [[ -s "$ROOT_DIR/deploy/keycloak/private/itecsa-realm.json" ]] || fail "falta el import privado del realm"
   compose up -d --wait keycloak api web
@@ -295,9 +298,10 @@ install_database() {
   start_application
   verify_public_issuer
   post_bootstrap
+  bootstrap_initial_administrators
   verify_application
   installation_state complete
-  echo "MYSQL_DEPLOY: instalacion completa para $PROJECT; ejecutar first-user para preparar el Administrador de Produccion inicial."
+  echo "MYSQL_DEPLOY: instalacion completa para $PROJECT; administradores de Produccion, Cobranzas y Ventas preparados."
 }
 update_database() {
   prepare_images
@@ -398,9 +402,9 @@ case "$ACTION" in
     render_realm
     start_application
     verify_public_issuer ;;
-  first-user)
+  initial-admins|first-user)
     require_completed_installation
     verify_application
-    compose --profile tools run --rm --no-deps keycloak-first-user ;;
+    bootstrap_initial_administrators ;;
   *) fail "accion desconocida: $ACTION" ;;
 esac

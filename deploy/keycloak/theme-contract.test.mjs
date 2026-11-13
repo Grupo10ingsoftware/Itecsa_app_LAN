@@ -6,6 +6,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { prepareTheme } from '../../scripts/prepare-keycloak-theme.mjs';
+import { buildRealm } from './render-realm.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const source = path.join(root, 'deploy/keycloak/themes/itecsa');
@@ -104,6 +105,35 @@ test('template loads each declared stylesheet, including the shared action indic
   assert.match(template, /href="\$\{url\.resourcesPath\}\/\$\{style\}"/);
   assert.deepEqual(properties.get('styles').split(' '), ['css/itecsa.css', 'css/loading.css']);
   for (const style of properties.get('styles').split(' ')) await access(path.join(source, 'login/resources', style));
+});
+
+test('PIN recovery inherits the ITECSA theme selected by its separate OIDC client', async () => {
+  const pinSource = path.join(root, 'deploy/keycloak/themes/itecsa-pin-recovery/login');
+  const properties = catalog(await read(path.join(pinSource, 'theme.properties')));
+  assert.equal(properties.get('parent'), 'itecsa', 'inheriting keycloak directly restores the gray/blue stock login');
+  assert.equal(properties.get('itecsaLoginTitle'), 'loginAccountTitle');
+  const parent = catalog(await read(path.join(source, 'login/theme.properties')));
+  const effective = new Map([...parent, ...properties]);
+  assert.equal(effective.get('styles'), 'css/itecsa.css css/loading.css');
+  assert.equal(effective.get('itecsaLogo'), 'img/itecsa-logo.avif');
+  const login = await read(path.join(source, 'login/login.ftl'));
+  assert.match(login, /msg\(properties\.itecsaLoginTitle!"doLogIn"\)/);
+  const realm = buildRealm({ origin: 'https://itecsa.example.test', adminClientSecret: 'fixture-'.repeat(5) });
+  const client = realm.clients.find(value => value.clientId === 'itecsa-pin-recovery');
+  assert.equal(client.attributes.login_theme, 'itecsa-pin-recovery');
+  const dockerfile = await read(path.join(root, 'deploy/keycloak/Dockerfile'));
+  assert.match(dockerfile, /COPY --from=theme \/prepared\/itecsa \/opt\/keycloak\/themes\/itecsa/);
+  assert.match(dockerfile, /COPY deploy\/keycloak\/themes\/itecsa-pin-recovery \/opt\/keycloak\/themes\/itecsa-pin-recovery/);
+});
+
+test('PIN recovery keeps its own Spanish instructions in both supported message bundles', async () => {
+  const messages = path.join(root, 'deploy/keycloak/themes/itecsa-pin-recovery/login/messages');
+  const spanish = catalog(await read(path.join(messages, 'messages_es.properties')));
+  const fallback = catalog(await read(path.join(messages, 'messages_en.properties')));
+  assert.deepEqual(fallback, spanish);
+  assert.equal(spanish.get('loginAccountTitle'), 'Ingresa tus credenciales para recuperar tu PIN');
+  assert.equal(spanish.get('doLogIn'), 'Confirmar identidad');
+  assert.equal(spanish.get('reauthenticate'), 'Confirma tu contraseña para recuperar tu PIN.');
 });
 
 test('unsupported versions or unsafe output paths fail before modifying the source', async t => {

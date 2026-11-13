@@ -50,6 +50,39 @@ no se ha descargado `loading.css`.
 
 ## Instalación Docker existente
 
+### Recuperación de PIN con pantalla gris y azul
+
+La recuperación de PIN utiliza el cliente OIDC `itecsa-pin-recovery`, que selecciona
+su propio tema mediante `login_theme=itecsa-pin-recovery`. Ese tema debe declarar
+`parent=itecsa`. Con `parent=keycloak` hereda la pantalla predeterminada, aunque
+el login principal del realm esté configurado con ITECSA y los dos directorios
+estén incluidos en la imagen.
+
+La herencia corregida reutiliza el logo, los campos, los botones, el indicador de
+carga y los colores del tema principal. El título y el mensaje de confirmación de
+identidad siguen siendo específicos de la recuperación de PIN, en español.
+
+Para inspeccionar el archivo que realmente usa el contenedor, desde el servidor:
+
+```bash
+docker compose --env-file deploy/mysql.env -f compose.mysql.yaml exec -T keycloak cat /opt/keycloak/themes/itecsa-pin-recovery/login/theme.properties
+```
+
+Debe aparecer `parent=itecsa`. Si sigue apareciendo `parent=keycloak`, el contenedor
+está usando el tema anterior. Construir o cargar la imagen Keycloak corregida y
+recrear su contenedor mediante el procedimiento de actualización de la entrega.
+Cambiar solamente los archivos del checkout no cambia los archivos ya incluidos
+en una imagen. Al reemplazar el contenedor se renuevan también las cachés del tema;
+abrir un flujo nuevo de recuperación y recargar los recursos del navegador.
+Se conservan las bases, los usuarios y los volúmenes de la instalación.
+
+La comprobación HTTP de `image-provenance.mjs verify --active --http` comprueba
+tanto `itecsa-web` como `itecsa-pin-recovery`, con sus callbacks y PKCE. Para ambos
+valida los recursos CSS, JS y logo contra la entrega, sin iniciar sesión. CI también
+compara el directorio del tema de PIN extraído de la imagen con el del repositorio.
+
+### Actualización de la entrega e idioma
+
 Primero construir/cargar la nueva imagen Keycloak y desplegarla siguiendo el
 procedimiento habitual de imágenes del entorno. El cambio de idioma se aplica
 sin recrear el realm ni usuarios:

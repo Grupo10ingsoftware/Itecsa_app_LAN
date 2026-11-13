@@ -3,7 +3,7 @@
 <#assign credentialError = messagesPerField.existsError('username','password')>
 <@layout.registrationLayout displayMessage=!credentialError displayInfo=realm.password && realm.registrationAllowed && !registrationDisabled??; section>
   <#if section == "header">
-    ${msg("doLogIn")}
+    ${msg(properties.itecsaLoginTitle!"doLogIn")}
   <#elseif section == "form">
     <#if realm.password>
       <form id="kc-form-login" action="${url.loginAction}" method="post" data-auth-form novalidate>
