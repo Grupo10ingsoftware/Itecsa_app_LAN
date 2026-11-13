@@ -50,6 +50,7 @@ export function initializeAuthForms(root = document) {
       form.removeAttribute('aria-busy')
       buttons.forEach(button => {
         button.removeAttribute('aria-disabled')
+        button.removeAttribute('data-loading')
         button.innerHTML = originalContent.get(button)
       })
     }
@@ -121,7 +122,11 @@ export function initializeAuthForms(root = document) {
       buttons.forEach(button => button.setAttribute('aria-disabled', 'true'))
       const submitter = event.submitter
       if (submitter) {
-        submitter.innerHTML = '<span class="itecsa-loading" data-scope="action" data-surface="dark" role="status" aria-live="polite"><svg class="itecsa-loading__ring" width="16" height="16" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="itecsa-loading__track" cx="24" cy="24" r="20"/><circle class="itecsa-loading__arc" cx="24" cy="24" r="20"/></svg><span>Cargando...</span></span>'
+        // Keep the original label in flow: the progress indicator must not size
+        // the button, including when the shared indicator CSS has not loaded.
+        submitter.setAttribute('data-loading', 'true')
+        submitter.innerHTML = '<span class="auth-button-label" aria-hidden="true">' + originalContent.get(submitter)
+          + '</span><span class="auth-button-progress itecsa-loading" data-scope="action" data-surface="dark" role="status" aria-live="polite"><svg class="itecsa-loading__ring" width="16" height="16" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle class="itecsa-loading__track" cx="24" cy="24" r="20"/><circle class="itecsa-loading__arc" cx="24" cy="24" r="20"/></svg><span>Cargando...</span></span>'
       }
     })
   })

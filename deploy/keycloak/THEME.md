@@ -6,6 +6,12 @@ El idioma de la aplicación es español. El realm nuevo declara
 el tema padre; los textos propios de ITECSA se mantienen en
 `themes/itecsa/login/messages/messages_es.properties`.
 
+El tema fuente incluye también `messages_en.properties`, con los mismos textos
+en español. Así se resuelven los nombres de los campos y los requisitos aunque
+Keycloak todavía seleccione inglés en una instalación directa del directorio.
+`node scripts/sync-loading-theme.mjs` sincroniza ese respaldo y el CSS de carga;
+el empaquetador vuelve a generarlos desde sus fuentes originales.
+
 ## Un mismo artefacto para Docker e instalación externa
 
 ```bash
@@ -36,6 +42,11 @@ estilos del indicador. Su SVG tiene además dimensiones intrínsecas de 16 × 16
 como respaldo. Se conserva el POST nativo, el nombre/valor del botón, la
 prevención de envíos duplicados y la recuperación al volver mediante BFCache.
 La validación de contraseña del servidor sigue siendo la autoridad final.
+
+Durante el envío se conserva el texto original del botón en el flujo de diseño,
+oculto visualmente, y se superpone el indicador de carga. El botón mantiene sus
+dimensiones al iniciar sesión o actualizar la contraseña, incluso si todavía
+no se ha descargado `loading.css`.
 
 ## Instalación Docker existente
 

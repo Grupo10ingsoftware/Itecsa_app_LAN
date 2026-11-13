@@ -50,6 +50,7 @@ test('successful submission retains native POST and named successful controls, r
   assert.equal(form.dispatch('submit', { submitter: button }).defaultPrevented, false);
   assert.equal(form.getAttribute('aria-busy'), 'true');
   assert.equal(button.getAttribute('aria-disabled'), 'true');
+  assert.equal(button.getAttribute('data-loading'), 'true');
   assert.equal(button.disabled, false, 'native successful controls must remain enabled');
   assert.equal(button.name, 'login');
   assert.equal(button.value, 'continuar');
@@ -58,9 +59,21 @@ test('successful submission retains native POST and named successful controls, r
   window.dispatch('pageshow', { persisted: true });
   assert.equal(form.getAttribute('aria-busy'), null);
   assert.equal(button.getAttribute('aria-disabled'), null);
+  assert.equal(button.getAttribute('data-loading'), null);
   assert.equal(button.innerHTML, original);
   assert.equal(form.dispatch('submit', { submitter: button }).defaultPrevented, false);
 });
+
+for (const passwordUpdate of [false, true]) {
+  test(`${passwordUpdate ? 'password update' : 'login'} preserves its label in flow while the loading indicator is overlaid`, () => {
+    const { form, button } = formFixture({ passwordUpdate });
+    const original = button.innerHTML;
+    form.dispatch('submit', { submitter: button });
+    assert.ok(button.innerHTML.startsWith('<span class="auth-button-label" aria-hidden="true">' + original + '</span>'));
+    assert.match(button.innerHTML, /class="auth-button-progress itecsa-loading"/);
+    assert.equal(button.disabled, false);
+  });
+}
 
 test('missing credentials remain editable and do not start the progress indicator', () => {
   const { form, password, button } = formFixture({ valid: false });

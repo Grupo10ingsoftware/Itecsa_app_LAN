@@ -30,6 +30,9 @@ test('packaged Spanish and disabled-i18n fallback cover every custom static key 
   const spanish = catalog(await read(path.join(output, 'login/messages/messages_es.properties')));
   const fallback = catalog(await read(path.join(output, 'login/messages/messages_en.properties')));
   assert.deepEqual(fallback, spanish);
+  // Source-directory installations must resolve the same labels as the image.
+  const sourceFallback = catalog(await read(path.join(source, 'login/messages/messages_en.properties')));
+  assert.deepEqual(sourceFallback, spanish);
   const keys = new Set();
   for (const name of (await readdir(path.join(source, 'login'))).filter(name => name.endsWith('.ftl'))) {
     const template = await read(path.join(source, 'login', name));
@@ -51,6 +54,13 @@ test('packaged Spanish and disabled-i18n fallback cover every custom static key 
   assert.equal(fallback.get('itecsa.rule.lengthMany').replace('{0}', '8'), 'Mínimo 8 caracteres');
   assert.equal(fallback.get('itecsa.rule.upperCaseOne'), 'Al menos una letra mayúscula');
   assert.equal(fallback.get('notMatchPasswordMessage'), 'Las contraseñas no coinciden');
+  for (const messages of [spanish, fallback, sourceFallback]) {
+    assert.equal(messages.get('doLogIn'), 'Iniciar sesión');
+    assert.equal(messages.get('updatePasswordTitle'), 'Actualizar contraseña');
+    assert.equal(messages.get('passwordNew'), 'Nueva contraseña');
+    assert.equal(messages.get('passwordConfirm'), 'Confirmar contraseña');
+    assert.equal(messages.get('itecsa.requirementsTitle'), 'La contraseña debe cumplir con:');
+  }
 });
 
 test('manifest identifies every deployed file and is deterministic across packaging runs', async t => {
